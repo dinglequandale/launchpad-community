@@ -1,9 +1,7 @@
+import LandingPage from "./pages/landing_page/LandingPage";
+
 function App() {
-  return (
-    <>
-      POOKIE
-    </>
-  )
+  return <LandingPage/>
 }
 
-export default App
+export default App;

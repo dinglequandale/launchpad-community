@@ -1,0 +1,6 @@
+.landingPage {
+    height: 50px;
+    width: 100%;
+    background: rgb(17,88,226);
+    background: linear-gradient(140deg, rgba(17,88,226,1) 0%, rgba(52,197,227,0) 100%);
+}
