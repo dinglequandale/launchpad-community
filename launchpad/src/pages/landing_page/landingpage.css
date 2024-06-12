@@ -1,6 +1,90 @@
-.landingPage {
-    height: 50px;
-    width: 100%;
+
+
+.background {
+    width: 100vw;
+    height: 100vh;
     background: rgb(17,88,226);
     background: linear-gradient(140deg, rgba(17,88,226,1) 0%, rgba(52,197,227,0) 100%);
+    justify-content: center;
+    align-items: center;
+}
+
+.landingPage{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.title{
+    margin-top: 40px;
+    font-weight: 100;
+    font-size: 100px;
+    text-shadow: 1px 1px 2px black,
+    0 0 1em rgb(214, 214, 249),
+    0 0 0.2em rgb(240, 240, 255);
+
+}
+
+.landingCard{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    text-align: center;
+    gap: 50px;
+    width: 50vw;
+    height: 50vh;
+    background: rgb(63,94,251);
+    background: radial-gradient(circle, rgba(63,94,251,0) 0%, rgba(22, 61, 255, 0.167) 100%);
+    border-radius: 15px;
+    box-shadow: 0 4px 100px 0 rgba(0, 0, 0, 0.3), 0 6px 100px 0 rgba(0, 0, 0, 0.19);
+    padding: 40px;
+}
+
+.txt1 {
+    font-weight: 550;
+    font-size: 25px;
+    color: rgb(207, 207, 210);
+    text-shadow: 1px 1px 2px black,
+    0 0 1em rgba(38, 38, 38, 0.546),
+    0 0 0.2em rgb(29, 29, 30);
+}
+
+.ppl{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.ppl1, .ppl2, .ppl3 {
+    font-weight: 550;
+    font-size: 40px;
+    color: rgb(201, 202, 203);
+    text-shadow: 1px 1px 2px black,
+    0 0 1em rgba(38, 38, 38, 0.546),
+    0 0 0.2em rgb(29, 29, 30);
+}
+
+.ppl1:hover{
+    color: rgb(120, 131, 255);
+    cursor: pointer;
+}
+
+.ppl2:hover{
+    color: rgb(120, 131, 255);
+    cursor: pointer;
+}
+
+.ppl3:hover{
+    color: rgb(120, 131, 255);
+    cursor: pointer;
+}
+
+.btnJoin{
+    background: rgb(63,94,251);
+    background: radial-gradient(circle, rgba(32, 69, 255, 0) 0%, rgba(0, 42, 255, 0.276) 100%);
+    border-color: black;
+    border-width: 2.5px;
+    font-weight: 600;
+    font-size: 20px;
 }
