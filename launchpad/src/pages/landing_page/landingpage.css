@@ -63,20 +63,24 @@
     text-shadow: 1px 1px 2px black,
     0 0 1em rgba(38, 38, 38, 0.546),
     0 0 0.2em rgb(29, 29, 30);
+    transition: transform 0.3s ease-out;
 }
 
 .ppl1:hover{
     color: rgb(120, 131, 255);
+    transform: translateY(-5px);
     cursor: pointer;
 }
 
 .ppl2:hover{
     color: rgb(120, 131, 255);
+    transform: translateY(-5px);
     cursor: pointer;
 }
 
 .ppl3:hover{
     color: rgb(120, 131, 255);
+    transform: translateY(-5px);
     cursor: pointer;
 }
 

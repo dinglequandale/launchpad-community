@@ -1,9 +1,11 @@
 import React from "react"
 import { useNavigate } from "react-router-dom"
 import "./landingpage.css"
+import { useAuth0 } from "@auth0/auth0-react";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const {isAuthenticated, loginWithRedirect} = useAuth0();
   return (
     <div className="background">
       <div className="landingPage">
@@ -21,7 +23,12 @@ export default function LandingPage() {
               Professional?
             </span>
           </div>
-          <button className="btnJoin" onClick={() => navigate("/Signup")}> Join us now </button>
+          <button className="btnJoin" onClick={
+            () => {
+              !isAuthenticated && loginWithRedirect();
+              isAuthenticated && navigate("Signup");
+            }
+            }> Join us now </button>
         </div>
       </div>
     </div>
