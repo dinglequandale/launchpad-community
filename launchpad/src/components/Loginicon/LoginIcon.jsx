@@ -6,8 +6,11 @@ export default function LoginIcon(){
     const {user, isAuthenticated} = useAuth0();
 
     return (
-        isAuthenticated && (
-            <article> {JSON.stringify(user)} </article>
-        )
+        <>
+            <article className="iconContainer"> 
+                <span className="iconUsername"> {user?.name} </span>
+                {user?.picture && <img className="userPfp" src={user.picture} alt = {user?.name} />}
+            </article>
+        </>
     )
 }

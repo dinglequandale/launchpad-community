@@ -1,0 +1,24 @@
+.topBar{
+    display: flex;
+    width: 100vw;
+    background-color: rgb(52, 113, 255);
+    justify-content: space-between;
+    position: sticky;
+    align-items: center;
+    padding: 5px;
+    height: 5vh;
+}
+
+.user{
+    display: flex;
+    padding-right: 20px;
+}
+
+.topBarTitle{
+    font-weight: 600;
+    font-size: 20px;
+    padding: 5px;
+    text-shadow: 1px 1px 2px black,
+    0 0 1em rgb(214, 214, 249),
+    0 0 0.2em rgb(240, 240, 255);
+}
