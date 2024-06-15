@@ -4,8 +4,12 @@ import { VscAccount } from "react-icons/vsc";
 import { SlLink } from "react-icons/sl";   
 import { IoCloseOutline } from "react-icons/io5";
 import SideNav from '../Sidenav/SideNav';
+import { useState } from 'react';
 
 export default function ProfileCard({userData, onClose}) {
+    const [showPfpCard, setShowPfpCard] = useState(false);
+
+    
     return(
         <>
             <div className='profileCardContainer'>
