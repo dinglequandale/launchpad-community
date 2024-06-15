@@ -1,7 +1,18 @@
+.body{
+    margin:0;
+    overflow-x: hidden;
+}
+
 .onboarding1Container{
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr; /* one column for SideNav, one for other stuff */
+    grid-template-rows: auto 1fr;  
+
+}
+
+.content{
     justify-content: center;
     align-items: center;
-    width: 100vw;
-    height: 90vh;
+    background-color: aqua;
+    height: 300vh;
 }

@@ -1,12 +1,12 @@
 .topBar{
     display: flex;
-    width: 100vw;
     background-color: rgb(52, 113, 255);
     justify-content: space-between;
     position: sticky;
     align-items: center;
     padding: 5px;
     height: 5vh;
+    z-index: 10;
 }
 
 .user{

@@ -7,8 +7,7 @@ import SideNav from '../Sidenav/SideNav';
 
 export default function ProfileCard({userData, onClose}) {
     return(
-        <div className='profileCardView'>
-            <SideNav/>
+        <>
             <div className='profileCardContainer'>
                 <div className='profileCard'>
                     <IoCloseOutline className='close' onClick={onClose}/>
@@ -33,6 +32,7 @@ export default function ProfileCard({userData, onClose}) {
                     <span className='cardResume'>Resume:</span> 
                 </div>
             </div>
-        </div>
+            <div className='blurOverlay'></div>
+        </>    
     )
 }
