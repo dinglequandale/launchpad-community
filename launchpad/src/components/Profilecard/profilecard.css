@@ -11,14 +11,19 @@
     flex-direction: column;
     background: rgb(179,205,255);
     background: linear-gradient(335deg, rgba(179,205,255,1) 0%, rgba(255,255,255,1) 60%);
+    z-index: 2;
+    position: absolute;
 }
 
-
+.blurOverlay{
+    width: 100vw;
+    height: 100vh;
+    backdrop-filter: blur(5px);
+}
 
 
 .profileCardContainer{
     background-color: transparent;
-    padding-top: 20px;
     width: 85vw;
     display: flex;
     align-items:start;

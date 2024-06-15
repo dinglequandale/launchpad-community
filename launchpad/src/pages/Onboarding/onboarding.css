@@ -9,10 +9,3 @@
     grid-template-rows: auto 1fr;  
 
 }
-
-.content{
-    justify-content: center;
-    align-items: center;
-    background-color: aqua;
-    height: 300vh;
-}
