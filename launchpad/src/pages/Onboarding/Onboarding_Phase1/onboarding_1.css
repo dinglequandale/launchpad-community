@@ -1,0 +1,11 @@
+.body{
+    margin:0;
+    overflow-x: hidden;
+}
+
+.onboarding1Container{
+    display: grid;
+    grid-template-columns: auto 1fr; /* one column for SideNav, one for other stuff */
+    grid-template-rows: auto 1fr;  
+
+}

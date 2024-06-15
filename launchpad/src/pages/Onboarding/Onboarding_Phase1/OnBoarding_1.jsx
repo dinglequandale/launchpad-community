@@ -1,9 +1,9 @@
-import './onboarding.css';
+import './onboarding_1.css';
 import React from 'react';
-import TopBar from "../../components/Topbar/TopBar";
-import SideNav from '../../components/Sidenav/SideNav';
-// import { useRef,useEffect } from 'react';
-import ProfileCard from '../../components/Profilecard/ProfileCard';
+import TopBar from "../../../components/Topbar/TopBar";
+import SideNav from '../../../components/Sidenav/SideNav';
+import ProfileCard from '../../../components/Profilecard/ProfileCard';
+
 
 export default function OnBoarding_1() {
 
