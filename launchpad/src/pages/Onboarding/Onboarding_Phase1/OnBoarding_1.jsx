@@ -1,4 +1,4 @@
-import './onboarding.css';
+import './onboarding_1.css';
 import React from 'react';
 import TopBar from "../../../components/Topbar/TopBar";
 

@@ -1,10 +1,4 @@
-.onboarding1Container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
-    height: 90vh;
-}
+/* Add any styles here that should apply to the overall onboarding process
 
 /* NOTE: This is an overall style sheet for each page in the onboarding sequence, 
 but you probably should also make an individual personalized CSS file for each page itself */
