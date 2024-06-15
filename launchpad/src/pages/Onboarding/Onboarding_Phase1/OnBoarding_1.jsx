@@ -1,6 +1,6 @@
 import './onboarding.css';
 import React from 'react';
-import TopBar from "../../components/Topbar/TopBar";
+import TopBar from "../../../components/Topbar/TopBar";
 
 export default function OnBoarding_1() {
     return(

@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import OnBoarding_1 from './pages/Onboarding/OnBoarding_1';
+import OnBoarding_1 from './pages/Onboarding/Onboarding_Phase1/OnBoarding_1';
 import {Auth0Provider} from '@auth0/auth0-react';
 
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
