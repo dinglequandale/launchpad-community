@@ -1,14 +1,12 @@
 import "./usercard.css";
 import { VscAccount } from "react-icons/vsc";
 import { SlLink } from "react-icons/sl";   
-import { IoCloseOutline } from "react-icons/io5";
 
 export default function ProfileCard({userData}) {
     return(
         <>
-            <div className='profileCardContainer'>
-                <div className='profileCard'>
-                    <IoCloseOutline className='close' onClick={onClose}/>
+                <div className='networkProfileCard'>
+                    <span style={{position: "relative", right: "3%", fontSize: "smaller"}} className="seeProfile">See Profile</span>
                     <div className='basicInfo'>
                         <div>
                             <VscAccount size = {80} className='cardPfp'/>
@@ -22,13 +20,12 @@ export default function ProfileCard({userData}) {
                         <span>Current position (if applicable): ...</span>
                         <span>Expertise (if applicable): ... </span>
                     </div>
-                    <button className='cardbtnConnect'> 
+                    <button className='userCardBtnConnect'> 
                         <div>
                             <SlLink size={15}/> Connect
                         </div> 
                     </button>
                 </div>
-            </div>
         </>   
     )
 }
