@@ -1,0 +1,17 @@
+.body{
+    margin:0;
+    overflow-x: hidden;
+}
+
+.btnProfile{
+    background-color: #4d73be;
+    border-radius: 5px;
+    width: 40vw;
+}
+
+.content{
+    display: flex;
+    margin: 0 auto;
+    padding-top: 20px;
+    justify-content: center;
+}

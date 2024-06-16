@@ -1,11 +1,9 @@
 .topBar{
     display: flex;
-    width: 100vw;
     background-color: rgb(52, 113, 255);
     justify-content: space-between;
-    position: sticky;
     align-items: center;
-    padding: 5px;
+    padding: .5vh;
     height: 5vh;
 }
 
