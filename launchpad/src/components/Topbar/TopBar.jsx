@@ -3,7 +3,6 @@ import React from 'react';
 import LoginIcon from '../Loginicon/LoginIcon';
 import LogoutButton from '../Loginbutton/LogoutButton';
 import { RxHamburgerMenu } from "react-icons/rx";
-import { useState } from 'react';
 
 export default function TopBar({onBurgerPress}){
 

@@ -26,7 +26,7 @@ export default function LandingPage() {
           <button className="btnJoin" onClick={
             () => {
               !isAuthenticated && loginWithRedirect();
-              isAuthenticated && navigate("OnBoarding_1");
+              isAuthenticated && navigate("UserSchool");
             }
             }> Join us now </button>
         </div>
