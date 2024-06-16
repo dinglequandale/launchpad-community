@@ -23,9 +23,34 @@ export default function UserNetwork() {
           <SideNav show={sideNavVisibility}/>
           <div className='networkContainer'>
             <SearchBar/>
-            <div>
-              <span>Upperclassmen</span>
-              <UserCard/>
+            <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px"}}>
+              <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
+                <h3>Upperclassmen</h3>
+                <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
+              </div>
+              <div style={{display: "flex", gap: "40px", justifyContent: "center"}}>
+                <UserCard/>
+                <UserCard/>
+                <UserCard/>
+              </div>
+              <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
+                <h3>Alumni</h3>
+                <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
+              </div>
+              <div style={{display: "flex", gap: "40px", justifyContent: "center"}}>
+                <UserCard/>
+                <UserCard/>
+                <UserCard/>
+              </div>
+              <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
+                <h3>Professionals</h3>
+                <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
+              </div>
+              <div style={{display: "flex", gap: "40px", justifyContent: "center"}}>
+                <UserCard/>
+                <UserCard/>
+                <UserCard/>
+              </div>
             </div>
           </div>
       </div>

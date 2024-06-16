@@ -4,9 +4,22 @@ import { VscAccount } from "react-icons/vsc";
 import { SlLink } from "react-icons/sl";   
 import { IoCloseOutline } from "react-icons/io5";
 import SideNav from '../Sidenav/SideNav';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ProfileCard({userData, onClose}) {
+    
+    useEffect(() => {
+        const modalOverlay = document.querySelector('.blurOverlay');
+        const pageHeight = Math.max(
+          document.body.scrollHeight, document.documentElement.scrollHeight,
+          document.body.offsetHeight, document.documentElement.offsetHeight,
+          document.body.clientHeight, document.documentElement.clientHeight
+        );
+        if (modalOverlay) {
+          modalOverlay.style.height = `${pageHeight}px`;
+        }
+    }, []);
+
     return(
         <>
             <div className='profileCardContainer'>
