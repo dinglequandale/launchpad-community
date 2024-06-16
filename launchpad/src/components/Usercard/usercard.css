@@ -1,4 +1,6 @@
 .networkProfileCard{
+    overflow: hidden;
+    position: relative;
     height: fit-content;
     width: 30vw;
     background-color: aliceblue;
@@ -10,6 +12,7 @@
     flex-direction: column;
     background: rgb(179,205,255);
     background: linear-gradient(335deg, rgba(179,205,255,1) 0%, rgba(255,255,255,1) 60%);
+    margin: 0 auto;
 }
 
 .seeProfile{
