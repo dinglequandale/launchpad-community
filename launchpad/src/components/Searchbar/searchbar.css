@@ -1,0 +1,39 @@
+.searchBar{
+    background-color: aliceblue;
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    padding: 10px;
+    width: 90vw;
+    background-color: #EFEFEF;
+}
+
+.searchBar:focus{
+    outline: none;
+}
+
+.searchContainer{
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(242, 255, 251);
+}
+
+.search{
+    gap: 8px;
+    padding-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.searchFilter{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border: black;
+    padding: 2px 3px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.searchFilter:hover{
+    background-color: rgb(120, 131, 255);
+}
