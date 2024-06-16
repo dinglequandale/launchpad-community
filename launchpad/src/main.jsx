@@ -5,6 +5,8 @@ import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import SideNav_Test from './pages/temp_sidenavTesting/SideNav_Test.jsx';
 import {Auth0Provider} from '@auth0/auth0-react';
+import UserNetwork from './pages/Network/UserNetwork.jsx';
+import UserSchool from './pages/Onboarding/Initialphase/Userschool/UserSchool.jsx';
 
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
@@ -19,7 +21,17 @@ const router = createBrowserRouter([
   path: '/OnBoarding_1',
   element: <SideNav_Test/>,
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
-}
+},
+{
+  path: '/UserNetwork',
+  element: <UserNetwork/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
+{
+  path: '/UserSchool',
+  element: <UserSchool/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
 ]);
 
 
