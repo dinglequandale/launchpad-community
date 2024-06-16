@@ -3,21 +3,15 @@
     overflow-x: hidden;
 }
 
-.onboarding1Container{
-    display: grid;
-    grid-template-columns: auto 1fr; /* one column for SideNav, one for other stuff */
-    grid-template-rows: auto 1fr;  
-
-}
-
 .btnProfile{
-    padding: 5px;
     background-color: #4d73be;
     border-radius: 5px;
-    width: 75%;
-    margin: 0 auto; 
+    width: 40vw;
+}
+
+.content{
     display: flex;
-    align-items: center;
+    margin: 0 auto;
+    padding-top: 20px;
     justify-content: center;
-    cursor: pointer;
 }

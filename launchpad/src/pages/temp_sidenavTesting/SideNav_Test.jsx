@@ -8,7 +8,12 @@ import { useState, useEffect } from 'react';
 
 export default function SideNav_Test() {
 
+    const [sideNavVisibility, setSideNavVisibility] = useState(false);
     const [showPfpCard, setShowPfpCard] = useState(false);
+
+    const onBurgerPress = () => {
+        setSideNavVisibility(!sideNavVisibility);
+    }
 
     useEffect(() => {
         document.addEventListener("keydown", onKeyPress, true)
@@ -24,9 +29,10 @@ export default function SideNav_Test() {
         <>
             {showPfpCard && <ProfileCard onClose={() => setShowPfpCard(false)}/>}
             <div>
-                <TopBar/>
+                <TopBar onBurgerPress={onBurgerPress}/>
+                {/* {sideNavVisibility && <SideNav onClose={()=>{setSideNavVisibility(false)}} id ="sideNav"/>} */}
+                <SideNav show={sideNavVisibility}/>
                 <div className='onboarding1Container'> 
-                    <SideNav/>
                     <div className='content'>
                         <button className='btnProfile' onClick={()=>setShowPfpCard(true)}>See profile</button>
                     </div>

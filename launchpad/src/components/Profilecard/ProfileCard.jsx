@@ -7,9 +7,6 @@ import SideNav from '../Sidenav/SideNav';
 import { useState } from 'react';
 
 export default function ProfileCard({userData, onClose}) {
-    const [showPfpCard, setShowPfpCard] = useState(false);
-
-    
     return(
         <>
             <div className='profileCardContainer'>
@@ -33,10 +30,11 @@ export default function ProfileCard({userData, onClose}) {
                             <SlLink size={15}/> Connect
                         </div> 
                     </button>
-                    <span className='cardResume'>Resume:</span> 
+                    <span className='cardResume'>Resume:</span>
+                    <img src="https://www.myperfectresume.com/wp-content/uploads/2022/05/Free-Template-Modern-Blueprint-resume-template.svg" alt="sample resume" />
                 </div>
             </div>
             <div className='blurOverlay'></div>
-        </>    
+        </>   
     )
 }
