@@ -11,13 +11,13 @@ export default function SearchBar({filters}) {
             </div>
             <div style={{display: "flex", paddingBottom: "10px", gap: "30px", marginLeft: "5%"}}>
                 <span className="searchFilter">
-                    Filter1
+                    Upperclassmen
                 </span>
                 <span className="searchFilter">
-                    Filter2
+                    Alumni
                 </span>
                 <span className="searchFilter">
-                    Filter3
+                    Professionals
                 </span>
                 <span className="searchFilter">
                     More Filters +

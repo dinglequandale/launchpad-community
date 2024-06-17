@@ -1,0 +1,8 @@
+.scroll{
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.scroll:hover{
+    background-color: rgb(120, 131, 255);
+}
