@@ -1,0 +1,37 @@
+.filterContainer{
+    align-items: center;
+    width: fit-content;
+    position: relative;
+}
+
+.dropdown{
+    background-color: rgb(242, 255, 251);
+    border-radius: 0px 0px 5px 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    overflow: hidden; /* Hide overflowing content initially */
+    max-height: 0;    /* Start with zero height */
+    transition: max-height 0.3s ease-in-out; /* Smooth transition */
+    position: absolute;
+    width: 100%;
+    z-index: 2;
+}
+  
+  .dropdown.open {
+    max-height: 200px; /* Adjust to desired maximum height */
+  }
+
+.filterTop:hover{
+    color: rgb(120, 131, 255);
+}
+
+.filterOptions{
+    color: black;
+}
+
+.filterOptions:hover{
+    color: rgb(120, 131, 255);
+}
+
+.filterOptions.active{
+    color: rgb(120, 131, 255);
+}

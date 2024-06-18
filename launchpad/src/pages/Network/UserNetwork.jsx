@@ -11,6 +11,10 @@ export default function UserNetwork() {
 
   const [sideNavVisibility, setSideNavVisibility] = useState(false);
   const [showPfpCard, setShowPfpCard] = useState(false);
+  const filterContent = [
+    ["Any Education Stage",["High School Student", "College Student", "Bachelor's", "Master's", "Doctorate"]],
+    ["Any Colleges",["Hustler's", "Carnegie Mellon", "Princeton"]],
+    ["Interests",["Rizzing", "Physics", "Finance", "Theatre"]]];
 
   const onBurgerPress = () => {
     setSideNavVisibility(!sideNavVisibility);
@@ -31,7 +35,7 @@ export default function UserNetwork() {
           <TopBar onBurgerPress={onBurgerPress}/>
           <SideNav show={sideNavVisibility}/>
           <div className='networkContainer'>
-            <SearchBar/>
+            <SearchBar filters = {filterContent}/>
             <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px"}}>
               <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                 <h3>Upperclassmen</h3>

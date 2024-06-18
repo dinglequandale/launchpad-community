@@ -1,7 +1,9 @@
+import ContentFilter from "../Contentfilter/ContentFilter";
 import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
 
 export default function SearchBar({filters}) {
+    console.log(filters[2][0])
     return (
         <div className="searchContainer">
             <h2 style={{paddingLeft: "3%"}}>Network</h2>
@@ -10,18 +12,9 @@ export default function SearchBar({filters}) {
                 <input type="text" name="fname" className="searchBar" placeholder="Search for connections" />
             </div>
             <div style={{display: "flex", paddingBottom: "10px", gap: "30px", marginLeft: "5%"}}>
-                <span className="searchFilter">
-                    Upperclassmen
-                </span>
-                <span className="searchFilter">
-                    Alumni
-                </span>
-                <span className="searchFilter">
-                    Professionals
-                </span>
-                <span className="searchFilter">
-                    More Filters +
-                </span>
+                {filters.map((filter, index)=>(
+                    <ContentFilter filterContent={filters[index]}/>
+                ))}
             </div>
         </div>
         
