@@ -7,7 +7,20 @@ import SideNav from '../Sidenav/SideNav';
 import { useState, useEffect } from 'react';
 
 export default function ProfileCard({userData, onClose}) {
-    
+
+//     const [profileCardVisibility, setProfileCardVisibility] = useState(false);
+
+//     const menuRef = useRef();
+
+//     useEffect(() => {
+//       let onClickOutside = (e) => {
+//           if(!menuRef.current.contains(e.target)){
+//             setProfileCardVisibility(false);
+//           }
+//       }
+//       document.addEventListener("mousedown", onClickOutside)
+//   })
+
     useEffect(() => {
         const modalOverlay = document.querySelector('.blurOverlay');
         const pageHeight = Math.max(

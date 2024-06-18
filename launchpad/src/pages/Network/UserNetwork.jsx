@@ -16,6 +16,14 @@ export default function UserNetwork() {
     setSideNavVisibility(!sideNavVisibility);
   }
 
+
+  const bsData = [{id: 1, userName: "Bubba", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}, 
+    {id: 2, userName: "Ting Skra", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}, 
+    {id: 3, userName: "Glug But", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}, 
+    {id: 4, userName: "EWEEW", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"},
+    {id: 5, userName: "BuFOFOFbba", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}];
+
+
   return (
     <>
       {showPfpCard && <ProfileCard onClose={() => setShowPfpCard(false)}/>}
@@ -29,17 +37,17 @@ export default function UserNetwork() {
                 <h3>Upperclassmen</h3>
                 <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
               </div>
-              <UserWheelView/>
+              <UserWheelView userNetworkData={bsData}/>
               <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                 <h3>Alumni</h3>
                 <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
               </div>
-              <UserWheelView/>
+              <UserWheelView userNetworkData={bsData}/>
               <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                 <h3>Professionals</h3>
                 <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
               </div>
-              <UserWheelView/>
+              <UserWheelView userNetworkData={bsData}/>
             </div>
           </div>
       </div>
