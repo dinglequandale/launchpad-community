@@ -6,7 +6,7 @@ import ContentFilter from "./components/Contentfilter/ContentFilter";
 function App() {
   const {isAuthenticated, loginWithRedirect} = useAuth0();
   return (
-    <UserNetwork/>
+    <LandingPage/>
   )
 }
 
