@@ -9,6 +9,8 @@ import UserWheelView from "../../components/Userwheel/UserWheelView";
 
 export default function UserNetwork() {
 
+  const pageName = "Network";
+
   const [sideNavVisibility, setSideNavVisibility] = useState(false);
   const [showPfpCard, setShowPfpCard] = useState(false);
   const filterContent = [
@@ -35,7 +37,7 @@ export default function UserNetwork() {
           <TopBar onBurgerPress={onBurgerPress}/>
           <SideNav show={sideNavVisibility}/>
           <div className='networkContainer'>
-            <SearchBar filters = {filterContent}/>
+            <SearchBar filters = {filterContent} pageName={pageName}/>
             <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px"}}>
               <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                 <h3>Upperclassmen</h3>

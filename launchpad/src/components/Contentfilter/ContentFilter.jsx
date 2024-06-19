@@ -24,7 +24,6 @@ export default function ContentFilter({filterContent}){
     const dropRef = useRef();
 
     const options = filterContent[1];
-    console.log(options, filterContent[0])
 
     const handleClick = () => {
         setDropdownVisibility(!dropdownVisibility);

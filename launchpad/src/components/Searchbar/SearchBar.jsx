@@ -2,11 +2,10 @@ import ContentFilter from "../Contentfilter/ContentFilter";
 import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
 
-export default function SearchBar({filters}) {
-    console.log(filters[2][0])
+export default function SearchBar({filters, pageName}) {
     return (
         <div className="searchContainer">
-            <h2 style={{paddingLeft: "3%"}}>Network</h2>
+            <h2 style={{paddingLeft: "3%"}}>{pageName}</h2>
             <div style={{dislay: "flex"}} className="search">
                 <CiSearch size={28} style={{color:"grey"}}/>
                 <input type="text" name="fname" className="searchBar" placeholder="Search for connections" />
