@@ -12,21 +12,16 @@
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     top: 6vh;
     left: 0;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-    z-index: 2;
+    /* transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out; */
+    z-index: 3;
+    background: rgb(115,169,223);
+    background: linear-gradient(0deg, rgba(115,169,223,1) 0%, rgb(255, 255, 255) 100%);
 }
 
-.sideNav.open{
+/* .sideNav.open{
     transform: translateX(0);
-}
-
-.navClose{
-    margin-left: auto;
-    padding-top: 6px;
-    padding-right: 6px;
-    cursor: pointer;
-}
+} */
 
 .navOptions{
     position: absolute;
@@ -44,6 +39,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    color: black;
 }
 
 .destinationNav:hover{
@@ -52,8 +48,12 @@
 }
 
 .schoollogo{
-    width: 8vw;
+    width: 9.5vw;
     padding: 5px;
     margin-bottom: auto;
     
+}
+
+.destinationNav.selected{
+    color: rgb(120, 131, 255);
 }

@@ -23,18 +23,23 @@ export default function Organizations(){
     return(
         <>
             <TopBar onBurgerPress={onBurgerPress}/>
-            <SideNav show={sideNavVisibility}/>
-            <div className='organizationsContainer'>
-                <SearchBar filters = {filterContent} pageName = {pageName}/> 
+            <div style={{paddingTop: "3%"}}>
+                <SideNav/>
             </div>
-            <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px"}}>
-                <OrganizationProfile/>
-                <OrganizationProfile/>
-                <OrganizationProfile/>
-                <OrganizationProfile/>
-                <OrganizationProfile/>
-                <OrganizationProfile/>
+            <div style={{paddingLeft:"10%"}}>
+                <div className='organizationsContainer'>
+                        <SearchBar filters = {filterContent} pageName = {pageName}/> 
+                    </div>
+                    <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px"}}>
+                        <OrganizationProfile/>
+                        <OrganizationProfile/>
+                        <OrganizationProfile/>
+                        <OrganizationProfile/>
+                        <OrganizationProfile/>
+                        <OrganizationProfile/>
+                </div>
             </div>
+                
         </>
         
     )

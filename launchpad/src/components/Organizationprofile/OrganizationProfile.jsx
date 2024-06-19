@@ -55,7 +55,7 @@ export default function OrganizationProfile({organizationData}){
 
 function RelevanceBanner({relevanceType}){
     return(
-        <div style={{borderRadius: "20px", position: "absolute", top: "-10px", left: "10px", width: "fitContent", padding: "4px 8px", background: "rgb(47,162,52)",
+        <div style={{borderRadius: "20px", position: "absolute", top: "-15px", left: "10px", width: "fitContent", padding: "4px 8px", background: "rgb(47,162,52)",
             background: "linear-gradient(90deg, rgba(47,162,52,1) 48%, rgba(18,123,22,1) 100%)", zIndex: "1"}}>
             <span style={{color: "white", fontWeight: "600"}}>For finance, business fields </span>
         </div>
