@@ -1,25 +1,28 @@
-.profileCard{
+.networkProfileCard{
+    overflow: hidden;
+    position: relative;
+    width: 310px;
     height: fit-content;
-    width: 30vw;
     background-color: aliceblue;
     color: black;
     display: flex;
     padding: 10px;
     border-radius: 15px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
     flex-direction: column;
     background: rgb(179,205,255);
     background: linear-gradient(335deg, rgba(179,205,255,1) 0%, rgba(255,255,255,1) 60%);
-    z-index: 2;
-    position: absolute;
-    top: 20vh;
+    z-index: 1;
 }
 
-.profileCardContainer{
-    background-color: transparent;
-    display: flex;
-    align-items:start;
-    justify-content: center;
+.seeProfile{
+    color: #4d73be;
+    cursor: pointer;
+}
+
+.seeProfile:hover{
+    color: rgb(120, 131, 255);
+    text-decoration: underline;
 }
 
 .basicInfo{
@@ -55,11 +58,12 @@
     padding-bottom: 10px;
 }
 
-.cardbtnConnect{
+.userCardBtnConnect{
     padding: 5px;
     background-color: #4d73be;
     border-radius: 5px;
     width: 75%;
+    color: white;
     margin: 0 auto; 
     display: flex;
     align-items: center;
@@ -67,6 +71,6 @@
     cursor: pointer;
 }
 
-.cardbtnConnect:hover{
+.userCardBtnConnect:hover{
     background-color: rgb(120, 131, 255);
 }

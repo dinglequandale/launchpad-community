@@ -1,0 +1,20 @@
+/* .user-wheel-view {
+  }
+
+  .slick-next {
+    right: 0 !important; /* Use !important to override Slick's styles */
+    /* Add other styles as needed (e.g., top, transform) */
+
+.wheelContainer{
+  width: 80%;
+}
+
+.leftArrow,.rightArrow{
+  width: fit-content;
+  height: fit-content;
+  border-radius: 50%;
+  background-color: rgb(127, 206, 255);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
