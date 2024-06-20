@@ -38,3 +38,14 @@
     border-color: black;
     border-width: 1px;
 }
+
+.logisticOption{
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
+}
+
+.logisticOption.hidden{
+    display:none;
+}
