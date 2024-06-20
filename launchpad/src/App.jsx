@@ -8,7 +8,7 @@ import Organizations from "./pages/Organizationspage/Organizations";
 function App() {
   const {isAuthenticated, loginWithRedirect} = useAuth0();
   return (
-    <LandingPage/>
+    <Organizations/>
   )
 }
 

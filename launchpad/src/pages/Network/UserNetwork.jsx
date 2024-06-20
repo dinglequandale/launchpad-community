@@ -18,9 +18,9 @@ export default function UserNetwork() {
     ["Any Colleges",["Hustler's", "Carnegie Mellon", "Princeton"]],
     ["Interests",["Rizzing", "Physics", "Finance", "Theatre"]]];
 
-  const onBurgerPress = () => {
-    setSideNavVisibility(!sideNavVisibility);
-  }
+  // const onBurgerPress = () => {
+  //   setSideNavVisibility(!sideNavVisibility);
+  // }
 
 
   const bsData = [{id: 1, userName: "Bubba", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}, 
@@ -34,9 +34,9 @@ export default function UserNetwork() {
     <>
       {showPfpCard && <ProfileCard onClose={() => setShowPfpCard(false)}/>}
       <div>
-          <TopBar onBurgerPress={onBurgerPress}/>
-          <SideNav show={sideNavVisibility}/>
-          <div className='networkContainer'>
+          <TopBar/>
+          <SideNav/>
+          <div className='networkContainer' style={{paddingTop: "3%", paddingLeft: "10%"}}>
             <SearchBar filters = {filterContent} pageName={pageName}/>
             <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px"}}>
               <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
