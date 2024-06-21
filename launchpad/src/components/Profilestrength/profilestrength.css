@@ -1,0 +1,15 @@
+.progressBar.red{
+    background: rgb(223, 93, 93);
+}
+
+.progressBar.orange{
+    background: rgb(255, 178, 35);
+}
+
+.progressBar.green{
+    background: rgb(102, 203, 114);
+}
+
+.progressBar.progressBar.purple{
+    background: #646cff;
+}
