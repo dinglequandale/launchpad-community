@@ -1,5 +1,7 @@
+import { useState } from "react";
 import LoginIcon from "../Loginicon/LoginIcon";
 import "./profilestrength.css";
+import ProfileCard from "../Profilecard/ProfileCard";
 
 export default function ProfileStrength({userData}){
 
@@ -7,8 +9,11 @@ export default function ProfileStrength({userData}){
     const userProfile = [{highImportance: ["...", null, null, "...", "..."]}, {lowImportance: ["...", "...","...",null]}];
     const nullValues = [userProfile[0].highImportance.filter((e)=>(e===null)).length, userProfile[1].lowImportance.filter((e)=>(e===null)).length]
 
+    const [ProfileVisibility, setProfileVisibility] = useState(false);
+
     return(
         <>
+            {ProfileVisibility && <ProfileCard userData={userData}/>}
             <div style={{borderBottomStyle: "solid", paddingBottom: "5px", borderColor: "#C0C0C0", borderWidth: "1px",
                 display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}}>
                 <span style={
@@ -27,7 +32,8 @@ export default function ProfileStrength({userData}){
                 </>
                 {nullValues[0] !== 0 && <span style={{fontWeight: "bolder", color: "rgb(223, 93, 93)"}}> {nullValues[0]} mandatory field{nullValues[0] > 1 ? "s" : ""} missing! </span>}
                 {nullValues[1] !== 0 && <span style={{fontWeight: "bolder", color: "rgb(255, 178, 35)"}}> {nullValues[1]} optional field{nullValues[1] > 1 ? "s" : ""} missing! </span>}
-                <button style={{position: "absolute", bottom: "30px", padding: "10px", color: "white", fontSize: "20px", width: "60%", fontWeight: "bolder"}}>
+                <button style={{position: "absolute", bottom: "30px", padding: "10px", color: "white", fontSize: "20px", width: "60%", fontWeight: "bolder"}}
+                onClick={()=>{setProfileVisibility(true)}}>
                     Complete Profile
                 </button>
             </div>
@@ -66,4 +72,16 @@ function ProfileIcon(){
             </div>
         </div>
     )
+}
+
+function ProfilePercentage({profileQuestionData}){
+    const numQuestions = profileQuestionData.length;
+    const numUnanswered = (profileQuestionData.filter((question)=>(question.answer === null))).length;
+    return numUnanswered/numQuestions;
+}
+
+function ProfileMissing({profileQuestionData}){
+    const numMandatoryQuestions = (profileQuestionData.filter((question)=>((question.answer === null) && (question.importance === "mandatory")))).length;
+    const numOptionQuestions = (profileQuestionData.filter((question)=>((question.answer === null) && (question.importance === "optional")))).length;
+    return [numMandatoryQuestions, numOptionQuestions];
 }
