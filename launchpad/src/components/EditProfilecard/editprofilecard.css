@@ -126,14 +126,10 @@
     max-height: 250px; /* Adjust to desired maximum height */
   }
 
-.filterOptions{
-    color: black;
-}
-
-.filterOptions:hover{
+.dropdownOption:hover{
     color: rgb(120, 131, 255);
 }
 
-.filterOptions.active{
-    color: rgb(120, 131, 255);
+.return:hover{
+    color: #4d73be;
 }

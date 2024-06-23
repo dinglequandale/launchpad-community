@@ -7,11 +7,14 @@ import { useState, useEffect, useRef } from 'react';
 import { IoAdd } from "react-icons/io5";
 import { IoLockClosedOutline } from "react-icons/io5";
 import { TbWorld } from "react-icons/tb";
+import { useNavigate } from 'react-router-dom';
+import { RiArrowGoBackFill } from "react-icons/ri";
 
-export default function ProfileCard({userData, onClose}) {
+export default function ProfileCard({userData, prevLocation}) {
 
     const userType = ["professional, high schooler, alumni"];
     const userName = "Shuja";
+    const navigate = useNavigate();
 
     useEffect(() => {
         const modalOverlay = document.querySelector('.blurOverlay');
@@ -30,7 +33,10 @@ export default function ProfileCard({userData, onClose}) {
             <div className='editprofileCardContainer'>
                 <div className='editprofileCard'>
                     <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", paddingBottom: "20px"}}>
-                        <IoCloseOutline className='return' onClick={onClose}/>
+                        <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}>
+                            <RiArrowGoBackFill size={20} onClick={() => navigate({prevLocation})}/>
+                            <span>Go Back</span>
+                        </div>
                         <div className='basicInfo'>
                             <div>
                                 <VscAccount size = {80} className='cardPfp'/>
@@ -100,15 +106,14 @@ function EditInformation(){
 
 function PublicPrivateDropdown({userResumePublicity}){
     const dropdownRef = useRef();
-    const [selectedPublicity, setSelectedPublicity] = useState(<div style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "4px"}}> {<TbWorld/>} <span>Public</span>
-        </div>);
+    const [selectedPublicity, setSelectedPublicity] = useState(<PrivacyComponent icon={<TbWorld size={23}/>} privacy={"Public"}/>);
     const [dropdownVisibility, setDropdownVisibility] = useState(false);
-    const options = [["Public",<TbWorld size={15}/>], ["Private", <IoLockClosedOutline size={25}/>]];
+    const options = [["Public",<TbWorld size={23}/>], ["Private", <IoLockClosedOutline size={20}/>]];
+    
+
     const handleClick = () => {
         setDropdownVisibility(!dropdownVisibility);
     }
-    const [optionSelected, setOptionSelected] = useState("");
-
     useEffect(()=>{
         let onClickHandler = (e) => {
             if(!dropdownRef.current.contains(e.target)){
@@ -124,10 +129,22 @@ function PublicPrivateDropdown({userResumePublicity}){
                 <span style={{fontWeight: "550"}}>{selectedPublicity}</span>
             </div>
             <div className={dropdownVisibility ? "dropdown open" : "dropdown "}>
-                {options.map(([option,icon],index)=>(<div style={{className={}, display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "5px"}} key={index}> {icon}
+                {options.map(([option,icon],index)=>(<div className='dropdownOption' style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "5px", cursor: "pointer"}} key={index} onClick={()=>{
+                            setSelectedPublicity(<PrivacyComponent icon={icon} privacy={option}/>);
+                            setDropdownVisibility(false);
+                            }}> {icon}
                      <span>{option}</span>
                      </div>))}
             </div>
+        </div>
+    )
+}
+
+function PrivacyComponent({icon, privacy}){
+    return(
+        <div style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "4px"}}> 
+            {icon} 
+            <span>{privacy}</span>
         </div>
     )
 }
