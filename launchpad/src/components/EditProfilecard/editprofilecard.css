@@ -1,0 +1,139 @@
+.editprofileCard{
+    height: fit-content;
+    width: 33vw;
+    background-color: aliceblue;
+    color: black;
+    display: flex;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    flex-direction: column;
+    background: rgb(179,205,255);
+    background: linear-gradient(180deg, rgba(179,205,255,.5) 0%, rgba(255,255,255,1) 60%);
+    position: absolute;
+    left: 54%;
+    transform: translate(-50%, 0%);
+    top: 10%;
+    z-index: 1;
+}
+
+.basicInfo{
+    display: flex;
+}
+
+.cardPfp{
+    background-color: #4d73be;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.cardName{
+    font-weight: 700;
+    font-size: larger;
+}
+.cardNameDescription{
+    padding-left: 10px;
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+}
+.cardDescription{
+    font-size: small;
+    font-weight: lighter;
+}
+
+.userInfo{
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+    font-size: smaller;
+    padding-bottom: 10px;
+}
+
+.cardbtnConnect{
+    padding: 5px;
+    background-color: #4d73be;
+    border-radius: 5px;
+    width: 75%;
+    margin: 0 auto; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    font-size: larger;
+}
+
+.cardbtnConnect:hover{
+    background-color: rgb(120, 131, 255);
+}
+
+.close{
+    cursor: pointer;
+}
+
+.editcardResume{
+    text-shadow: 0 0 3px #4d73be;
+    color: #4d73be;
+    padding-top: 20px;
+    font-weight: 600;
+    font-size: larger;
+}
+
+.addOne{
+    color: #4d73be;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    gap:4px;
+    cursor:pointer;
+    padding-bottom: 15px;
+}
+.addOne:hover{
+    color: rgb(120, 131, 255);
+}
+
+.publicPrivateDropdown{
+    color: black;
+}
+
+/* .dropDownSelected:hover{
+    color: rgb(120, 131, 255);
+} */
+
+.dropdownContainer{
+    align-items: center;
+    width: fit-content;
+    position: relative;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.dropdown{
+    background-color: rgb(242, 255, 251);
+    border-radius: 0px 0px 5px 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    overflow: hidden; /* Hide overflowing content initially */
+    max-height: 0;    /* Start with zero height */
+    transition: max-height 0.3s ease-in-out; /* Smooth transition */
+    position: absolute;
+    width: 100%;
+    z-index: 2;
+}
+  
+  .dropdown.open {
+    max-height: 250px; /* Adjust to desired maximum height */
+  }
+
+.filterOptions{
+    color: black;
+}
+
+.filterOptions:hover{
+    color: rgb(120, 131, 255);
+}
+
+.filterOptions.active{
+    color: rgb(120, 131, 255);
+}

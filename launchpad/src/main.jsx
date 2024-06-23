@@ -32,6 +32,11 @@ const router = createBrowserRouter([
   element: <Organizations/>,
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
 },
+{
+  path: '/Organizations',
+  element: <Organizations/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
 ]);
 
 
