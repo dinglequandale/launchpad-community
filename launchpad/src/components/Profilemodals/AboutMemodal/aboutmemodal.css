@@ -1,0 +1,17 @@
+.inputAboutMe::placeholder {
+    display: block; /* Makes it behave like a block element */
+    top: 5px; /* Adjust the negative margin to match your padding */
+    position: absolute;
+  }
+
+.inputAboutMe {
+    padding: 5px; /* Add your desired padding */
+    background: #dfecef;
+    width: 450px;
+    height: 200px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 10px;
+    border-style: solid;
+    border-color: #77a9b5;
+    font-family: "Inter";
+  }

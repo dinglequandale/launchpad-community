@@ -8,6 +8,7 @@ import { TbWorld } from "react-icons/tb";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { MdEdit } from "react-icons/md";
+import AboutMeModal from '../Profilemodals/AboutMemodal/AboutMeModal';
 
 
 export default function ProfileCard({userData}) {
@@ -28,6 +29,7 @@ export default function ProfileCard({userData}) {
     const descType = {highSchool: "College(s) of Interest", alumni: "Attending College", professional: "Current Position"};
 
     return(
+        <>
             <div className='editprofileCard'>
                 <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", paddingBottom: "5px"}}>
                     <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
@@ -62,6 +64,7 @@ export default function ProfileCard({userData}) {
                     </div>
                 </div>}
             </div>
+        </>
     )
 }
 
@@ -195,15 +198,22 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
 }
 
 function AboutMeDisplay(){
+    const [aboutMeModalVisibility, setAboutMeModalVisibility] = useState(false);
+    const onModalClose = () => {
+        setAboutMeModalVisibility(false);
+    }
     return(
+        <>
+        <AboutMeModal visibility={aboutMeModalVisibility} onClose={onModalClose}/>
         <div className="aboutMe" style={{paddingTop: "20px"}}>
             <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me ...</span> <br />
             <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>
-            <div className="addOne" id="About Me">
+            <div className="addOne" id="About Me" onClick={()=>{setAboutMeModalVisibility(true)}}>
                 <IoAdd size={25} />
                 <span style={{textDecoration: "underline"}}>Add an About Me Description</span>
                 <EditInformation isAnswered={false} questionName={"About Me"}/>
             </div>
         </div>
+        </>
     )
 }
