@@ -11,14 +11,13 @@ import { MdEdit } from "react-icons/md";
 
 
 export default function ProfileCard({userData}) {
-
-    const userType = "Professional";
-    const userName = "Shuja";
     const navigate = useNavigate();
     const location = useLocation();
 
 
     // temporary data
+    const userType = "Professional";
+    const userName = "Shuja";
     const opportunitiesOptions = {highSchool: 
     <p style={{color: "#4d73be", textAlign: "center", borderBottomStyle: "solid", paddingBottom: "5px"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</p>,
     alum:
@@ -26,8 +25,6 @@ export default function ProfileCard({userData}) {
     professional:
     <p style={{color: "#4d73be", textAlign: "center", borderBottomStyle: "solid", paddingBottom: "5px"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</p>
 };
-
-
     const descType = {highSchool: "College(s) of Interest", alumni: "Attending College", professional: "Current Position"};
 
     return(
@@ -38,21 +35,13 @@ export default function ProfileCard({userData}) {
                         <RiArrowGoBackFill size={20}/>
                         <span>Go Back</span>
                     </div>
-                <BasicInfoCard userName={userName} userType={userType} descType={descType}/>
+                    <BasicInfoCard userName={userName} userType={userType} descType={descType}/>
                 </div>
                 <div style={{paddingTop: "20px"}}>
                     <OpportunityPopup userName={userName} userType={userType} descType={descType} opportunitiesOptions={opportunitiesOptions}/>
                 </div>
-                <div className="aboutMe" style={{paddingTop: "20px"}}>
-                    <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me ...</span> <br />
-                    <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>
-                    <div className="addOne" id="About Me">
-                        <IoAdd size={25} />
-                        <span style={{textDecoration: "underline"}}>Add an About Me Description</span>
-                        <EditInformation isAnswered={false} questionName={"About Me"}/>
-                    </div>
-                </div>
-                <div className={`userResume ${userType === "High Schooler" ? "no_border" : ""}`}>
+                <AboutMeDisplay/>
+                <div className={`userResume ${userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px"}}>
                     <div style={{display: "flex", justifyContent: "space-between"}} id="Resume">
                         <span style={{fontSize: "20px", fontWeight: "bolder"}}>{userName}'s Resume ...</span>
                         <PublicPrivateDropdown/>
@@ -200,6 +189,20 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
                 <IoAdd size={25} />
                 <span style={{textDecoration: "underline"}}>Add one!</span>
                 <EditInformation isAnswered={false} questionName={"Opportunity"}/>
+            </div>
+        </div>
+    )
+}
+
+function AboutMeDisplay(){
+    return(
+        <div className="aboutMe" style={{paddingTop: "20px"}}>
+            <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me ...</span> <br />
+            <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>
+            <div className="addOne" id="About Me">
+                <IoAdd size={25} />
+                <span style={{textDecoration: "underline"}}>Add an About Me Description</span>
+                <EditInformation isAnswered={false} questionName={"About Me"}/>
             </div>
         </div>
     )
