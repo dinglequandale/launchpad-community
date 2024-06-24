@@ -2,18 +2,18 @@ import { useState } from "react";
 import LoginIcon from "../Loginicon/LoginIcon";
 import "./profilestrength.css";
 import ProfileCard from "../Profilecard/ProfileCard";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileStrength({userData}){
 
     const profileProgress = .9;
     const userProfile = [{highImportance: ["...", null, null, "...", "..."]}, {lowImportance: ["...", "...","...",null]}];
-    const nullValues = [userProfile[0].highImportance.filter((e)=>(e===null)).length, userProfile[1].lowImportance.filter((e)=>(e===null)).length]
+    const nullValues = [userProfile[0].highImportance.filter((e)=>(e===null)).length, userProfile[1].lowImportance.filter((e)=>(e===null)).length];
 
-    const [ProfileVisibility, setProfileVisibility] = useState(false);
+    const navigate = useNavigate();
 
     return(
         <>
-            {ProfileVisibility && <ProfileCard userData={userData}/>}
             <div style={{borderBottomStyle: "solid", paddingBottom: "5px", borderColor: "#C0C0C0", borderWidth: "1px",
                 display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}}>
                 <span style={
@@ -34,7 +34,7 @@ export default function ProfileStrength({userData}){
                 {nullValues[1] !== 0 && <span style={{fontWeight: "bolder", color: "rgb(255, 178, 35)"}}> {nullValues[1]} optional field{nullValues[1] > 1 ? "s" : ""} missing! </span>}
                 <button style={{position: "absolute", bottom: "30px", padding: "10px", color: "white",
                  fontSize: "20px", width: "60%", fontWeight: "bolder", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}}
-                onClick={()=>{setProfileVisibility(true)}}>
+                onClick={()=>{navigate("/MyProfile", { state: '/' })}}>
                     Complete Profile
                 </button>
             </div>

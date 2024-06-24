@@ -13,6 +13,8 @@
     background: rgb(179,205,255);
     background: linear-gradient(335deg, rgba(179,205,255,1) 0%, rgba(255,255,255,1) 60%);
     z-index: 1;
+    border-style: solid;
+    border-color: #4d73be;
 }
 
 .seeProfile{

@@ -6,7 +6,7 @@ import EditProfilePage from "./pages/Editprofilepage/EditProfilePage";
 function App() {
   const {isAuthenticated, loginWithRedirect} = useAuth0();
   return (
-    <EditProfilePage/>
+    <Home/>
   )
 }
 

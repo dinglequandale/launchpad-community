@@ -1,93 +1,76 @@
 import './editprofilecard.css';
 import React from 'react';
 import { VscAccount } from "react-icons/vsc";
-import { SlLink } from "react-icons/sl";   
 import { useState, useEffect, useRef } from 'react';
 import { IoAdd } from "react-icons/io5";
 import { IoLockClosedOutline } from "react-icons/io5";
 import { TbWorld } from "react-icons/tb";
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { RiArrowGoBackFill } from "react-icons/ri";
+import { MdEdit } from "react-icons/md";
 
-export default function ProfileCard({userData, prevLocation}) {
 
-    const userType = ["professional, high schooler, alumni"];
+export default function ProfileCard({userData}) {
+
+    const userType = "High Schooler";
     const userName = "Shuja";
     const navigate = useNavigate();
+    const location = useLocation();
 
-    useEffect(() => {
-        const modalOverlay = document.querySelector('.blurOverlay');
-        const pageHeight = Math.max(
-          document.body.scrollHeight, document.documentElement.scrollHeight,
-          document.body.offsetHeight, document.documentElement.offsetHeight,
-          document.body.clientHeight, document.documentElement.clientHeight
-        );
-        if (modalOverlay) {
-          modalOverlay.style.height = `${pageHeight}px`;
-        }
-    }, []);
+
+    // temporary data
+    const opportunitiesOptions = {highSchool: 
+    <p style={{color: "#4d73be", textAlign: "center", borderBottomStyle: "solid", paddingBottom: "5px"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</p>,
+    alum:
+    <p style={{color: "#4d73be", textAlign: "center", borderBottomStyle: "solid", paddingBottom: "5px"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead an <span style={{fontWeight: "bolder"}}>out-of-school student initative</span>, such as a nonprofit?</p>,
+    professional:
+    <p style={{color: "#4d73be", textAlign: "center", borderBottomStyle: "solid", paddingBottom: "5px"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</p>
+};
+
+
+    const descType = {highSchool: "College(s) of Interest", alumni: "Attending College", professional: "Current Position"};
 
     return(
-        <div className='editprofileCardContainer'>
             <div className='editprofileCard'>
-                <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", paddingBottom: "20px"}}>
-                    <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}>
-                        <RiArrowGoBackFill size={20} onClick={() => navigate({prevLocation})}/>
+                <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", paddingBottom: "5px"}}>
+                    <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
+                    onClick={() => navigate(location.state)}>
+                        <RiArrowGoBackFill size={20}/>
                         <span>Go Back</span>
                     </div>
-                    <div className='basicInfo'>
-                        <div>
-                            <VscAccount size = {80} className='cardPfp'/>
-                        </div>
-                        <div className='cardNameDescription'>
-                            <span className='cardName'>Name Tittel</span>
-                            <span className='cardDescription'> Short description</span>
-                        </div>   
-                    </div>
-                    <div className='userInfo' style={{fontSize: "16px"}}>
-                        <span>Current position (if applicable): ...</span>
-                        <span>Expertise (if applicable): ... </span>
-                    </div>
-                    <button className='cardbtnConnect'> 
-                        <div>
-                            <SlLink size={15}/> Connect
-                        </div> 
-                    </button>
+                <BasicInfoCard userName={userName} userType={userType} descType={descType}/>
                 </div>
                 <div style={{paddingTop: "20px"}}>
                     <div className="initiativeOrOpportunity" style={{backgroundColor: "#DFECEF", borderRadius: "20px", padding: "0px 5px",
                         boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
                         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-                        <p style={{color: "#4d73be", textAlign: "center", borderBottomStyle: "solid", paddingBottom: "5px"}}>
-                            <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?
-                        </p>
+                        {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
                         <div className="addOne">
                             <IoAdd size={25} />
                             <span style={{textDecoration: "underline"}}>Add one!</span>
+                            <EditInformation isAnswered={false} questionName={"Opportunity"}/>
                         </div>
                     </div>
                 </div>
                 <div className="aboutMe" style={{paddingTop: "20px"}}>
                     <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me ...</span> <br />
                     <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>
-                    <div className="addOne">
+                    <div className="addOne" id="About Me">
                         <IoAdd size={25} />
                         <span style={{textDecoration: "underline"}}>Add an About Me Description</span>
+                        <EditInformation isAnswered={false} questionName={"About Me"}/>
                     </div>
                 </div>
-                <div className="userResume" style={{borderBottomStyle: "solid", borderColor: "#C0C0C0"}}>
-                    <div style={{display: "flex", justifyContent: "space-between"}}>
+                <div className={`userResume ${userType === "High Schooler" ? "no_border" : ""}`}>
+                    <div style={{display: "flex", justifyContent: "space-between"}} id="Resume">
                         <span style={{fontSize: "20px", fontWeight: "bolder"}}>{userName}'s Resume ...</span>
                         <PublicPrivateDropdown/>
                     </div>
                     <span style={{fontWeight: "250", fontSize: "15px"}}>Upload a resume so others can understand more about your experiences.</span> 
-                    <div className="addOne">
-                        <IoAdd size={25} />
-                        <span style={{textDecoration: "underline"}}>Upload a Resume</span>
-                    </div>
+                    <ResumeUpload/>
                 </div>
 
-                {<div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
+                {(userType === "Professional" || userType === "Alumni") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
                     <div style={{paddingBottom: "10px"}}>
                         <h style={{color: "#4d73be", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userName}</span> is <span style={{fontWeight: "450"}}>open to</span> ... <br /></h>
                         <span style={{fontWeight: "250", fontSize: "15px"}}>What are you open to do for these students?</span>
@@ -95,20 +78,24 @@ export default function ProfileCard({userData, prevLocation}) {
                     <div className='addOne'>
                         <IoAdd size={25} />
                         <span style={{textDecoration: "underline"}}>Add Your Availability</span>
+                        <EditInformation isAnswered={false} questionName={"Availability"}/>
                     </div>
                 </div>}
 
             </div>
-        </div>
     )
 }
 
-function EditInformation(){
+function EditInformation({questionName, isAnswered}){
     return(
-        <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center"}}>
+        <>
+        {!isAnswered && <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", position: "absolute", width: "150px", right: "-150px"}}>
+            <MdEdit size={30} style={{background: "#DFECEF", borderRadius: "50%", padding: "5px"}}/>
             <span style={{textDecoration: "underline", color: "#4d73be"}}>
+                Edit {questionName}
             </span>
-        </div>
+        </div>}
+        </>
     )
 }
 
@@ -154,5 +141,54 @@ function PrivacyComponent({icon, privacy}){
             {icon} 
             <span>{privacy}</span>
         </div>
+    )
+}
+
+function ResumeUpload(){
+    
+    const [pdfUrl, setPdfUrl] = useState(null);
+    useEffect(() => {
+        return () => {
+          if (pdfUrl) {
+            URL.revokeObjectURL(pdfUrl);
+          }
+        };
+      }, [pdfUrl]); 
+
+  function onFileChange(event) {
+    const file = event.target.files[0];
+    setPdfUrl(URL.createObjectURL(file));
+  }
+  
+    return (
+      <div style={{paddingTop: "20px"}}>
+        {pdfUrl ? <iframe src={pdfUrl} frameborder="0" style={{width: "100%", height: "500px"}}></iframe> : <input type="file" accept=".pdf" onChange={onFileChange} />}
+      </div>
+    );
+}
+
+function BasicInfoCard({userType, userName, descType}){
+    
+    return(
+        <>
+        <div className='basicInfo'>
+            <div>
+                <VscAccount size = {80} className='cardPfp'/>
+            </div>
+            <div className='cardNameDescription'>
+                <span className='cardName'>Name Tittel</span>
+                <span className='cardDescription'> Short description</span>
+            </div>   
+            </div>
+            <div style={{display: "flex"}}>
+            <div className='userInfo' style={{fontSize: "16px"}}>
+                <span>Field(s) of {userType === "Professional" ? "Expertise": "Interest"}: ...</span>
+                <span>{userType === "High Schooler" ? descType.highSchool : userType === "Alumni" ? descType.alumni : descType.professional}: ...</span>
+            </div>
+            <div className='addOne'>
+                <EditInformation isAnswered={false} questionName={"Intro"}/>
+            </div>
+        </div>
+        </>
     )
 }

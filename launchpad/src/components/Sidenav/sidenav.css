@@ -15,8 +15,6 @@
     /* transform: translateX(-100%);
     transition: transform 0.3s ease-in-out; */
     z-index: 3;
-    background: rgb(115,169,223);
-    background: linear-gradient(0deg, rgba(115,169,223,1) 0%, rgb(255, 255, 255) 100%);
 }
 
 /* .sideNav.open{

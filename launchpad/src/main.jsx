@@ -7,6 +7,7 @@ import {Auth0Provider} from '@auth0/auth0-react';
 import UserNetwork from './pages/Network/UserNetwork.jsx';
 import UserSchool from './pages/Onboarding/Initialphase/Userschool/UserSchool.jsx';
 import Organizations from './pages/Organizationspage/Organizations.jsx';
+import EditProfilePage from './pages/Editprofilepage/EditProfilePage.jsx';
 
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
@@ -37,6 +38,11 @@ const router = createBrowserRouter([
   element: <Organizations/>,
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
 },
+{
+  path: '/MyProfile',
+  element: <EditProfilePage/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+}
 ]);
 
 

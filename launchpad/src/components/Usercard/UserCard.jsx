@@ -9,16 +9,7 @@ export default function UserCard({userData, onProfileClick}) {
     const [userName, userDescription, userFOI, userLocation] = ["Full Name", "User Description", "User's interests / fields of expertise", "User dream/current school / workplace"];
     const [bannerVisibility, setBannerVisibility] = useState(false);
     const [showPfpCard, setShowPfpCard] = useState(false);
-
-    // useEffect(() => {
-    //     document.addEventListener("keydown", onKeyPress, true)
-    //   }, [])
     
-    //   const onKeyPress = (e) => {
-    //     if(e.key === "Escape"){
-    //       setShowPfpCard(false)
-    //     }
-    //   }
     return(
         <>
             <div className='networkProfileCard'>
