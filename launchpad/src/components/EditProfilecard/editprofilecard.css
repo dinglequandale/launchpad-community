@@ -134,3 +134,23 @@
     border-bottom-style:"solid";
     border-bottom-color: "#C0C0C0";
 }
+
+.userResume.no_border{
+    border: none;
+}
+
+.btnUpload {
+    padding: 15px;
+    border: 2px dashed #ccc; /* Dotted border */
+    border-radius: 5px;       /* Rounded corners */
+    cursor: pointer;        
+    background-color: #DFECEF; /* Light background */
+    font-size: 16px;
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+    color: #4d73be;
+  }
+  
+  .btnUpload:hover {
+    background-color: rgb(179,205,255);
+    color: rgb(120, 131, 255);
+  }

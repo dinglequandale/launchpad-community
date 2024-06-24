@@ -12,7 +12,7 @@ import { MdEdit } from "react-icons/md";
 
 export default function ProfileCard({userData}) {
 
-    const userType = "High Schooler";
+    const userType = "Professional";
     const userName = "Shuja";
     const navigate = useNavigate();
     const location = useLocation();
@@ -41,16 +41,7 @@ export default function ProfileCard({userData}) {
                 <BasicInfoCard userName={userName} userType={userType} descType={descType}/>
                 </div>
                 <div style={{paddingTop: "20px"}}>
-                    <div className="initiativeOrOpportunity" style={{backgroundColor: "#DFECEF", borderRadius: "20px", padding: "0px 5px",
-                        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-                        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-                        {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
-                        <div className="addOne">
-                            <IoAdd size={25} />
-                            <span style={{textDecoration: "underline"}}>Add one!</span>
-                            <EditInformation isAnswered={false} questionName={"Opportunity"}/>
-                        </div>
-                    </div>
+                    <OpportunityPopup userName={userName} userType={userType} descType={descType} opportunitiesOptions={opportunitiesOptions}/>
                 </div>
                 <div className="aboutMe" style={{paddingTop: "20px"}}>
                     <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me ...</span> <br />
@@ -81,7 +72,6 @@ export default function ProfileCard({userData}) {
                         <EditInformation isAnswered={false} questionName={"Availability"}/>
                     </div>
                 </div>}
-
             </div>
     )
 }
@@ -145,7 +135,12 @@ function PrivacyComponent({icon, privacy}){
 }
 
 function ResumeUpload(){
-    
+    const inputRef = useRef();
+
+    const handleUploadClick = () => {
+        inputRef.current.click();
+    }
+
     const [pdfUrl, setPdfUrl] = useState(null);
     useEffect(() => {
         return () => {
@@ -155,14 +150,16 @@ function ResumeUpload(){
         };
       }, [pdfUrl]); 
 
-  function onFileChange(event) {
+    function onFileChange(event) {
     const file = event.target.files[0];
     setPdfUrl(URL.createObjectURL(file));
   }
   
     return (
-      <div style={{paddingTop: "20px"}}>
-        {pdfUrl ? <iframe src={pdfUrl} frameborder="0" style={{width: "100%", height: "500px"}}></iframe> : <input type="file" accept=".pdf" onChange={onFileChange} />}
+      <div className="pdf-viewer-container" style={{paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center"}}>
+        {pdfUrl ? <iframe src={pdfUrl} frameborder="0" style={{width: "100%", height: "500px"}}></iframe> : 
+        <button onClick={handleUploadClick} className='btnUpload'>Upload Your&nbsp;<span style={{fontWeight: "bolder"}}>Resume</span></button>}
+        <input type="file" accept=".pdf" onChange={onFileChange} style={{ display: 'none' }} ref={inputRef} />
       </div>
     );
 }
@@ -190,5 +187,20 @@ function BasicInfoCard({userType, userName, descType}){
             </div>
         </div>
         </>
+    )
+}
+
+function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
+    return(
+        <div className="initiativeOrOpportunity" style={{backgroundColor: "#DFECEF", borderRadius: "20px", padding: "0px 5px",
+            boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+            {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
+            <div className="addOne">
+                <IoAdd size={25} />
+                <span style={{textDecoration: "underline"}}>Add one!</span>
+                <EditInformation isAnswered={false} questionName={"Opportunity"}/>
+            </div>
+        </div>
     )
 }
