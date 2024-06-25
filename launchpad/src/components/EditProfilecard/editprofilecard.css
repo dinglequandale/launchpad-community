@@ -86,7 +86,6 @@
     justify-content: center;
     gap:4px;
     cursor:pointer;
-    padding-bottom: 15px;
 }
 .addOne:hover{
     color: rgb(120, 131, 255);

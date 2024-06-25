@@ -15,7 +15,6 @@ export default function ProfileCard({userData}) {
     const navigate = useNavigate();
     const location = useLocation();
 
-
     // temporary data
     const userType = "Professional";
     const userName = "Shuja";
@@ -45,7 +44,7 @@ export default function ProfileCard({userData}) {
                 <AboutMeDisplay/>
                 <div className={`userResume ${userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px"}}>
                     <div style={{display: "flex", justifyContent: "space-between"}} id="Resume">
-                        <span style={{fontSize: "20px", fontWeight: "bolder"}}>{userName}'s Resume ...</span>
+                        <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px"}}>{userName}'s Resume ...</span>
                         <PublicPrivateDropdown/>
                     </div>
                     <span style={{fontWeight: "250", fontSize: "15px"}}>Upload a resume so others can understand more about your experiences.</span> 
@@ -68,10 +67,12 @@ export default function ProfileCard({userData}) {
     )
 }
 
-function EditInformation({questionName, isAnswered}){
+function EditInformation({questionName, onEdit, isAnswered}){
     return(
         <>
-        {!isAnswered && <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", position: "absolute", width: "150px", right: "-150px"}}>
+        {isAnswered && <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", position: "absolute", width: "150px", right: "-150px"}}
+            onClick={onEdit}>
+            
             <MdEdit size={30} style={{background: "#DFECEF", borderRadius: "50%", padding: "5px"}}/>
             <span style={{textDecoration: "underline", color: "#4d73be"}}>
                 Edit {questionName}
@@ -183,6 +184,7 @@ function BasicInfoCard({userType, userName, descType}){
 }
 
 function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
+    
     return(
         <div className="initiativeOrOpportunity" style={{backgroundColor: "#DFECEF", borderRadius: "20px", padding: "0px 5px",
             boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
@@ -197,7 +199,11 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
     )
 }
 
-function AboutMeDisplay(){
+function AboutMeDisplay({reference}){
+    // editting functionality
+    const aboutMeRef = useRef();
+    const aboutMe = localStorage.getItem("userAboutMe");
+
     const [aboutMeModalVisibility, setAboutMeModalVisibility] = useState(false);
     const onModalClose = () => {
         setAboutMeModalVisibility(false);
@@ -207,12 +213,16 @@ function AboutMeDisplay(){
         <AboutMeModal visibility={aboutMeModalVisibility} onClose={onModalClose}/>
         <div className="aboutMe" style={{paddingTop: "20px"}}>
             <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me ...</span> <br />
-            <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>
-            <div className="addOne" id="About Me" onClick={()=>{setAboutMeModalVisibility(true)}}>
+
+            {!aboutMe && <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>}
+            <div className="addOne" id="About Me" onClick={()=>{setAboutMeModalVisibility(true)}} ref={aboutMeRef}>
+                
+                {!aboutMe && <>
                 <IoAdd size={25} />
                 <span style={{textDecoration: "underline"}}>Add an About Me Description</span>
-                <EditInformation isAnswered={false} questionName={"About Me"}/>
-            </div>
+                </>}
+                <EditInformation questionName={"About Me"} onEdit={()=>aboutMeRef.current.click()} isAnswered={aboutMe}/>
+            </div><span>{aboutMe}</span>
         </div>
         </>
     )
