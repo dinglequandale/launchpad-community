@@ -54,7 +54,7 @@ export default function AboutMeModal({visibility, onClose}){
         shouldCloseOnOverlayClick={false} 
       >
         <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px"}}> My "About Me" <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Tell us more about yourself.</span></h2>
-        <div><textarea className='inputAboutMe' placeholder='Tell us more about yourself ...' onChange={e => setAboutMeContent(e.target.value)} value={aboutMeContent}></textarea></div>
+        <div><textarea className='inputAboutMe' placeholder='Tell us more about yourself ...' onChange={e => setAboutMeContent(e.target.value)} value={aboutMeContent} maxLength={500}></textarea></div>
         <span style={{fontSize: "smaller"}}>Word Count: {aboutMeContent ? `${aboutMeContent.split(" ").length}` : "0"}/100</span>
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
           <button onClick={

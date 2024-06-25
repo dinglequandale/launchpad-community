@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { MdEdit } from "react-icons/md";
 import AboutMeModal from '../Profilemodals/AboutMemodal/AboutMeModal';
+import OpportunityModal from '../Profilemodals/Opportunitymodal/OpportunityModal';
 
 
 export default function ProfileCard({userData}) {
@@ -184,18 +185,22 @@ function BasicInfoCard({userType, userName, descType}){
 }
 
 function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
+    const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
     
     return(
+        <>
+        <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>
         <div className="initiativeOrOpportunity" style={{backgroundColor: "#DFECEF", borderRadius: "20px", padding: "0px 5px",
             boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
             {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
-            <div className="addOne">
+            <div className="addOne" onClick={()=>setOpportunityModalVisibility(true)}>
                 <IoAdd size={25} />
                 <span style={{textDecoration: "underline"}}>Add one!</span>
                 <EditInformation isAnswered={false} questionName={"Opportunity"}/>
             </div>
         </div>
+        </>
     )
 }
 
