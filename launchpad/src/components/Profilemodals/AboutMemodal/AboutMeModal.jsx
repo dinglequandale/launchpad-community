@@ -1,10 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import "./aboutmemodal.css"
+import MakeChanges from '../../Makechanges/MakeChanges';
 
 export default function AboutMeModal({visibility, onClose}){
-  const [aboutMeContent, setAboutMeContent] = useState(null);
-  console.log(aboutMeContent);
+  const [aboutMeContent, setAboutMeContent] = useState("");
+  const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
+
+  // later replace with logic tailored to FireStore
+
+  const saveAboutMe = () => {
+    localStorage.setItem("userAboutMe", aboutMeContent);
+    onClose();
+  }
+
+  useEffect(() => {
+    const storedAboutMe = localStorage.getItem("userAboutMe");
+    if (storedAboutMe) {
+        setAboutMeContent(storedAboutMe);
+    }
+}, [visibility]);
+
 
   const customStyles = {
     content: {
@@ -16,32 +32,29 @@ export default function AboutMeModal({visibility, onClose}){
       transform: 'translate(-50%, -50%)',
     },
     overlay: {
-      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Background blur effect
-      backdropFilter: 'blur(5px)',            // Additional blur (optional)
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      backdropFilter: 'blur(5px)',
       zIndex: "3",
     }
   };
-  // console.log(aboutMeContent);
-  // const getWordCount = (body) => {
-  //   return `${(body.match("/ /g")).length + 1}`;
 
   return (
     <div>
-      {/* <button onClick={() => setIsOpen(true)}>Open Modal</button> */}
+      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       <Modal
         isOpen={visibility}
         onRequestClose={onClose}
         style={customStyles}
-        contentLabel="Example Modal"
+        contentLabel="About Me Modal"
         shouldCloseOnOverlayClick={false} 
       >
         <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px"}}> My "About Me" <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Tell us more about yourself.</span></h2>
-        <div><textarea className='inputAboutMe' placeholder='Tell us more about yourself ...' onChange={e => setAboutMeContent(e.target.value)}></textarea></div>
+        <div><textarea className='inputAboutMe' placeholder='Tell us more about yourself ...' onChange={e => setAboutMeContent(e.target.value)} value={aboutMeContent}></textarea></div>
         <span style={{fontSize: "smaller"}}>Word Count: {aboutMeContent ? `${aboutMeContent.split(" ").length}` : "0"}/100</span>
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-          <button onClick={onClose} style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+          <button onClick={()=>setMakeChangesVisibility(true)} style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Cancel</button>
-          <button type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+          <button onClick={saveAboutMe} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Save Changes</button>
         </footer>
       </Modal>
