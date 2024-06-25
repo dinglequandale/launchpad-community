@@ -6,8 +6,13 @@ import MakeChanges from '../../Makechanges/MakeChanges';
 export default function AboutMeModal({visibility, onClose}){
   const [aboutMeContent, setAboutMeContent] = useState("");
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
+  const prevAboutMe =  localStorage.getItem("userAboutMe", "") ? localStorage.getItem("userAboutMe", "") : "";
 
   // later replace with logic tailored to FireStore
+
+  const clearCache = () => {
+    localStorage.setItem("userAboutMe", prevAboutMe);
+  }
 
   const saveAboutMe = () => {
     localStorage.setItem("userAboutMe", aboutMeContent);
@@ -16,7 +21,7 @@ export default function AboutMeModal({visibility, onClose}){
 
   useEffect(() => {
     const storedAboutMe = localStorage.getItem("userAboutMe");
-    if (storedAboutMe) {
+    if (storedAboutMe || storedAboutMe === "") {
         setAboutMeContent(storedAboutMe);
     }
 }, [visibility]);
@@ -40,7 +45,7 @@ export default function AboutMeModal({visibility, onClose}){
 
   return (
     <div>
-      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
+      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose} clearCache={clearCache}/>
       <Modal
         isOpen={visibility}
         onRequestClose={onClose}
@@ -52,7 +57,9 @@ export default function AboutMeModal({visibility, onClose}){
         <div><textarea className='inputAboutMe' placeholder='Tell us more about yourself ...' onChange={e => setAboutMeContent(e.target.value)} value={aboutMeContent}></textarea></div>
         <span style={{fontSize: "smaller"}}>Word Count: {aboutMeContent ? `${aboutMeContent.split(" ").length}` : "0"}/100</span>
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-          <button onClick={()=>setMakeChangesVisibility(true)} style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+          <button onClick={
+            ()=>setMakeChangesVisibility(true)
+            } style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Cancel</button>
           <button onClick={saveAboutMe} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Save Changes</button>

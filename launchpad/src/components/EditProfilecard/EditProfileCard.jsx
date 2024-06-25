@@ -199,7 +199,7 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
     )
 }
 
-function AboutMeDisplay({reference}){
+function AboutMeDisplay(){
     // editting functionality
     const aboutMeRef = useRef();
     const aboutMe = localStorage.getItem("userAboutMe");

@@ -1,6 +1,6 @@
 import Modal from "react-modal";
 
-export default function MakeChanges({visibility, onCancel, onVerify}){
+export default function MakeChanges({visibility, onCancel, onVerify, clearCache}){
     const customStyles = {
         content: {
           top: '50%',
@@ -34,9 +34,11 @@ export default function MakeChanges({visibility, onCancel, onVerify}){
                     No</button>
                     
                     <button onClick={()=>{
-                        onCancel();
-                        onVerify();
-                        }} style={{color: "white", width: "30%", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>Yes</button>
+                          clearCache();
+                          onCancel();
+                          onVerify();
+                          }} style={{color: "white", width: "30%", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+                        Yes</button>
                 </div>
             </Modal>
         </div>
