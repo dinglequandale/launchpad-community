@@ -1,7 +1,5 @@
 import { useState } from "react";
-import LoginIcon from "../Loginicon/LoginIcon";
 import "./profilestrength.css";
-import ProfileCard from "../Profilecard/ProfileCard";
 import { useNavigate } from "react-router-dom";
 
 export default function ProfileStrength({userData}){

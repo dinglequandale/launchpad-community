@@ -1,11 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, createContext, useContext } from 'react';
 import Modal from 'react-modal';
 import "./opportunitymodal.css";
 import MakeChanges from '../../Makechanges/MakeChanges';
 import OrganizationProfile from '../../Organizationprofile/OrganizationProfile';
+import ProgressBar from '../../Progressbar/ProgressBar';
+
+const OpportunityContext = createContext({
+  opportunityData: {},
+  setOpportunityData: () => {},
+  currentOpportunityPage: 1,
+  setCurrentOpportuntityPage: () => {},
+});
 
 export default function OpportunityModal({visibility, onClose}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
+  const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
+  
+
 //   const prevAboutMe =  localStorage.getItem("userAboutMe", "") ? localStorage.getItem("userAboutMe", "") : "";
 
   // later replace with logic tailored to FireStore
@@ -66,78 +77,201 @@ export default function OpportunityModal({visibility, onClose}){
   };
 
   return (
-    <div style={{}}>
+    <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose} clearCache={clearCache}/>
-      <Modal
-        isOpen={visibility}
-        onRequestClose={onClose}
-        style={customStyles}
-        contentLabel="Opportunity Modal"
-        shouldCloseOnOverlayClick={false} 
-        preventScroll
-      >
-        <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
-        <content>
-        <form onSubmit={saveOpportunityData} style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "800px"}}>
-            <label htmlFor="workplaceOpportunityType">Workplace Opportunity Type:</label>
-            <select
-                id="workplaceOpportunityType"
-                name="workplaceOpportunityType"
-                value={opportunityData.workplaceOpportunityType}
-                onChange={handleChange}
-            >
-                <option value="">Select Type</option>
-                <option>Shadowing</option>
-                <option>Internship</option>
-            </select>
+      <OpportunityContext.Provider value={{ opportunityData, setOpportunityData, currentOpportunityPage, setCurrentOpportuntityPage }}> 
+        <Modal
+          isOpen={visibility}
+          onRequestClose={onClose}
+          style={customStyles}
+          contentLabel="Opportunity Modal"
+          shouldCloseOnOverlayClick={false}
+        >
+          
+          <header>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>  
+          </header>
+          <hr style={{borderColor: "var(--secondary)"}}/>
+          <main style={{paddingTop:"10px"}}>
+          <form onSubmit={saveOpportunityData} style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "800px"}}>
+            {currentOpportunityPage === 1 && <OpportunityType/>}
+            {currentOpportunityPage === 2 && <InternInfo/>}
+            {currentOpportunityPage === 3 && <BasicLogistics/>}
+            {currentOpportunityPage === 4 && <FinalInfo/>}
+            {currentOpportunityPage === 5 && <OpportunityCardPreview/>}
+          </form>
+          </main>
+          <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
+            <button onClick={
+              ()=>setMakeChangesVisibility(true)
+              } style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+              Cancel</button>
+            {currentOpportunityPage === 4 && <button onClick={saveOpportunityData} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+              Save Changes</button>}
+          </footer>
+        </Modal>
+      </OpportunityContext.Provider>
+    </div>
+  );
+};
 
-            <label htmlFor="hostCompany">Host Company / Organization:</label>
+function OpportunityType(){
+  const { opportunityData, setOpportunityData } = useContext(OpportunityContext);
+
+  const handleChange = (event) => {
+    const { name, value, type, files } = event.target;
+    setOpportunityData({
+      ...opportunityData,
+      [name]: type === 'file' ? files[0] : value
+    });
+  };
+
+  return(
+    <>
+    <header><PreviousAndNext/></header>
+    <main>
+      <label htmlFor="workplaceOpportunityType">Workplace Opportunity Type:</label>
+          <select
+              id="workplaceOpportunityType"
+              name="workplaceOpportunityType"
+              value={opportunityData.workplaceOpportunityType}
+              onChange={handleChange}
+          >
+              <option value="">Select Type</option>
+              <option>Shadowing</option>
+              <option>Internship</option>
+          </select>
+
+          <label htmlFor="hostCompany">Host Company / Organization:</label>
+          <input
+              id="hostCompany"
+              name="hostCompany"
+              value={opportunityData.hostCompany}
+              onChange={handleChange}
+              type='text'
+              maxLength={40}
+          />
+    </main>
+    </>
+  )
+}
+
+function InternInfo(){
+  const { opportunityData, setOpportunityData } = useContext(OpportunityContext);
+
+  const handleChange = (event) => {
+    const { name, value, type, files } = event.target;
+    setOpportunityData({
+      ...opportunityData,
+      [name]: type === 'file' ? files[0] : value
+    });
+  };
+  return(
+    <>
+    <header><PreviousAndNext/></header>
+    <main>
+      <div style={{display: "flex", justifyContent: "space-around"}}>
+          <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+              <label htmlFor="internFieldOfWork">Intern Field of Work</label>
+              <input
+                  id="internFieldOfWork"
+                  name="internFieldOfWork"
+                  value={opportunityData.internFieldOfWork}
+                  onChange={handleChange}
+                  type='text'
+                  maxLength={40}
+                  placeholder='e.g. “finance”'
+              />
+          </div>
+          <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+              <label htmlFor="internPosition">Intern Position</label>
+              <input
+                  id="internPosition"
+                  name="internPosition"
+                  value={opportunityData.internPosition}
+                  onChange={handleChange}
+                  type='text'
+                  maxLength={40}
+                  placeholder='e.g. "data analytics"'
+              />
+          </div>
+      </div>
+      <label htmlFor="internExpectations">Intern Expectations</label>
+      <textarea 
+          className='internExpectations'
+          id="internExpectations"
+          name="internExpectations"
+          value={opportunityData.internExpectations}
+          onChange={handleChange}
+          maxLength={500}
+          placeholder='Briefly describe the tools and knowledge interns will need to be equipped with to succeed in the internship."'>
+      </textarea>
+    </main>
+    </>
+  )
+}
+
+function FinalInfo(){
+  const { opportunityData, setOpportunityData } = useContext(OpportunityContext);
+
+  const handleChange = (event) => {
+    const { name, value, type, files } = event.target;
+    setOpportunityData({
+      ...opportunityData,
+      [name]: type === 'file' ? files[0] : value
+    });
+  };
+  return(
+    <>
+    <header><PreviousAndNext/></header>
+    <main>
+      <label htmlFor="learnMoreLink">Where would you like users to learn more about your opportunity?</label>
             <input
-                id="hostCompany"
-                name="hostCompany"
-                value={opportunityData.hostCompany}
+                type="link"
+                id="learnMoreLink"
+                name="learnMoreLink"
+                value={opportunityData.learnMoreLink}
                 onChange={handleChange}
-                type='text'
-                maxLength={40}
+                placeholder='Paste a link here!'
             />
-            <div style={{display: "flex", justifyContent: "space-around"}}>
-                <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-                    <label htmlFor="internFieldOfWork">Intern Field of Work</label>
-                    <input
-                        id="internFieldOfWork"
-                        name="internFieldOfWork"
-                        value={opportunityData.internFieldOfWork}
-                        onChange={handleChange}
-                        type='text'
-                        maxLength={40}
-                        placeholder='e.g. “finance”'
-                    />
-                </div>
-                <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-                    <label htmlFor="internPosition">Intern Position</label>
-                    <input
-                        id="internPosition"
-                        name="internPosition"
-                        value={opportunityData.internPosition}
-                        onChange={handleChange}
-                        type='text'
-                        maxLength={40}
-                        placeholder='e.g. "data analytics"'
-                    />
-                </div>
-            </div>
-            <label htmlFor="internExpectations">Intern Expectations</label>
-            <textarea 
-                className='internExpectations'
-                id="internExpectations"
-                name="internExpectations"
-                value={opportunityData.internExpectations}
+            <label htmlFor="applyLink">Where can students apply?</label>
+            <input
+                type="link"
+                id="applyLink"
+                name="applyLink"
+                value={opportunityData.applyLink}
                 onChange={handleChange}
-                maxLength={500}
-                placeholder='Briefly describe the tools and knowledge interns will need to be equipped with to succeed in the internship."'>
-            </textarea>
-            <br />
-            <label htmlFor="basicLogistics" style={{fontWeight: "bolder", fontSize: "larger"}}>Basic Logistics</label>
+                placeholder='Paste a link here!'
+            />
+            <label htmlFor="organizationLogo">Upload a logo of your organization or an image that embodies your opportunity.</label>
+            <input
+                type="file"
+                id="organizationLogo"
+                name="organizationLogo"
+                value={opportunityData.organizationLogo}
+                onChange={handleChange}
+            />
+    </main>
+    </>
+  )
+}
+
+function BasicLogistics(){
+  const { opportunityData, setOpportunityData } = useContext(OpportunityContext);
+
+  const handleChange = (event) => {
+    const { name, value, type, files } = event.target;
+    setOpportunityData({
+      ...opportunityData,
+      [name]: type === 'file' ? files[0] : value
+    });
+  };
+
+  return(
+    <>
+    <header><PreviousAndNext/></header>
+    <main>
+      <label htmlFor="basicLogistics" style={{fontWeight: "bolder", fontSize: "larger"}}>Basic Logistics</label>
             <div style={{display: "flex", flexWrap: "wrap", justifyContent:"space-evenly", alignItems: "center"}} className='basicLogistics'>
                 <div className='logisticsQuestion'>
                     <label htmlFor="isPaid">Is this opportunity paid or unpaid?</label>
@@ -187,44 +321,51 @@ export default function OpportunityModal({visibility, onClose}){
                     </select>
                 </div>
             </div>
-            <label htmlFor="learnMoreLink">Where would you like users to learn more about your opportunity?</label>
-            <input
-                type="link"
-                id="learnMoreLink"
-                name="learnMoreLink"
-                value={opportunityData.learnMoreLink}
-                onChange={handleChange}
-                placeholder='Paste a link here!'
-            />
-            <label htmlFor="applyLink">Where can students apply?</label>
-            <input
-                type="link"
-                id="applyLink"
-                name="applyLink"
-                value={opportunityData.applyLink}
-                onChange={handleChange}
-                placeholder='Paste a link here!'
-            />
-            <label htmlFor="organizationLogo">Upload a logo of your organization or an image that embodies your opportunity.</label>
-            <input
-                type="file"
-                id="organizationLogo"
-                name="organizationLogo"
-                value={opportunityData.organizationLogo}
-                onChange={handleChange}
-            />
-            <label htmlFor="cardPreview">Card Preview:</label>
-        </form>
-        </content>
-        <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-          <button onClick={
-            ()=>setMakeChangesVisibility(true)
-            } style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-            Cancel</button>
-          <button onClick={saveOpportunityData} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-            Save Changes</button>
-        </footer>
-      </Modal>
-    </div>
-  );
-};
+    </main>
+    </>
+  )
+}
+
+function PreviewOppportunityCard(){
+  const { opportunityData, setOpportunityData } = useContext(OpportunityContext);
+
+  const handleChange = (event) => {
+    const { name, value, type, files } = event.target;
+    setOpportunityData({
+      ...opportunityData,
+      [name]: type === 'file' ? files[0] : value
+    });
+  };
+
+  return(
+    <>
+    <header><PreviousAndNext/></header>
+    <main>
+      <label htmlFor="cardPreview">Card Preview:</label>
+    </main>
+    </>
+  )
+}
+
+function PreviousAndNext(){
+  const { currentOpportunityPage, setCurrentOpportuntityPage } = useContext(OpportunityContext);
+  
+  const goPrevious = () => {
+    setCurrentOpportuntityPage(currentOpportunityPage - 1);
+  }
+
+  const goNext = () => {
+    setCurrentOpportuntityPage(currentOpportunityPage + 1);
+  }
+
+  return(
+    <>
+      <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage}/>
+      <div style={{display: "flex", justifyContent: "space-between"}}>
+        {currentOpportunityPage !== 1 && <button onClick={goPrevious}> Previous </button>}
+        {currentOpportunityPage !== 5 && <button onClick={goNext}> Next </button>}
+        {currentOpportunityPage === 5 && <button onClick={saveOpportunityData}>  </button>}
+      </div>
+    </>
+  )
+}

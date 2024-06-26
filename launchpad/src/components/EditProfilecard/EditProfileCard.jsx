@@ -20,18 +20,18 @@ export default function ProfileCard({userData}) {
     const userType = "Professional";
     const userName = "Shuja";
     const opportunitiesOptions = {highSchool: 
-    <p style={{color: "var(--secondary)", textAlign: "center", borderBottomStyle: "solid", paddingBottom: "5px"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</p>,
+    <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
     alum:
-    <p style={{color: "var(--secondary)", textAlign: "center", borderBottomStyle: "solid", paddingBottom: "5px"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead an <span style={{fontWeight: "bolder"}}>out-of-school student initative</span>, such as a nonprofit?</p>,
+    <span style={{color: "var(--secondary)", textAlign: "center", }}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead an <span style={{fontWeight: "bolder"}}>out-of-school student initative</span>, such as a nonprofit?</span>,
     professional:
-    <p style={{color: "var(--secondary)", textAlign: "center", borderBottomStyle: "solid", paddingBottom: "5px"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</p>
+    <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</span>
 };
     const descType = {highSchool: "College(s) of Interest", alumni: "Attending College", professional: "Current Position"};
 
     return(
         <>
             <div className='editprofileCard'>
-                <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", paddingBottom: "5px"}}>
+                <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", borderWidth: "1.7px", paddingBottom: "5px"}}>
                     <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
                     onClick={() => navigate(location.state)}>
                         <RiArrowGoBackFill size={20}/>
@@ -51,7 +51,7 @@ export default function ProfileCard({userData}) {
                     <span style={{fontWeight: "250", fontSize: "15px"}}>Upload a resume so others can understand more about your experiences.</span> 
                     <ResumeUpload/>
                 </div>
-                {(userType === "Professional" || userType === "Alumni") && <hr style={{borderTop: "solid", width: "100%", borderWidth: "1px", borderColor: "#C0C0C0"}}/>}
+                {(userType === "Professional" || userType === "Alumni") && <hr style={{width: "100%"}}/>}
                 {(userType === "Professional" || userType === "Alumni") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
                     <div style={{paddingBottom: "10px"}}>
                         <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userName}</span> is <span style={{fontWeight: "450"}}>open to</span> ... <br /></h>
@@ -190,13 +190,14 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
     return(
         <>
         <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>
-        <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px", padding: "0px 5px",
+        <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
             boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
             {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
+            <hr style={{width:"50%", borderColor: "var(--accent)"}}/>
             <div className="addOne" onClick={()=>setOpportunityModalVisibility(true)}>
                 <IoAdd size={25} />
-                <span style={{textDecoration: "underline"}}>Add one!</span>
+                <span style={{textDecoration: "underline", paddingTop: "10px"}}>Add one!</span>
                 <EditInformation isAnswered={false} questionName={"Opportunity"}/>
             </div>
         </div>

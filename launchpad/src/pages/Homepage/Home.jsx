@@ -108,10 +108,10 @@ function InviteContacts({userName}){
 
 function ResourceItem({resourceType}){
     return(
-        <div className="resourceItem">
-            <span>{resourceType}</span>
-            <FaArrowCircleDown color="grey"/>
-        </div>
+        <button className="resourceItem">
+            <span style={{padding: "5px", fontSize: "larger"}}>{resourceType}</span>
+            <FaArrowCircleDown color="grey" size={20}/>
+        </button>
     )
 }
 
