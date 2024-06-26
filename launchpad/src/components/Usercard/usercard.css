@@ -10,20 +10,19 @@
     border-radius: 15px;
     /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
     flex-direction: column;
-    background: rgb(179,205,255);
-    background: linear-gradient(335deg, rgba(179,205,255,1) 0%, rgba(255,255,255,1) 60%);
+    background: var(--primary);
     z-index: 1;
     border-style: solid;
-    border-color: #4d73be;
+    border-color: var(--secondary);
 }
 
 .seeProfile{
-    color: #4d73be;
+    color: var(--secondary);
     cursor: pointer;
 }
 
 .seeProfile:hover{
-    color: rgb(120, 131, 255);
+    color: var(--highlight);
     text-decoration: underline;
 }
 
@@ -32,7 +31,7 @@
 }
 
 .cardPfp{
-    background-color: #4d73be;
+    background-color: var(--accent);
     border-radius: 50%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
@@ -62,10 +61,10 @@
 
 .userCardBtnConnect{
     padding: 5px;
-    background-color: #4d73be;
+    background-color: var(--secondary);
     border-radius: 5px;
     width: 75%;
-    color: white;
+    color: var(--primary);
     margin: 0 auto; 
     display: flex;
     align-items: center;

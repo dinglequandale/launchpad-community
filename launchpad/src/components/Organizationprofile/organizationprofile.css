@@ -3,16 +3,18 @@
     display: flex;
     width: 60%; 
     padding: 10px;
-    background: rgb(179,205,255);
-    background: linear-gradient(335deg, rgba(179,205,255,1) 0%, rgba(255,255,255,1) 100%);
+    background: var(--accent);
+    background: linear-gradient(335deg, var(--neutral) 0%, rgba(255,255,255,1) 100%);
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     margin: 0 auto;
+    border-style: solid;
+    border-color: var(--secondary);
 }
 
 .btnOrganizationConnect{
     padding: 5px;
-    background-color: #1158E2;
+    background-color: var(--secondary);
     border-radius: 2px;
     width: 75%;
     margin: 0 auto; 
@@ -25,7 +27,7 @@
 
 .btnOrganizationLearnMore{
     padding: 5px;
-    background-color: whitesmoke;
+    background-color: var(--primary);
     border-radius: 2px;
     width: 75%;
     margin: 0 auto; 

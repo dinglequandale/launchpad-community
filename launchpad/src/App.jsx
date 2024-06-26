@@ -5,8 +5,14 @@ import EditProfilePage from "./pages/Editprofilepage/EditProfilePage";
 
 function App() {
   const {isAuthenticated, loginWithRedirect} = useAuth0();
+
+  // TODO: later input logic for this boolean to check whether user finished onboarding
+  const onBoarded = false;
   return (
+    <>
+    {/* {isAuthenticated && onBoarded ? <Home/> : <LandingPage/>} */}
     <Home/>
+    </>
   )
 }
 

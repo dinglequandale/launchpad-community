@@ -8,8 +8,8 @@
     border-radius: 15px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     flex-direction: column;
-    background: rgb(179,205,255);
-    background: linear-gradient(180deg, rgba(179,205,255,.5) 0%, rgba(255,255,255,1) 60%);
+    background: var(--neutral);
+    background: linear-gradient(180deg, var(--neutral) 0%, rgba(255,255,255,1) 60%);
     position: absolute;
     left: 54%;
     transform: translate(-50%, 0%);
@@ -21,7 +21,7 @@
 }
 
 .cardPfp{
-    background-color: #4d73be;
+    background-color: var(--accent);
     border-radius: 50%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
@@ -49,38 +49,16 @@
     padding-bottom: 10px;
 }
 
-.cardbtnConnect{
-    padding: 5px;
-    background-color: #4d73be;
-    border-radius: 5px;
-    width: 75%;
-    margin: 0 auto; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: white;
-    font-size: larger;
-}
-
-.cardbtnConnect:hover{
-    background-color: rgb(120, 131, 255);
-}
-
-.close{
-    cursor: pointer;
-}
-
 .editcardResume{
     text-shadow: 0 0 3px #4d73be;
-    color: #4d73be;
+    color: var(--secondary);
     padding-top: 20px;
     font-weight: 600;
     font-size: larger;
 }
 
 .addOne{
-    color: #4d73be;
+    color: var(--secondary);
     display: flex; 
     align-items: center;
     justify-content: center;
@@ -88,11 +66,7 @@
     cursor:pointer;
 }
 .addOne:hover{
-    color: rgb(120, 131, 255);
-}
-
-.publicPrivateDropdown{
-    color: black;
+    color: var(--highlight);
 }
 
 .dropdownContainer{
@@ -121,11 +95,11 @@
   }
 
 .dropdownOption:hover{
-    color: rgb(120, 131, 255);
+    color: var(--highlight);
 }
 
 .return:hover{
-    color: #4d73be;
+    color: var(--highlight);
 }
 
 .userResume{
@@ -145,10 +119,10 @@
     background-color: #DFECEF; /* Light background */
     font-size: 16px;
     transition: background-color 0.3s ease; /* Smooth transition on hover */
-    color: #4d73be;
+    color: var(--secondary);
   }
   
   .btnUpload:hover {
     background-color: rgb(179,205,255);
-    color: rgb(120, 131, 255);
+    color: var(--highlight);
   }

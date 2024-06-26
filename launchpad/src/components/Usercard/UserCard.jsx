@@ -14,7 +14,7 @@ export default function UserCard({userData, onProfileClick}) {
         <>
             <div className='networkProfileCard'>
                 {bannerVisibility && <ConnectionBanner/>}
-                <span style={{position: "absolute", right: "3%", fontSize: "smaller"}} className="seeProfile" onClick={onProfileClick} userData = {userData}>
+                <span style={{position: "absolute", right: "3%", fontSize: "smaller", textDecoration: "underline"}} className="seeProfile" onClick={onProfileClick} userData = {userData}>
                     See Profile</span>
                 <div className='basicInfo'>
                     <div>

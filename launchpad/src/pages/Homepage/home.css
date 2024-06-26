@@ -12,6 +12,6 @@
 }
 
 .resourceItem:hover{
-    background-color: #646cff;
+    background-color: var(--highlight);
     color: white;
 }

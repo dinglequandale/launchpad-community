@@ -94,7 +94,7 @@ export default function Home({userData}){
 function InviteContacts({userName}){
     return(
         <div style={
-            {position: "relative", padding: "15px", margin: "0 auto", width: "fitParent%", backgroundColor: "#73bbdf",
+            {position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "var(--accent)",
          height: "fitContent", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
          }>
             <span> &emsp; Hey, {userName}!</span> <br />

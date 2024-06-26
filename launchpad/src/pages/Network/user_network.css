@@ -1,4 +1,4 @@
 .mainBody{
-    background: rgb(120, 131, 255);
-    background: linear-gradient(360deg, rgb(121, 154, 222, .7) 0%, rgba(52,197,227,0) 100%);
+    background: var(--accent);
+    background: linear-gradient(360deg, var(--neutral) 0%, rgba(52,197,227,0) 100%);
 }

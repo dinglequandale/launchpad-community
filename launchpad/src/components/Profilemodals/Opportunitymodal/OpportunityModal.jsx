@@ -214,7 +214,6 @@ export default function OpportunityModal({visibility, onClose}){
                 onChange={handleChange}
             />
             <label htmlFor="cardPreview">Card Preview:</label>
-            {/* <OrganizationProfile/> */}
         </form>
         </content>
         <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>

@@ -17,7 +17,7 @@ export default function ProfileStrength({userData}){
             <div style={{borderBottomStyle: "solid", paddingBottom: "5px", borderColor: "#C0C0C0", borderWidth: "1px",
                 display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}}>
                 <span style={
-                        {fontWeight: "600", fontSize: "20px", color: "#4d73be"}
+                        {fontWeight: "600", fontSize: "20px", color: "var(--secondary)"}
                         }>
                         Complete your profile
                 </span>
