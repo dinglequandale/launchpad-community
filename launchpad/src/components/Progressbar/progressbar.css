@@ -5,3 +5,13 @@
 .bar.unfilled{
     background-color: var(--primary);
 }
+
+.btnNavigate{
+    border-radius: 20px;
+    width: 100px;
+    justify-content: space-around;
+}
+
+.btnNavigate.hidden{
+    visibility: hidden;
+}

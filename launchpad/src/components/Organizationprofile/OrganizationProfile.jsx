@@ -6,7 +6,7 @@ import { SlCalender } from "react-icons/sl";
 import { useState, useEffect } from "react";
 import ProfileCard from "../Profilecard/ProfileCard";
 
-export default function OrganizationProfile({organizationData}){
+export default function OrganizationProfile({organizationData, location}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
     const [showPfpCard, setShowPfpCard] = useState(false);
 
@@ -43,12 +43,12 @@ export default function OrganizationProfile({organizationData}){
     return(
         <>
             {showPfpCard && <ProfileCard onClose={() => setShowPfpCard(false)}/>}
-            <div className="organizationProfileContainer" style={{position: "relative"}}>
+            <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : "opportunityPopup"}`} style={{position: "relative"}}>
                 {organizationData.organizationTags && <RelevanceBanner relevanceType={organizationData.organizationTags}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
                     <div style={{display: "flex", position: "relative", justifyContent: "center", alignItems: "center"}}>
                         <img src="https://purepng.com/public/uploads/large/big-chungus-jkg.png" alt="display image" 
-                        style={{borderStyle: "solid", width: "145px", height: "145px"}} />
+                        style={{borderStyle: "solid", borderColor: "var(--secondary)", width: "145px", height: "145px"}} />
                         <div style={{paddingLeft: "15px"}}>
                             <span style={{fontWeight: "bolder", fontSize: "20px"}}>{organizationData.organizationName}</span> <br />
                             <span style={{fontWeight: "300", fontSize: "smaller"}}>{

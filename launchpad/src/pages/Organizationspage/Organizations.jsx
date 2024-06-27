@@ -84,7 +84,7 @@ export default function Organizations(){
                     </div>
                     <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px", paddingBottom: "40px"}}>
                         {organizationsData.map((organization, index)=>(
-                            <OrganizationProfile key={index} organizationData={organization}/>
+                            <OrganizationProfile key={index} organizationData={organization} location={"organizations_page"}/>
                         ))}
                 </div>
             </div>

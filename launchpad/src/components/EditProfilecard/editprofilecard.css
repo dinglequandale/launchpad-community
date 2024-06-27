@@ -64,6 +64,7 @@
     justify-content: center;
     gap:4px;
     cursor:pointer;
+    padding-top: 10px;
 }
 .addOne:hover{
     color: var(--highlight);

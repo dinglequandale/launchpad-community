@@ -197,7 +197,7 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
             <hr style={{width:"50%", borderColor: "var(--accent)"}}/>
             <div className="addOne" onClick={()=>setOpportunityModalVisibility(true)}>
                 <IoAdd size={25} />
-                <span style={{textDecoration: "underline", paddingTop: "10px"}}>Add one!</span>
+                <span style={{textDecoration: "underline"}}>Add one!</span>
                 <EditInformation isAnswered={false} questionName={"Opportunity"}/>
             </div>
         </div>

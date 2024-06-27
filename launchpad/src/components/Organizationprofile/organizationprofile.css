@@ -12,6 +12,10 @@
     border-color: var(--secondary);
 }
 
+.organizationProfileContainer.opportunityPopup{
+    width: 80%;
+}
+
 .btnOrganizationConnect{
     padding: 5px;
     background-color: var(--secondary);
