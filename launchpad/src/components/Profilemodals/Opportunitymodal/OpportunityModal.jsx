@@ -4,7 +4,6 @@ import "./opportunitymodal.css";
 import MakeChanges from '../../Makechanges/MakeChanges';
 import OrganizationProfile from '../../Organizationprofile/OrganizationProfile';
 import ProgressBar from '../../Progressbar/ProgressBar';
-import { CgAdd } from 'react-icons/cg';
 import { GrAdd } from 'react-icons/gr';
 
 
@@ -13,12 +12,17 @@ const OpportunityContext = createContext({
   setOpportunityData: () => {},
   currentOpportunityPage: 1,
   setCurrentOpportuntityPage: () => {},
+  handleChange: () => {},
+  opportunityQuestionsPossibilities: {},
 });
 
 export default function OpportunityModal({visibility, onClose}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
-  
+  const [showLast, setShowLast] = useState(false);
+  const [opportunityQuestions, setOpportunityQuestions] = useState(null);
+
+  const opportunityQuestionsPossibilities = {"Shadowing": [1], "Intership": [1]};
 
 //   const prevAboutMe =  localStorage.getItem("userAboutMe", "") ? localStorage.getItem("userAboutMe", "") : "";
 
@@ -32,6 +36,7 @@ export default function OpportunityModal({visibility, onClose}){
     localStorage.setItem("userOpportunityData", opportunityData);
     onClose();
   }
+  
 
 //   useEffect(() => {
 //     const storedOpportunityData = localStorage.getItem("userOpportunityData");
@@ -57,15 +62,16 @@ export default function OpportunityModal({visibility, onClose}){
     }
   };
 
-  const [opportunityData, setOpportunityData] = useState({workplaceOpportunityType: '',
+  const [opportunityData, setOpportunityData] = useState({
+    workplaceOpportunityType: '',
     hostCompany: '',
     internFieldOfWork: '',
     internPosition: '',
     internExpectations: '',
-    isPaid: 'paid',
-    applicants: 'both',
-    workLocation: 'onsite',
-    timeFrame: '',
+    isPaid: 'Unpaid',
+    applicants: 'Either One',
+    workLocation: 'On-site',
+    timeFrame: 'One Week',
     learnMoreLink: '',
     applyLink: '',
     organizationLogo: null,
@@ -82,7 +88,15 @@ export default function OpportunityModal({visibility, onClose}){
   return (
     <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose} clearCache={clearCache}/>
-      <OpportunityContext.Provider value={{ opportunityData, setOpportunityData, currentOpportunityPage, setCurrentOpportuntityPage }}> 
+      <OpportunityContext.Provider 
+      value={{
+        opportunityData,
+        setOpportunityData, 
+        currentOpportunityPage, 
+        setCurrentOpportuntityPage,
+        handleChange,
+        opportunityQuestionsPossibilities,
+        }}> 
         <Modal
           isOpen={visibility}
           onRequestClose={onClose}
@@ -94,7 +108,7 @@ export default function OpportunityModal({visibility, onClose}){
           <header>
           <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
-          <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage}/>
+          <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
           </header>
           <main style={{paddingTop:"10px"}}>
           <form onSubmit={saveOpportunityData} style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
@@ -120,39 +134,29 @@ export default function OpportunityModal({visibility, onClose}){
 };
 
 function OpportunityType(){
-  const { opportunityData, setOpportunityData } = useContext(OpportunityContext);
-
-  const handleChange = (event) => {
-    const { name, value, type, files } = event.target;
-    setOpportunityData({
-      ...opportunityData,
-      [name]: type === 'file' ? files[0] : value
-    });
-  };
+  const { opportunityData, handleChange, opportunityQuestionsPossibilities } = useContext(OpportunityContext);
 
   return(
     <>
     <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>We need some general information first.</h2>
     <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-    <main style={{display: "flex", flexDirection: "column",}}>
-      <div style={{display: "flex", justifyContent: "space-around", padding: "20px"}}>
+    <main style={{display: "flex", alignItems: "center", justifyContent: "space-around", paddingTop: "1rem"}}>
+      <div style={{display: "flex", flexDirection: "column", gap: "30px"}}>
         <label htmlFor="workplaceOpportunityType">Workplace Opportunity Type:</label>
+        <label htmlFor="hostCompany">Host Company / Organization:</label>
+      </div>
+      <div style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "50%", gap: "30px"}}>
         <select
             id="workplaceOpportunityType"
             name="workplaceOpportunityType"
             value={opportunityData.workplaceOpportunityType}
             onChange={handleChange}
-            style={{width: "35%"}}
         >
             <option value="">Select Type</option>
-            <option>Shadowing</option>
-            <option>Internship</option>
-            <option>Community Service</option>
+            <option value="Shadowing">Shadowing</option>
+            <option value="Internship">Internship</option>
+            <option value="Community Service">Community Service</option>
         </select>
-      </div>
-      <br />
-      <div style={{display: "flex", justifyContent: "space-around"}}>
-        <label htmlFor="hostCompany">Host Company / Organization:</label>
         <input
             id="hostCompany"
             name="hostCompany"
@@ -160,7 +164,6 @@ function OpportunityType(){
             onChange={handleChange}
             type='text'
             maxLength={40}
-            style={{width: "35%"}}
         />
       </div>
     </main>
@@ -169,15 +172,8 @@ function OpportunityType(){
 }
 
 function InternInfo(){
-  const { opportunityData, setOpportunityData } = useContext(OpportunityContext);
+  const { opportunityData, handleChange, opportunityQuestionsPossibilities } = useContext(OpportunityContext);
 
-  const handleChange = (event) => {
-    const { name, value, type, files } = event.target;
-    setOpportunityData({
-      ...opportunityData,
-      [name]: type === 'file' ? files[0] : value
-    });
-  };
   return(
     <>
     <main>
@@ -227,9 +223,11 @@ function InternInfo(){
 }
 
 function FinalInfo(){
-  const { opportunityData, setOpportunityData } = useContext(OpportunityContext);
+  const { opportunityData, setOpportunityData, opportunityQuestionsPossibilities } = useContext(OpportunityContext);
   const logoRef = useRef();
   const [logoPreviewURL, setLogoPreviewUrl] = useState(null);
+  const [learnMoreTextActivation, setLearnMoreTextActivation] = useState(false);
+  const [applyTextActivation, setApplyTextActivation] = useState(false);
 
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;
@@ -256,6 +254,16 @@ function FinalInfo(){
     }
   };
 
+  const handleTextClick = (event) => {
+    event.preventDefault();
+    if(event.target.name==="learnMoreText"){
+      setLearnMoreTextActivation(!learnMoreTextActivation);
+    }
+    else if(event.target.name === "applyText"){
+      setApplyTextActivation(!applyTextActivation);
+    }
+  }
+
   return(
     <>
     <main>
@@ -272,9 +280,12 @@ function FinalInfo(){
                 value={opportunityData.learnMoreLink}
                 onChange={handleChange}
                 placeholder='Paste a link here!'
-                style={{width: "60%"}}
+                style={{width: "60%", 
+                  backgroundColor: learnMoreTextActivation && 'lightgray',
+                  opacity: learnMoreTextActivation ? 0.7 : 1,
+                  borderColor: learnMoreTextActivation && "darkgray", cursor: learnMoreTextActivation && "default"}}
             />
-            <button className="btnText">Or by sending a text</button>
+            <button className={`btnText ${learnMoreTextActivation ? "activated" : ""}`} name="learnMoreText" onClick={handleTextClick}>Or by sending a text</button>
           </div>
         </div>
         <br />
@@ -288,9 +299,12 @@ function FinalInfo(){
                 value={opportunityData.applyLink}
                 onChange={handleChange}
                 placeholder='Paste a link here!'
-                style={{width: "60%"}}
+                style={{width: "60%", 
+                  backgroundColor: applyTextActivation && 'lightgray',
+                  opacity: applyTextActivation ? 0.7 : 1,
+                  borderColor: applyTextActivation && "darkgray", cursor: applyTextActivation && "default"}}
             />
-            <button className="btnText">Or by sending a text</button>
+            <button className={`btnText ${applyTextActivation ? "activated" : ""}`} name="applyText" onClick={handleTextClick}>Or by sending a text</button>
           </div>
         </div>
         <br />
@@ -318,15 +332,7 @@ function FinalInfo(){
 }
 
 function BasicLogistics(){
-  const { opportunityData, setOpportunityData, currentOpportunityPage, setCurrentOpportuntityPage } = useContext(OpportunityContext);
-
-  const handleChange = (event) => {
-    const { name, value, type, files } = event.target;
-    setOpportunityData({
-      ...opportunityData,
-      [name]: type === 'file' ? files[0] : value
-    });
-  };
+  const { opportunityData, handleChange, opportunityQuestionsPossibilities } = useContext(OpportunityContext);
 
   return(
     <>
@@ -341,8 +347,8 @@ function BasicLogistics(){
                   name="isPaid"
                   value={opportunityData.isPaid}
                   onChange={handleChange}>
-                      <option>Paid</option>
-                      <option>Unpaid</option>
+                      <option value="Paid">Paid</option>
+                      <option value="Unpaid">Unpaid</option>
               </select>
           </div>
           <div className='logisticsQuestion'>
@@ -352,9 +358,9 @@ function BasicLogistics(){
                   name="workLocation"
                   value={opportunityData.workLocation}
                   onChange={handleChange}>
-                      <option>On-site</option>
-                      <option>Remote</option>
-                      <option>Hybrid</option>
+                      <option value="On-site">On-site</option>
+                      <option value="Remote">Remote</option>
+                      <option value="Hybrid">Hybrid</option>
               </select>
           </div>
           <div className='logisticsQuestion'>
@@ -364,9 +370,9 @@ function BasicLogistics(){
                   name="applicants"
                   value={opportunityData.applicants}
                   onChange={handleChange}>
-                      <option>Either one</option>
-                      <option>High School</option>
-                      <option>College</option>
+                      <option value="Either One">Either one</option>
+                      <option value="High School">High School</option>
+                      <option value="College">College</option>
               </select>
           </div>
           <div className='logisticsQuestion'>
@@ -376,9 +382,10 @@ function BasicLogistics(){
                   name="timeFrame"
                   value={opportunityData.timeFrame}
                   onChange={handleChange}>
-                      <option>One Week</option>
-                      <option>Two Weeks</option>
-                      <option>Three Weeks</option>
+                      <option value="One Week">One Week</option>
+                      <option value="Two Weeks">Two Weeks</option>
+                      <option value="Three Weeks">Three Weeks</option>
+                      <option value="Custom">Custom</option>
               </select>
           </div>
       </div>
@@ -388,16 +395,8 @@ function BasicLogistics(){
 }
 
 function PreviewOppportunityCard(){
-  const { opportunityData, setOpportunityData } = useContext(OpportunityContext);
-
-  const handleChange = (event) => {
-    const { name, value, type, files } = event.target;
-    setOpportunityData({
-      ...opportunityData,
-      [name]: type === 'file' ? files[0] : value
-    });
-  };
-
+  const { opportunityData } = useContext(OpportunityContext);
+ 
   return(
     <>
     <main>

@@ -31,3 +31,7 @@ form label{
     justify-content: center;
     gap: 5px;
 }
+
+.btnText.activated{
+    color: var(--highlight);
+}

@@ -3,9 +3,11 @@ import "./progressbar.css";
 import { GrFormPrevious } from "react-icons/gr";
 import { GrFormNext } from "react-icons/gr";
 import Modal from "react-modal";
+import { CgClose } from "react-icons/cg";
 
-export default function ProgressBar({numOfSections, currentPage, setCurrentPage, showLast=false}){
+export default function ProgressBar({numOfSections, currentPage, setCurrentPage, showLast=true}){
     // const sectionWidth = 100/numOfSections;
+    // TODO: Integrate showLast state into opportunity modal
     const emptyArray = Array.from({ length: numOfSections }, (_, i) => i + 1); 
     const [bufferModalVisibility, setBuffererModalVisibility] = useState(false);
 
@@ -55,8 +57,10 @@ export default function ProgressBar({numOfSections, currentPage, setCurrentPage,
         style={customStyles}
         contentLabel="Buffer Modal"
         >
-            <h1>Note:</h1>
-            <p>Please fill out the remainder of the form before proceeding.</p>
+            <CgClose className="btnClose" size={25} onClick={()=>setBuffererModalVisibility(false)}/>
+            <h1 style={{color: "var(--secondary)", lineHeight: "1px", textAlign: "center"}}>Notice:</h1>
+            <hr style={{width:"20%", borderColor: "var(--secondary)", borderWidth: "2px"}}/>
+            <p style={{fontWeight: "300", fontSize: "larger"}}>Please fill out the remainder of the form before proceeding.</p>
         </Modal>
         <header style={{display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: "20px", paddingTop: "10px"}}>
             {<button onClick={goPrevious} className={`btnNavigate ${currentPage === 1 ? "hidden" : ""} btnUnfilled`}> <GrFormPrevious size={20}/> Previous </button>}

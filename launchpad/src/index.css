@@ -87,6 +87,18 @@ button {
   transition: background-color 0.3s ease;
 }
 
+.btnClose{
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  color: var(--secondary);
+  cursor: pointer;
+}
+
+.btnClose:hover{
+  color: var(--highlight);
+}
+
 .btnUnfilled{
   background-color: var(--primary);
   border-style: solid;
