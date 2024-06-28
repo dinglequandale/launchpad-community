@@ -135,7 +135,7 @@ function OpportunityType(){
     <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>We need some general information first.</h2>
     <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
     <main style={{display: "flex", flexDirection: "column",}}>
-      <div style={{display: "flex", justifyContent: "space-around"}}>
+      <div style={{display: "flex", justifyContent: "space-around", padding: "20px"}}>
         <label htmlFor="workplaceOpportunityType">Workplace Opportunity Type:</label>
         <select
             id="workplaceOpportunityType"
@@ -218,7 +218,7 @@ function InternInfo(){
             value={opportunityData.internExpectations}
             onChange={handleChange}
             maxLength={500}
-            placeholder='Briefly describe the tools and knowledge interns will need to be equipped with to succeed in the internship."'>
+            placeholder='Briefly describe the tools and knowledge interns will need to succeed throughout internship.'>
         </textarea>
       </div>
     </main>
@@ -264,28 +264,34 @@ function FinalInfo(){
       <div className='questionItem' style={{paddingTop: "15px"}}>
         <div className='questionItem' style={{width: "100%"}}>
           <label htmlFor="learnMoreLink">Where would you like users to learn more about your opportunity?</label>
-          <input
-              type="link"
-              id="learnMoreLink"
-              name="learnMoreLink"
-              value={opportunityData.learnMoreLink}
-              onChange={handleChange}
-              placeholder='Paste a link here!'
-              style={{width: "60%"}}
-          />
+          <div style={{width: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}}>
+            <input
+                type="link"
+                id="learnMoreLink"
+                name="learnMoreLink"
+                value={opportunityData.learnMoreLink}
+                onChange={handleChange}
+                placeholder='Paste a link here!'
+                style={{width: "60%"}}
+            />
+            <button className="btnText">Or by sending a text</button>
+          </div>
         </div>
         <br />
         <div className='questionItem' style={{width: "100%"}}>
           <label htmlFor="applyLink">Where can students apply?</label>
-          <input
-              type="link"
-              id="applyLink"
-              name="applyLink"
-              value={opportunityData.applyLink}
-              onChange={handleChange}
-              placeholder='Paste a link here!'
-              style={{width: "60%"}}
-          />
+          <div style={{width: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}}>
+            <input
+                type="link"
+                id="applyLink"
+                name="applyLink"
+                value={opportunityData.applyLink}
+                onChange={handleChange}
+                placeholder='Paste a link here!'
+                style={{width: "60%"}}
+            />
+            <button className="btnText">Or by sending a text</button>
+          </div>
         </div>
         <br />
         <div className='questionItem'>
@@ -395,7 +401,7 @@ function PreviewOppportunityCard(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Here's a preview of your card.</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're all set! Here's a preview of your card:</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "10px"}}>
         <OrganizationProfile organizationData={opportunityData} location={"opportunity_popup"}/>

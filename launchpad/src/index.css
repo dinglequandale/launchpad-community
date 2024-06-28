@@ -94,6 +94,18 @@ button {
   color: var(--secondary);
 }
 
+.btnText{
+  background-color: transparent;
+  color: var(--accent);
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.btnText:hover{
+  background-color: transparent;
+  color: var(--highlight);
+}
+
 /* .btnFilled{
 
 } */

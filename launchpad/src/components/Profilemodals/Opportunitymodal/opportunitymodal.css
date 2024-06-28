@@ -1,7 +1,7 @@
 form label{
     font-weight: 250;
     font-size: 20px;
-    color: var(--secondary);
+    color: black;
 }
 
 .internExpectations{
@@ -12,8 +12,10 @@ form label{
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     border-radius: 10px;
     border-style: solid;
-    border-color: #77a9b5;
+    border-color: var(--secondary);
     font-family: "Inter";
+    border-width: 1.5px;
+    font-size: 17px;
 }
 
 .logisticsQuestion{
