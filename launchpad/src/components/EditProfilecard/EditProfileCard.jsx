@@ -34,7 +34,7 @@ export default function EditProfileCard({userData}) {
             <div className='editprofileCard'>
                 <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", borderWidth: "1.7px", paddingBottom: "5px"}}>
                     <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
-                    onClick={() => navigate(location.state)}>
+                    onClick={() => {location.state ? navigate(location.state) : navigate("/")}}>
                         <RiArrowGoBackFill size={20}/>
                         <span>Go Back</span>
                     </div>
@@ -185,7 +185,7 @@ function BasicInfoCard({userType, userName, descType}){
     )
 }
 
-function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
+function OpportunityPopup({userType, userName, opportunitiesOptions}){
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
     const [opportunityData, setOpportunityData] = useState(null);
     const [showOrganizationProfile, setShowOrganizationProfile] = useState(false);
@@ -202,7 +202,10 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
     return(
         <>
         <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>
-        { showOrganizationProfile ? <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/> : <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
+        { showOrganizationProfile ? <>
+        <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>{userName} is offering one <span style={{fontWeight: "bold"}}>{opportunityData.organizationType} opportunity</span>!</span>
+        <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
+        </> : <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
             boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
             {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
@@ -212,7 +215,7 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
                 <span style={{textDecoration: "underline"}}>Add one!</span>
             </div>
         </div>}
-        <div className='addOne' style={{transform: "translate(0,-150px)"}}>
+        <div className='addOne' style={{transform: "translate(0,-100px)"}}>
             <EditInformation isAnswered={showOrganizationProfile} questionName={"Opportunity"} onEdit={()=>setOpportunityModalVisibility(true)}/>
         </div>
         </>
