@@ -111,6 +111,7 @@ button {
   color: var(--accent);
   text-decoration: underline;
   transition: color 0.3s ease;
+  cursor: pointer;
 }
 
 .btnText:hover{

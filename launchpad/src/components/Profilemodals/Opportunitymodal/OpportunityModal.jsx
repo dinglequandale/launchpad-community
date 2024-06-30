@@ -8,42 +8,34 @@ import { GrAdd } from 'react-icons/gr';
 
 
 const OpportunityContext = createContext({
-  opportunityData: {},
-  setOpportunityData: () => {},
+  organizationData: {},
+  setOrganizationData: () => {},
   currentOpportunityPage: 1,
   setCurrentOpportuntityPage: () => {},
   handleChange: () => {},
-  opportunityQuestionsPossibilities: {},
+  organizationQuestionsPossibilities: {},
 });
 
 export default function OpportunityModal({visibility, onClose}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
   const [showLast, setShowLast] = useState(false);
-  const [opportunityQuestions, setOpportunityQuestions] = useState(null);
+  const [organizationQuestions, setOrganizationQuestions] = useState(null);
 
-  const opportunityQuestionsPossibilities = {"Shadowing": [1], "Intership": [1]};
-
-//   const prevAboutMe =  localStorage.getItem("userAboutMe", "") ? localStorage.getItem("userAboutMe", "") : "";
-
-  // later replace with logic tailored to FireStore
-
-  const clearCache = () => {
-    localStorage.setItem("userAboutMe", prevAboutMe);
-  }
+  const organizationQuestionsPossibilities = {"Shadowing": [1], "Intership": [1]};
 
   const saveOpportunityData = () => {
-    localStorage.setItem("userOpportunityData", opportunityData);
+    localStorage.setItem("userOpportunityData", JSON.stringify(organizationData));
     onClose();
   }
   
 
-//   useEffect(() => {
-//     const storedOpportunityData = localStorage.getItem("userOpportunityData");
-//     if (storedAboutMe || storedAboutMe === "") {
-//         setOpportunityData(JSON.parse(storedOpportunityData));;
-//     }
-//     }, [visibility]);
+  useEffect(() => {
+    const storedOpportunityData = localStorage.getItem("userOpportunityData");
+    if (storedOpportunityData !== null) {
+        setOrganizationData(JSON.parse(storedOpportunityData));
+    }
+    }, [visibility]);
 
   const customStyles = {
     content: {
@@ -58,13 +50,12 @@ export default function OpportunityModal({visibility, onClose}){
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       backdropFilter: 'blur(5px)',
       zIndex: "3",
-      overflow: "hidden",
     }
   };
 
-  const [opportunityData, setOpportunityData] = useState({
-    workplaceOpportunityType: '',
-    hostCompany: '',
+  const [organizationData, setOrganizationData] = useState({
+    organizationType: '',
+    host: '',
     internFieldOfWork: '',
     internPosition: '',
     internExpectations: '',
@@ -75,27 +66,39 @@ export default function OpportunityModal({visibility, onClose}){
     learnMoreLink: '',
     applyLink: '',
     organizationLogo: null,
+    organizationLogoPreview: '',
+    applyTextActivation: false,
+    learnMoreTextActivation: false,
   });
+
+  useEffect(()=>{
+    if(Object.values(organizationData).filter((data)=>(data !== '')).length === Object.values(organizationData).length){
+      setShowLast(true)
+    }
+    else{
+      setShowLast(false)
+    }
+  },[organizationData])
 
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;
-    setOpportunityData({
-      ...opportunityData,
+    setOrganizationData({
+      ...organizationData,
       [name]: type === 'file' ? files[0] : value
     });
   };
 
   return (
     <div>
-      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose} clearCache={clearCache}/>
+      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose} clearCache={()=>{}}/>
       <OpportunityContext.Provider 
       value={{
-        opportunityData,
-        setOpportunityData, 
+        organizationData,
+        setOrganizationData, 
         currentOpportunityPage, 
         setCurrentOpportuntityPage,
         handleChange,
-        opportunityQuestionsPossibilities,
+        organizationQuestionsPossibilities,
         }}> 
         <Modal
           isOpen={visibility}
@@ -134,7 +137,7 @@ export default function OpportunityModal({visibility, onClose}){
 };
 
 function OpportunityType(){
-  const { opportunityData, handleChange, opportunityQuestionsPossibilities } = useContext(OpportunityContext);
+  const { organizationData, handleChange, organizationQuestionsPossibilities } = useContext(OpportunityContext);
 
   return(
     <>
@@ -142,14 +145,14 @@ function OpportunityType(){
     <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
     <main style={{display: "flex", alignItems: "center", justifyContent: "space-around", paddingTop: "1rem"}}>
       <div style={{display: "flex", flexDirection: "column", gap: "30px"}}>
-        <label htmlFor="workplaceOpportunityType">Workplace Opportunity Type:</label>
-        <label htmlFor="hostCompany">Host Company / Organization:</label>
+        <label htmlFor="organizationType">Workplace Opportunity Type:</label>
+        <label htmlFor="host">Host Company / Organization:</label>
       </div>
       <div style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "50%", gap: "30px"}}>
         <select
-            id="workplaceOpportunityType"
-            name="workplaceOpportunityType"
-            value={opportunityData.workplaceOpportunityType}
+            id="organizationType"
+            name="organizationType"
+            value={organizationData.organizationType}
             onChange={handleChange}
         >
             <option value="">Select Type</option>
@@ -158,9 +161,9 @@ function OpportunityType(){
             <option value="Community Service">Community Service</option>
         </select>
         <input
-            id="hostCompany"
-            name="hostCompany"
-            value={opportunityData.hostCompany}
+            id="host"
+            name="host"
+            value={organizationData.host}
             onChange={handleChange}
             type='text'
             maxLength={40}
@@ -172,7 +175,7 @@ function OpportunityType(){
 }
 
 function InternInfo(){
-  const { opportunityData, handleChange, opportunityQuestionsPossibilities } = useContext(OpportunityContext);
+  const { organizationData, handleChange, organizationQuestionsPossibilities } = useContext(OpportunityContext);
 
   return(
     <>
@@ -185,7 +188,7 @@ function InternInfo(){
               <input
                   id="internFieldOfWork"
                   name="internFieldOfWork"
-                  value={opportunityData.internFieldOfWork}
+                  value={organizationData.internFieldOfWork}
                   onChange={handleChange}
                   type='text'
                   maxLength={40}
@@ -197,7 +200,7 @@ function InternInfo(){
               <input
                   id="internPosition"
                   name="internPosition"
-                  value={opportunityData.internPosition}
+                  value={organizationData.internPosition}
                   onChange={handleChange}
                   type='text'
                   maxLength={40}
@@ -211,7 +214,7 @@ function InternInfo(){
             className='internExpectations'
             id="internExpectations"
             name="internExpectations"
-            value={opportunityData.internExpectations}
+            value={organizationData.internExpectations}
             onChange={handleChange}
             maxLength={500}
             placeholder='Briefly describe the tools and knowledge interns will need to succeed throughout internship.'>
@@ -223,11 +226,28 @@ function InternInfo(){
 }
 
 function FinalInfo(){
-  const { opportunityData, setOpportunityData, opportunityQuestionsPossibilities } = useContext(OpportunityContext);
+  const { organizationData, setOrganizationData, organizationQuestionsPossibilities } = useContext(OpportunityContext);
   const logoRef = useRef();
   const [logoPreviewURL, setLogoPreviewUrl] = useState(null);
-  const [learnMoreTextActivation, setLearnMoreTextActivation] = useState(false);
-  const [applyTextActivation, setApplyTextActivation] = useState(false);
+
+
+  // logic to load the preview image when user opens tab
+  useEffect(()=>{
+    // if(organizationData.learnMoreTextActivation){
+    //   setLearnMoreTextActivation(true);
+    // }
+    // if(organizationData.applyLink === " "){
+    //   setApplyTextActivation(true);
+    // }
+    if(organizationData.organizationLogo){
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreviewUrl(reader.result);
+      };
+      try{reader.readAsDataURL(organizationData.organizationLogo);}catch{}
+      // TODO: what the flip is going on here
+    }
+  },[])
 
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;
@@ -242,13 +262,18 @@ function FinalInfo(){
       };
       reader.readAsDataURL(file); // Read the file for preview
 
-      setOpportunityData({
-        ...opportunityData,
+      setOrganizationData({
+        ...organizationData,
         [name]: file, // Store the File object
       });
+
+      setOrganizationData({
+        ...organizationData,
+        organizationLogoPreview: logoPreviewURL,
+      })
     } else {
-      setOpportunityData({
-        ...opportunityData,
+      setOrganizationData({
+        ...organizationData,
         [name]: value,
       });
     }
@@ -256,12 +281,18 @@ function FinalInfo(){
 
   const handleTextClick = (event) => {
     event.preventDefault();
-    if(event.target.name==="learnMoreText"){
-      setLearnMoreTextActivation(!learnMoreTextActivation);
+    if(event.target.name==="learnMoreTextActivation"){
+      setOrganizationData({ ...organizationData,
+        learnMoreTextActivation : !organizationData.learnMoreTextActivation
+      })
     }
-    else if(event.target.name === "applyText"){
-      setApplyTextActivation(!applyTextActivation);
+    else if(event.target.name==="applyTextActivation"){
+      setOrganizationData({ ...organizationData,
+        applyTextActivation : !organizationData.applyTextActivation
+      })
     }
+    
+    {alert(organizationData.applyTextActivation)}
   }
 
   return(
@@ -271,21 +302,21 @@ function FinalInfo(){
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div className='questionItem' style={{paddingTop: "15px"}}>
         <div className='questionItem' style={{width: "100%"}}>
-          <label htmlFor="learnMoreLink">Where would you like users to learn more about your opportunity?</label>
+          <label htmlFor="learnMoreLink">Where would you like users to learn more about your organization?</label>
           <div style={{width: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}}>
             <input
                 type="link"
                 id="learnMoreLink"
                 name="learnMoreLink"
-                value={opportunityData.learnMoreLink}
+                value={organizationData.learnMoreLink}
                 onChange={handleChange}
                 placeholder='Paste a link here!'
                 style={{width: "60%", 
-                  backgroundColor: learnMoreTextActivation && 'lightgray',
-                  opacity: learnMoreTextActivation ? 0.7 : 1,
-                  borderColor: learnMoreTextActivation && "darkgray", cursor: learnMoreTextActivation && "default"}}
+                  backgroundColor: organizationData.learnMoreTextActivation && 'lightgray',
+                  opacity: organizationData.learnMoreTextActivation ? 0.7 : 1,
+                  borderColor: organizationData.learnMoreTextActivation && "darkgray", cursor: organizationData.learnMoreTextActivation && "default"}}
             />
-            <button className={`btnText ${learnMoreTextActivation ? "activated" : ""}`} name="learnMoreText" onClick={handleTextClick}>Or by sending a text</button>
+            <button className={`btnText ${organizationData.learnMoreTextActivation ? "activated" : ""}`} name="learnMoreTextActivation" onClick={handleTextClick}>Or by sending a text</button>
           </div>
         </div>
         <br />
@@ -296,34 +327,38 @@ function FinalInfo(){
                 type="link"
                 id="applyLink"
                 name="applyLink"
-                value={opportunityData.applyLink}
+                value={organizationData.applyLink}
                 onChange={handleChange}
                 placeholder='Paste a link here!'
                 style={{width: "60%", 
-                  backgroundColor: applyTextActivation && 'lightgray',
-                  opacity: applyTextActivation ? 0.7 : 1,
-                  borderColor: applyTextActivation && "darkgray", cursor: applyTextActivation && "default"}}
+                  backgroundColor: organizationData.applyTextActivation && 'lightgray',
+                  opacity: organizationData.applyTextActivation ? 0.7 : 1,
+                  borderColor: organizationData.applyTextActivation && "darkgray", cursor: organizationData.applyTextActivation && "default"}}
             />
-            <button className={`btnText ${applyTextActivation ? "activated" : ""}`} name="applyText" onClick={handleTextClick}>Or by sending a text</button>
+            <button className={`btnText ${organizationData.applyTextActivation ? "activated" : ""}`} name="applyTextActivation" onClick={handleTextClick}>Or by sending a text</button>
           </div>
         </div>
         <br />
         <div className='questionItem'>
-          <label htmlFor="organizationLogo">Upload a logo of your organization or an image that embodies your opportunity.</label>
-          <button style={{borderRadius: "50%", boxShadow: "var(--shadowColor)", padding: "15px"}} onClick={(e)=>{
-            logoRef.current.click();
-            e.preventDefault();}}><GrAdd size={30}/></button>
-          <input
-              type="file"
-              id="organizationLogo"
-              name="organizationLogo"
-              // value={opportunityData.organizationLogo}
-              onChange={handleChange}
-              style={{display: "none"}}
-              ref={logoRef}
-              accept=".jpg"
-          />
-          {logoPreviewURL && <img src={logoPreviewURL} alt="Logo" style={{width: "100px",overflow: "hidden", borderRadius: "50%"}}/>}
+          <label htmlFor="organizationLogo">Upload a logo of your organization or an image that embodies your organization.</label>
+          <div style={{display: "flex", position: "relative", alignItems: "center", justifyContent: "center", width: "40%", paddingTop: "15px"}}>
+            <button style={{borderRadius: "50%", boxShadow: "var(--shadowColor)", padding: "15px"}} onClick={(e)=>{
+              logoRef.current.click();
+              e.preventDefault();}}><GrAdd size={30}/></button>
+            <input
+                type="file"
+                id="organizationLogo"
+                name="organizationLogo"
+                onChange={handleChange}
+                style={{display: "none"}}
+                ref={logoRef}
+                accept=".jpg"
+            />
+            {logoPreviewURL && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
+              <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Logo Preview:</span>
+              <img src={logoPreviewURL} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
+            </div>}
+          </div>
         </div>
       </div>
     </main>
@@ -332,31 +367,31 @@ function FinalInfo(){
 }
 
 function BasicLogistics(){
-  const { opportunityData, handleChange, opportunityQuestionsPossibilities } = useContext(OpportunityContext);
+  const { organizationData, handleChange, organizationQuestionsPossibilities } = useContext(OpportunityContext);
 
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Tell us some basic information about your opportunity.</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Tell us some basic information about your organization.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{display: "flex", flexWrap: "wrap", justifyContent:"space-evenly", alignItems: "center", paddingTop: "10px", gap: "15px"}} className='basicLogistics'>
           <div className='logisticsQuestion'>
-              <label htmlFor="isPaid">Is this opportunity paid or unpaid?</label>
+              <label htmlFor="isPaid">Is this organization paid or unpaid?</label>
               <select
                   id="isPaid"
                   name="isPaid"
-                  value={opportunityData.isPaid}
+                  value={organizationData.isPaid}
                   onChange={handleChange}>
                       <option value="Paid">Paid</option>
                       <option value="Unpaid">Unpaid</option>
               </select>
           </div>
           <div className='logisticsQuestion'>
-              <label htmlFor="workLocation">What is the format of the opportunity?</label>
+              <label htmlFor="workLocation">What is the format of the organization?</label>
               <select
                   id="workLocation"
                   name="workLocation"
-                  value={opportunityData.workLocation}
+                  value={organizationData.workLocation}
                   onChange={handleChange}>
                       <option value="On-site">On-site</option>
                       <option value="Remote">Remote</option>
@@ -368,7 +403,7 @@ function BasicLogistics(){
               <select
                   id="applicants"
                   name="applicants"
-                  value={opportunityData.applicants}
+                  value={organizationData.applicants}
                   onChange={handleChange}>
                       <option value="Either One">Either one</option>
                       <option value="High School">High School</option>
@@ -376,11 +411,11 @@ function BasicLogistics(){
               </select>
           </div>
           <div className='logisticsQuestion'>
-              <label htmlFor="timeFrame">What is the timeframe of the opportunity?</label>
+              <label htmlFor="timeFrame">What is the timeframe of the organization?</label>
               <select
                   id="timeFrame"
                   name="timeFrame"
-                  value={opportunityData.timeFrame}
+                  value={organizationData.timeFrame}
                   onChange={handleChange}>
                       <option value="One Week">One Week</option>
                       <option value="Two Weeks">Two Weeks</option>
@@ -395,7 +430,7 @@ function BasicLogistics(){
 }
 
 function PreviewOppportunityCard(){
-  const { opportunityData } = useContext(OpportunityContext);
+  const { organizationData } = useContext(OpportunityContext);
  
   return(
     <>
@@ -403,7 +438,7 @@ function PreviewOppportunityCard(){
       <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're all set! Here's a preview of your card:</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "10px"}}>
-        <OrganizationProfile organizationData={opportunityData} location={"opportunity_popup"}/>
+        <OrganizationProfile organizationData={organizationData} location={"opportunity_popup"}/>
       </div>
     </main>
     </>

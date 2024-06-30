@@ -10,9 +10,10 @@ import { RiArrowGoBackFill } from "react-icons/ri";
 import { MdEdit } from "react-icons/md";
 import AboutMeModal from '../Profilemodals/AboutMemodal/AboutMeModal';
 import OpportunityModal from '../Profilemodals/Opportunitymodal/OpportunityModal';
+import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
 
 
-export default function ProfileCard({userData}) {
+export default function EditProfileCard({userData}) {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -71,7 +72,7 @@ export default function ProfileCard({userData}) {
 function EditInformation({questionName, onEdit, isAnswered}){
     return(
         <>
-        {isAnswered && <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", position: "absolute", width: "150px", right: "-150px"}}
+        {isAnswered && <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", position: "absolute", width: "150px", right: "-180px"}}
             onClick={onEdit}>
             
             <MdEdit size={30} style={{background: "#DFECEF", borderRadius: "50%", padding: "5px"}}/>
@@ -186,11 +187,15 @@ function BasicInfoCard({userType, userName, descType}){
 
 function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
+
+    // useEffect(()=>{
+    //     let opportunityData = JSON.stringify(localStorage.getItem("userOpportunityData"));
+    // }, [])
     
     return(
         <>
         <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>
-        <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
+        {opportunityData ? <OrganizationProfile location={"opportunity_popup"} opportunityData={opportunityData}/> : <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
             boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
             {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
@@ -200,7 +205,7 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
                 <span style={{textDecoration: "underline"}}>Add one!</span>
                 <EditInformation isAnswered={false} questionName={"Opportunity"}/>
             </div>
-        </div>
+        </div>}
         </>
     )
 }

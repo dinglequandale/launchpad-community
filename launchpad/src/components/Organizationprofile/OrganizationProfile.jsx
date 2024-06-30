@@ -9,7 +9,7 @@ import ProfileCard from "../Profilecard/ProfileCard";
 export default function OrganizationProfile({organizationData, location}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
     const [showPfpCard, setShowPfpCard] = useState(false);
-
+    let organizationLogistics = [organizationData.isPaid,organizationData.applicants, organizationData.workLocation, organizationData.timeFrame]
     useEffect(() => {
         document.addEventListener("keydown", onKeyPress, true)
       }, [])
@@ -20,25 +20,23 @@ export default function OrganizationProfile({organizationData, location}){
         }
       }
 
-    const handleOrganizationDesc = (organizationType, organizationHost) => {
-        if(organizationHost && (organizationType==="Club" || organizationType == "Initiative")){
-            return <span>{organizationType} led by <span style={{
-                textDecoration: "underline",
-                color: "rgb(115, 169, 223)",
-                cursor:"pointer"}}
-            onClick={()=>handleOnHostClick(organizationHost)}
-            >{organizationHost}</span> </span>;
-        } else if (organizationHost){
-            return `${organizationType} overseen by ${organizationHost}`;
-        }
-        else{
-            return organizationType;
-        }
-    }
-
     const handleOnHostClick = () => (
         setShowPfpCard(true)
     )
+
+    const handleConnect = (e) => {
+        e.preventDefault();
+        if(location === "organizations_page"){
+            // input connect logic here
+        }
+    }
+
+    const handleLearnMore = (e) => {
+        e.preventDefault();
+        if(location === "organizations_page"){
+            // input learn more logic here
+        }
+    }
 
     return(
         <>
@@ -47,29 +45,28 @@ export default function OrganizationProfile({organizationData, location}){
                 {organizationData.organizationTags && <RelevanceBanner relevanceType={organizationData.organizationTags}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
                     <div style={{display: "flex", position: "relative", justifyContent: "center", alignItems: "center"}}>
-                        <img src="https://purepng.com/public/uploads/large/big-chungus-jkg.png" alt="display image" 
-                        style={{borderStyle: "solid", borderColor: "var(--secondary)", width: "145px", height: "145px"}} />
-                        <div style={{paddingLeft: "15px"}}>
-                            <span style={{fontWeight: "bolder", fontSize: "20px"}}>{organizationData.organizationName}</span> <br />
-                            <span style={{fontWeight: "300", fontSize: "smaller"}}>{
-                                handleOrganizationDesc(organizationData.organizationType, organizationData.organizationHost)
-                            }</span> <br /> <br />
-                            
-                            <span>blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah blah</span>
+                        <img src={organizationData.organizationLogoPreview ? organizationData.organizationLogoPreview : "https://thebuzzmagazines.com/sites/default/files/events/2021/08/awty_logo_sep16.jpg"} alt="bruh" 
+                        style={{borderStyle: "solid", borderColor: "var(--secondary)", width: "145px", height: "145px", objectFit: "cover"}} />
+                        <div style={{paddingLeft: "15px", lineHeight: "1.2"}}>
+                            <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.5"}}>{organizationData.host}</span> <br />
+                            <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>
+                                <span style={{fontWeight: "bolder", color: "var(--secondary)"}}>{organizationData.organizationType}</span>  {["Club", "Initiative"].includes(organizationData.organizationType) ? "" : "opportunity"} run by {organizationData.host}
+                            </span> <br /> <br />
+                            <span>{["Shadowing", "Internship", "Community Service"].includes(organizationData.organizationType) ? organizationData.internExpectations : ""}</span>
                         </div>
                     </div>
-                    {organizationData.organizationLogistics && <div style={{display: "flex", justifyContent: "space-evenly", paddingTop: "10px"}}>
+                    {organizationLogistics && <div style={{display: "flex", justifyContent: "space-evenly", paddingTop: "10px"}}>
                         {logisticsList.map((logistic, index)=>(
-                            <div key={index} className={organizationData.organizationLogistics[index] ? "logisticOption" : "logisticOption hidden"}>
+                            <div key={index} style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "5px"}}>
                                 {logistic}
-                                <span style={{fontWeight: "300"}}>{organizationData.organizationLogistics[index]}</span>
+                                <span style={{fontWeight: "300"}}>{organizationLogistics[index]}</span>
                             </div>
                         ))}
                     </div>}
                 </div>
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px"}}>
-                    <button className="btnOrganizationConnect"> Learn More </button>
-                    <button className="btnOrganizationLearnMore"> {organizationData.organizationType==="Community Service" ? "Volunteer" : "Connect"} </button>
+                    <button className="btnOrganizationLearnMore" onClick={e => handleLearnMore(e)}> Learn More </button>
+                    <button className="btnOrganizationConnect" onClick={e => handleConnect(e)}> {organizationData.organizationType==="Community Service" ? "Volunteer" : "Connect"} </button>
                 </div>
             </div>
         </>

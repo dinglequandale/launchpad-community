@@ -16,7 +16,7 @@
     width: 80%;
 }
 
-.btnOrganizationConnect{
+.btnOrganizationLearnMore{
     padding: 5px;
     background-color: var(--secondary);
     border-radius: 2px;
@@ -29,7 +29,7 @@
     color: aliceblue;
 }
 
-.btnOrganizationLearnMore{
+.btnOrganizationConnect{
     padding: 5px;
     background-color: var(--primary);
     border-radius: 2px;
