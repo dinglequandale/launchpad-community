@@ -16,6 +16,10 @@
     width: 80%;
 }
 
+.organizationProfileContainer.userProfile{
+    width: 95%;
+}
+
 .btnOrganizationLearnMore{
     padding: 5px;
     background-color: var(--secondary);

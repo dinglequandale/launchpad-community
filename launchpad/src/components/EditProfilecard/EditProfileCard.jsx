@@ -187,15 +187,22 @@ function BasicInfoCard({userType, userName, descType}){
 
 function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
+    const [opportunityData, setOpportunityData] = useState(null);
+    const [showOrganizationProfile, setShowOrganizationProfile] = useState(false);
 
-    // useEffect(()=>{
-    //     let opportunityData = JSON.stringify(localStorage.getItem("userOpportunityData"));
-    // }, [])
-    
+    useEffect(() => {
+        const storedOpportunityData = localStorage.getItem("userOpportunityData");
+        if (storedOpportunityData !== null) {
+          setOpportunityData(JSON.parse(storedOpportunityData));
+          setShowOrganizationProfile(true);
+        }
+      }, [opportunityModalVisibility]);
+      
+
     return(
         <>
         <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>
-        {opportunityData ? <OrganizationProfile location={"opportunity_popup"} opportunityData={opportunityData}/> : <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
+        { showOrganizationProfile ? <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/> : <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
             boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
             {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
@@ -203,16 +210,17 @@ function OpportunityPopup({userType, userName, descType, opportunitiesOptions}){
             <div className="addOne" onClick={()=>setOpportunityModalVisibility(true)}>
                 <IoAdd size={25} />
                 <span style={{textDecoration: "underline"}}>Add one!</span>
-                <EditInformation isAnswered={false} questionName={"Opportunity"}/>
             </div>
         </div>}
+        <div className='addOne' style={{transform: "translate(0,-150px)"}}>
+            <EditInformation isAnswered={showOrganizationProfile} questionName={"Opportunity"} onEdit={()=>setOpportunityModalVisibility(true)}/>
+        </div>
         </>
     )
 }
 
 function AboutMeDisplay(){
     // editting functionality
-    const aboutMeRef = useRef();
     const aboutMe = localStorage.getItem("userAboutMe");
 
     const [aboutMeModalVisibility, setAboutMeModalVisibility] = useState(false);
@@ -226,13 +234,13 @@ function AboutMeDisplay(){
             <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me ...</span> <br />
 
             {!aboutMe && <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>}
-            <div className="addOne" id="About Me" onClick={()=>{setAboutMeModalVisibility(true)}} ref={aboutMeRef}>
+            <div className="addOne" id="About Me" onClick={()=>{setAboutMeModalVisibility(true)}}>
                 
                 {!aboutMe && <>
                 <IoAdd size={25} />
                 <span style={{textDecoration: "underline"}}>Add an About Me Description</span>
                 </>}
-                <EditInformation questionName={"About Me"} onEdit={()=>aboutMeRef.current.click()} isAnswered={aboutMe}/>
+                <EditInformation questionName={"About Me"} onEdit={()=>setAboutMeModalVisibility(true)} isAnswered={aboutMe}/>
             </div><span>{aboutMe}</span>
         </div>
         </>

@@ -41,7 +41,7 @@ export default function OrganizationProfile({organizationData, location}){
     return(
         <>
             {showPfpCard && <ProfileCard onClose={() => setShowPfpCard(false)}/>}
-            <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : "opportunityPopup"}`} style={{position: "relative"}}>
+            <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : location === "user_profile" ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
                 {organizationData.organizationTags && <RelevanceBanner relevanceType={organizationData.organizationTags}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
                     <div style={{display: "flex", position: "relative", justifyContent: "center", alignItems: "center"}}>
