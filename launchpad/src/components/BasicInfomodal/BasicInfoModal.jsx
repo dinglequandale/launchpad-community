@@ -3,13 +3,13 @@ import "./basicinfomodal.css"
 import Modal from "react-modal"
 import MakeChanges from "../Makechanges/MakeChanges";
 
-export default function BasicInfoModal({visibility,onClose,userType,}){
-    const [basicInfoContent, setBasicInfoContent] = useState({areasOfInterest: "", colleges: "", yearsOfExperience: "", industryOfExperience});
+export default function BasicInfoModal({visibility,onClose,userType}){
+    const [basicInfoContent, setBasicInfoContent] = useState({areasOfInterest: "", colleges: "", yearsOfExperience: "", industryOfExperience: ""});
     const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
     // later replace with logic tailored to FireStore
   
     const saveBasicInfo = () => {
-      localStorage.setItem("userBasicInfo", basicInfoContent);
+      localStorage.setItem("userBasicInfo", JSON.stringify(basicInfoContent));
       onClose();
     }
   
@@ -35,6 +35,10 @@ export default function BasicInfoModal({visibility,onClose,userType,}){
         }
       };
 
+      const handleOnChange = (e) => {
+        setBasicInfoContent({...basicInfoContent, [e.target.name] : e.target.value});
+      }
+
     return(
         <div>
         <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
@@ -51,14 +55,15 @@ export default function BasicInfoModal({visibility,onClose,userType,}){
             <hr style={{borderColor: "var(--secondary)"}}/>
           </header>
           <main style={{paddingTop: "20px"}}>
-            <form style={{width: "650px", display: "flex", gap: "20px", flexDirection: "column"}}>
+            <form style={{width: "750px", display: "flex", gap: "20px", flexDirection: "column"}}>
             <div style={{display: "flex", justifyContent: "space-between"}}>
                     <label htmlFor="areasOfInterest">What is are your areas of {userType==="Professional" ? "expertise" : "interests"}?</label>
                     <input 
                     type="text"
                     name="areasOfInterest"
                     value={basicInfoContent.areasOfInterest}
-                    placeholder="E.g. 'finance, data analytics'"/>
+                    placeholder="E.g. 'finance, data analytics'"
+                    onChange={handleOnChange}/>
                 </div>
                 {userType !== "Professional" &&
                 <div style={{display: "flex", justifyContent: "space-between"}}>
@@ -67,25 +72,29 @@ export default function BasicInfoModal({visibility,onClose,userType,}){
                     type="text"
                     name="colleges"
                     value={basicInfoContent.colleges}
-                    placeholder=""/>
+                    placeholder="E.g. 'Harvard, Yale, ...'"
+                    onChange={handleOnChange}
+                    />
                 </div>}
                 {userType === "Professional" && 
                 <div style={{display: "flex", justifyContent: "space-between"}}>
-                    <label htmlFor="experience">  </label>
+                    <label htmlFor="industryOfExperience"> In what industry have you worked in the longest? </label>
                     <input 
                     type="text"
-                    name="experience"
-                    value={basicInfoContent.experience}
-                    placeholder=""/>
+                    name="industryOfExperience"
+                    value={basicInfoContent.industryOfExperience}
+                    placeholder=""
+                    onChange={handleOnChange}/>
                 </div>}
                 {userType === "Professional" &&
                 <div style={{display: "flex", justifyContent: "space-between"}}>
-                    <label htmlFor="experience">  </label>
+                    <label htmlFor="yearsOfExperience"> How many years of experience do have? </label>
                     <input 
                     type="text"
-                    name="experience"
-                    value={basicInfoContent.experience}
-                    placeholder=""/>
+                    name="yearsOfExperience"
+                    value={basicInfoContent.yearsOfExperience}
+                    placeholder="E.g. '30+', or '48'"
+                    onChange={handleOnChange}/>
                 </div>}
 
 

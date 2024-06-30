@@ -167,9 +167,17 @@ function ResumeUpload(){
       </div>
     );
 }
-
+localStorage.clear()
 function BasicInfoCard({userType, userName, descType}){
+    const [basicInfoData, setBasicInfoData] = useState(null);
     const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(false);
+    
+    useEffect(() => {
+        const storedBasicInfoData = localStorage.getItem("userBasicInfo");
+        if (storedBasicInfoData !== null) {
+          setBasicInfoData(JSON.parse(storedBasicInfoData));
+        }
+      }, [basicInfoModalVisibility]);
     return(
         <>
         <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userType={userType}/>
@@ -183,10 +191,10 @@ function BasicInfoCard({userType, userName, descType}){
             </div>   
             </div>
             <div style={{display: "flex"}}>
-            <div className='userInfo' style={{fontSize: "16px"}}>
-                <span>Fields of {userType === "Professional" ? "Expertise" : "Interest"}: </span>
-                <span>{descType()}: </span>
-            </div>
+            {basicInfoData && <div className='userInfo' style={{fontSize: "16px"}}>
+                <span>Fields of {userType === "Professional" ? "Expertise" : "Interest"}: {basicInfoData.areasOfInterest && basicInfoData.areasOfInterest}</span>
+                <span>{descType()}: {userType !== "Professional" ? basicInfoData.colleges : `${basicInfoData.yearsOfExperience} Years of Experience in ${basicInfoData.industryOfExperience}`}</span>
+            </div>}
         </div>
         <div className='addOne' style={{transform: "translate(0,-70px)"}}>
                 <EditInformation isAnswered={true} questionName={"Intro"} onEdit={()=>setBasicInfoModalVisibility(true)}/>
