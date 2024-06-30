@@ -20,9 +20,12 @@ export default function OrganizationProfile({organizationData, location}){
         }
       }
 
-    const handleOnHostClick = () => (
-        setShowPfpCard(true)
-    )
+    const handleOnHostClick = (e) => {
+        e.preventDefault();
+        if(location === "organizations_page"){
+            setShowPfpCard(true)
+        }
+    }
 
     const handleConnect = (e) => {
         e.preventDefault();
@@ -42,22 +45,26 @@ export default function OrganizationProfile({organizationData, location}){
         <>
             {showPfpCard && <ProfileCard onClose={() => setShowPfpCard(false)}/>}
             <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : location === "user_profile" ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
-                {organizationData.organizationTags && <RelevanceBanner relevanceType={organizationData.organizationTags}/>}
+                {organizationData.applicantFieldOfWork && <RelevanceBanner relevanceType={organizationData.applicantFieldOfWork}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
-                    <div style={{display: "flex", position: "relative", justifyContent: "center", alignItems: "center"}}>
+                    <div style={{display: "flex", position: "relative"}}>
                         <img src={organizationData.organizationLogoPreview ? organizationData.organizationLogoPreview : "https://thebuzzmagazines.com/sites/default/files/events/2021/08/awty_logo_sep16.jpg"} alt="bruh" 
-                        style={{borderStyle: "solid", borderColor: "var(--secondary)", width: "145px", height: "145px", objectFit: "cover"}} />
+                        className="organizationPfp"/>
                         <div style={{paddingLeft: "15px", lineHeight: "1.2"}}>
                             <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.5"}}>{organizationData.host}</span> <br />
                             <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>
-                                <span style={{fontWeight: "bolder", color: "var(--secondary)"}}>{organizationData.organizationType}</span>  {["Club", "Initiative"].includes(organizationData.organizationType) ? "" : "opportunity"} run by {organizationData.host}
-                            </span> <br /> <br />
-                            <span>{["Shadowing", "Internship", "Community Service"].includes(organizationData.organizationType) ? organizationData.internExpectations : ""}</span>
+                                <span 
+                                style={{fontWeight: "bold", color: "var(--secondary)"}}>
+                                    {organizationData.organizationType} {["Club", "Initiative"].includes(organizationData.organizationType) ? "" : "opportunity"} </span> run by <button className="btnText" onClick={(e) => handleOnHostClick(e)}>{organizationData.host}</button>
+                            </span> 
+                            <br />
+                            <span name="organizationDescription">{["Shadowing", "Internship", "Job", "Community Service"].includes(organizationData.organizationType) ? organizationData.applicantExpectations : ""}</span>
                         </div>
                     </div>
-                    {organizationLogistics && <div style={{display: "flex", justifyContent: "space-evenly", paddingTop: "10px"}}>
+
+                    {organizationLogistics && <div className="logisticsDisplay">
                         {logisticsList.map((logistic, index)=>(
-                            <div key={index} style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "5px"}}>
+                            <div key={index} className="logisticOption">
                                 {logistic}
                                 <span style={{fontWeight: "300"}}>{organizationLogistics[index]}</span>
                             </div>
@@ -77,7 +84,7 @@ function RelevanceBanner({relevanceType}){
     return(
         <div style={{borderRadius: "20px", position: "absolute", top: "-15px", left: "10px", width: "fitContent", padding: "4px 8px", background: "rgb(47,162,52)",
             background: "linear-gradient(90deg, rgba(47,162,52,1) 48%, rgba(18,123,22,1) 100%)", zIndex: "1"}}>
-            <span style={{color: "white", fontWeight: "600"}}>For finance, business fields </span>
+            <span style={{color: "white", fontWeight: "600"}}>For {relevanceType} </span>
         </div>
     )
 }

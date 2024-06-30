@@ -56,9 +56,9 @@ export default function OpportunityModal({visibility, onClose}){
   const [organizationData, setOrganizationData] = useState({
     organizationType: '',
     host: '',
-    internFieldOfWork: '',
-    internPosition: '',
-    internExpectations: '',
+    applicantFieldOfWork: '',
+    applicantPosition: '',
+    applicantExpectations: '',
     isPaid: 'Unpaid',
     applicants: 'Either One',
     workLocation: 'On-site',
@@ -90,7 +90,7 @@ export default function OpportunityModal({visibility, onClose}){
 
   return (
     <div>
-      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose} clearCache={()=>{}}/>
+      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       <OpportunityContext.Provider 
       value={{
         organizationData,
@@ -114,9 +114,9 @@ export default function OpportunityModal({visibility, onClose}){
           <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
           </header>
           <main style={{paddingTop:"10px"}}>
-          <form onSubmit={saveOpportunityData} style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
+          <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
             {currentOpportunityPage === 1 && <OpportunityType/>}
-            {currentOpportunityPage === 2 && <InternInfo/>}
+            {currentOpportunityPage === 2 && <ApplicantInfo/>}
             {currentOpportunityPage === 3 && <BasicLogistics/>}
             {currentOpportunityPage === 4 && <FinalInfo/>}
             {currentOpportunityPage === 5 && <PreviewOppportunityCard/>}
@@ -158,6 +158,7 @@ function OpportunityType(){
             <option value="">Select Type</option>
             <option value="Shadowing">Shadowing</option>
             <option value="Internship">Internship</option>
+            <option value="Job">Job</option>
             <option value="Community Service">Community Service</option>
         </select>
         <input
@@ -174,8 +175,21 @@ function OpportunityType(){
   )
 }
 
-function InternInfo(){
+function ApplicantInfo(){
   const { organizationData, handleChange, organizationQuestionsPossibilities } = useContext(OpportunityContext);
+  const getApplicantType = () => {
+  switch(organizationData.organizationType){
+    case "Internship":
+      return "Intern";
+    case "Job":
+      return "Applicant";
+    case "Community Service":
+      return "Volunteer";
+    case "Shadowing":
+      return "Shadowee";
+  }
+}
+const applicantType = getApplicantType();
 
   return(
     <>
@@ -184,37 +198,37 @@ function InternInfo(){
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{display: "flex", justifyContent: "space-around", paddingBottom: "20px"}}>
           <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px"}}>
-              <label htmlFor="internFieldOfWork">Intern Field of Work</label>
+              <label htmlFor="applicantFieldOfWork">{} Field of Work</label>
               <input
-                  id="internFieldOfWork"
-                  name="internFieldOfWork"
-                  value={organizationData.internFieldOfWork}
+                  id="applicantFieldOfWork"
+                  name="applicantFieldOfWork"
+                  value={organizationData.applicantFieldOfWork}
                   onChange={handleChange}
                   type='text'
                   maxLength={40}
                   placeholder='e.g. “finance”'
               />
           </div>
-          <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px"}}>
-              <label htmlFor="internPosition">Intern Position</label>
+          {<div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px"}}>
+              <label htmlFor="applicantPosition">Intern Position</label>
               <input
-                  id="internPosition"
-                  name="internPosition"
-                  value={organizationData.internPosition}
+                  id="applicantPosition"
+                  name="applicantPosition"
+                  value={organizationData.applicantPosition}
                   onChange={handleChange}
                   type='text'
                   maxLength={40}
                   placeholder='e.g. "data analytics"'
               />
-          </div>
+          </div>}
       </div>
       <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px"}}>
-        <label htmlFor="internExpectations">Intern Expectations</label>
+        <label htmlFor="applicantExpectations">Intern Expectations</label>
         <textarea 
-            className='internExpectations'
-            id="internExpectations"
-            name="internExpectations"
-            value={organizationData.internExpectations}
+            className='applicantExpectations'
+            id="applicantExpectations"
+            name="applicantExpectations"
+            value={organizationData.applicantExpectations}
             onChange={handleChange}
             maxLength={500}
             placeholder='Briefly describe the tools and knowledge interns will need to succeed throughout internship.'>

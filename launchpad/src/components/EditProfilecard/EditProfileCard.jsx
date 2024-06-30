@@ -11,6 +11,7 @@ import { MdEdit } from "react-icons/md";
 import AboutMeModal from '../Profilemodals/AboutMemodal/AboutMeModal';
 import OpportunityModal from '../Profilemodals/Opportunitymodal/OpportunityModal';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
+import BasicInfoModal from '../BasicInfomodal/BasicInfoModal';
 
 
 export default function EditProfileCard({userData}) {
@@ -19,7 +20,7 @@ export default function EditProfileCard({userData}) {
 
     // temporary data
     const userType = "Professional";
-    const userName = "Shuja";
+    const userName = "Shuja Gupta";
     const opportunitiesOptions = {highSchool: 
     <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
     alum:
@@ -27,7 +28,15 @@ export default function EditProfileCard({userData}) {
     professional:
     <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</span>
 };
-    const descType = {highSchool: "College(s) of Interest", alumni: "Attending College", professional: "Current Position"};
+    const descType = () => {switch(userType){
+        case "High Schooler":
+            return "Colleges of Interest"
+        case "Alumni":
+            return "Attending College"
+        case "Professional":
+            return "Current Position"
+    }
+    }
 
     return(
         <>
@@ -160,27 +169,28 @@ function ResumeUpload(){
 }
 
 function BasicInfoCard({userType, userName, descType}){
-    
+    const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(false);
     return(
         <>
+        <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userType={userType}/>
         <div className='basicInfo'>
             <div>
                 <VscAccount size = {80} className='cardPfp'/>
             </div>
             <div className='cardNameDescription'>
-                <span className='cardName'>Name Tittel</span>
-                <span className='cardDescription'> Short description</span>
+                <span className='cardName'>{userName}</span>
+                <span className='cardDescription'>30+ Years of Experience</span>
             </div>   
             </div>
             <div style={{display: "flex"}}>
             <div className='userInfo' style={{fontSize: "16px"}}>
-                <span>Field(s) of {userType === "Professional" ? "Expertise": "Interest"}: ...</span>
-                <span>{userType === "High Schooler" ? descType.highSchool : userType === "Alumni" ? descType.alumni : descType.professional}: ...</span>
-            </div>
-            <div className='addOne'>
-                <EditInformation isAnswered={false} questionName={"Intro"}/>
+                <span>Fields of {userType === "Professional" ? "Expertise" : "Interest"}: </span>
+                <span>{descType()}: </span>
             </div>
         </div>
+        <div className='addOne' style={{transform: "translate(0,-70px)"}}>
+                <EditInformation isAnswered={true} questionName={"Intro"} onEdit={()=>setBasicInfoModalVisibility(true)}/>
+            </div>
         </>
     )
 }

@@ -6,13 +6,8 @@ import MakeChanges from '../../Makechanges/MakeChanges';
 export default function AboutMeModal({visibility, onClose}){
   const [aboutMeContent, setAboutMeContent] = useState("");
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
-  const prevAboutMe =  localStorage.getItem("userAboutMe", "") ? localStorage.getItem("userAboutMe", "") : "";
 
   // later replace with logic tailored to FireStore
-
-  const clearCache = () => {
-    localStorage.setItem("userAboutMe", prevAboutMe);
-  }
 
   const saveAboutMe = () => {
     localStorage.setItem("userAboutMe", aboutMeContent);
@@ -45,7 +40,7 @@ export default function AboutMeModal({visibility, onClose}){
 
   return (
     <div>
-      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose} clearCache={clearCache}/>
+      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       <Modal
         isOpen={visibility}
         onRequestClose={onClose}

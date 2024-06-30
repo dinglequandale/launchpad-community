@@ -59,3 +59,18 @@
 .logisticOption.hidden{
     display:none;
 }
+
+.logisticsDisplay{
+    display: flex;
+    justify-content: space-evenly;
+    padding-top: 10px;
+}
+
+.organizationPfp{
+    border-style: solid;
+    border-color: var(--secondary);
+    width: 145px;
+    height: 145px;
+    object-fit: cover;
+    left: 0;
+}
