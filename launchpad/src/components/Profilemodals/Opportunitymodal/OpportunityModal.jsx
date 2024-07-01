@@ -5,6 +5,9 @@ import MakeChanges from '../../Makechanges/MakeChanges';
 import OrganizationProfile from '../../Organizationprofile/OrganizationProfile';
 import ProgressBar from '../../Progressbar/ProgressBar';
 import { GrAdd } from 'react-icons/gr';
+import { LuMessagesSquare } from 'react-icons/lu';
+import { MdEmail } from 'react-icons/md';
+import { CgWebsite } from 'react-icons/cg';
 
 
 const OpportunityContext = createContext({
@@ -64,8 +67,6 @@ export default function OpportunityModal({visibility, onClose}){
     apply: '',
     organizationLogo: null,
     organizationLogoPreview: '',
-    applyTextActivation: false,
-    learnMoreTextActivation: false,
   });
 
   const getApplicantType = () => {
@@ -74,7 +75,7 @@ export default function OpportunityModal({visibility, onClose}){
         return "Intern";
       case "Job":
         return "Applicant";
-      case "Community Service":
+      case "Volunteering":
         return "Volunteer";
       case "Shadowing":
         return "Shadowee";
@@ -88,7 +89,8 @@ export default function OpportunityModal({visibility, onClose}){
       id: "organizationType",
       text: "Workplace Opportunity Type:",
       type: "select",
-      options: ["Select Type", "Shadowing", "Internship", "Job", "Community Service"],
+      options: ["Select Type", "Shadowing", "Internship", "Job", "Volunteering"],
+      includers: ["Job", "Internship", "Shadowing", "Volunteering"],
       required: true,
       page: 1, 
     },
@@ -97,6 +99,7 @@ export default function OpportunityModal({visibility, onClose}){
       text: "Host Company / Organization:",
       type: "text",
       maxLength: 40,
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: true,
       page: 1, 
     },
@@ -104,28 +107,31 @@ export default function OpportunityModal({visibility, onClose}){
     // Page 2
     {
       id: "applicantFieldOfWork",
-      text: `${getApplicantType()} Field of Work`,
+      text: `${organizationData.organizationType} Field of Work`,
       type: "text",
       maxLength: 40,
       placeholder: 'e.g. "finance"',
+      includers: ["Internship", "Shadowing", ""],
       required: true,
       page: 2, 
     },
     {
       id: "applicantPosition",
-      text: `${getApplicantType()} Position`,
+      text: `${organizationData.organizationType} Position`,
       type: "text",
       maxLength: 40,
       placeholder: 'e.g. "data analytics"',
-      required: (orgType) => orgType !== "Community Service",
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
+      required: (orgType) => orgType !== "Volunteering",
       page: 2, 
     },
     {
       id: "applicantExpectations",
-      text: `${getApplicantType()} Expectations`,
+      text: `${organizationData.organizationType} Expectations`,
       type: "textarea",
       maxLength: 500,
-      placeholder: `Briefly describe the tools and knowledge the ${getApplicantType().toLowerCase()} will need to succeed throughout this ${organizationData.organizationType && organizationData.organizationType.toLowerCase()} opportunity.`,
+      placeholder: `Briefly describe the tools and knowledge the ${getApplicantType().toLowerCase()}(s) will need to succeed throughout this ${organizationData.organizationType && organizationData.organizationType.toLowerCase()} opportunity.`,
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: true,
       page: 2, 
     },
@@ -136,6 +142,7 @@ export default function OpportunityModal({visibility, onClose}){
       text: "Is this opportunity paid or unpaid?",
       type: "select",
       options: ["Paid", "Unpaid"],
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: true,
       page: 3, 
     },
@@ -144,6 +151,7 @@ export default function OpportunityModal({visibility, onClose}){
       text: "What is the format of the opportunity?",
       type: "select",
       options: ["On-site", "Remote", "Hybrid"],
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: true,
       page: 3, 
     },
@@ -152,14 +160,16 @@ export default function OpportunityModal({visibility, onClose}){
       text: "What is the level of education?",
       type: "select",
       options: ["High School / College", "High School", "College"],
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: true,
       page: 3, 
     },
     {
       id: "timeFrame",
-      text: "What is opportunity timeframe?",
+      text: "What is the opportunity timeframe?",
       type: "select",
-      options: ["One Week", "Two Weeks", "Three Weeks", ],
+      options: ["One Week", "Two Weeks", "Three Weeks"],
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: true,
       page: 3, 
     },
@@ -170,27 +180,31 @@ export default function OpportunityModal({visibility, onClose}){
       text: "Where would you like users to learn more about this opportunity?",
       type: "link",
       placeholder: "Paste a link here!",
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: true,
       page: 4, 
     },
     {
       id: "apply",
-      text: "Where can students apply for this opportunity?",
+      text: `Where can students ${organizationData.organizationType === "Volunteering" ? "volunteer" : "apply"} for this opportunity?`,
       type: "link",
       placeholder: "Paste a link here!",
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: true,
       page: 4, 
     },
     {
       id: "organizationLogo",
-      text: "Upload a logo that embodies your opportunity!",
+      text: "Upload a logo that embodies your opportunity! (optional)",
       type: "file",
       accept: ".jpg",
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: false,
       page: 4, 
     },
   ];
 
+  // fix this later
   useEffect(()=>{
     if(Object.values(organizationData).filter((data)=>(data !== '')).length === Object.values(organizationData).length){
       setShowLast(true)
@@ -298,7 +312,7 @@ function OpportunityType(){
                 key={question.id}
                 id={question.id}
                 name={question.id}
-                value={organizationData[question.id]}
+                value={organizationData[question.id] ?? ''}
                 onChange={handleChange}
                 type="text"
                 maxLength={question.maxLength}
@@ -314,7 +328,7 @@ function OpportunityType(){
 
 function ApplicantInfo(){
   const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
-  const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 2));
+  const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 2 && question.includers.includes(organizationData.organizationType)));
 
   return(
     <>
@@ -326,8 +340,8 @@ function ApplicantInfo(){
             {questionsForPage
               .filter(
                 (question) =>
-                  question.id === "applicantFieldOfWork" ||
-                  question.id === "applicantPosition"
+                  (question.id === "applicantFieldOfWork" && !question.includers.includes(question.id)) ||
+                  (question.id === "applicantPosition"  && !question.includers.includes(question.id))
               )
               .map((question) => (
                 <div key={question.id} style={{ flex: 1, marginRight: "10px" }}>
@@ -375,16 +389,17 @@ function FinalInfo(){
   const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(OpportunityContext);
   const logoRef = useRef();
   const [logoPreviewURL, setLogoPreviewUrl] = useState(null);
-
-
-  // logic to load the preview image when user opens tab
+  
+  const learnMoreAndApplyOptions = [["In-Platform Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
+  
+  // TODO: temporary way of discerning between email / link
+  const [learnMoreType, setLearnMoreType] = useState(organizationData.learnMore.includes("@") ? "Email" : organizationData.learnMore === "Messages" ? "In-Platform Messages" : organizationData.learnMore ? "Website" : "");
+  const [applyType, setApplyType] = useState(organizationData.apply.includes("@") ? "Email" : organizationData.apply === "Messages" ? "In-Platform Messages" : organizationData.apply ? "Website" : "");
+  
+  const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState((learnMoreType && learnMoreType !== "In-Platform Messages") ?? "");
+  const [applyInputVisibility, setApplyInputVisibility] = useState((applyType && applyType !== "In-Platform Messages") ?? "");
+  // logic to load the preview image when user opens tab, not working
   useEffect(()=>{
-    // if(organizationData.learnMoreTextActivation){
-    //   setLearnMoreTextActivation(true);
-    // }
-    // if(organizationData.apply === " "){
-    //   setApplyTextActivation(true);
-    // }
     if(organizationData.organizationLogo){
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -410,7 +425,7 @@ function FinalInfo(){
 
       setOrganizationData({
         ...organizationData,
-        [name]: file, // Store the File object
+        [name]: file,
       });
 
       setOrganizationData({
@@ -418,6 +433,7 @@ function FinalInfo(){
         organizationLogoPreview: logoPreviewURL,
       })
     } else {
+      // TODO: different logic for messages, since user doesn't input anything
       setOrganizationData({
         ...organizationData,
         [name]: value,
@@ -425,65 +441,80 @@ function FinalInfo(){
     }
   };
 
-  const handleTextClick = (event) => {
+  const handleOptionClick = (event, optionName, questionId) => {
     event.preventDefault();
-    if(event.target.name==="learnMoreTextActivation"){
-      setOrganizationData({ ...organizationData,
-        learnMoreTextActivation : !organizationData.learnMoreTextActivation
-      })
+    setOrganizationData({...organizationData, [questionId]: ""})
+    if(optionName !== "In-Platform Messages" && questionId === "learnMore"){
+      setLearnMoreType(optionName);
+      setLearnMoreInputVisibility(true);
     }
-    else if(event.target.name==="applyTextActivation"){
-      setOrganizationData({ ...organizationData,
-        applyTextActivation : !organizationData.applyTextActivation
-      })
+    else if(optionName !== "In-Platform Messages" && questionId === "apply"){
+      setApplyType(optionName);
+      setApplyInputVisibility(true);
+    }
+    else if(optionName === "In-Platform Messages" && questionId === "apply"){
+      setApplyInputVisibility(false);
+      setApplyType(optionName);
+      setOrganizationData({...organizationData, [questionId]: "Messages"});
+    }
+    else{
+      setLearnMoreInputVisibility(false);
+      setLearnMoreType(optionName);
+      setOrganizationData({...organizationData, [questionId]: "Messages"})
     }
   }
 
-
-  const questionsForPage = organizationQuestionsConfig.filter((question=>(question.page===4)));
+  const questionsForPage = organizationQuestionsConfig.filter((question=>(question.page === 4 && question.includers.includes(organizationData.organizationType))));
 
   return(
     <>
     <main>
       <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're almost done. Just a few more details.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}> {/* Main container for flexbox */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           {/* First two questions (link inputs) */}
-          <div style={{ display: "flex", gap: "10px", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center"}}> 
+          <div style={{ display: "flex", gap: "10px", flexDirection: "column", textAlign: "center"}}> 
             {questionsForPage
               .filter(question => question.type === "link")
               .map(question => (
                 <div key={question.id}> 
                   <label htmlFor={question.id}>{question.text}</label>
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px"}}>
-                    <input
-                      type={question.type}
-                      id={question.id}
-                      name={question.id}
-                      value={organizationData[question.id]}
-                      onChange={handleChange}
-                      placeholder={question.placeholder}
-                      style={{
-                        width: "500px", 
-                        backgroundColor: organizationData[`${question.id}TextActivation`] && 'lightgray',
-                        opacity: organizationData[`${question.id}TextActivation`] ? 0.7 : 1,
-                        borderColor: organizationData[`${question.id}TextActivation`] && "darkgray", 
-                        cursor: organizationData[`${question.id}TextActivation`] && "default"
-                      }}
-                    />
-                    <button 
-                      className={`btnText ${organizationData[`${question.id}TextActivation`] ? "activated" : ""}`} 
-                      name={`${question.id}TextActivation`} 
-                      onClick={handleTextClick}
-                    >
-                      Or by sending a text
-                    </button>
+                  <div style={{display: "flex", justifyContent: "center", gap: "25px", paddingTop: "10px"}}>
+                  {learnMoreAndApplyOptions.map((option)=>(
+                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: "100px"}}>
+                      <button key={option[0]} style={{padding: "10px"}} className={`btnCircle ${option[0] === (question.id === "learnMore" ? learnMoreType : applyType) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
+                        {option[1]}
+                      </button>
+                      <span>{option[0]}</span>
+                    </div>)
+                  )}
                   </div>
+                  {learnMoreInputVisibility && question.id === "learnMore" &&
+                  <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", color: "var(--secondary)"}}>
+                    <span style={{fontWeight: "600"}} htmlFor={`${question.id} Input`}>Input your desired {learnMoreType === "Email" ? "email" : "website link"}:</span>
+                    <input 
+                    type={learnMoreType === "Email" ? "email" : "url"} 
+                    id={question.id}
+                    name={question.id}
+                    value={organizationData[question.id]}
+                    onChange={handleChange}
+                    />
+                  </div>}
+                  {applyInputVisibility && question.id === "apply" &&
+                  <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", color: "var(--secondary)"}}>
+                    <span style={{fontWeight: "600"}} htmlFor={`${question.id} Input`}>Input your desired {applyType === "Email" ? "email" : "website link"}:</span>
+                    <input
+                    type={applyType === "Email" ? "email" : "url"} 
+                    id={question.id}
+                    name={question.id}
+                    onChange={handleChange}
+                    value={organizationData[question.id]}/>
+                  </div>}
                 </div>
               ))}
           </div>
           {/* Logo upload */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}> {/* Wrap logo upload in a flexbox container */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {questionsForPage
               .filter(question => question.type === "file")
               .map(question => (
@@ -519,7 +550,7 @@ function FinalInfo(){
 function BasicLogistics(){
   const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
 
-  const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 3))
+  const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 3 && question.includers.includes(organizationData.organizationType)))
 
   return(
     <>

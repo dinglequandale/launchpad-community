@@ -58,7 +58,7 @@ export default function OrganizationProfile({organizationData, location}){
                                     {organizationData.organizationType} {["Club", "Initiative"].includes(organizationData.organizationType) ? "" : "opportunity"} </span> run by <button className="btnText" onClick={(e) => handleOnHostClick(e)}>{organizationData.host}</button>
                             </span> 
                             <br />
-                            <span name="organizationDescription">{["Shadowing", "Internship", "Job", "Community Service"].includes(organizationData.organizationType) ? organizationData.applicantExpectations : ""}</span>
+                            <span name="organizationDescription">{["Shadowing", "Internship", "Job", "Volunteering"].includes(organizationData.organizationType) ? organizationData.applicantExpectations : ""}</span>
                         </div>
                     </div>
 
@@ -73,7 +73,7 @@ export default function OrganizationProfile({organizationData, location}){
                 </div>
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px"}}>
                     <button className="btnOrganizationLearnMore" onClick={e => handleLearnMore(e)}> Learn More </button>
-                    <button className="btnOrganizationConnect" onClick={e => handleConnect(e)}> {organizationData.organizationType==="Community Service" ? "Volunteer" : "Connect"} </button>
+                    <button className="btnOrganizationConnect" onClick={e => handleConnect(e)}> {organizationData.organizationType==="Volunteering" ? "Volunteer" : "Connect"} </button>
                 </div>
             </div>
         </>

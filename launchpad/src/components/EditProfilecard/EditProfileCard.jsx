@@ -21,6 +21,7 @@ export default function EditProfileCard({userData}) {
     // temporary data
     const userType = "Professional";
     const userName = "Shuja Gupta";
+    
     const opportunitiesOptions = {highSchool: 
     <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
     alum:

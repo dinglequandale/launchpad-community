@@ -32,6 +32,6 @@ form label{
     gap: 5px;
 }
 
-.btnText.activated{
-    color: var(--highlight);
+.btnCircle.selected{
+    background-color: var(--highlight);
 }

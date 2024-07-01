@@ -99,6 +99,11 @@ button {
   color: var(--highlight);
 }
 
+.btnCircle{
+  overflow: hidden;
+  border-radius: 50%;
+}
+
 .btnUnfilled{
   background-color: var(--primary);
   border-style: solid;
