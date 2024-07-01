@@ -13,16 +13,13 @@ const OpportunityContext = createContext({
   currentOpportunityPage: 1,
   setCurrentOpportuntityPage: () => {},
   handleChange: () => {},
-  organizationQuestionsPossibilities: {},
+  organizationQuestionsConfig: {},
 });
 
 export default function OpportunityModal({visibility, onClose}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
   const [showLast, setShowLast] = useState(false);
-  const [organizationQuestions, setOrganizationQuestions] = useState(null);
-
-  const organizationQuestionsPossibilities = {"Shadowing": [1], "Intership": [1]};
 
   const saveOpportunityData = () => {
     localStorage.setItem("userOpportunityData", JSON.stringify(organizationData));
@@ -63,13 +60,136 @@ export default function OpportunityModal({visibility, onClose}){
     applicants: 'Either One',
     workLocation: 'On-site',
     timeFrame: 'One Week',
-    learnMoreLink: '',
-    applyLink: '',
+    learnMore: '',
+    apply: '',
     organizationLogo: null,
     organizationLogoPreview: '',
     applyTextActivation: false,
     learnMoreTextActivation: false,
   });
+
+  const getApplicantType = () => {
+    switch(organizationData.organizationType){
+      case "Internship":
+        return "Intern";
+      case "Job":
+        return "Applicant";
+      case "Community Service":
+        return "Volunteer";
+      case "Shadowing":
+        return "Shadowee";
+      default:
+        return "Applicant"
+    }
+  }
+  const organizationQuestionsConfig = [
+    // Page 1
+    {
+      id: "organizationType",
+      text: "Workplace Opportunity Type:",
+      type: "select",
+      options: ["Select Type", "Shadowing", "Internship", "Job", "Community Service"],
+      required: true,
+      page: 1, 
+    },
+    {
+      id: "host",
+      text: "Host Company / Organization:",
+      type: "text",
+      maxLength: 40,
+      required: true,
+      page: 1, 
+    },
+  
+    // Page 2
+    {
+      id: "applicantFieldOfWork",
+      text: `${getApplicantType()} Field of Work`,
+      type: "text",
+      maxLength: 40,
+      placeholder: 'e.g. "finance"',
+      required: true,
+      page: 2, 
+    },
+    {
+      id: "applicantPosition",
+      text: `${getApplicantType()} Position`,
+      type: "text",
+      maxLength: 40,
+      placeholder: 'e.g. "data analytics"',
+      required: (orgType) => orgType !== "Community Service",
+      page: 2, 
+    },
+    {
+      id: "applicantExpectations",
+      text: `${getApplicantType()} Expectations`,
+      type: "textarea",
+      maxLength: 500,
+      placeholder: `Briefly describe the tools and knowledge the ${getApplicantType().toLowerCase()} will need to succeed throughout this ${organizationData.organizationType && organizationData.organizationType.toLowerCase()} opportunity.`,
+      required: true,
+      page: 2, 
+    },
+  
+    // Page 3
+    {
+      id: "isPaid",
+      text: "Is this opportunity paid or unpaid?",
+      type: "select",
+      options: ["Paid", "Unpaid"],
+      required: true,
+      page: 3, 
+    },
+    {
+      id: "workLocation",
+      text: "What is the format of the opportunity?",
+      type: "select",
+      options: ["On-site", "Remote", "Hybrid"],
+      required: true,
+      page: 3, 
+    },
+    {
+      id: "applicants",
+      text: "What is the level of education?",
+      type: "select",
+      options: ["High School / College", "High School", "College"],
+      required: true,
+      page: 3, 
+    },
+    {
+      id: "timeFrame",
+      text: "What is opportunity timeframe?",
+      type: "select",
+      options: ["One Week", "Two Weeks", "Three Weeks", ],
+      required: true,
+      page: 3, 
+    },
+  
+    // Page 4
+    {
+      id: "learnMore",
+      text: "Where would you like users to learn more about this opportunity?",
+      type: "link",
+      placeholder: "Paste a link here!",
+      required: true,
+      page: 4, 
+    },
+    {
+      id: "apply",
+      text: "Where can students apply for this opportunity?",
+      type: "link",
+      placeholder: "Paste a link here!",
+      required: true,
+      page: 4, 
+    },
+    {
+      id: "organizationLogo",
+      text: "Upload a logo that embodies your opportunity!",
+      type: "file",
+      accept: ".jpg",
+      required: false,
+      page: 4, 
+    },
+  ];
 
   useEffect(()=>{
     if(Object.values(organizationData).filter((data)=>(data !== '')).length === Object.values(organizationData).length){
@@ -98,7 +218,7 @@ export default function OpportunityModal({visibility, onClose}){
         currentOpportunityPage, 
         setCurrentOpportuntityPage,
         handleChange,
-        organizationQuestionsPossibilities,
+        organizationQuestionsConfig,
         }}> 
         <Modal
           isOpen={visibility}
@@ -106,6 +226,7 @@ export default function OpportunityModal({visibility, onClose}){
           style={customStyles}
           contentLabel="Opportunity Modal"
           shouldCloseOnOverlayClick={false}
+          shouldCloseOnEsc={false}
         >
           
           <header>
@@ -137,38 +258,54 @@ export default function OpportunityModal({visibility, onClose}){
 };
 
 function OpportunityType(){
-  const { organizationData, handleChange, organizationQuestionsPossibilities } = useContext(OpportunityContext);
+  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
+
+  const questionsForPage = organizationQuestionsConfig.filter((question) => (question.page === 1));
 
   return(
     <>
     <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>We need some general information first.</h2>
     <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-    <main style={{display: "flex", alignItems: "center", justifyContent: "space-around", paddingTop: "1rem"}}>
-      <div style={{display: "flex", flexDirection: "column", gap: "30px"}}>
-        <label htmlFor="organizationType">Workplace Opportunity Type:</label>
-        <label htmlFor="host">Host Company / Organization:</label>
+    <main style={{ display: "flex", alignItems: "center", justifyContent: "space-around", paddingTop: "1rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+        {questionsForPage.map((question) => (
+          <label key={question.id} htmlFor={question.id}>
+            {question.text}
+          </label>
+        ))}
       </div>
-      <div style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "50%", gap: "30px"}}>
-        <select
-            id="organizationType"
-            name="organizationType"
-            value={organizationData.organizationType}
-            onChange={handleChange}
-        >
-            <option value="">Select Type</option>
-            <option value="Shadowing">Shadowing</option>
-            <option value="Internship">Internship</option>
-            <option value="Job">Job</option>
-            <option value="Community Service">Community Service</option>
-        </select>
-        <input
-            id="host"
-            name="host"
-            value={organizationData.host}
-            onChange={handleChange}
-            type='text'
-            maxLength={40}
-        />
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-around", width: "50%", gap: "30px" }}>
+        {questionsForPage.map((question) => {
+          if (question.type === "select") {
+            return (
+              <select
+                key={question.id}
+                id={question.id}
+                name={question.id}
+                value={organizationData[question.id]}
+                onChange={handleChange}
+              >
+                {question.options.map((option) => (
+                  <option key={option} value={option === "Select Type" ? "" : option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            );
+          } else if (question.type === "text") {
+            return (
+              <input
+                key={question.id}
+                id={question.id}
+                name={question.id}
+                value={organizationData[question.id]}
+                onChange={handleChange}
+                type="text"
+                maxLength={question.maxLength}
+              />
+            );
+          }
+        })}
       </div>
     </main>
     </>
@@ -176,71 +313,66 @@ function OpportunityType(){
 }
 
 function ApplicantInfo(){
-  const { organizationData, handleChange, organizationQuestionsPossibilities } = useContext(OpportunityContext);
-  const getApplicantType = () => {
-  switch(organizationData.organizationType){
-    case "Internship":
-      return "Intern";
-    case "Job":
-      return "Applicant";
-    case "Community Service":
-      return "Volunteer";
-    case "Shadowing":
-      return "Shadowee";
-  }
-}
-const applicantType = getApplicantType();
+  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
+  const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 2));
 
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Explain what you need from your interns.</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Explain what you need from your applicants.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{display: "flex", justifyContent: "space-around", paddingBottom: "20px"}}>
-          <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px"}}>
-              <label htmlFor="applicantFieldOfWork">{} Field of Work</label>
-              <input
-                  id="applicantFieldOfWork"
-                  name="applicantFieldOfWork"
-                  value={organizationData.applicantFieldOfWork}
-                  onChange={handleChange}
-                  type='text'
-                  maxLength={40}
-                  placeholder='e.g. “finance”'
-              />
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center"}}>
+            {questionsForPage
+              .filter(
+                (question) =>
+                  question.id === "applicantFieldOfWork" ||
+                  question.id === "applicantPosition"
+              )
+              .map((question) => (
+                <div key={question.id} style={{ flex: 1, marginRight: "10px" }}>
+                  {question.required && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "center", justifyContent: "center" }}>
+                      <label htmlFor={question.id}>{question.text}</label>
+                      <input
+                        id={question.id}
+                        name={question.id}
+                        value={organizationData[question.id]}
+                        onChange={handleChange}
+                        type="text"
+                        maxLength={question.maxLength}
+                        placeholder={question.placeholder}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
           </div>
-          {<div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "5px"}}>
-              <label htmlFor="applicantPosition">Intern Position</label>
-              <input
-                  id="applicantPosition"
-                  name="applicantPosition"
-                  value={organizationData.applicantPosition}
+
+          {questionsForPage
+            .filter((question) => question.id === "applicantExpectations")
+            .map((question) => (
+              <div key={question.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                <label htmlFor={question.id}>{question.text}</label>
+                <textarea
+                  className="applicantExpectations"
+                  id={question.id}
+                  name={question.id}
+                  value={organizationData[question.id]}
                   onChange={handleChange}
-                  type='text'
-                  maxLength={40}
-                  placeholder='e.g. "data analytics"'
-              />
-          </div>}
-      </div>
-      <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px"}}>
-        <label htmlFor="applicantExpectations">Intern Expectations</label>
-        <textarea 
-            className='applicantExpectations'
-            id="applicantExpectations"
-            name="applicantExpectations"
-            value={organizationData.applicantExpectations}
-            onChange={handleChange}
-            maxLength={500}
-            placeholder='Briefly describe the tools and knowledge interns will need to succeed throughout internship.'>
-        </textarea>
-      </div>
+                  maxLength={question.maxLength}
+                  placeholder={question.placeholder}
+                ></textarea>
+              </div>
+            ))}
+        </div>
     </main>
     </>
   )
 }
 
 function FinalInfo(){
-  const { organizationData, setOrganizationData, organizationQuestionsPossibilities } = useContext(OpportunityContext);
+  const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(OpportunityContext);
   const logoRef = useRef();
   const [logoPreviewURL, setLogoPreviewUrl] = useState(null);
 
@@ -250,7 +382,7 @@ function FinalInfo(){
     // if(organizationData.learnMoreTextActivation){
     //   setLearnMoreTextActivation(true);
     // }
-    // if(organizationData.applyLink === " "){
+    // if(organizationData.apply === " "){
     //   setApplyTextActivation(true);
     // }
     if(organizationData.organizationLogo){
@@ -305,139 +437,114 @@ function FinalInfo(){
         applyTextActivation : !organizationData.applyTextActivation
       })
     }
-    
-    {alert(organizationData.applyTextActivation)}
   }
+
+
+  const questionsForPage = organizationQuestionsConfig.filter((question=>(question.page===4)));
 
   return(
     <>
     <main>
       <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're almost done. Just a few more details.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div className='questionItem' style={{paddingTop: "15px"}}>
-        <div className='questionItem' style={{width: "100%"}}>
-          <label htmlFor="learnMoreLink">Where would you like users to learn more about your organization?</label>
-          <div style={{width: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}}>
-            <input
-                type="link"
-                id="learnMoreLink"
-                name="learnMoreLink"
-                value={organizationData.learnMoreLink}
-                onChange={handleChange}
-                placeholder='Paste a link here!'
-                style={{width: "60%", 
-                  backgroundColor: organizationData.learnMoreTextActivation && 'lightgray',
-                  opacity: organizationData.learnMoreTextActivation ? 0.7 : 1,
-                  borderColor: organizationData.learnMoreTextActivation && "darkgray", cursor: organizationData.learnMoreTextActivation && "default"}}
-            />
-            <button className={`btnText ${organizationData.learnMoreTextActivation ? "activated" : ""}`} name="learnMoreTextActivation" onClick={handleTextClick}>Or by sending a text</button>
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}> {/* Main container for flexbox */}
+          {/* First two questions (link inputs) */}
+          <div style={{ display: "flex", gap: "10px", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center"}}> 
+            {questionsForPage
+              .filter(question => question.type === "link")
+              .map(question => (
+                <div key={question.id}> 
+                  <label htmlFor={question.id}>{question.text}</label>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px"}}>
+                    <input
+                      type={question.type}
+                      id={question.id}
+                      name={question.id}
+                      value={organizationData[question.id]}
+                      onChange={handleChange}
+                      placeholder={question.placeholder}
+                      style={{
+                        width: "500px", 
+                        backgroundColor: organizationData[`${question.id}TextActivation`] && 'lightgray',
+                        opacity: organizationData[`${question.id}TextActivation`] ? 0.7 : 1,
+                        borderColor: organizationData[`${question.id}TextActivation`] && "darkgray", 
+                        cursor: organizationData[`${question.id}TextActivation`] && "default"
+                      }}
+                    />
+                    <button 
+                      className={`btnText ${organizationData[`${question.id}TextActivation`] ? "activated" : ""}`} 
+                      name={`${question.id}TextActivation`} 
+                      onClick={handleTextClick}
+                    >
+                      Or by sending a text
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+          {/* Logo upload */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}> {/* Wrap logo upload in a flexbox container */}
+            {questionsForPage
+              .filter(question => question.type === "file")
+              .map(question => (
+                <div key={question.id} className="questionItem">
+                  <label htmlFor={question.id}>{question.text}</label>
+                  <div style={{display: "flex", position: "relative", alignItems: "center", justifyContent: "center", width: "40%", paddingTop: "15px"}}>
+                    <button style={{borderRadius: "50%", boxShadow: "var(--shadowColor)", padding: "15px"}} onClick={(e)=>{
+                      logoRef.current.click();
+                      e.preventDefault();}}><GrAdd size={30}/></button>
+                    <input
+                        type="file"
+                        id="organizationLogo"
+                        name="organizationLogo"
+                        onChange={handleChange}
+                        style={{display: "none"}}
+                        ref={logoRef}
+                        accept=".jpg"
+                    />
+                    {logoPreviewURL && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
+                      <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Logo Preview:</span>
+                      <img src={logoPreviewURL} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
+                    </div>}
+                      </div>
+                  </div>
+              ))}
           </div>
         </div>
-        <br />
-        <div className='questionItem' style={{width: "100%"}}>
-          <label htmlFor="applyLink">Where can students apply?</label>
-          <div style={{width: "100%", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}}>
-            <input
-                type="link"
-                id="applyLink"
-                name="applyLink"
-                value={organizationData.applyLink}
-                onChange={handleChange}
-                placeholder='Paste a link here!'
-                style={{width: "60%", 
-                  backgroundColor: organizationData.applyTextActivation && 'lightgray',
-                  opacity: organizationData.applyTextActivation ? 0.7 : 1,
-                  borderColor: organizationData.applyTextActivation && "darkgray", cursor: organizationData.applyTextActivation && "default"}}
-            />
-            <button className={`btnText ${organizationData.applyTextActivation ? "activated" : ""}`} name="applyTextActivation" onClick={handleTextClick}>Or by sending a text</button>
-          </div>
-        </div>
-        <br />
-        <div className='questionItem'>
-          <label htmlFor="organizationLogo">Upload a logo of your organization or an image that embodies your organization.</label>
-          <div style={{display: "flex", position: "relative", alignItems: "center", justifyContent: "center", width: "40%", paddingTop: "15px"}}>
-            <button style={{borderRadius: "50%", boxShadow: "var(--shadowColor)", padding: "15px"}} onClick={(e)=>{
-              logoRef.current.click();
-              e.preventDefault();}}><GrAdd size={30}/></button>
-            <input
-                type="file"
-                id="organizationLogo"
-                name="organizationLogo"
-                onChange={handleChange}
-                style={{display: "none"}}
-                ref={logoRef}
-                accept=".jpg"
-            />
-            {logoPreviewURL && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
-              <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Logo Preview:</span>
-              <img src={logoPreviewURL} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
-            </div>}
-          </div>
-        </div>
-      </div>
     </main>
     </>
   )
 }
 
 function BasicLogistics(){
-  const { organizationData, handleChange, organizationQuestionsPossibilities } = useContext(OpportunityContext);
+  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
+
+  const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 3))
 
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Tell us some basic information about your organization.</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Tell us some basic information about your opportunity.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{display: "flex", flexWrap: "wrap", justifyContent:"space-evenly", alignItems: "center", paddingTop: "10px", gap: "15px"}} className='basicLogistics'>
-          <div className='logisticsQuestion'>
-              <label htmlFor="isPaid">Is this organization paid or unpaid?</label>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-evenly", alignItems: "center", paddingTop: "10px", gap: "15px" }} className='basicLogistics'>
+          {questionsForPage.map((question) => (
+            <div key={question.id} className='logisticsQuestion' style={{ flex: "1 1 40%", textAlign: "center"}}> {/* Flexbox for responsiveness */}
+              <label htmlFor={question.id}>{question.text}</label>
               <select
-                  id="isPaid"
-                  name="isPaid"
-                  value={organizationData.isPaid}
-                  onChange={handleChange}>
-                      <option value="Paid">Paid</option>
-                      <option value="Unpaid">Unpaid</option>
+                id={question.id}
+                name={question.id}
+                value={organizationData[question.id]}
+                onChange={handleChange}
+              >
+                {question.options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
               </select>
-          </div>
-          <div className='logisticsQuestion'>
-              <label htmlFor="workLocation">What is the format of the organization?</label>
-              <select
-                  id="workLocation"
-                  name="workLocation"
-                  value={organizationData.workLocation}
-                  onChange={handleChange}>
-                      <option value="On-site">On-site</option>
-                      <option value="Remote">Remote</option>
-                      <option value="Hybrid">Hybrid</option>
-              </select>
-          </div>
-          <div className='logisticsQuestion'>
-              <label htmlFor="applicants">What is the level of education?</label>
-              <select
-                  id="applicants"
-                  name="applicants"
-                  value={organizationData.applicants}
-                  onChange={handleChange}>
-                      <option value="Either One">Either one</option>
-                      <option value="High School">High School</option>
-                      <option value="College">College</option>
-              </select>
-          </div>
-          <div className='logisticsQuestion'>
-              <label htmlFor="timeFrame">What is the timeframe of the organization?</label>
-              <select
-                  id="timeFrame"
-                  name="timeFrame"
-                  value={organizationData.timeFrame}
-                  onChange={handleChange}>
-                      <option value="One Week">One Week</option>
-                      <option value="Two Weeks">Two Weeks</option>
-                      <option value="Three Weeks">Three Weeks</option>
-                      <option value="Custom">Custom</option>
-              </select>
-          </div>
-      </div>
+            </div>
+          ))}
+        </div>
     </main>
     </>
   )

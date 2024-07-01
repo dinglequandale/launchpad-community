@@ -167,7 +167,6 @@ function ResumeUpload(){
       </div>
     );
 }
-localStorage.clear()
 function BasicInfoCard({userType, userName, descType}){
     const [basicInfoData, setBasicInfoData] = useState(null);
     const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(false);

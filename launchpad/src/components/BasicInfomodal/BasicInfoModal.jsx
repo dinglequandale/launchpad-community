@@ -7,6 +7,7 @@ export default function BasicInfoModal({visibility,onClose,userType}){
     const [basicInfoContent, setBasicInfoContent] = useState({areasOfInterest: "", colleges: "", yearsOfExperience: "", industryOfExperience: ""});
     const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
     // later replace with logic tailored to FireStore
+    const checkEmpty = () => ((basicInfoContent.filter((answer) => {answer === ""})).length > 0);
   
     const saveBasicInfo = () => {
       localStorage.setItem("userBasicInfo", JSON.stringify(basicInfoContent));
