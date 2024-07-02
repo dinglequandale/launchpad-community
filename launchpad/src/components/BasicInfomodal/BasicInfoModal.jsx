@@ -1,24 +1,51 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import "./basicinfomodal.css"
 import Modal from "react-modal"
 import MakeChanges from "../Makechanges/MakeChanges";
 
 export default function BasicInfoModal({visibility,onClose,userType}){
-    const [basicInfoContent, setBasicInfoContent] = useState({areasOfInterest: "", colleges: "", yearsOfExperience: "", industryOfExperience: ""});
+    const [basicInfoContent, setBasicInfoContent] = useState({areasOfInterest: "", fieldsOfExpertise: "", dreamColleges: "", acceptedColleges: "", yearsOfExperience: "", industryOfExperience: "", currentPosition: ""});
     const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
+    
+    const basicInfoQuestionsConfig = [
+      {
+        id: "areasOfInterest",
+        text: "What is are your areas of interest?",
+        type: "text",
+        userTypeIncluders: ["High Schooler", "Alumni"],
+        required: true,
+      },
+      {
+        id: "fieldsOfExpertise",
+        text: "What is are your fields of expertise?",
+        type: "text",
+        userTypeIncluders: ["Professional"],
+        required: true,
+      },
+      {
+        id: "dreamColleges",
+        text: "What are your dream colleges?",
+        type: "text",
+        // change this later to an actual searchable list
+        options: ["Carnegie", "Princton", "Stanford", "Harvard", "etc..."],
+        userTypeIncluders: ["High Schooler"],
+        required: false,
+      },
+    ]
+
     // later replace with logic tailored to FireStore
-    const checkEmpty = () => ((basicInfoContent.filter((answer) => {answer === ""})).length > 0);
+    // const checkEmpty = () => ((basicInfoContent.filter((answer) => {answer === ""})).length > 0);
   
     const saveBasicInfo = () => {
       localStorage.setItem("userBasicInfo", JSON.stringify(basicInfoContent));
       onClose();
     }
   
-    // useEffect(() => {
-    //   const storedBasicInfo = localStorage.getItem("userBasicInfo");
-    //   if (storedBasicInfo) {
-    //     setBasicInfoContent(basicInfoContent);
-    //   }},[visibility])
+    useEffect(() => {
+      const storedBasicInfo = localStorage.getItem("userBasicInfo");
+      if (storedBasicInfo) {
+        setBasicInfoContent(basicInfoContent);
+      }},[visibility])
 
     const customStyles = {
         content: {

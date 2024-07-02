@@ -39,7 +39,6 @@
 
 .dropdownContainer{
     align-items: center;
-    width: fit-content;
     position: relative;
     padding-bottom: 10px;
     padding-left: 5px;
@@ -53,9 +52,10 @@
     overflow: hidden;
     max-height: 0;
     transition: max-height 0.3s ease-in-out;
-    position: absolute;
     width: 100%;
     z-index: 2;
+    position: absolute;
+    padding: 0px 5px;
 }
   
   .dropdown.open {

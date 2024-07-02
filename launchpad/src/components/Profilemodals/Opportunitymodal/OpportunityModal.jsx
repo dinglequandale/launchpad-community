@@ -55,7 +55,7 @@ export default function OpportunityModal({visibility, onClose}){
 
   const [organizationData, setOrganizationData] = useState({
     organizationType: '',
-    host: '',
+    organizationHostCompany: '',
     applicantFieldOfWork: '',
     applicantPosition: '',
     applicantExpectations: '',
@@ -90,12 +90,12 @@ export default function OpportunityModal({visibility, onClose}){
       text: "Workplace Opportunity Type:",
       type: "select",
       options: ["Select Type", "Shadowing", "Internship", "Job", "Volunteering"],
-      includers: ["Job", "Internship", "Shadowing", "Volunteering"],
+      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
       required: true,
       page: 1, 
     },
     {
-      id: "host",
+      id: "organizationHostCompany",
       text: "Host Company / Organization:",
       type: "text",
       maxLength: 40,

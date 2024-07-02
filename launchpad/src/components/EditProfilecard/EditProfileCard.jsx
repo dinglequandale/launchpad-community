@@ -96,7 +96,7 @@ function EditInformation({questionName, onEdit, isAnswered}){
 
 function PublicPrivateDropdown({userResumePublicity}){
     const dropdownRef = useRef();
-    const [selectedPublicity, setSelectedPublicity] = useState(<PrivacyComponent icon={<TbWorld size={23}/>} privacy={"Public"}/>);
+    const [selectedPublicity, setSelectedPublicity] = useState("Public");
     const [dropdownVisibility, setDropdownVisibility] = useState(false);
     const options = [["Public",<TbWorld size={23}/>], ["Private", <IoLockClosedOutline size={20}/>]];
     
@@ -115,16 +115,17 @@ function PublicPrivateDropdown({userResumePublicity}){
     })
     return(
         <div className="dropdownContainer" ref={dropdownRef}>
-            <div style={{display: "flex", alignItems: "center", cursor: "pointer"}} className="filterTop" onClick={handleClick}>
+            <div style={{display: "flex", alignItems: "center", cursor: "pointer", justifyContent: "space-between", gap:"5px"}} className="filterTop" onClick={handleClick}>
+                {selectedPublicity === "Public" ? <TbWorld size={23}/> : <IoLockClosedOutline size={20}/>}
                 <span style={{fontWeight: "550"}}>{selectedPublicity}</span>
             </div>
             <div className={dropdownVisibility ? "dropdown open" : "dropdown "}>
-                {options.map(([option,icon],index)=>(<div className='dropdownOption' style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "4px", padding: "5px", cursor: "pointer"}} key={index} onClick={()=>{
-                            setSelectedPublicity(<PrivacyComponent icon={icon} privacy={option}/>);
+                {options.map(([option,icon],index)=>(<div className='dropdownOption' style={{display: "flex", alignItems: "center", justifyContent: "space-between", gap: "5px", padding: "5px", cursor: "pointer"}} key={index} onClick={()=>{
+                            setSelectedPublicity(option);
                             setDropdownVisibility(false);
-                            }}> {icon}
-                     <span>{option}</span>
-                     </div>))}
+                            }}>
+                     <PrivacyComponent icon={icon} privacy={option}/>
+             </div>))}
             </div>
         </div>
     )
@@ -169,6 +170,7 @@ function ResumeUpload(){
     );
 }
 function BasicInfoCard({userType, userName, descType}){
+
     const [basicInfoData, setBasicInfoData] = useState(null);
     const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(false);
     
@@ -221,7 +223,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
         <>
         <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>
         { showOrganizationProfile ? <>
-        <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>{userName} is offering one <span style={{fontWeight: "bold"}}>{opportunityData.organizationType} opportunity</span>!</span>
+        <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>{userName} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
         <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
         </> : <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
             boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",

@@ -9,7 +9,16 @@ import ProfileCard from "../Profilecard/ProfileCard";
 export default function OrganizationProfile({organizationData, location}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
     const [showPfpCard, setShowPfpCard] = useState(false);
-    let organizationLogistics = [organizationData.isPaid,organizationData.applicants, organizationData.workLocation, organizationData.timeFrame]
+
+    const organizationProfileData = {
+        organizationType : organizationData.organizationType,
+        organizationHost : organizationData.organizationHostCompany ?? organizationData.organizationHostStudent,
+        organizationDescription: organizationData.applicantExpectations ?? organizationData.organizationMission,
+        organizationLogistics: organizationData.isPaid ? [organizationData.isPaid,organizationData.applicants, organizationData.workLocation, organizationData.timeFrame] : null,
+        applicantFieldOfWork: organizationData.applicantFieldOfWork ?? null,
+        organizationLogoPreview: organizationData.organizationLogoPreview ?? "https://thebuzzmagazines.com/sites/default/files/events/2021/08/awty_logo_sep16.jpg",
+    }
+
     useEffect(() => {
         document.addEventListener("keydown", onKeyPress, true)
       }, [])
@@ -45,35 +54,34 @@ export default function OrganizationProfile({organizationData, location}){
         <>
             {showPfpCard && <ProfileCard onClose={() => setShowPfpCard(false)}/>}
             <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : location === "user_profile" ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
-                {organizationData.applicantFieldOfWork && <RelevanceBanner relevanceType={organizationData.applicantFieldOfWork}/>}
+                {organizationProfileData.applicantFieldOfWork && <RelevanceBanner relevanceType={organizationProfileData.applicantFieldOfWork}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
                     <div style={{display: "flex", position: "relative"}}>
-                        <img src={organizationData.organizationLogoPreview ? organizationData.organizationLogoPreview : "https://thebuzzmagazines.com/sites/default/files/events/2021/08/awty_logo_sep16.jpg"} alt="bruh" 
+                        <img src={organizationProfileData.organizationLogoPreview} alt="bruh" 
                         className="organizationPfp"/>
                         <div style={{paddingLeft: "15px", lineHeight: "1.2"}}>
-                            <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.5"}}>{organizationData.host}</span> <br />
+                            <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.5"}}>{organizationProfileData.organizationHost}</span> <br />
                             <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>
-                                <span 
-                                style={{fontWeight: "bold", color: "var(--secondary)"}}>
-                                    {organizationData.organizationType} {["Club", "Initiative"].includes(organizationData.organizationType) ? "" : "opportunity"} </span> run by <button className="btnText" onClick={(e) => handleOnHostClick(e)}>{organizationData.host}</button>
+                            <span style={{fontWeight: "bold", color: "var(--secondary)"}}>
+                                {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span> run by <button className="btnText" onClick={(e) => handleOnHostClick(e)}>{organizationProfileData.organizationHost}</button>
                             </span> 
                             <br />
-                            <span name="organizationDescription">{["Shadowing", "Internship", "Job", "Volunteering"].includes(organizationData.organizationType) ? organizationData.applicantExpectations : ""}</span>
+                            <span name="organizationDescription">{organizationProfileData.organizationDescription}</span>
                         </div>
                     </div>
 
-                    {organizationLogistics && <div className="logisticsDisplay">
+                    {organizationProfileData.organizationLogistics && <div className="logisticsDisplay">
                         {logisticsList.map((logistic, index)=>(
                             <div key={index} className="logisticOption">
                                 {logistic}
-                                <span style={{fontWeight: "300"}}>{organizationLogistics[index]}</span>
+                                <span style={{fontWeight: "300"}}>{organizationProfileData.organizationLogistics[index]}</span>
                             </div>
                         ))}
                     </div>}
                 </div>
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px"}}>
                     <button className="btnOrganizationLearnMore" onClick={e => handleLearnMore(e)}> Learn More </button>
-                    <button className="btnOrganizationConnect" onClick={e => handleConnect(e)}> {organizationData.organizationType==="Volunteering" ? "Volunteer" : "Connect"} </button>
+                    <button className="btnOrganizationConnect" onClick={e => handleConnect(e)}> {organizationProfileData.organizationType==="Volunteering" ? "Volunteer" : "Connect"} </button>
                 </div>
             </div>
         </>
