@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useContext, useRef } from 'react';
 import Modal from 'react-modal';
-import "./opportunitymodal.css";
+import "./initiativemodal.css";
 import MakeChanges from '../../Makechanges/MakeChanges';
 import OrganizationProfile from '../../Organizationprofile/OrganizationProfile';
 import ProgressBar from '../../Progressbar/ProgressBar';
@@ -10,30 +10,30 @@ import { MdEmail } from 'react-icons/md';
 import { CgWebsite } from 'react-icons/cg';
 
 
-const OpportunityContext = createContext({
+const InitiativeContext = createContext({
   organizationData: {},
   setOrganizationData: () => {},
-  currentOpportunityPage: 1,
-  setCurrentOpportuntityPage: () => {},
+  currentInitiativePage: 1,
+  setCurrentInitiativePage: () => {},
   handleChange: () => {},
   organizationQuestionsConfig: {},
 });
 
-export default function OpportunityModal({visibility, onClose}){
+export default function InitiativeModal({visibility, onClose}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
-  const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
+  const [currentInitiativePage, setCurrentInitiativePage] = useState(1);
   const [showLast, setShowLast] = useState(false);
 
-  const saveOpportunityData = () => {
+  const saveInitiativeData = () => {
     localStorage.setItem("userOrganizationData", JSON.stringify(organizationData));
     onClose();
   }
   
 
   useEffect(() => {
-    const storedOpportunityData = localStorage.getItem("userOrganizationData");
-    if (storedOpportunityData !== null) {
-        setOrganizationData(JSON.parse(storedOpportunityData));
+    const storedInitiativeData = localStorage.getItem("userOrganizationData");
+    if (storedInitiativeData !== null) {
+        setOrganizationData(JSON.parse(storedInitiativeData));
     }
     }, [visibility]);
 
@@ -54,159 +54,104 @@ export default function OpportunityModal({visibility, onClose}){
   };
 
   const [organizationData, setOrganizationData] = useState({
-    organizationType: '',
-    organizationHostCompany: '',
-    applicantFieldOfWork: '',
-    applicantPosition: '',
-    applicantExpectations: '',
-    isPaid: 'Unpaid',
-    applicants: 'Either One',
-    workLocation: 'On-site',
-    timeFrame: 'One Week',
+    organizationType: "",
+    organizationName: "",
+    organizationHostStudent: "",
+    organizationMission: "",
+    organizationTags: "",
     learnMore: '',
     apply: '',
     organizationLogo: null,
     organizationLogoPreview: '',
   });
 
-  const getApplicantType = () => {
-    switch(organizationData.organizationType){
-      case "Internship":
-        return "Intern";
-      case "Job":
-        return "Applicant";
-      case "Volunteering":
-        return "Volunteer";
-      case "Shadowing":
-        return "Shadowee";
-      default:
-        return "Applicant"
-    }
-  }
   const organizationQuestionsConfig = [
     // Page 1
     {
       id: "organizationType",
-      text: "Workplace Opportunity Type:",
+      text: "Workplace Initiative Type:",
       type: "select",
-      options: ["Select Type", "Shadowing", "Internship", "Job", "Volunteering"],
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
+      options: ["Select Type", "Club", "Nonprofit"],
+      includers: ["Nonprofit", "Club", ""],
       required: true,
       page: 1, 
     },
     {
-      id: "organizationHostCompany",
-      text: "Host Company / Organization:",
+      id: "organizationName",
+      text: "What is the name of your initiative?",
       type: "text",
       maxLength: 40,
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
+      includers: ["Nonprofit", "Club", ""],
       required: true,
+      placeholder: "E.g. 'Math Club'",
       page: 1, 
     },
-  
+    {
+      id: "organizationHostStudent",
+      text: "What is your position in the initiative?",
+      type: "text",
+      maxLength: 40,
+      includers: ["Nonprofit", "Club", ""],
+      required: true,
+      page: 1,
+      placeholder: "E.g. 'Founder'",
+    },
+
     // Page 2
     {
-      id: "applicantFieldOfWork",
-      text: `${organizationData.organizationType} Field of Work`,
+      id: "organizationTags",
+      text: "People interested in which career fields would benefit the most from participating in your club?",
       type: "text",
       maxLength: 40,
-      placeholder: 'e.g. "finance"',
-      includers: ["Internship", "Shadowing", ""],
+      placeholder: 'e.g. "data analytics, finance"',
+      includers: ["Club", ""],
       required: true,
       page: 2, 
     },
     {
-      id: "applicantPosition",
-      text: `${organizationData.organizationType} Position`,
-      type: "text",
-      maxLength: 40,
-      placeholder: 'e.g. "data analytics"',
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
-      required: (orgType) => orgType !== "Volunteering",
-      page: 2, 
-    },
-    {
-      id: "applicantExpectations",
-      text: `${organizationData.organizationType} Expectations`,
+      id: "organizationMission",
+      text: "Your Mission",
       type: "textarea",
       maxLength: 500,
-      placeholder: `Briefly describe the tools and knowledge the ${getApplicantType().toLowerCase()}(s) will need to succeed throughout this ${organizationData.organizationType && organizationData.organizationType.toLowerCase()} opportunity.`,
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
+      placeholder: `Summarize your ${organizationData.organizationType}'s mission and values in a few sentences.`,
+      includers: ["Nonprofit", "Club", ""],
       required: true,
       page: 2, 
     },
   
     // Page 3
     {
-      id: "isPaid",
-      text: "Is this opportunity paid or unpaid?",
-      type: "select",
-      options: ["Paid", "Unpaid"],
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
-      required: true,
-      page: 3, 
-    },
-    {
-      id: "workLocation",
-      text: "What is the format of the opportunity?",
-      type: "select",
-      options: ["On-site", "Remote", "Hybrid"],
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
-      required: true,
-      page: 3, 
-    },
-    {
-      id: "applicants",
-      text: "What is the level of education?",
-      type: "select",
-      options: ["High School / College", "High School", "College"],
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
-      required: true,
-      page: 3, 
-    },
-    {
-      id: "timeFrame",
-      text: "What is the opportunity timeframe?",
-      type: "select",
-      options: ["One Week", "Two Weeks", "Three Weeks"],
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
-      required: true,
-      page: 3, 
-    },
-  
-    // Page 4
-    {
       id: "learnMore",
-      text: "Where would you like users to learn more about this opportunity?",
+      text: `Where would you like users to learn more about your ${organizationData.organizationType.toLowerCase()}?`,
       type: "link",
       placeholder: "Paste a link here!",
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
+      includers: ["Nonprofit", "Club", ""],
       required: true,
-      page: 4, 
+      page: 3, 
     },
     {
       id: "apply",
-      text: `Where can students ${organizationData.organizationType === "Volunteering" ? "volunteer" : "apply"} for this opportunity?`,
+      text: `How can students take part in your ${organizationData.organizationType.toLowerCase()}?`,
       type: "link",
       placeholder: "Paste a link here!",
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
+      includers: ["Nonprofit", "Club", ""],
       required: true,
-      page: 4, 
+      page: 3, 
     },
     {
       id: "organizationLogo",
-      text: "Upload a logo that embodies your opportunity! (optional)",
+      text: `Upload a logo that embodies your ${organizationData.organizationType.toLowerCase()}! (optional)`,
       type: "file",
       accept: ".jpg",
-      includers: ["Job", "Internship", "Shadowing", "Volunteering", ""],
+      includers: ["Nonprofit", "Club", ""],
       required: false,
-      page: 4, 
+      page: 3, 
     },
   ];
 
   // fix this later
   useEffect(()=>{
-    if(Object.values(organizationData).filter((data)=>(data !== '')).length === Object.values(organizationData).length){
+    if(Object.values(organizationData).filter((data)=>(data !== '')).length = Object.values(organizationData).length){
       setShowLast(true)
     }
     else{
@@ -225,12 +170,12 @@ export default function OpportunityModal({visibility, onClose}){
   return (
     <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
-      <OpportunityContext.Provider 
+      <InitiativeContext.Provider 
       value={{
         organizationData,
         setOrganizationData, 
-        currentOpportunityPage, 
-        setCurrentOpportuntityPage,
+        currentInitiativePage, 
+        setCurrentInitiativePage,
         handleChange,
         organizationQuestionsConfig,
         }}> 
@@ -238,23 +183,22 @@ export default function OpportunityModal({visibility, onClose}){
           isOpen={visibility}
           onRequestClose={onClose}
           style={customStyles}
-          contentLabel="Opportunity Modal"
+          contentLabel="Initiative Modal"
           shouldCloseOnOverlayClick={false}
           shouldCloseOnEsc={false}
         >
           
           <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Initiative <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Make your voice heard.</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
-          <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
+          <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast}/>
           </header>
           <main style={{paddingTop:"10px"}}>
           <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
-            {currentOpportunityPage === 1 && <OpportunityType/>}
-            {currentOpportunityPage === 2 && <ApplicantInfo/>}
-            {currentOpportunityPage === 3 && <BasicLogistics/>}
-            {currentOpportunityPage === 4 && <FinalInfo/>}
-            {currentOpportunityPage === 5 && <PreviewOppportunityCard/>}
+            {currentInitiativePage === 1 && <InitiativeType/>}
+            {currentInitiativePage === 2 && <InitiativeMission/>}
+            {currentInitiativePage === 3 && <FinalInfo/>}
+            {currentInitiativePage === 4 && <PreviewOppportunityCard/>}
           </form>
           </main>
           <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
@@ -262,17 +206,17 @@ export default function OpportunityModal({visibility, onClose}){
               ()=>setMakeChangesVisibility(true)
               } style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Cancel</button>
-            {currentOpportunityPage === 5 && <button onClick={saveOpportunityData} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+            {currentInitiativePage === 4 && <button onClick={saveInitiativeData} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Save Changes</button>}
           </footer>
         </Modal>
-      </OpportunityContext.Provider>
+      </InitiativeContext.Provider>
     </div>
   );
 };
 
-function OpportunityType(){
-  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
+function InitiativeType(){
+  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(InitiativeContext);
 
   const questionsForPage = organizationQuestionsConfig.filter((question) => (question.page === 1));
 
@@ -316,6 +260,7 @@ function OpportunityType(){
                 onChange={handleChange}
                 type="text"
                 maxLength={question.maxLength}
+                placeholder={question.placeholder}
               />
             );
           }
@@ -326,67 +271,53 @@ function OpportunityType(){
   )
 }
 
-function ApplicantInfo(){
-  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
-  const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 2 && question.includers.includes(organizationData.organizationType)));
+function InitiativeMission(){
+  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(InitiativeContext);
+
+  const questionsForPage = organizationQuestionsConfig.filter((question) => (question.page === 2 && question.includers.includes(organizationData.organizationType)));
 
   return(
     <>
-    <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Explain what you need from your applicants.</h2>
-      <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center"}}>
-            {questionsForPage
-              .filter(
-                (question) =>
-                  (question.id === "applicantFieldOfWork" && !question.includers.includes(question.id)) ||
-                  (question.id === "applicantPosition"  && !question.includers.includes(question.id))
-              )
-              .map((question) => (
-                <div key={question.id} style={{ flex: 1, marginRight: "10px" }}>
-                  {question.required && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "center", justifyContent: "center" }}>
-                      <label htmlFor={question.id}>{question.text}</label>
-                      <input
-                        id={question.id}
-                        name={question.id}
-                        value={organizationData[question.id]}
-                        onChange={handleChange}
-                        type="text"
-                        maxLength={question.maxLength}
-                        placeholder={question.placeholder}
-                      />
-                    </div>
-                  )}
-                </div>
-              ))}
+    <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Time to get down to business. What sets you apart?</h2>
+    <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
+    <main style={{ display: "flex", alignItems: "center", justifyContent: "space-around", paddingTop: "1rem" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+        {questionsForPage.map((question) => (
+          <div style={{display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", textAlign: "center"}}>
+            <label htmlFor={question.id}>{question.text}</label>
+            {question.type !== "textarea" ? <input
+            key={question.id}
+            id={question.id}
+            name={question.id}
+            value={organizationData[question.id] ?? ''}
+            onChange={handleChange}
+            type={question.type}
+            maxLength={question.maxLength}
+            style={{width: "450px"}}
+            placeholder={question.placeholder}
+            /> : 
+            <textarea
+            className='initiativeMission'
+            key={question.id}
+            id={question.id}
+            name={question.id}
+            value={organizationData[question.id] ?? ''}
+            onChange={handleChange}
+            type={question.type}
+            maxLength={question.maxLength}
+            placeholder={question.placeholder}
+            />}
           </div>
-
-          {questionsForPage
-            .filter((question) => question.id === "applicantExpectations")
-            .map((question) => (
-              <div key={question.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-                <label htmlFor={question.id}>{question.text}</label>
-                <textarea
-                  className="applicantExpectations"
-                  id={question.id}
-                  name={question.id}
-                  value={organizationData[question.id]}
-                  onChange={handleChange}
-                  maxLength={question.maxLength}
-                  placeholder={question.placeholder}
-                ></textarea>
-              </div>
-            ))}
-        </div>
+        ))}
+      </div>
     </main>
     </>
   )
 }
 
+
 function FinalInfo(){
-  const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(OpportunityContext);
+  const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(InitiativeContext);
   const logoRef = useRef();
   const [logoPreviewURL, setLogoPreviewUrl] = useState(null);
   
@@ -464,12 +395,12 @@ function FinalInfo(){
     }
   }
 
-  const questionsForPage = organizationQuestionsConfig.filter((question=>(question.page === 4 && question.includers.includes(organizationData.organizationType))));
+  const questionsForPage = organizationQuestionsConfig.filter((question=>(question.page === 3 && question.includers.includes(organizationData.organizationType))));
 
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're almost done. Just a few more details.</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're almost done! Just a few more things.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           {/* First two questions (link inputs) */}
@@ -547,42 +478,8 @@ function FinalInfo(){
   )
 }
 
-function BasicLogistics(){
-  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
-
-  const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 3 && question.includers.includes(organizationData.organizationType)))
-
-  return(
-    <>
-    <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Tell us some basic information about your opportunity.</h2>
-      <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-evenly", alignItems: "center", paddingTop: "10px", gap: "15px" }} className='basicLogistics'>
-          {questionsForPage.map((question) => (
-            <div key={question.id} className='logisticsQuestion' style={{ flex: "1 1 40%", textAlign: "center"}}> {/* Flexbox for responsiveness */}
-              <label htmlFor={question.id}>{question.text}</label>
-              <select
-                id={question.id}
-                name={question.id}
-                value={organizationData[question.id]}
-                onChange={handleChange}
-              >
-                {question.options.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
-        </div>
-    </main>
-    </>
-  )
-}
-
 function PreviewOppportunityCard(){
-  const { organizationData } = useContext(OpportunityContext);
+  const { organizationData } = useContext(InitiativeContext);
  
   return(
     <>

@@ -6,21 +6,7 @@ import TopBar from "../../components/Topbar/TopBar";
 import OrganizationProfile from "../../components/Organizationprofile/OrganizationProfile";
 
 export default function Organizations(){
-    const [organizationData, setOrganizationData] = useState({
-        organizationType: '',
-        organizationHostStudent: '',
-        applicantFieldOfWork: '',
-        applicantPosition: '',
-        applicantExpectations: '',
-        isPaid: 'Unpaid',
-        applicants: 'Either One',
-        workLocation: 'On-site',
-        timeFrame: 'One Week',
-        learnMore: '',
-        apply: '',
-        organizationLogo: null,
-        organizationLogoPreview: '',
-      });
+
     const organizationsData = [
         {
             // initiative data format

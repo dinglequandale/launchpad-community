@@ -12,6 +12,7 @@ import AboutMeModal from '../Profilemodals/AboutMemodal/AboutMeModal';
 import OpportunityModal from '../Profilemodals/Opportunitymodal/OpportunityModal';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
 import BasicInfoModal from '../BasicInfomodal/BasicInfoModal';
+import InitiativeModal from '../Profilemodals/Initiativemodal/InitiativeModal';
 
 
 export default function EditProfileCard({userData}) {
@@ -41,7 +42,6 @@ export default function EditProfileCard({userData}) {
                 return "poo";
         }
     }
-
     return(
         <>
             <div className='editprofileCard'>
@@ -54,7 +54,7 @@ export default function EditProfileCard({userData}) {
                     <BasicInfoCard userName={userName} userType={userType} descType={descType()}/>
                 </div>
                 <div style={{paddingTop: "20px"}}>
-                    <OpportunityPopup userName={userName} userType={userType} descType={descType} opportunitiesOptions={opportunitiesOptions}/>
+                    <OpportunityPopup userName={userName} userType={userType} opportunitiesOptions={opportunitiesOptions}/>
                 </div>
                 <AboutMeDisplay/>
                 <div className={`userResume ${userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px"}}>
@@ -225,7 +225,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
     const [showOrganizationProfile, setShowOrganizationProfile] = useState(false);
 
     useEffect(() => {
-        const storedOpportunityData = localStorage.getItem("userOpportunityData");
+        const storedOpportunityData = localStorage.getItem("userOrganizationData");
         if (storedOpportunityData !== null) {
           setOpportunityData(JSON.parse(storedOpportunityData));
           setShowOrganizationProfile(true);
@@ -235,7 +235,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
 
     return(
         <>
-        <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>
+        {userType === "Professional" ? <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/> : <InitiativeModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>}
         { showOrganizationProfile ? <>
         <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>{userName} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
         <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>

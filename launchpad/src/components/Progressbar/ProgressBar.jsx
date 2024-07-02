@@ -71,7 +71,7 @@ export default function ProgressBar({numOfSections, currentPage, setCurrentPage,
                 </div>
             ))}
             </div>
-            {<button onClick={goNext} className={`btnNavigate ${currentPage === 5 ? "hidden" : ""} btnUnfilled`}> Next <GrFormNext size={20}/> </button>}
+            {<button onClick={goNext} className={`btnNavigate ${currentPage === numOfSections ? "hidden" : ""} btnUnfilled`}> Next <GrFormNext size={20}/> </button>}
         </header>
         </>
     )
