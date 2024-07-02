@@ -19,7 +19,7 @@ export default function EditProfileCard({userData}) {
     const location = useLocation();
 
     // temporary data
-    const userType = "Professional";
+    const userType = "High Schooler";
     const userName = "Shuja Gupta";
     
     const opportunitiesOptions = {highSchool: 
@@ -29,14 +29,17 @@ export default function EditProfileCard({userData}) {
     professional:
     <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</span>
 };
-    const descType = () => {switch(userType){
-        case "High Schooler":
-            return "Colleges of Interest"
-        case "Alumni":
-            return "Attending College"
-        case "Professional":
-            return "Current Position"
-    }
+    const descType = () => {
+        switch(userType){
+            case "High Schooler":
+                return "Dream Colleges";
+            case "Alumni":
+                return "Attending College";
+            case "Professional":
+                return "Current Position";
+            default:
+                return "poo";
+        }
     }
 
     return(
@@ -48,7 +51,7 @@ export default function EditProfileCard({userData}) {
                         <RiArrowGoBackFill size={20}/>
                         <span>Go Back</span>
                     </div>
-                    <BasicInfoCard userName={userName} userType={userType} descType={descType}/>
+                    <BasicInfoCard userName={userName} userType={userType} descType={descType()}/>
                 </div>
                 <div style={{paddingTop: "20px"}}>
                     <OpportunityPopup userName={userName} userType={userType} descType={descType} opportunitiesOptions={opportunitiesOptions}/>
@@ -171,15 +174,25 @@ function ResumeUpload(){
 }
 function BasicInfoCard({userType, userName, descType}){
 
-    const [basicInfoData, setBasicInfoData] = useState(null);
-    const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(false);
-    
+    const [basicInfoData, setBasicInfoData] = useState({});
+    const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(null);
     useEffect(() => {
         const storedBasicInfoData = localStorage.getItem("userBasicInfo");
         if (storedBasicInfoData !== null) {
           setBasicInfoData(JSON.parse(storedBasicInfoData));
         }
-      }, [basicInfoModalVisibility]);
+        else{
+        }
+      }, [basicInfoModalVisibility,]);
+
+    const basicInfoContent = {userPreface: userType === "Professional" ? `${basicInfoData.yearsOfExperience} years of experience in ${basicInfoData.industryOfExperience}`
+    : userType === "Alumni" ? `Graduated with Class of [...]`
+    : `[...], Class of [...]`,
+    userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${basicInfoData.areasOfInterest ?? basicInfoData.fieldsOfExpertise}`,
+    userSecondDesc: `${descType}: ${userType === "Professional" ? basicInfoData.industryPosition : userType === "Alumni" ? basicInfoData.attendingCollege : basicInfoData.dreamColleges}`,
+    acceptedColleges: `Accepted Colleges: ${basicInfoData.acceptedColleges}`,
+}
+    
     return(
         <>
         <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userType={userType}/>
@@ -189,14 +202,15 @@ function BasicInfoCard({userType, userName, descType}){
             </div>
             <div className='cardNameDescription'>
                 <span className='cardName'>{userName}</span>
-                <span className='cardDescription'>30+ Years of Experience</span>
+                <span className='cardDescription'>{basicInfoContent.userPreface}</span>
             </div>   
             </div>
             <div style={{display: "flex"}}>
-            {basicInfoData && <div className='userInfo' style={{fontSize: "16px"}}>
-                <span>Fields of {userType === "Professional" ? "Expertise" : "Interest"}: {basicInfoData.areasOfInterest && basicInfoData.areasOfInterest}</span>
-                <span>{descType()}: {userType !== "Professional" ? basicInfoData.colleges : `${basicInfoData.yearsOfExperience} Years of Experience in ${basicInfoData.industryOfExperience}`}</span>
-            </div>}
+            <div className='userInfo' style={{fontSize: "16px"}}>
+                <span>{basicInfoContent.userFirstDesc}</span>
+                <span>{basicInfoContent.userSecondDesc}</span>
+                {basicInfoData.acceptedColleges && <span>{basicInfoContent.acceptedColleges}</span>}
+            </div>
         </div>
         <div className='addOne' style={{transform: "translate(0,-70px)"}}>
                 <EditInformation isAnswered={true} questionName={"Intro"} onEdit={()=>setBasicInfoModalVisibility(true)}/>

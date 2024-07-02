@@ -61,10 +61,12 @@ export default function OrganizationProfile({organizationData, location}){
                         className="organizationPfp"/>
                         <div style={{paddingLeft: "15px", lineHeight: "1.2"}}>
                             <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.5"}}>{organizationProfileData.organizationHost}</span> <br />
-                            <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>
-                            <span style={{fontWeight: "bold", color: "var(--secondary)"}}>
-                                {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span> run by <button className="btnText" onClick={(e) => handleOnHostClick(e)}>{organizationProfileData.organizationHost}</button>
-                            </span> 
+                            <div style={{display: "flex"}}>
+                                <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>
+                                    <span style={{fontWeight: "bold", color: "var(--secondary)"}}> {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span> run by&nbsp;
+                                </span>
+                                <button className="btnText" onClick={(e) => handleOnHostClick(e)}>{organizationProfileData.organizationHost}</button>
+                            </div>
                             <br />
                             <span name="organizationDescription">{organizationProfileData.organizationDescription}</span>
                         </div>
