@@ -7,12 +7,14 @@ import { IoLockClosedOutline } from "react-icons/io5";
 import { TbWorld } from "react-icons/tb";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { RiArrowGoBackFill } from "react-icons/ri";
-import { MdEdit } from "react-icons/md";
+import { MdDeleteOutline, MdEdit } from "react-icons/md";
 import AboutMeModal from '../Profilemodals/AboutMemodal/AboutMeModal';
 import OpportunityModal from '../Profilemodals/Opportunitymodal/OpportunityModal';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
 import BasicInfoModal from '../BasicInfomodal/BasicInfoModal';
 import InitiativeModal from '../Profilemodals/Initiativemodal/InitiativeModal';
+import { FaDeleteLeft } from 'react-icons/fa6';
+import { TiDeleteOutline } from 'react-icons/ti';
 
 
 export default function EditProfileCard({userData}) {
@@ -192,7 +194,7 @@ function BasicInfoCard({userType, userName, descType}){
     userSecondDesc: `${descType}: ${userType === "Professional" ? basicInfoData.industryPosition : userType === "Alumni" ? basicInfoData.attendingCollege : basicInfoData.dreamColleges}`,
     acceptedColleges: `Accepted Colleges: ${basicInfoData.acceptedColleges}`,
 }
-    
+
     return(
         <>
         <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userType={userType}/>
@@ -223,7 +225,6 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
     const [opportunityData, setOpportunityData] = useState(null);
     const [showOrganizationProfile, setShowOrganizationProfile] = useState(false);
-
     useEffect(() => {
         const storedOpportunityData = localStorage.getItem("userOrganizationData");
         if (storedOpportunityData !== null) {
@@ -232,23 +233,36 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
         }
       }, [opportunityModalVisibility]);
       
-
+    const handleDeleteOpportunity = () => {
+        if(window.confirm("Are you sure you want to delete your opportunity?")){
+        setShowOrganizationProfile(false);
+        setOpportunityData(null);
+        localStorage.setItem("userOrganizationData", JSON.stringify(null));
+        }
+    }
     return(
         <>
-        {userType === "Professional" ? <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/> : <InitiativeModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>}
-        { showOrganizationProfile ? <>
-        <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>{userName} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
-        <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
-        </> : <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
-            boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
-            {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
-            <hr style={{width:"50%", borderColor: "var(--accent)"}}/>
-            <div className="addOne" onClick={()=>setOpportunityModalVisibility(true)}>
-                <IoAdd size={25} />
-                <span style={{textDecoration: "underline"}}>Add one!</span>
-            </div>
-        </div>}
+        <div name="opportunityModal" style={{position: "relative"}}>
+            {userType === "Professional" ? <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/> : <InitiativeModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>}
+        </div>
+        <div style={{position: "relative"}}>
+            { showOrganizationProfile ? <>
+            <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>{userName} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
+            <button className='btnCircle' onClick={handleDeleteOpportunity} style={{position: "absolute", right: "-13px", top: "28px", background: "red", zIndex: "2"}}>
+                <MdDeleteOutline size={30}/>
+            </button>
+            <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
+            </> : <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
+                boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
+                {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
+                <hr style={{width:"50%", borderColor: "var(--accent)"}}/>
+                <div className="addOne" onClick={()=>setOpportunityModalVisibility(true)}>
+                    <IoAdd size={25} />
+                    <span style={{textDecoration: "underline"}}>Add one!</span>
+                </div>
+            </div>}
+        </div>
         <div className='addOne' style={{transform: "translate(0,-100px)"}}>
             <EditInformation isAnswered={showOrganizationProfile} questionName={"Opportunity"} onEdit={()=>setOpportunityModalVisibility(true)}/>
         </div>

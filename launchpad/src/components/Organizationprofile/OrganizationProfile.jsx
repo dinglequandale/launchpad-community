@@ -16,7 +16,7 @@ export default function OrganizationProfile({organizationData, location}){
         organizationHost : organizationData.organizationHostCompany ?? organizationData.organizationHostStudent,
         organizationDescription: organizationData.applicantExpectations ?? organizationData.organizationMission,
         organizationLogistics: organizationData.isPaid ? [organizationData.isPaid,organizationData.applicants, organizationData.workLocation, organizationData.timeFrame] : null,
-        applicantFieldOfWork: organizationData.applicantFieldOfWork ?? null,
+        organizationRelevanceTags: organizationData.organizationTags ?? (organizationData.applicantFieldOfWork + ", " + organizationData.applicantPosition),
         organizationLogoPreview: organizationData.organizationLogoPreview ?? "https://thebuzzmagazines.com/sites/default/files/events/2021/08/awty_logo_sep16.jpg",
     }
 
@@ -55,7 +55,7 @@ export default function OrganizationProfile({organizationData, location}){
         <>
             {showPfpCard && <ProfileCard onClose={() => setShowPfpCard(false)}/>}
             <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : location === "user_profile" ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
-                {organizationProfileData.applicantFieldOfWork && <RelevanceBanner relevanceType={organizationProfileData.applicantFieldOfWork}/>}
+                {organizationProfileData.organizationRelevanceTags && <RelevanceBanner relevanceType={organizationProfileData.organizationRelevanceTags}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
                     <div style={{display: "flex", position: "relative"}}>
                         <img src={organizationProfileData.organizationLogoPreview} alt="bruh" 
