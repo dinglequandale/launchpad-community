@@ -14,7 +14,7 @@ export default function MakeChanges({visibility, onCancel, onVerify}){
         overlay: {
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           backdropFilter: 'blur(5px)',
-          zIndex: "4",
+          zIndex: "10",
         }
       };
     

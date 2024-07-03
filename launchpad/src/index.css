@@ -34,6 +34,37 @@ input{
   font-weight: bolder;
 }
 
+input[type="checkbox"] {
+  background-color: transparent;
+  border-style: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  box-shadow: none;
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  display: inline-block;
+  width: 23px;
+  height: 23px;
+  border: 2px solid var(--secondary); 
+  border-radius: 6px;
+  vertical-align: middle;
+  margin-right: 5px;
+  cursor: pointer;
+  box-shadow: var(--shadowColor);
+}
+
+input[type="checkbox"]:checked::before {
+  background-color: var(--highlight); /* Or your desired color */
+  content: "\2713"; /* Unicode checkmark character */
+  color: white;
+  text-align: center;
+  font-size: 16px; /* Adjust size as needed */
+}
+
+
 select{
   background-color: var(--neutral);
   border-style: solid;
