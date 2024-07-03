@@ -8,10 +8,7 @@ export default function TopBar({onBurgerPress}){
 
     return (
         <div className='topBar'>
-            {/* <div style={{display: "flex", gap: "5px", justifyContent: "center", alignItems: "center", cursor: "pointer"}}>
-                <RxHamburgerMenu size={25} style={{color: "white"}} onClick={onBurgerPress}/> */}
-                <span align="center" className='topBarTitle'>L A U N C H P A D.</span>
-            {/* </div> */}
+            <img src="/assets/launchpad_logo.png" alt="Your Image Description" style={{width: "19%"}}/>
             <div className='user'>
                 <LoginIcon/>
                 <LogoutButton/>

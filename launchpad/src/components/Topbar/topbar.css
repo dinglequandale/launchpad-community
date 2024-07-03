@@ -1,11 +1,11 @@
 .topBar{
     display: flex;
-    background-color: rgb(115, 169, 223);
+    background-color: var(--accent);
     justify-content: space-between;
     position: fixed;
     align-items: center;
     padding: .5vh;
-    height: 5%;
+    height: 6%;
     width: 100%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     z-index: 3;

@@ -9,9 +9,9 @@ export default function LandingPage() {
   return (
     <div className="background">
       <div className="landingPage">
-        <span className="title">launchpad.</span>
+        <span className="title"><span style={{textDecoration: "underline", color: "var(--secondary)"}}>launch</span>pad.</span>
         <div className="landingCard">
-          <span className="txt1">A platform that revolutionizes high schoolers' access to valuable connections and on-site job experience</span>
+          <span className="landingText">A platform that revolutionizes students' access to valuable connections and on-site job experience</span>
           <div className="ppl">
             <span className="ppl1">
               Student?

@@ -6,26 +6,28 @@ import TopBar from "../../components/Topbar/TopBar";
 import OrganizationProfile from "../../components/Organizationprofile/OrganizationProfile";
 
 export default function Organizations(){
+
     const organizationsData = [
         {
+            // initiative data format
             id: Math.random(10**5),
             organizationType: "Club",
             organizationName: "Financial Literacy Club",
-            organizationHost: "Juan Gallo Bonilla",
-            organizationDescription: "Description Description Description Description Description Description",
-            prganizationImage: "Image src",
-            organizationLogistics: null,
+            organizationHostStudent: "Juan Gallo Bonilla",
+            organizationMission: "Description Description Description Description Description Description",
             organizationTags: ["engineering", "fortnite"],
-            organizationLearnMore: null,
+            learnMore: '',
+            apply: '',
+            organizationLogo: null,
+            organizationLogoPreview: '',
         },
         {
             id: Math.random(10**5),
-            organizationType: "Community Service",
+            organizationType: "Volunteering",
             organizationName: "Houston Food Bank",
-            organizationHost: null,
-            organizationDescription: "Description Description Description Description Description Description",
+            organizationHostStudent: "e",
+            organizationMission: "Description Description Description Description Description Description",
             prganizationImage: "Image src",
-            organizationLogistics: null,
             organizationTags: null,
             organizationLearnMore: null,
         },
@@ -33,34 +35,31 @@ export default function Organizations(){
             id: Math.random(10**5),
             organizationType: "Organization_Type",
             organizationName: "Organization_Name",
-            organizationHost: null,
-            organizationDescription: "Description Description Description Description Description Description",
+            organizationHostStudent: "",
+            organizationMission: "Description Description Description Description Description Description",
             prganizationImage: "Image src",
-            organizationLogistics: ["Unpaid", null, "On-site", null],
-            organizationTags: null,
-            organizationLearnMore: null,
+            organizationTags: "",
+            organizationLearnMore: "",
         },
         {
             id: Math.random(10**5),
             organizationType: "Organization_Type",
             organizationName: "Organization_Name",
-            organizationHost: null,
-            organizationDescription: "Description Description Description Description Description Description",
-            prganizationImage: "Image src",
-            organizationLogistics: ["Paid", "High School", "On-site", "Seasonal (Full-time)"],
+            organizationHostStudent: "",
+            organizationMission: "Description Description Description Description Description Description",
+            prganizationImage: "",
             organizationTags: ["theatre", "arts", "leadership"],
-            organizationLearnMore: null,
+            organizationLearnMore: "",
         },
         {
             id: Math.random(10**5),
             organizationType: "Organization_Type",
             organizationName: "Organization_Name",
-            organizationHost: null,
-            organizationDescription: "Description Description Description Description Description Description",
+            organizationHostStudent: "",
+            organizationMission: "Description Description Description Description Description Description",
             prganizationImage: "Image src",
-            organizationLogistics: null,
-            organizationTags: null,
-            organizationLearnMore: null,
+            organizationTags: "",
+            organizationLearnMore: "",
         },
     ]
 
@@ -84,7 +83,7 @@ export default function Organizations(){
                     </div>
                     <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px", paddingBottom: "40px"}}>
                         {organizationsData.map((organization, index)=>(
-                            <OrganizationProfile key={index} organizationData={organization}/>
+                            <OrganizationProfile key={index} organizationData={organization} location={"organizations_page"}/>
                         ))}
                 </div>
             </div>

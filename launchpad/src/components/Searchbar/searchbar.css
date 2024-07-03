@@ -15,8 +15,8 @@
 .searchContainer{
     display: flex;
     flex-direction: column;
-    background-color: rgb(242, 255, 251);
-    border-bottom: solid #e0efff;
+    background-color: var(--neutral);
+    border-bottom: solid var(--secondary);
     padding-left: 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09);
 }
@@ -38,5 +38,5 @@
 }
 
 .searchFilter:hover{
-    background-color: rgb(120, 131, 255);
+    background-color: var(--highlight);
 }

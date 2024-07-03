@@ -6,7 +6,7 @@
 }
 
 .dropdown{
-    background-color: rgb(242, 255, 251);
+    background-color: var(--primary);
     border-radius: 0px 0px 5px 5px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     overflow: hidden; /* Hide overflowing content initially */

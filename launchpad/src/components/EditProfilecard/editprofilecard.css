@@ -1,0 +1,96 @@
+.editprofileCard{
+    height: fit-content;
+    width: 550px;
+    background-color: aliceblue;
+    color: black;
+    display: flex;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    flex-direction: column;
+    background: var(--neutral);
+    background: linear-gradient(180deg, var(--neutral) 0%, rgba(255,255,255,1) 60%);
+    left: 54%;
+    margin: 0 auto;
+    top: 10%;
+}
+
+.editcardResume{
+    text-shadow: 0 0 3px #4d73be;
+    color: var(--secondary);
+    padding-top: 20px;
+    font-weight: 600;
+    font-size: larger;
+}
+
+.addOne{
+    color: var(--secondary);
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    gap:4px;
+    cursor:pointer;
+    padding-top: 10px;
+    position: relative;
+}
+.addOne:hover{
+    color: var(--highlight);
+}
+
+.dropdownContainer{
+    align-items: center;
+    position: relative;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.dropdown{
+    background-color: rgb(242, 255, 251);
+    border-radius: 0px 0px 5px 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease-in-out;
+    width: 100%;
+    z-index: 2;
+    position: absolute;
+    padding: 0px 5px;
+}
+  
+  .dropdown.open {
+    max-height: 250px;
+  }
+
+.dropdownOption:hover{
+    color: var(--highlight);
+}
+
+.return:hover{
+    color: var(--highlight);
+}
+
+.userResume{
+    border-bottom-style:"solid";
+    border-bottom-color: "#C0C0C0";
+}
+
+.userResume.no_border{
+    border: none;
+}
+
+.btnUpload {
+    padding: 15px;
+    border: 2px dashed #ccc; /* Dotted border */
+    border-radius: 5px;       /* Rounded corners */
+    cursor: pointer;        
+    background-color: #DFECEF; /* Light background */
+    font-size: 16px;
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+    color: var(--secondary);
+  }
+  
+  .btnUpload:hover {
+    background-color: rgb(179,205,255);
+    color: var(--highlight);
+  }

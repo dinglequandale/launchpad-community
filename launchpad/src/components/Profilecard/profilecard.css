@@ -35,39 +35,6 @@
     justify-content: center;
 }
 
-.basicInfo{
-    display: flex;
-}
-
-.cardPfp{
-    background-color: #4d73be;
-    border-radius: 50%;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-}
-
-.cardName{
-    font-weight: 700;
-    font-size: larger;
-}
-.cardNameDescription{
-    padding-left: 10px;
-    justify-content: center;
-    display: flex;
-    flex-direction: column;
-}
-.cardDescription{
-    font-size: small;
-    font-weight: lighter;
-}
-
-.userInfo{
-    display: flex;
-    flex-direction: column;
-    padding-left: 10px;
-    font-size: smaller;
-    padding-bottom: 10px;
-}
-
 .cardbtnConnect{
     padding: 5px;
     background-color: #4d73be;

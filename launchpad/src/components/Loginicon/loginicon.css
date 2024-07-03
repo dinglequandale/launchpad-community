@@ -7,13 +7,15 @@
 }
 
 .userPfp{
-    width: 35px;
+    width: 43px;
     border-radius: 50%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    height: 43px;
 }
 
 .iconUsername{
     padding-right: 20px;
     font-weight: 600;
     text-shadow: 2px 0px 8px #ffffff;
+    font-size: larger;
 }
