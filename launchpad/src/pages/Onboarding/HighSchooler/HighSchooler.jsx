@@ -3,41 +3,41 @@ import OnboardingDropdown from '../../../components/OnboardingDropdown/Onboardin
 
 
 export default HighSchooler = () => {
-    const numOfSections = 3;
-    const [currentPage, setCurrentPage] = useState(1);
-    const [selectedOptions, setSelectedOptions] = useState({});
+  const numOfSections = 3;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedOptions, setSelectedOptions] = useState({});
 
-    const handleDropdownChange = (id, value) => {
-        setSelectedOptions(prevState => ({
-        ...prevState,
-        [id]: value,
-        }));
-    };
+  const handleDropdownChange = (id, value) => {
+      setSelectedOptions(prevState => ({
+      ...prevState,
+      [id]: value,
+      }));
+  };
 
-    const renderPage = () => {
-        switch (currentPage) {
-        case 1:
-            return <Page1 selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
-        case 2:
-            return <Page2 selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
-        case 3:
-            return <Page3 selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
-        default:
-            return null;
-        }
-};
+  const renderPage = () => {
+      switch (currentPage) {
+      case 1:
+          return <Page1 selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
+      case 2:
+          return <Page2 selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
+      case 3:
+          return <Page3 selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
+      default:
+          return null;
+      }
+  };
 
-return (
-    <div>
-    <ProgressBar
-        numOfSections={numOfSections}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        showLast={true}
-    />
-    {renderPage()}
-    </div>
-);
+  return (
+      <div>
+      <ProgressBar
+          numOfSections={numOfSections}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          showLast={true}
+      />
+      {renderPage()}
+      </div>
+  );
 };
   
 const Page1 = ({ selectedOptions, handleChange }) => {
