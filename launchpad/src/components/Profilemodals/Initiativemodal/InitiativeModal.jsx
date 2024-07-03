@@ -330,16 +330,8 @@ function FinalInfo(){
   const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState((learnMoreType && learnMoreType !== "In-Platform Messages") ?? "");
   const [applyInputVisibility, setApplyInputVisibility] = useState((applyType && applyType !== "In-Platform Messages") ?? "");
   // logic to load the preview image when user opens tab, not working
-  useEffect(()=>{
-    if(organizationData.organizationLogo){
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreviewUrl(reader.result);
-      };
-      try{reader.readAsDataURL(organizationData.organizationLogo);}catch{}
-      // TODO: what the flip is going on here
-    }
-  },[])
+
+  // IMPORTANT TODO: files funky with localStorage, need to adjust when transition to database
 
   const handleChange = (event) => {
     const { name, value, type, files } = event.target;

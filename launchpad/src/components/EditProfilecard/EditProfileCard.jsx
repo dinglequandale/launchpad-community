@@ -15,6 +15,7 @@ import BasicInfoModal from '../BasicInfomodal/BasicInfoModal';
 import InitiativeModal from '../Profilemodals/Initiativemodal/InitiativeModal';
 import { FaDeleteLeft } from 'react-icons/fa6';
 import { TiDeleteOutline } from 'react-icons/ti';
+import DeleteWarningModal from '../DeleteWarningmodal/DeleteWarningModal';
 
 
 export default function EditProfileCard({userData}) {
@@ -22,7 +23,7 @@ export default function EditProfileCard({userData}) {
     const location = useLocation();
 
     // temporary data
-    const userType = "High Schooler";
+    const userType = "Professional";
     const userName = "Shuja Gupta";
     
     const opportunitiesOptions = {highSchool: 
@@ -151,7 +152,7 @@ function ResumeUpload(){
     const handleUploadClick = () => {
         inputRef.current.click();
     }
-
+    // IMPORTANT TODO: files funky with localStorage, need to adjust when transition to database
     const [pdfUrl, setPdfUrl] = useState(null);
     useEffect(() => {
         return () => {
@@ -167,8 +168,15 @@ function ResumeUpload(){
   }
   
     return (
-      <div className="pdf-viewer-container" style={{paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center"}}>
-        {pdfUrl ? <iframe src={pdfUrl} frameborder="0" style={{width: "100%", height: "500px"}}></iframe> : 
+      <div className="pdf-viewer-container" style={{paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative"}}>
+        {pdfUrl ? 
+        <>
+        <iframe src={pdfUrl} frameborder="0" style={{width: "100%", height: "500px"}}></iframe>
+        <div className='addOne' style={{position: "absolute", right: "0"}}>
+            <EditInformation isAnswered={true} questionName={"Resume"} onEdit={()=>inputRef.current.click()}/>
+        </div>
+        </>
+         : 
         <button onClick={handleUploadClick} className='btnUpload'>Upload Your&nbsp;<span style={{fontWeight: "bolder"}}>Resume</span></button>}
         <input type="file" accept=".pdf" onChange={onFileChange} style={{ display: 'none' }} ref={inputRef} />
       </div>
@@ -225,30 +233,32 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
     const [opportunityData, setOpportunityData] = useState(null);
     const [showOrganizationProfile, setShowOrganizationProfile] = useState(false);
+    const [deleteWarningVisibility, setDeleteWarningVisibility] = useState(false);
     useEffect(() => {
         const storedOpportunityData = localStorage.getItem("userOrganizationData");
         if (storedOpportunityData !== null) {
-          setOpportunityData(JSON.parse(storedOpportunityData));
-          setShowOrganizationProfile(true);
+            setOpportunityData(JSON.parse(storedOpportunityData));
+            setShowOrganizationProfile(true);
         }
       }, [opportunityModalVisibility]);
-      
     const handleDeleteOpportunity = () => {
-        if(window.confirm("Are you sure you want to delete your opportunity?")){
         setShowOrganizationProfile(false);
         setOpportunityData(null);
-        localStorage.setItem("userOrganizationData", JSON.stringify(null));
-        }
+        localStorage.removeItem("userOrganizationData");
     }
     return(
         <>
+        <div name="deleteWarning">
+            {deleteWarningVisibility && <DeleteWarningModal onCancel={()=>setDeleteWarningVisibility(false)} onVerify={handleDeleteOpportunity} visibility={deleteWarningVisibility}
+                objectOfDeletation={opportunityData.organizationType}/>}
+        </div>
         <div name="opportunityModal" style={{position: "relative"}}>
             {userType === "Professional" ? <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/> : <InitiativeModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>}
         </div>
         <div style={{position: "relative"}}>
             { showOrganizationProfile ? <>
             <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>{userName} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
-            <button className='btnCircle' onClick={handleDeleteOpportunity} style={{position: "absolute", right: "-13px", top: "28px", background: "red", zIndex: "2"}}>
+            <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "-13px", top: "28px", background: "red", zIndex: "2"}}>
                 <MdDeleteOutline size={30}/>
             </button>
             <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>

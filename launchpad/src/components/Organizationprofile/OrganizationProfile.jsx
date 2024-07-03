@@ -11,7 +11,7 @@ export default function OrganizationProfile({organizationData, location}){
     const [showPfpCard, setShowPfpCard] = useState(false);
 
     const organizationProfileData = {
-        organizationName: organizationData.organizationName ?? organizationHostCompany,
+        organizationName: organizationData.organizationName ?? organizationData.organizationHostCompany,
         organizationType : organizationData.organizationType,
         organizationHost : organizationData.organizationHostCompany ?? organizationData.organizationHostStudent,
         organizationDescription: organizationData.applicantExpectations ?? organizationData.organizationMission,
@@ -60,16 +60,13 @@ export default function OrganizationProfile({organizationData, location}){
                     <div style={{display: "flex", position: "relative"}}>
                         <img src={organizationProfileData.organizationLogoPreview} alt="bruh" 
                         className="organizationPfp"/>
-                        <div style={{paddingLeft: "15px", lineHeight: "1.2"}}>
+                        <div style={{padding: "0px 15px", lineHeight: "1.2"}}>
                             <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.5"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
-                            <div style={{display: "flex"}}>
-                                <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>
-                                    <span style={{fontWeight: "bold", color: "var(--secondary)"}}> {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span> run by&nbsp;
-                                </span>
-                                <button className="btnText" onClick={(e) => handleOnHostClick(e)}>{organizationProfileData.organizationHost}</button>
-                            </div>
-                            <br />
-                            <span name="organizationDescription">{organizationProfileData.organizationDescription}</span>
+                                <span style={{fontWeight: "bold", color: "var(--secondary)", fontSize: "smaller"}}> {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
+                                <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>run by&nbsp;</span>
+                                <button className="btnText" onClick={(e) => handleOnHostClick(e)} style={{paddingBottom: "10px"}}>{organizationProfileData.organizationHost}</button>
+                                <br />
+                            <span name="organizationDescription" style={{fontSize: "14px", lineHeight: "1"}}>{organizationProfileData.organizationDescription}</span>
                         </div>
                     </div>
 
