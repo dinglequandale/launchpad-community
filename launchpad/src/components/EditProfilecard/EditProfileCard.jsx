@@ -304,17 +304,38 @@ function AboutMeDisplay(){
 
 function ConnectionAvailability({userType}){
     const [availabilityModalVisibility, setAvailabilityModalVisibility] = useState(false);
-    const [availability, setAvailability] = useState("");
+    const [availabilityData, setAvailabilityData] = useState(null);
+
+    useEffect(()=>{
+        const storedAvailabilityData = localStorage.getItem("userAvailabilityData");
+        if(storedAvailabilityData !== null){
+            console.log("there's something here")
+            setAvailabilityData(JSON.parse(storedAvailabilityData));
+        }
+    },[availabilityModalVisibility,])
+    console.log(availabilityData);
+
     return(
         <>
             {availabilityModalVisibility && <AvailabilityModal visibility={availabilityModalVisibility} onClose={()=>setAvailabilityModalVisibility(false)} userType={userType}/>}
             <div>
-                <span style={{fontWeight: "250", fontSize: "15px"}}>How are you open to assisting prospective students?</span>
-                <div className='addOne' onClick={()=>setAvailabilityModalVisibility(true)}>
-                    <IoAdd size={25} />
+                {!availabilityData && <span style={{fontWeight: "250", fontSize: "15px"}}>How are you open to assisting prospective students?</span>}
+                {!availabilityData && <div className='addOne' onClick={()=>setAvailabilityModalVisibility(true)}>
+                     <IoAdd size={25} />
                     <span style={{textDecoration: "underline"}}>Add Your Availability</span>
-                    <EditInformation isAnswered={availability !== ""} questionName={"Availability"}/>
-                </div>
+                </div>}
+                {availabilityData && <div style={{position: "relative", paddingTop: "10px", alignItems: "center"}}>
+                    <div className='addOne' style={{position: "absolute", right: "0"}}>
+                        <EditInformation isAnswered={true} questionName={"Availability"} onEdit={()=>setAvailabilityModalVisibility(true)}/>
+                    </div>
+                    <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px"}}>
+                        {availabilityData.map((availability)=>(
+                            <div key={availability} style={{background: "var(--neutral)", padding: "6px 11px", borderRadius: "5px"}}>
+                                <a href='/' style={{lineHeight: "1.5", fontSize: "22px", textDecoration: "underline"}}>{availability}</a>
+                            </div>
+                        ))}
+                    </div>
+                </div>}
             </div>
         </>
     )

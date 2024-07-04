@@ -21,6 +21,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+h3{
+  line-height: 1;
+}
+
 input{
   background-color: var(--neutral);
   border-style: solid;
