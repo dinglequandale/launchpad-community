@@ -309,11 +309,9 @@ function ConnectionAvailability({userType}){
     useEffect(()=>{
         const storedAvailabilityData = localStorage.getItem("userAvailabilityData");
         if(storedAvailabilityData !== null){
-            console.log("there's something here")
             setAvailabilityData(JSON.parse(storedAvailabilityData));
         }
     },[availabilityModalVisibility,])
-    console.log(availabilityData);
 
     return(
         <>
