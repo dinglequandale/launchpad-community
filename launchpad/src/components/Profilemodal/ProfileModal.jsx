@@ -1,4 +1,4 @@
-import './profilecard.css';
+import './profilemodal.css';
 import React from 'react';
 import { VscAccount } from "react-icons/vsc";
 import { SlLink } from "react-icons/sl";   
@@ -6,7 +6,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import SideNav from '../Sidenav/SideNav';
 import { useState, useEffect } from 'react';
 
-export default function ProfileCard({userData, onClose}) {
+export default function ProfileCard({user, onClose, top}) {
 
 //     const [profileCardVisibility, setProfileCardVisibility] = useState(false);
 
@@ -35,8 +35,8 @@ export default function ProfileCard({userData, onClose}) {
 
     return(
         <>
-            <div className='profileCardContainer'>
-                <div className='profileCard'>
+            <div className='blurOverlay'>
+                <div className='profileModalContent' style={{ top: top }}>
                     <IoCloseOutline className='close' onClick={onClose}/>
                     <div className='basicInfo'>
                         <div>
@@ -60,7 +60,6 @@ export default function ProfileCard({userData, onClose}) {
                     <img src="https://www.myperfectresume.com/wp-content/uploads/2022/05/Free-Template-Modern-Blueprint-resume-template.svg" alt="sample resume" />
                 </div>
             </div>
-            <div className='blurOverlay'></div>
         </>   
     )
 }
