@@ -13,9 +13,8 @@ import OpportunityModal from '../Profilemodals/Opportunitymodal/OpportunityModal
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
 import BasicInfoModal from '../BasicInfomodal/BasicInfoModal';
 import InitiativeModal from '../Profilemodals/Initiativemodal/InitiativeModal';
-import { FaDeleteLeft } from 'react-icons/fa6';
-import { TiDeleteOutline } from 'react-icons/ti';
 import DeleteWarningModal from '../DeleteWarningmodal/DeleteWarningModal';
+import AvailabilityModal from '../Profilemodals/Availabilitymodal/AvailabilityModal';
 
 
 export default function EditProfileCard({userData}) {
@@ -65,20 +64,12 @@ export default function EditProfileCard({userData}) {
                         <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px"}}>{userName}'s Resume ...</span>
                         <PublicPrivateDropdown/>
                     </div>
-                    <span style={{fontWeight: "250", fontSize: "15px"}}>Upload a resume so others can understand more about your experiences.</span> 
                     <ResumeUpload/>
                 </div>
                 {(userType === "Professional" || userType === "Alumni") && <hr style={{width: "100%"}}/>}
                 {(userType === "Professional" || userType === "Alumni") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
-                    <div style={{paddingBottom: "10px"}}>
-                        <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userName}</span> is <span style={{fontWeight: "450"}}>open to</span> ... <br /></h>
-                        <span style={{fontWeight: "250", fontSize: "15px"}}>What are you open to do for these students?</span>
-                    </div>
-                    <div className='addOne'>
-                        <IoAdd size={25} />
-                        <span style={{textDecoration: "underline"}}>Add Your Availability</span>
-                        <EditInformation isAnswered={false} questionName={"Availability"}/>
-                    </div>
+                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userName}</span> is <span style={{fontWeight: "450"}}>open to</span> ... </h>
+                    <ConnectionAvailability userType={userType}/>
                 </div>}
             </div>
         </>
@@ -168,18 +159,21 @@ function ResumeUpload(){
   }
   
     return (
-      <div className="pdf-viewer-container" style={{paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative"}}>
-        {pdfUrl ? 
-        <>
-        <iframe src={pdfUrl} frameborder="0" style={{width: "100%", height: "500px"}}></iframe>
-        <div className='addOne' style={{position: "absolute", right: "0"}}>
-            <EditInformation isAnswered={true} questionName={"Resume"} onEdit={()=>inputRef.current.click()}/>
+    <>
+        {!pdfUrl && <span style={{fontWeight: "250", fontSize: "15px"}}>Upload a resume so others can understand more about your experiences.</span>} 
+        <div className="pdf-viewer-container" style={{paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative"}}>
+            {pdfUrl ? 
+            <>
+            <iframe src={pdfUrl} frameborder="0" style={{width: "100%", height: "500px"}}></iframe>
+            <div className='addOne' style={{position: "absolute", right: "0"}}>
+                <EditInformation isAnswered={true} questionName={"Resume"} onEdit={()=>inputRef.current.click()}/>
+            </div>
+            </>
+            : 
+            <button onClick={handleUploadClick} className='btnUpload'>Upload Your&nbsp;<span style={{fontWeight: "bolder"}}>Resume</span></button>}
+            <input type="file" accept=".pdf" onChange={onFileChange} style={{ display: 'none' }} ref={inputRef} />
         </div>
-        </>
-         : 
-        <button onClick={handleUploadClick} className='btnUpload'>Upload Your&nbsp;<span style={{fontWeight: "bolder"}}>Resume</span></button>}
-        <input type="file" accept=".pdf" onChange={onFileChange} style={{ display: 'none' }} ref={inputRef} />
-      </div>
+    </>
     );
 }
 function BasicInfoCard({userType, userName, descType}){
@@ -304,6 +298,45 @@ function AboutMeDisplay(){
                 <EditInformation questionName={"About Me"} onEdit={()=>setAboutMeModalVisibility(true)} isAnswered={aboutMe}/>
             </div><span>{aboutMe}</span>
         </div>
+        </>
+    )
+}
+
+function ConnectionAvailability({userType}){
+    const [availabilityModalVisibility, setAvailabilityModalVisibility] = useState(false);
+    const [availabilityData, setAvailabilityData] = useState(null);
+
+    useEffect(()=>{
+        const storedAvailabilityData = localStorage.getItem("userAvailabilityData");
+        if(storedAvailabilityData !== null){
+            console.log("there's something here")
+            setAvailabilityData(JSON.parse(storedAvailabilityData));
+        }
+    },[availabilityModalVisibility,])
+    console.log(availabilityData);
+
+    return(
+        <>
+            {availabilityModalVisibility && <AvailabilityModal visibility={availabilityModalVisibility} onClose={()=>setAvailabilityModalVisibility(false)} userType={userType}/>}
+            <div>
+                {!availabilityData && <span style={{fontWeight: "250", fontSize: "15px"}}>How are you open to assisting prospective students?</span>}
+                {!availabilityData && <div className='addOne' onClick={()=>setAvailabilityModalVisibility(true)}>
+                     <IoAdd size={25} />
+                    <span style={{textDecoration: "underline"}}>Add Your Availability</span>
+                </div>}
+                {availabilityData && <div style={{position: "relative", paddingTop: "10px", alignItems: "center"}}>
+                    <div className='addOne' style={{position: "absolute", right: "0"}}>
+                        <EditInformation isAnswered={true} questionName={"Availability"} onEdit={()=>setAvailabilityModalVisibility(true)}/>
+                    </div>
+                    <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px"}}>
+                        {availabilityData.map((availability)=>(
+                            <div key={availability} style={{background: "var(--neutral)", padding: "6px 11px", borderRadius: "5px"}}>
+                                <a href='/' style={{lineHeight: "1.5", fontSize: "22px", textDecoration: "underline"}}>{availability}</a>
+                            </div>
+                        ))}
+                    </div>
+                </div>}
+            </div>
         </>
     )
 }
