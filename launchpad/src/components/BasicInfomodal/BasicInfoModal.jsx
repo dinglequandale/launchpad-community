@@ -70,7 +70,7 @@ export default function BasicInfoModal({visibility,onClose,userType}){
         required: true,
       },
       {
-        id: "currentPosition",
+        id: "industryPosition",
         text: "What is/was your highest position?",
         type: "text",
         placeholder: "",

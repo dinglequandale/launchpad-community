@@ -4,7 +4,7 @@ import { RiGraduationCapLine } from "react-icons/ri";
 import { GoBriefcase } from "react-icons/go";
 import { SlCalender } from "react-icons/sl";
 import { useState, useEffect } from "react";
-import ProfileCard from "../Profilecard/ProfileCard";
+import ProfileModal from "../Profilemodal/ProfileModal";
 
 export default function OrganizationProfile({organizationData, location}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
@@ -53,7 +53,7 @@ export default function OrganizationProfile({organizationData, location}){
 
     return(
         <>
-            {showPfpCard && <ProfileCard onClose={() => setShowPfpCard(false)}/>}
+            {showPfpCard && <ProfileModal onClose={() => setShowPfpCard(false)}/>}
             <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : location === "user_profile" ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
                 {organizationProfileData.organizationRelevanceTags && <RelevanceBanner relevanceType={organizationProfileData.organizationRelevanceTags}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>

@@ -3,16 +3,15 @@ import { VscAccount } from "react-icons/vsc";
 import { SlLink } from "react-icons/sl";   
 import ConnectionBanner from "../Connectionbanner/ConnectionBanner";
 import { useState, useEffect } from "react";
-import ProfileCard from "../Profilecard/ProfileCard";
+import ProfileCard from "../Profilemodal/ProfileModal";
 import { FaLink } from "react-icons/fa6";
 
 export default function UserCard({userData, onProfileClick}) {
     const [bannerVisibility, setBannerVisibility] = useState(false);
 
-    // TODO: transition to database
+    // TODO: currently localStorage, transition to database
     const userType = "Professional";
     const userName = "Shuja Gupta";
-    const [showPfpCard, setShowPfpCard] = useState(false);
     
     const descType = () => {
         switch(userType){
@@ -28,15 +27,15 @@ export default function UserCard({userData, onProfileClick}) {
     }
     
     const [basicInfoData, setBasicInfoData] = useState({});
-    const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(null);
-    useEffect(() => {
-        const storedBasicInfoData = localStorage.getItem("userBasicInfo");
-        if (storedBasicInfoData !== null) {
-          setBasicInfoData(JSON.parse(storedBasicInfoData));
-        }
-        else{
-        }
-      }, [basicInfoModalVisibility,]);
+    // const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(null);
+    // useEffect(() => {
+    //     const storedBasicInfoData = localStorage.getItem("userBasicInfo");
+    //     if (storedBasicInfoData !== null) {
+    //       setBasicInfoData(JSON.parse(storedBasicInfoData));
+    //     }
+    //     else{
+    //     }
+    //   }, [basicInfoModalVisibility,]);
 
     const basicInfoContent = {userPreface: userType === "Professional" ? `${basicInfoData.yearsOfExperience} years of experience in ${basicInfoData.industryOfExperience}`
     : userType === "Alumni" ? `Graduated with Class of [...]`
