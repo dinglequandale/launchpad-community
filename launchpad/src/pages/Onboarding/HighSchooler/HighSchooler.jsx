@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
+import ProgressBar from '../../../components/Progressbar/ProgressBar';
 
 
-export default HighSchooler = () => {
+export default function HighSchooler(){
   const numOfSections = 3;
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOptions, setSelectedOptions] = useState({});
