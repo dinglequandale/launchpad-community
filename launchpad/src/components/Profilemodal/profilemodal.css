@@ -1,6 +1,6 @@
 .profileModalContent{
-    height: 80vh;
-    width: 30vw;
+    max-height: 80vh;
+    width: 550px;
     background-color: aliceblue;
     color: black;
     display: flex;
@@ -25,32 +25,16 @@
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.cardbtnConnect{
-    padding: 5px;
-    background-color: #4d73be;
-    border-radius: 5px;
-    width: 75%;
-    margin: 0 auto; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.closeProfileModal{
     cursor: pointer;
+    position: absolute;
+    right: 7px;
+    top: 9px;
+    color: var(--secondary);
 }
 
-.cardbtnConnect:hover{
-    background-color: rgb(120, 131, 255);
-}
-
-.close{
-    cursor: pointer;
-}
-
-.cardResume{
-    text-shadow: 0 0 3px #4d73be;
-    color: #4d73be;
-    padding-top: 20px;
-    font-weight: 600;
-    font-size: larger;
+.closeProfileModal:hover{
+    color: var(--highlight);
 }
 
 .profileModalContent{
