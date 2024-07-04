@@ -30,7 +30,7 @@ const highSchoolQuestionsConfig = [
   {
       id: "dreamCareer",
       text: "What is your dream career field? (Select up to 4)",
-      type: "select",
+      type: "multi-select",
       options: [
           "Consumer Electronics",
           "Consumer Goods",
@@ -55,7 +55,7 @@ const highSchoolQuestionsConfig = [
   {
       id: "collegeInterests",
       text: "What colleges are you interested in attending after highschool?",
-      type: "select",
+      type: "multi-select",
       options: [
           "Harvard",
           "Yale",
@@ -88,19 +88,6 @@ export default function HighSchooler() {
       }));
   };
 
-  const renderPage = () => {
-      switch (currentPage) {
-      case 1:
-          return <QuestionsPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={1} />;
-      case 2:
-          return <QuestionsPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={2} />;
-      case 3:
-          return <QuestionsPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={3} />;
-      default:
-          return null;
-      }
-  };
-
   return (
       <div>
       <ProgressBar
@@ -109,7 +96,7 @@ export default function HighSchooler() {
           setCurrentPage={setCurrentPage}
           showLast={true}
       />
-      {renderPage()}
+      <QuestionsPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={currentPage} />;
       </div>
   );
 };
