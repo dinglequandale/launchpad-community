@@ -1,33 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Select from 'react-select';
 
-export default function OnboardingDropdown({ question, options, selectedOption, onChange }) {
-    // Set the initial value of the selected option
-    const [internalSelectedOption, setInternalSelectedOption] = useState(selectedOption || '');
-
-    // Handle changes to the dropdown selection
-    const handleChange = (event) => {
-        const value = event.target.value;
-        setInternalSelectedOption(value);
-        onChange(value); // Notify the parent component of the change
+export default function OnboardingDropdown({ question, options, selectedOption, onChange, type }) {
+    const handleChange = (selectedOptions) => {
+        const value = type === 'multi-select'
+            ? selectedOptions.map(option => option.value)
+            : selectedOptions.value;
+        onChange(value);
     };
 
-    // Update internal state when the parent component's value changes
-    useEffect(() => {
-        setInternalSelectedOption(selectedOption);
-    }, [selectedOption]);
+    const formattedOptions = options.map(option => ({ value: option, label: option }));
 
     return (
-        <div>
-            <label htmlFor="dropdown">{question}</label>
-            <select id="dropdown" value={internalSelectedOption} onChange={handleChange}>
-                <option value="" disabled>Select an option</option>
-                {options.map((option, index) => (
-                    <option key={index} value={option}>
-                        {option}
-                    </option>
-                ))}
-            </select>
-            {internalSelectedOption && <p>You selected: {internalSelectedOption}</p>}
+        <div className="form-group">
+            <label>{question}</label>
+            {type === 'multi-select' ? (
+                <Select
+                    isMulti
+                    value={formattedOptions.filter(option => selectedOption.includes(option.value))}
+                    onChange={handleChange}
+                    options={formattedOptions}
+                />
+            ) : (
+                <Select
+                    value={formattedOptions.find(option => option.value === selectedOption)}
+                    onChange={handleChange}
+                    options={formattedOptions}
+                />
+            )}
         </div>
     );
 }

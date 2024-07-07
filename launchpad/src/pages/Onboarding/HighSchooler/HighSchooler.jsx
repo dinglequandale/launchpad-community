@@ -5,74 +5,74 @@ import ProgressBar from '../../../components/Progressbar/ProgressBar';
 const highSchoolQuestionsConfig = [
   // Page 1
   {
-      id: "whatSchool",
-      text: "What school do you go to?",
-      type: "select",
-      options: ["The Awty International School"],
-      page: 1,
+    id: "whatSchool",
+    text: "What school do you go to?",
+    type: "select",
+    options: ["The Awty International School"],
+    page: 1,
   },
   {
-      id: "graduationYear",
-      text: "What year do you graduate?",
-      type: "select",
-      options: [1999, 2008],
-      page: 1,
+    id: "graduationYear",
+    text: "What year do you graduate?",
+    type: "select",
+    options: [1999, 2008],
+    page: 1,
   },
   {
-      id: "whatSection",
-      text: "Are you part of the French or International Section?",
-      type: "select",
-      options: ["French", "International"],
-      page: 1,
+    id: "whatSection",
+    text: "Are you part of the French or International Section?",
+    type: "select",
+    options: ["French", "International"],
+    page: 1,
   },
 
   // Page 2
   {
-      id: "dreamCareer",
-      text: "What is your dream career field? (Select up to 4)",
-      type: "multi-select",
-      options: [
-          "Consumer Electronics",
-          "Consumer Goods",
-          "Consumer Services",
-          "Cosmetics",
-          "Business",
-          "Education",
-          "Healthcare",
-          "Technology"
-      ],
-      page: 2,
+    id: "dreamCareer",
+    text: "What is your dream career field? (Select up to 4)",
+    type: "multi-select",
+    options: [
+        "Consumer Electronics",
+        "Consumer Goods",
+        "Consumer Services",
+        "Cosmetics",
+        "Business",
+        "Education",
+        "Healthcare",
+        "Technology"
+    ],
+    page: 2,
   },
 
   // Page 3
   {
-      id: "collegeDecision",
-      text: "Have you decided what college you will attend after highschool?",
-      type: "select",
-      options: ["Yes", "No"],
-      page: 3
+    id: "collegeDecision",
+    text: "Have you decided what college you will attend after highschool?",
+    type: "select",
+    options: ["Yes", "No"],
+    page: 3
   },
   {
-      id: "collegeInterests",
-      text: "What colleges are you interested in attending after highschool?",
-      type: "multi-select",
-      options: [
-          "Harvard",
-          "Yale",
-          "UT Austin"
-      ],
-      page: 3  
+    id: "collegeInterests",
+    text: "What colleges are you interested in attending after highschool?",
+    type: "multi-select",
+    options: [
+        "Harvard",
+        "Yale",
+        "UT Austin"
+    ],
+    page: 3  
   },
   {
-      id: "collegeAttending",
-      text: "What college will you be attending?",
-      type: "select",
-      options: [
-          "Harvard",
-          "Yale",
-          "UT Austin"
-      ],
-      page: 3  
+    id: "collegeAttending",
+    text: "What college will you be attending?",
+    type: "select",
+    options: [
+        "Harvard",
+        "Yale",
+        "UT Austin"
+    ],
+    page: 3  
   }
 ];
 
@@ -104,16 +104,16 @@ export default function HighSchooler() {
   return (
     <div>
       <ProgressBar
-        numOfSections={numOfSections}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-        showLast={true}
+          numOfSections={numOfSections}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          showLast={true}
       />
       {renderPage()}
     </div>
   );
-}
-
+};
+  
 const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
   return (
     <div>
@@ -123,8 +123,8 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
           key={question.id}
           question={question.text}
           options={question.options}
-          selectedOption={selectedOptions[question.id]}
-          onChange={(e) => handleChange(question.id, e)}
+          selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+          onChange={(value) => handleChange(question.id, value)}
           type={question.type}
         />
       ))}
@@ -142,16 +142,16 @@ const LastPage = ({ selectedOptions, handleChange }) => {
       <OnboardingDropdown
         question={questions[0].text}
         options={questions[0].options}
-        selectedOption={selectedOptions['collegeDecision']}
-        onChange={(e) => handleChange('collegeDecision', e)}
+        selectedOption={selectedOptions['collegeDecision'] || ''}
+        onChange={(value) => handleChange('collegeDecision', value)}
         type={questions[0].type}
       />
       {collegeDecision === 'Yes' && (
         <OnboardingDropdown
           question={questions[1].text}
           options={questions[1].options}
-          selectedOption={selectedOptions['collegeInterests']}
-          onChange={(e) => handleChange('collegeInterests', e)}
+          selectedOption={selectedOptions['collegeInterests'] || []}
+          onChange={(value) => handleChange('collegeInterests', value)}
           type={questions[1].type}
         />
       )}
@@ -159,8 +159,8 @@ const LastPage = ({ selectedOptions, handleChange }) => {
         <OnboardingDropdown
           question={questions[2].text}
           options={questions[2].options}
-          selectedOption={selectedOptions['collegeAttending']}
-          onChange={(e) => handleChange('collegeAttending', e)}
+          selectedOption={selectedOptions['collegeAttending'] || ''}
+          onChange={(value) => handleChange('collegeAttending', value)}
           type={questions[2].type}
         />
       )}
