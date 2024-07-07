@@ -74,7 +74,7 @@ const highSchoolQuestionsConfig = [
       ],
       page: 3  
   }
-]
+];
 
 export default function HighSchooler() {
   const numOfSections = 3;
@@ -82,26 +82,39 @@ export default function HighSchooler() {
   const [selectedOptions, setSelectedOptions] = useState({});
 
   const handleDropdownChange = (id, value) => {
-      setSelectedOptions(prevState => ({
+    setSelectedOptions(prevState => ({
       ...prevState,
       [id]: value,
-      }));
+    }));
+  };
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 1:
+        return <FirstPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={1} />;
+      case 2:
+        return <FirstPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={2} />;
+      case 3:
+        return <LastPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
+      default:
+        return null;
+    }
   };
 
   return (
-      <div>
+    <div>
       <ProgressBar
-          numOfSections={numOfSections}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          showLast={true}
+        numOfSections={numOfSections}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        showLast={true}
       />
-      <QuestionsPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={currentPage} />;
-      </div>
+      {renderPage()}
+    </div>
   );
-};
-  
-const QuestionsPage = ({ selectedOptions, handleChange, pageNum }) => {
+}
+
+const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
   return (
     <div>
       {highSchoolQuestionsConfig.filter(question => question.page === pageNum)
@@ -111,9 +124,46 @@ const QuestionsPage = ({ selectedOptions, handleChange, pageNum }) => {
           question={question.text}
           options={question.options}
           selectedOption={selectedOptions[question.id]}
-          onChange={(e) => handleChange(question.id, e.target.value)}
+          onChange={(e) => handleChange(question.id, e)}
+          type={question.type}
         />
       ))}
+    </div>
+  );
+};
+
+const LastPage = ({ selectedOptions, handleChange }) => {
+  const questions = highSchoolQuestionsConfig.filter(question => question.page === 3);
+
+  const collegeDecision = selectedOptions['collegeDecision'];
+
+  return (
+    <div>
+      <OnboardingDropdown
+        question={questions[0].text}
+        options={questions[0].options}
+        selectedOption={selectedOptions['collegeDecision']}
+        onChange={(e) => handleChange('collegeDecision', e)}
+        type={questions[0].type}
+      />
+      {collegeDecision === 'Yes' && (
+        <OnboardingDropdown
+          question={questions[1].text}
+          options={questions[1].options}
+          selectedOption={selectedOptions['collegeInterests']}
+          onChange={(e) => handleChange('collegeInterests', e)}
+          type={questions[1].type}
+        />
+      )}
+      {collegeDecision === 'No' && (
+        <OnboardingDropdown
+          question={questions[2].text}
+          options={questions[2].options}
+          selectedOption={selectedOptions['collegeAttending']}
+          onChange={(e) => handleChange('collegeAttending', e)}
+          type={questions[2].type}
+        />
+      )}
     </div>
   );
 };
