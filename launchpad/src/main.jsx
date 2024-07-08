@@ -5,8 +5,7 @@ import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import {Auth0Provider} from '@auth0/auth0-react';
 import UserNetwork from './pages/Network/UserNetwork.jsx';
-import HighSchooler from './pages/Onboarding/HighSchooler/HighSchooler.jsx';
-import CollegeStudent from './pages/Onboarding/CollegeStudent/CollegeStudent.jsx';
+import Onboarding from './pages/Onboarding/Onboarding.jsx';
 import Organizations from './pages/Organizationspage/Organizations.jsx';
 import EditProfilePage from './pages/Editprofilepage/EditProfilePage.jsx';
 
@@ -25,13 +24,8 @@ const router = createBrowserRouter([
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
 },
 {
-  path: '/HighSchooler',
-  element: <HighSchooler/>,
-  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
-},
-{
-  path: '/CollegeStudent',
-  element: <CollegeStudent/>,
+  path: '/Onboarding',
+  element: <Onboarding/>,
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
 },
 {
