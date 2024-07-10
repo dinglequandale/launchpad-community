@@ -5,7 +5,10 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const {isAuthenticated, loginWithRedirect} = useAuth0();
+  const {isAuthenticated, loginWithRedirect, user} = useAuth0();
+
+  console.log(user)
+
   return (
     <div className="background">
       <div className="landingPage">
