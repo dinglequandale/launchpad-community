@@ -1,9 +1,7 @@
 import "./usercard.css";
 import { VscAccount } from "react-icons/vsc";
-import { SlLink } from "react-icons/sl";   
 import ConnectionBanner from "../Connectionbanner/ConnectionBanner";
-import { useState, useEffect } from "react";
-import ProfileCard from "../Profilemodal/ProfileModal";
+import { useState } from "react";
 import { FaLink } from "react-icons/fa6";
 
 export default function UserCard({userData, onProfileClick}) {
@@ -59,7 +57,7 @@ export default function UserCard({userData, onProfileClick}) {
                 <div className='cardNameDescription'>
                     <span className='cardName'>{userName}</span>
                     <span className='cardDescription'>{basicInfoContent.userPreface}</span>
-                </div>   
+                </div>
                 </div>
                 <div style={{display: "flex"}}>
                 <div className='userInfo' style={{fontSize: "16px"}}>
