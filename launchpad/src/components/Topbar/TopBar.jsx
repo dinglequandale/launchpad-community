@@ -8,7 +8,7 @@ export default function TopBar({onBurgerPress}){
 
     return (
         <div className='topBar'>
-            <img src="/assets/launchpad_logo.png" alt="Your Image Description" style={{width: "19%"}}/>
+            <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "19%"}}/>
             <div className='user'>
                 <LoginIcon/>
                 <LogoutButton/>
