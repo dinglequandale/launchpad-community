@@ -32,7 +32,9 @@ export default function SignUp(){
                 </div>
                 
                 <form onSubmit={handleSubmit}>
-                    <div style={{display: "flex", justifyContent: "cemter", alignItems: "center", flexDirection: "column"}}>
+                    <div style={{display: "flex", justifyContent: "cemter", alignItems: "center", flexDirection: "column", gap: "10px"}}>
+                        <div style={{width: "100%", display: "flex", flexDirection: "column", gap: "5px"}}>
+                        <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Email</span>
                         <input
                         type="email"
                         placeholder="Email address"
@@ -41,7 +43,10 @@ export default function SignUp(){
                         required
                         className="inputEmailAndPassword"
                         />
+                        </div>
 
+                        <div style={{width: "100%", display: "flex", flexDirection: "column", gap: "5px"}}>
+                        <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Password</span>
                         <input
                         type="password"
                         placeholder="Password"
@@ -50,6 +55,7 @@ export default function SignUp(){
                         required
                         className="inputEmailAndPassword"
                         />
+                        </div>
                     </div>
                     <a href="#" className="forgot-password">Forgot password?</a>
                     <button type="submit" className="submit-button">Continue</button>

@@ -51,6 +51,7 @@
     width: 95%;
     margin-bottom: 1rem;
     font-weight: 300;
+    border-style: none;
   }
   
   .forgot-password {
