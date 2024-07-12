@@ -167,6 +167,21 @@ export default function InitiativeModal({visibility, onClose}){
     });
   };
 
+  const renderPage = () => {
+    switch(currentInitiativePage){
+      case 1:
+        return <InitiativeType/>;
+      case 2:
+        return <InitiativeMission/>;
+      case 3:
+        return <FinalInfo/>;
+      case 4:
+        return <PreviewOppportunityCard/>;
+      default:
+        return null;
+    }
+  }
+
   return (
     <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
@@ -195,10 +210,7 @@ export default function InitiativeModal({visibility, onClose}){
           </header>
           <main style={{paddingTop:"10px"}}>
           <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
-            {currentInitiativePage === 1 && <InitiativeType/>}
-            {currentInitiativePage === 2 && <InitiativeMission/>}
-            {currentInitiativePage === 3 && <FinalInfo/>}
-            {currentInitiativePage === 4 && <PreviewOppportunityCard/>}
+            {renderPage()}
           </form>
           </main>
           <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
@@ -222,7 +234,7 @@ function InitiativeType(){
 
   return(
     <>
-    <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>We need some general information first.</h2>
+    <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>We need some general information first.</h2>
     <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
     <main style={{ display: "flex", alignItems: "center", justifyContent: "space-around", paddingTop: "1rem" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
@@ -278,7 +290,7 @@ function InitiativeMission(){
 
   return(
     <>
-    <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Time to get down to business. What sets you apart?</h2>
+    <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>Time to get down to business. What sets you apart?</h2>
     <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
     <main style={{ display: "flex", alignItems: "center", justifyContent: "space-around", paddingTop: "1rem" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
@@ -392,7 +404,7 @@ function FinalInfo(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're almost done! Just a few more things.</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>You're almost done! Just a few more things.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           {/* First two questions (link inputs) */}
@@ -476,7 +488,7 @@ function PreviewOppportunityCard(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're all set! Here's a preview of your card:</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>You're all set! Here's a preview of your card:</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "10px"}}>
         <OrganizationProfile organizationData={organizationData} location={"opportunity_popup"}/>

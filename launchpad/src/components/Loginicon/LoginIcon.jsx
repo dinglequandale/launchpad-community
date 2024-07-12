@@ -5,7 +5,7 @@ import { VscAccount } from "react-icons/vsc";
 
 export default function LoginIcon(){
     const {user, isAuthenticated, isLoading} = useAuth0();
-
+    // TODO: integrate firebase auth
     // TODO: add actual user data attained from onboarding
 
     return (
