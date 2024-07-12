@@ -11,6 +11,7 @@ import EditProfilePage from './pages/Editprofilepage/EditProfilePage.jsx';
 import Home from './pages/Homepage/Home.jsx';
 import { AuthProvider } from './contexts/auth/AuthContext.jsx';
 import SignUp from './pages/Authentication/Signup.jsx';
+import Login from './pages/Authentication/Login.jsx';
 
 const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
 const domain = import.meta.env.VITE_AUTH0_DOMAIN;
@@ -55,7 +56,12 @@ const router = createBrowserRouter([
   path: '/MyProfile',
   element: <EditProfilePage/>,
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
-}
+},
+{
+  path: '/Login',
+  element: <Login/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
 ]);
 
 

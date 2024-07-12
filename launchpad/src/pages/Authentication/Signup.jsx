@@ -1,31 +1,46 @@
 import { useState } from "react";
 import "./signin.css";
-import { doSignInWithEmailAndPassword, doSignInWithGoogle, doPasswordReset } from "../../firebase/auth";
+import { doCreateUserWithEmailAndPassword, doSignInWithGoogle } from "../../firebase/auth";
 import { useAuth } from "../../contexts/auth/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function SignUp(){
 
     const { userLoggedIn } = useAuth();
-
+    // alert(userLoggedIn)
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
     const [userIsSigningIn, setUserIsSigningIn] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
+        if(userPassword.length <= 6){
+            toast.error("Sorry! Your password requires at least 7 characters.")
+            return;
+        }
+        
         if(!userIsSigningIn){
             setUserIsSigningIn(true);
-            // await doSignInWithEmailAndPassword(userEmail, userPassword);
-            
-            toast.promise(doSignInWithEmailAndPassword(userEmail, userPassword), {
-                loading: 'Looking for you ...',
-                success: 'Logging in!',
-                error: "Error! We couldn't find you.",
-              });
+            try {
+                await toast.promise(
+                    doCreateUserWithEmailAndPassword(userEmail, userPassword),
+                    {
+                        loading: 'Creating your account ...',
+                        success: "You're set!",
+                        error: (err) => `Error! ${err.message}`
+                    }
+                );
+                
+                // Redirect to homepage after successful account creation
+                navigate('/Home');
+            } catch (error) {
+                console.error("Error creating account:", error);
+            } finally {
+                setUserIsSigningIn(false);
+            }
         }
-
     }
 
     const onContinueWithGoogle = (e) => {
@@ -59,7 +74,7 @@ export default function SignUp(){
                     <p>Your journey starts here!</p>
                 </div>
                 
-                <button className="social-button google" onClick={(e)=>onContinueWithGoogle(e)}>
+                <button className="social-button btnUnfilled" onClick={(e)=>onContinueWithGoogle(e)}>
                     <svg style={{width: "25px"}} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clipPath="url(#clip0_17_40)">
                             <path d="M47.532 24.5528C47.532 22.9214 47.3997 21.2811 47.1175 19.6761H24.48V28.9181H37.4434C36.9055 31.8988 35.177 34.5356 32.6461 36.2111V42.2078H40.3801C44.9217 38.0278 47.532 31.8547 47.532 24.5528Z" fill="#4285F4" />
@@ -83,7 +98,7 @@ export default function SignUp(){
                 </div>
                 
                 <form onSubmit={(e)=>handleSubmit(e)}>
-                    <div style={{display: "flex", justifyContent: "cemter", alignItems: "center", flexDirection: "column", gap: "10px"}}>
+                    <div style={{display: "flex", justifyContent: "cemter", alignItems: "center", flexDirection: "column", gap: "10px", paddingBottom: "1rem"}}>
                         <div style={{width: "100%", display: "flex", flexDirection: "column", gap: "5px"}}>
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Email</span>
                         <input
@@ -109,12 +124,11 @@ export default function SignUp(){
                         />
                         </div>
                     </div>
-                    <a href="#" className="forgot-password" disabled={userIsSigningIn}>Forgot password?</a>
                     <button type="submit" className="submit-button" disabled={userIsSigningIn}><span style={{fontSize: "larger"}} disabled={userIsSigningIn}>{userIsSigningIn ? 'Signing In...' : 'Continue'}</span></button>
                 </form>
                 
                 <p className="signup-link">
-                    Already have an account? <a href="#" disabled={userIsSigningIn}>Log in</a>
+                    Already have an account? <a href="/Login" disabled={userIsSigningIn}>Log in</a>
                 </p>
             </div>
       </div>
