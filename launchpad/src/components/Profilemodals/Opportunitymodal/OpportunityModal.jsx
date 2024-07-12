@@ -222,6 +222,23 @@ export default function OpportunityModal({visibility, onClose}){
     });
   };
 
+  const renderPage = () => {
+    switch(currentOpportunityPage){
+      case 1:
+        return <OpportunityType/>;
+      case 2:
+        return <ApplicantInfo/>;
+      case 3:
+        return <BasicLogistics/>;
+      case 4:
+        return <FinalInfo/>;
+      case 5:
+        return <PreviewOppportunityCard/>;
+      default:
+        return null;
+  }
+}
+
   return (
     <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
@@ -250,11 +267,7 @@ export default function OpportunityModal({visibility, onClose}){
           </header>
           <main style={{paddingTop:"10px"}}>
           <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
-            {currentOpportunityPage === 1 && <OpportunityType/>}
-            {currentOpportunityPage === 2 && <ApplicantInfo/>}
-            {currentOpportunityPage === 3 && <BasicLogistics/>}
-            {currentOpportunityPage === 4 && <FinalInfo/>}
-            {currentOpportunityPage === 5 && <PreviewOppportunityCard/>}
+            {renderPage()}
           </form>
           </main>
           <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
@@ -333,7 +346,7 @@ function ApplicantInfo(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Explain what you need from your applicants.</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>Explain what you need from your applicants.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center"}}>
@@ -460,7 +473,7 @@ function FinalInfo(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're almost done. Just a few more details.</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>You're almost done. Just a few more details.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           {/* First two questions (link inputs) */}
@@ -546,7 +559,7 @@ function BasicLogistics(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>Tell us some basic information about your opportunity.</h2>
+      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>Tell us some basic information about your opportunity.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-evenly", alignItems: "center", paddingTop: "10px", gap: "15px" }} className='basicLogistics'>
           {questionsForPage.map((question) => (

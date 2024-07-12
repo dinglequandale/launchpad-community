@@ -3,20 +3,36 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import {Auth0Provider} from '@auth0/auth0-react';
 import UserNetwork from './pages/Network/UserNetwork.jsx';
 import UserSchool from './pages/Onboarding/Initialphase/Userschool/UserSchool.jsx';
 import Organizations from './pages/Organizationspage/Organizations.jsx';
 import EditProfilePage from './pages/Editprofilepage/EditProfilePage.jsx';
-
-const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
-const domain = import.meta.env.VITE_AUTH0_DOMAIN;
+import Home from './pages/Homepage/Home.jsx';
+import { AuthProvider } from './contexts/auth/AuthContext.jsx';
+import SignUp from './pages/Authentication/Signup.jsx';
+import Login from './pages/Authentication/Login.jsx';
+import LandingPage from './pages/landing_page/LandingPage.jsx';
 
 const router = createBrowserRouter([
   {
   path: '/',
   element: <App/>,
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
+{
+  path: '/Landing',
+  element: <LandingPage/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
+{
+  path: '/Signup',
+  element: <SignUp/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
+{
+  path: 'Home',
+  element: <Home/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>,
 },
 {
   path: '/UserNetwork',
@@ -42,18 +58,19 @@ const router = createBrowserRouter([
   path: '/MyProfile',
   element: <EditProfilePage/>,
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
-}
+},
+{
+  path: '/Login',
+  element: <Login/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
 ]);
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Auth0Provider 
-    domain = {domain}
-    clientId={clientId}
-    redirectUri = {window.location.origin}>
-      <RouterProvider router = {router} /> 
-    </Auth0Provider>
-  
+    <AuthProvider>
+        <RouterProvider router = {router} /> 
+    </AuthProvider>
   </React.StrictMode>,
 )

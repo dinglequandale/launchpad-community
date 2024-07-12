@@ -1,0 +1,92 @@
+.signup-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f0f2f5;
+    background: linear-gradient(0deg, var(--accent) 0%, rgba(255,255,255,0) 100%);
+    box-shadow: var(--shadowColor);
+  }
+  
+  .signup-card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  h2 {
+    margin-bottom: 0.5rem;
+  }
+  
+  .social-button {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .google {
+    background-color: var(--secondary);
+    color: white;
+  }
+  
+  .orDivider{
+    width: 45%;
+    display: inline-block;
+    transform: translate(0px, 2px);
+  }
+  
+  .divider {
+    align-items: center;
+    text-align: center;
+    margin: 1rem 0;
+  }
+  
+  .inputEmailAndPassword {
+    width: 95%;
+    margin-bottom: 1rem;
+    font-weight: 300;
+    border-style: none;
+  }
+  
+  .forgot-password {
+    display: block;
+    text-align: right;
+    margin-bottom: 1rem;
+    color: var(--secondary);
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 17px;
+  }
+
+  .forgot-password:hover{
+    color: var(--highlight);
+  }
+  
+  .submit-button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--secondary);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .signup-link {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .signup-link a {
+    color: var(--secondary);
+    text-decoration: none;
+  }
+  

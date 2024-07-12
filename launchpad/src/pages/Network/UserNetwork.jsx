@@ -91,21 +91,40 @@ export default function UserNetwork() {
 
 function UserCarousel({userNetworkData}){
 
+  const CustomArrow = ({ className, style, onClick, direction }) => (
+    <div
+      className={className}
+      style={{ ...style, display: 'block'}}
+      onClick={onClick}
+    >
+      {direction === 'next' ? '>' : '<'}
+    </div>
+  );
+
   const handleOnProfileClick = useContext(NetworkContext);
 
-  const settings = {
+  // const settings = {
+  //         dots: false,
+  //         infinite: true,
+  //         speed: 500,
+  //         slidesToShow: 3,
+  //         slidesToScroll: 1,
+  //         centerPadding: '0px'
+  //       };
+        const settings = {
           dots: false,
           infinite: true,
           speed: 500,
           slidesToShow: 3,
           slidesToScroll: 1,
-          centerPadding: '0px'
+          prevArrow: <CustomArrow direction="prev" />,
+          nextArrow: <CustomArrow direction="next" />
         };
       
-  //TODO: curr localStorage; transition this to storage!!! all messed up
+  //TODO: curr localStorage; transition this to firebase!!! all messed up
   return (
     <>
-    <div style={{width: "80%", margin: "0 auto"}}>
+    <div style={{width: "1050px", margin: "0 auto"}}>
       <Slider {...settings}>
         {userNetworkData.map((profile) => (
                 <UserCard key={profile.id} userData={profile} onProfileClick={handleOnProfileClick}/>

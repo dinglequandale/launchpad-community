@@ -1,20 +1,19 @@
 import "./loginicon.css";
 import React from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import { VscAccount } from "react-icons/vsc";
 
 export default function LoginIcon(){
-    const {user, isAuthenticated, isLoading} = useAuth0();
-
+    // TODO: integrate firebase auth
     // TODO: add actual user data attained from onboarding
-
+    const userPicture = null;
     return (
         <>
             <article className="iconContainer">
-                {user?.picture && <img className="userPfp" src={user.picture}/>}
+                {userPicture ? <img className="userPfp" src={user.picture}/> : 
+                <VscAccount size={47} style={{background: "var(--neutral)", borderRadius: "50%"}}/>}
                 <div style={{display: "flex", flexDirection: "column", lineHeight: "1.2"}}>
-                    <span className="iconUsername"> {user?.name} </span>
-                    {!isLoading && <a href="/MyProfile" style={{textDecoration: "underline"}}>My Profile</a>}
+                    <span className="iconUsername"> Jose Gallo </span>
+                    {<a href="/MyProfile" style={{textDecoration: "underline"}}>My Profile</a>}
                 </div>
             </article>
         </>
