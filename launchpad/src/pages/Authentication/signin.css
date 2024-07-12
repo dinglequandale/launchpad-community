@@ -62,6 +62,12 @@
     margin-bottom: 1rem;
     color: var(--secondary);
     text-decoration: none;
+    cursor: pointer;
+    font-size: 17px;
+  }
+
+  .forgot-password:hover{
+    color: var(--highlight);
   }
   
   .submit-button {

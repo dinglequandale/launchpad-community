@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import {Auth0Provider} from '@auth0/auth0-react';
 import UserNetwork from './pages/Network/UserNetwork.jsx';
 import UserSchool from './pages/Onboarding/Initialphase/Userschool/UserSchool.jsx';
 import Organizations from './pages/Organizationspage/Organizations.jsx';
@@ -12,14 +11,17 @@ import Home from './pages/Homepage/Home.jsx';
 import { AuthProvider } from './contexts/auth/AuthContext.jsx';
 import SignUp from './pages/Authentication/Signup.jsx';
 import Login from './pages/Authentication/Login.jsx';
-
-const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID;
-const domain = import.meta.env.VITE_AUTH0_DOMAIN;
+import LandingPage from './pages/landing_page/LandingPage.jsx';
 
 const router = createBrowserRouter([
   {
   path: '/',
   element: <App/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
+{
+  path: '/Landing',
+  element: <LandingPage/>,
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
 },
 {
@@ -68,12 +70,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
-      <Auth0Provider 
-      domain = {domain}
-      clientId={clientId}
-      redirectUri = {window.location.origin}>
         <RouterProvider router = {router} /> 
-      </Auth0Provider>
     </AuthProvider>
   </React.StrictMode>,
 )

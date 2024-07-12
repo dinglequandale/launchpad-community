@@ -2,12 +2,14 @@ import { useState } from "react";
 import "./signin.css";
 import { doSignInWithEmailAndPassword, doSignInWithGoogle, doPasswordReset } from "../../firebase/auth";
 import { useAuth } from "../../contexts/auth/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function Login(){
 
     const { userLoggedIn } = useAuth();
+
+    const navigate = useNavigate();
 
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
@@ -17,15 +19,43 @@ export default function Login(){
         e.preventDefault(); 
         if(!userIsSigningIn){
             setUserIsSigningIn(true);
-            // await doSignInWithEmailAndPassword(userEmail, userPassword);
-            
-            toast.promise(doSignInWithEmailAndPassword(userEmail, userPassword), {
-                loading: 'Looking for you ...',
-                success: "You're set!",
-                error: "Error! We couldn't find you.",
-              });
+            try {
+                await toast.promise(
+                    doSignInWithEmailAndPassword(userEmail, userPassword),
+                    {
+                        loading: 'Logging you in ...',
+                        success: "You're set!",
+                        error: (err) => `Error! ${err.message}`
+                    }
+                );
+                
+                // Redirect to homepage after successful account creation
+                navigate('/Home');
+            } catch (error) {
+                console.error("Error logging in:", error);
+            } finally {
+                setUserIsSigningIn(false);
+            }
         }
 
+    }
+
+    const handlePasswordReset = async (e) => {
+        e.preventDefault();
+        try {
+            await toast.promise(
+                doPasswordReset(userEmail),
+                {
+                    loading: 'Sending password reset email ...',
+                    success: "Password reset email sent. Check your email!",
+                    error: (err) => `Error! ${err.message}`
+                }
+            );
+            
+            // Redirect to homepage after successful account creation
+        } catch (error) {
+            console.error("Error logging in:", error);
+        }
     }
 
     const onContinueWithGoogle = (e) => {
@@ -109,7 +139,7 @@ export default function Login(){
                         />
                         </div>
                     </div>
-                    <a href="#" className="forgot-password" disabled={userIsSigningIn}>Forgot password?</a>
+                    <span href="#" className="forgot-password" onClick={(e)=>handlePasswordReset(e)} disabled={userIsSigningIn}>Forgot password?</span>
                     <button type="submit" className="submit-button" disabled={userIsSigningIn}><span style={{fontSize: "larger"}} disabled={userIsSigningIn}>{userIsSigningIn ? 'Signing In...' : 'Continue'}</span></button>
                 </form>
                 

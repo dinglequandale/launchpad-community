@@ -1,7 +1,7 @@
 import './topbar.css';
 import React from 'react';
 import LoginIcon from '../Loginicon/LoginIcon';
-import LogoutButton from '../Loginbutton/LogoutButton';
+import LogoutButton from '../Logoutbutton/LogoutButton';
 import { RxHamburgerMenu } from "react-icons/rx";
 
 export default function TopBar({onBurgerPress}){
