@@ -4,7 +4,7 @@
     align-items: center;
     height: 100vh;
     background: #f0f2f5;
-    background: linear-gradient(0deg, var(--accent) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(0deg, var(--secondary) 0%, rgba(255,255,255,0) 100%);
     box-shadow: var(--shadowColor);
   }
   
