@@ -25,7 +25,7 @@ h3{
   line-height: 1;
 }
 
-input{
+form input{
   background-color: var(--neutral);
   border-style: solid;
   border-width: 1.5px;
@@ -69,7 +69,7 @@ input[type="checkbox"]:checked::before {
 }
 
 
-select{
+form select{
   background-color: var(--neutral);
   border-style: solid;
   border-width: 1.5px;

@@ -28,7 +28,7 @@ export default function EditProfileCard({userData}) {
     const navigate = useNavigate();
     const location = useLocation();
     // temporary data
-    const userType = "Professional";
+    const userType = "High Schooler";
     const userName = "Shuja Gupta";
 
     const { currentUser } = useAuth();
@@ -296,11 +296,19 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
             
             : <InitiativeModal 
                 onClose={()=>setOpportunityModalVisibility(false)} 
-                visibility={opportunityModalVisibility}/>}
+                visibility={opportunityModalVisibility}
+                opportunityData={opportunityData} 
+                isEditing={isEditing} 
+                opportunityId={opportunityId}/>}
         </div>
         <div style={{position: "relative"}}>
             { (showOrganizationProfile && opportunityData) ? <>
-            <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>{userName} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
+            <div style={{textAlign: "center"}}>
+            <span 
+            style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>
+                {userName.split(" ")[0]} is {userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userType === "Professional" && " opportunity"}!</span>
+            </span>
+            </div>
             <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "-13px", top: "28px", background: "red", zIndex: "2"}}>
                 <MdDeleteOutline size={30}/>
             </button>

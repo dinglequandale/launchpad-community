@@ -10,7 +10,7 @@ import { MdEmail } from 'react-icons/md';
 import { CgWebsite } from 'react-icons/cg';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
-import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebaseConfig';
 
 const OpportunityContext = createContext({
@@ -53,12 +53,12 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
     await toast.promise(
       addDoc(opportunitiesCollectionRef, organizationData),
       {
-        loading: 'Creating job opportunity...',
+        loading: 'Creating opportunity...',
         success:
-          'Job opportunity created successfully!',
+          'Opportunity created successfully!',
         error: (err) => {
-          console.error("Error creating job opportunity: ", err);
-          return `Failed to create job opportunity: ${err.message}`;
+          console.error("Error creating opportunity: ", err);
+          return `Failed to create opportunity: ${err.message}`;
         },
       }
     );
@@ -69,15 +69,10 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
       await toast.promise(
         updateDoc(opportunityRef, organizationData),
         {
-          loading: 'Updating job opportunity...',
-          success:
-            'Job opportunity updated successfully!',
-          error: (err) => {
-            console.error("Error updating job opportunity: ", err);
-            return `Failed to update your job opportunity!`;
-          },
-        },
-      );
+          loading: 'Updating opportunity...',
+          success: 'Opportunity updated successfully!',
+          error: "Failed to update your opportunity!",
+         });
     } 
     catch (error) {
       console.error("Error updating user profile: ", error);
@@ -285,7 +280,8 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
     <>
     <Toaster
     position="bottom-right"
-    reverseOrder={false}/>
+    reverseOrder={false}
+    />
     <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       <OpportunityContext.Provider 

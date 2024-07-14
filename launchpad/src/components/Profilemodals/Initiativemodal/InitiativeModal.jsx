@@ -8,6 +8,10 @@ import { GrAdd } from 'react-icons/gr';
 import { LuMessagesSquare } from 'react-icons/lu';
 import { MdEmail } from 'react-icons/md';
 import { CgWebsite } from 'react-icons/cg';
+import { useAuth } from '../../../contexts/auth/AuthContext';
+import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { db } from '../../../firebase/firebaseConfig';
+import toast, { Toaster } from 'react-hot-toast';
 
 
 const InitiativeContext = createContext({
@@ -19,23 +23,44 @@ const InitiativeContext = createContext({
   organizationQuestionsConfig: {},
 });
 
-export default function InitiativeModal({visibility, onClose}){
+export default function InitiativeModal({visibility, onClose, opportunityData, isEditing, opportunityId}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentInitiativePage, setCurrentInitiativePage] = useState(1);
   const [showLast, setShowLast] = useState(false);
 
-  const saveInitiativeData = () => {
-    localStorage.setItem("userOrganizationData", JSON.stringify(organizationData));
-    onClose();
+  const { currentUser } = useAuth();
+
+  const saveInitiativeData = async () => {
+    if(!isEditing){
+      const opportunitiesCollectionRef = collection(db, "users", currentUser.uid, "opportunities")
+      await toast.promise(
+        addDoc(opportunitiesCollectionRef, organizationData),
+        {
+          loading: 'Adding initiative...',
+          success: 'Initiative added successfully!',
+          error: "Failed to add your initiative!",
+         });
+    }
+    else{
+      try {
+        const opportunityRef = doc(db, "users", currentUser.uid, "opportunities", opportunityId);;
+        await toast.promise(
+          updateDoc(opportunityRef, organizationData),
+          {
+            loading: 'Updating initiative...',
+            success: 'Initiative updated successfully!',
+            error: "Failed to update your initiative!",
+           });
+      } 
+      catch (error) {
+        console.error("Error updating user initiative: ", error);
+      }
+      
+    }
+    
+      onClose();
   }
   
-
-  useEffect(() => {
-    const storedInitiativeData = localStorage.getItem("userOrganizationData");
-    if (storedInitiativeData !== null) {
-        setOrganizationData(JSON.parse(storedInitiativeData));
-    }
-    }, [visibility]);
 
   const customStyles = {
     content: {
@@ -64,6 +89,12 @@ export default function InitiativeModal({visibility, onClose}){
     organizationLogo: null,
     organizationLogoPreview: '',
   });
+
+  useEffect(() => {
+    if (opportunityData !== null) {
+        setOrganizationData({... opportunityData});
+    }
+    }, [visibility]);
 
   const organizationQuestionsConfig = [
     // Page 1
@@ -183,6 +214,10 @@ export default function InitiativeModal({visibility, onClose}){
   }
 
   return (
+    <>
+    <Toaster
+    position="bottom-right"
+    reverseOrder={false}/>
     <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       <InitiativeContext.Provider 
@@ -224,6 +259,7 @@ export default function InitiativeModal({visibility, onClose}){
         </Modal>
       </InitiativeContext.Provider>
     </div>
+    </>
   );
 };
 
