@@ -15,9 +15,10 @@ import BasicInfoModal from '../BasicInfomodal/BasicInfoModal';
 import InitiativeModal from '../Profilemodals/Initiativemodal/InitiativeModal';
 import DeleteWarningModal from '../DeleteWarningmodal/DeleteWarningModal';
 import AvailabilityModal from '../Profilemodals/Availabilitymodal/AvailabilityModal';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import { useAuth } from '../../contexts/auth/AuthContext';
+import toast from 'react-hot-toast';
 
 const ProfileContext = createContext({
     currentUser: null
@@ -263,14 +264,21 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
             setLoading(false);
           }
         }
-    
+        
         loadOpportunities();
       }, [showOrganizationProfile, opportunityModalVisibility]);
     
-    const handleDeleteOpportunity = () => {
+    const handleDeleteOpportunity = async () => {
+        try {
+            await deleteDoc(doc(db, "users", currentUser.uid, "opportunities", opportunityId));
+            console.log("User profile deleted successfully");
+        } catch (error) {
+            console.error("Error deleting user profile: ", error);
+            toast.error("Error deleting your opportunity!")
+            return;
+        }
         setShowOrganizationProfile(false);
         setOpportunityData(null);
-        localStorage.removeItem("userOrganizationData");
     }
     return(
         <>
@@ -284,14 +292,14 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
                 visibility={opportunityModalVisibility} 
                 opportunityData={opportunityData} 
                 isEditing={isEditing} 
-                opportunityId={opportunityId}/> 
+                opportunityId={opportunityId}/>
             
             : <InitiativeModal 
                 onClose={()=>setOpportunityModalVisibility(false)} 
                 visibility={opportunityModalVisibility}/>}
         </div>
         <div style={{position: "relative"}}>
-            { showOrganizationProfile ? <>
+            { (showOrganizationProfile && opportunityData) ? <>
             <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>{userName} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
             <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "-13px", top: "28px", background: "red", zIndex: "2"}}>
                 <MdDeleteOutline size={30}/>
@@ -309,7 +317,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
             </div>}
         </div>
         <div className='addOne' style={{transform: "translate(0,-120px)"}}>
-            <EditInformation isAnswered={showOrganizationProfile} questionName={"Opportunity"} onEdit={()=>{
+            <EditInformation isAnswered={opportunityData} questionName={"Opportunity"} onEdit={()=>{
                 setOpportunityModalVisibility(true);
                 setIsEditing(true);
                 }}/>
