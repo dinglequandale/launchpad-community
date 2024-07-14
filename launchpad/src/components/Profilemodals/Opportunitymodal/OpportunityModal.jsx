@@ -39,53 +39,56 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
     applicants: 'Either One',
     workLocation: 'On-site',
     timeFrame: 'One Week',
-    learnMore: '',
-    apply: '',
+    learnMore: 'Messages',
+    apply: 'Messages',
     organizationLogo: null,
     organizationLogoPreview: '',
   });
 
 
+const saveOpportunityData = async () => {
+  const opportunitiesCollectionRef = collection(db, "opportunities");
 
-  const saveOpportunityData = async (docId) => {
-    if(!isEditing){
-    const opportunitiesCollectionRef = collection(db, "users", currentUser.uid, "opportunities")
+  if (!isEditing) {
+    // Creating a new opportunity
     await toast.promise(
-      addDoc(opportunitiesCollectionRef, organizationData),
+      addDoc(opportunitiesCollectionRef, {
+        ...organizationData,
+        createdBy: currentUser.uid,
+        createdAt: new Date()
+      }),
       {
         loading: 'Creating opportunity...',
-        success:
-          'Opportunity created successfully!',
+        success: 'Opportunity created successfully!',
         error: (err) => {
           console.error("Error creating opportunity: ", err);
           return `Failed to create opportunity: ${err.message}`;
         },
       }
     );
-  }
-  else{
+  } else {
     try {
-      const opportunityRef = doc(db, "users", currentUser.uid, "opportunities", opportunityId);;
+      const opportunityRef = doc(db, "opportunities", opportunityId);
       await toast.promise(
         updateDoc(opportunityRef, organizationData),
         {
           loading: 'Updating opportunity...',
           success: 'Opportunity updated successfully!',
           error: "Failed to update your opportunity!",
-         });
-    } 
-    catch (error) {
-      console.error("Error updating user profile: ", error);
+        }
+      );
+    } catch (error) {
+      console.error("Error updating opportunity: ", error);
     }
-    
   }
+
   
     onClose();
   }
   
 
   useEffect(() => {
-    if (opportunityData !== null) {
+    if (opportunityData) {
         setOrganizationData({... opportunityData});
     }
     }, [visibility]);
@@ -446,14 +449,27 @@ function FinalInfo(){
   const logoRef = useRef();
   const [logoPreviewURL, setLogoPreviewUrl] = useState(null);
   
-  const learnMoreAndApplyOptions = [["In-Platform Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
+  const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
   
   // TODO: temporary way of discerning between email / link
-  const [learnMoreType, setLearnMoreType] = useState(organizationData.learnMore.includes("@") ? "Email" : organizationData.learnMore === "Messages" ? "In-Platform Messages" : organizationData.learnMore ? "Website" : "");
-  const [applyType, setApplyType] = useState(organizationData.apply.includes("@") ? "Email" : organizationData.apply === "Messages" ? "In-Platform Messages" : organizationData.apply ? "Website" : "");
-  
-  const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState((learnMoreType && learnMoreType !== "In-Platform Messages") ?? "");
-  const [applyInputVisibility, setApplyInputVisibility] = useState((applyType && applyType !== "In-Platform Messages") ?? "");
+  const [learnMoreType, setLearnMoreType] = useState("");
+  const [applyType, setApplyType] = useState("");
+  const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState(false);
+  const [applyInputVisibility, setApplyInputVisibility] = useState(false);
+
+  useEffect(()=>{
+    setApplyType(organizationData.apply.split(": ")[0]);
+    setLearnMoreType(organizationData.learnMore.split(": ")[0]);
+  },[])
+  console.log(applyType, learnMoreType)
+
+  useEffect(()=>{
+    console.log(applyType, learnMoreType)
+    setApplyInputVisibility(applyType !== "Messages");
+    setLearnMoreInputVisibility(learnMoreType !== "Messages");
+  },[applyType,learnMoreType])
+  console.log(learnMoreInputVisibility, applyInputVisibility)
+
   // logic to load the preview image when user opens tab, not working
   
   // IMPORTANT TODO: files funky with localStorage, need to adjust when transition to database
@@ -480,32 +496,26 @@ function FinalInfo(){
         organizationLogoPreview: logoPreviewURL,
       })
     } else {
-      // TODO: different logic for MESSAGES, since user doesn't input anything
       setOrganizationData({
         ...organizationData,
-        [name]: value,
+        [name]: `${name === "learnMore" ? learnMoreType : applyType}: ${value}`,
       });
     }
   };
 
   const handleOptionClick = (event, optionName, questionId) => {
     event.preventDefault();
-    setOrganizationData({...organizationData, [questionId]: ""})
-    if(optionName !== "In-Platform Messages" && questionId === "learnMore"){
+    if(optionName !== "Messages" && questionId === "learnMore"){
       setLearnMoreType(optionName);
-      setLearnMoreInputVisibility(true);
     }
-    else if(optionName !== "In-Platform Messages" && questionId === "apply"){
+    else if(optionName !== "Messages" && questionId === "apply"){
       setApplyType(optionName);
-      setApplyInputVisibility(true);
     }
-    else if(optionName === "In-Platform Messages" && questionId === "apply"){
-      setApplyInputVisibility(false);
+    else if(optionName === "Messages" && questionId === "apply"){
       setApplyType(optionName);
       setOrganizationData({...organizationData, [questionId]: "Messages"});
     }
     else{
-      setLearnMoreInputVisibility(false);
       setLearnMoreType(optionName);
       setOrganizationData({...organizationData, [questionId]: "Messages"})
     }
@@ -543,7 +553,7 @@ function FinalInfo(){
                     type={learnMoreType === "Email" ? "email" : "url"} 
                     id={question.id}
                     name={question.id}
-                    value={organizationData[question.id]}
+                    value={organizationData[question.id].split(": ")[1]}
                     onChange={handleChange}
                     />
                   </div>}
@@ -555,7 +565,7 @@ function FinalInfo(){
                     id={question.id}
                     name={question.id}
                     onChange={handleChange}
-                    value={organizationData[question.id]}/>
+                    value={organizationData[question.id].split(": ")[1]}/>
                   </div>}
                 </div>
               ))}
