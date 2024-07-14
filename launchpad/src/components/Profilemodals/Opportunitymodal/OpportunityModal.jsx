@@ -8,7 +8,10 @@ import { GrAdd } from 'react-icons/gr';
 import { LuMessagesSquare } from 'react-icons/lu';
 import { MdEmail } from 'react-icons/md';
 import { CgWebsite } from 'react-icons/cg';
-
+import { useAuth } from '../../../contexts/auth/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '../../../firebase/firebaseConfig';
 
 const OpportunityContext = createContext({
   organizationData: {},
@@ -19,21 +22,54 @@ const OpportunityContext = createContext({
   organizationQuestionsConfig: {},
 });
 
-export default function OpportunityModal({visibility, onClose}){
+export default function OpportunityModal({visibility, onClose, opportunityData}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
   const [showLast, setShowLast] = useState(false);
 
-  const saveOpportunityData = () => {
+  const { currentUser } = useAuth();
+
+  const [organizationData, setOrganizationData] = useState({
+    organizationType: '',
+    organizationHostCompany: '',
+    applicantFieldOfWork: '',
+    applicantPosition: '',
+    applicantExpectations: '',
+    isPaid: 'Unpaid',
+    applicants: 'Either One',
+    workLocation: 'On-site',
+    timeFrame: 'One Week',
+    learnMore: '',
+    apply: '',
+    organizationLogo: null,
+    organizationLogoPreview: '',
+  });
+
+
+
+  const saveOpportunityData = async () => {
+    const jobsCollectionRef = collection(db, "users", currentUser.uid, "opportunities")
     localStorage.setItem("userOrganizationData", JSON.stringify(organizationData));
+    await toast.promise(
+      addDoc(jobsCollectionRef, organizationData),
+      {
+        loading: 'Creating job opportunity...',
+        success:
+          'Job opportunity created successfully!',
+        error: (err) => {
+          console.error("Error creating job opportunity: ", err);
+          return `Failed to create job opportunity: ${err.message}`;
+        },
+      }
+    );
+  
     onClose();
   }
   
 
   useEffect(() => {
-    const storedOpportunityData = localStorage.getItem("userOrganizationData");
-    if (storedOpportunityData !== null) {
-        setOrganizationData(JSON.parse(storedOpportunityData));
+    if (opportunityData !== null) {
+        setOrganizationData({... opportunityData});
     }
     }, [visibility]);
 
@@ -52,22 +88,6 @@ export default function OpportunityModal({visibility, onClose}){
       zIndex: "3",
     }
   };
-
-  const [organizationData, setOrganizationData] = useState({
-    organizationType: '',
-    organizationHostCompany: '',
-    applicantFieldOfWork: '',
-    applicantPosition: '',
-    applicantExpectations: '',
-    isPaid: 'Unpaid',
-    applicants: 'Either One',
-    workLocation: 'On-site',
-    timeFrame: 'One Week',
-    learnMore: '',
-    apply: '',
-    organizationLogo: null,
-    organizationLogoPreview: '',
-  });
 
   const getApplicantType = () => {
     switch(organizationData.organizationType){
@@ -240,6 +260,10 @@ export default function OpportunityModal({visibility, onClose}){
 }
 
   return (
+    <>
+    <Toaster
+    position="bottom-right"
+    reverseOrder={false}/>
     <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       <OpportunityContext.Provider 
@@ -281,6 +305,7 @@ export default function OpportunityModal({visibility, onClose}){
         </Modal>
       </OpportunityContext.Provider>
     </div>
+    </>
   );
 };
 

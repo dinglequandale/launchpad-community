@@ -1,5 +1,5 @@
 import './editprofilecard.css';
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { VscAccount } from "react-icons/vsc";
 import { useState, useEffect, useRef } from 'react';
 import { IoAdd } from "react-icons/io5";
@@ -15,15 +15,22 @@ import BasicInfoModal from '../BasicInfomodal/BasicInfoModal';
 import InitiativeModal from '../Profilemodals/Initiativemodal/InitiativeModal';
 import DeleteWarningModal from '../DeleteWarningmodal/DeleteWarningModal';
 import AvailabilityModal from '../Profilemodals/Availabilitymodal/AvailabilityModal';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../firebase/firebaseConfig';
+import { useAuth } from '../../contexts/auth/AuthContext';
 
+const ProfileContext = createContext({
+    currentUser: null
+  });
 
 export default function EditProfileCard({userData}) {
     const navigate = useNavigate();
     const location = useLocation();
-
     // temporary data
     const userType = "Professional";
     const userName = "Shuja Gupta";
+
+    const { currentUser } = useAuth();
     
     const opportunitiesOptions = {highSchool: 
     <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
@@ -46,6 +53,7 @@ export default function EditProfileCard({userData}) {
     }
     return(
         <>
+            <ProfileContext.Provider value={{currentUser}}>
             <div className='editprofileCard'>
                 <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", borderWidth: "1.7px", paddingBottom: "5px"}}>
                     <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
@@ -72,6 +80,7 @@ export default function EditProfileCard({userData}) {
                     <ConnectionAvailability userType={userType}/>
                 </div>}
             </div>
+            </ProfileContext.Provider>
         </>
     )
 }
@@ -228,13 +237,27 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
     const [opportunityData, setOpportunityData] = useState(null);
     const [showOrganizationProfile, setShowOrganizationProfile] = useState(false);
     const [deleteWarningVisibility, setDeleteWarningVisibility] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const { currentUser } = useContext(ProfileContext);
+
     useEffect(() => {
-        const storedOpportunityData = localStorage.getItem("userOrganizationData");
-        if (storedOpportunityData !== null) {
-            setOpportunityData(JSON.parse(storedOpportunityData));
+        async function loadOpportunities() {
+          try {
+            setLoading(true);
+            const querySnapshot = await getDocs(collection(db, "users", currentUser.uid, "opportunities"));
+            setOpportunityData({...querySnapshot.docs[0].data()});
             setShowOrganizationProfile(true);
+            console.log(opportunityData);
+          } catch (error) {
+            console.log(error)
+          } finally {
+            setLoading(false);
+          }
         }
-      }, [opportunityModalVisibility]);
+    
+        loadOpportunities();
+      }, [showOrganizationProfile, opportunityModalVisibility]);
+    
     const handleDeleteOpportunity = () => {
         setShowOrganizationProfile(false);
         setOpportunityData(null);
@@ -247,7 +270,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
                 objectOfDeletation={opportunityData.organizationType}/>}
         </div>
         <div name="opportunityModal" style={{position: "relative"}}>
-            {userType === "Professional" ? <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/> : <InitiativeModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>}
+            {userType === "Professional" ? <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility} opportunityData={opportunityData}/> : <InitiativeModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>}
         </div>
         <div style={{position: "relative"}}>
             { showOrganizationProfile ? <>
@@ -267,7 +290,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
                 </div>
             </div>}
         </div>
-        <div className='addOne' style={{transform: "translate(0,-100px)"}}>
+        <div className='addOne' style={{transform: "translate(0,-120px)"}}>
             <EditInformation isAnswered={showOrganizationProfile} questionName={"Opportunity"} onEdit={()=>setOpportunityModalVisibility(true)}/>
         </div>
         </>
