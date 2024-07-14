@@ -233,21 +233,30 @@ function BasicInfoCard({userType, userName, descType}){
 }
 
 function OpportunityPopup({userType, userName, opportunitiesOptions}){
-    const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
+
+    const { currentUser } = useContext(ProfileContext);
+
     const [opportunityData, setOpportunityData] = useState(null);
+
+    const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
     const [showOrganizationProfile, setShowOrganizationProfile] = useState(false);
     const [deleteWarningVisibility, setDeleteWarningVisibility] = useState(false);
     const [loading, setLoading] = useState(false);
-    const { currentUser } = useContext(ProfileContext);
+    const [isEditing,setIsEditing] = useState(false);
+    const [opportunityId, setOpportunityId] = useState("");
 
     useEffect(() => {
         async function loadOpportunities() {
           try {
             setLoading(true);
             const querySnapshot = await getDocs(collection(db, "users", currentUser.uid, "opportunities"));
-            setOpportunityData({...querySnapshot.docs[0].data()});
+            querySnapshot.forEach((doc) => {
+                setOpportunityData({... doc.data() });
+                setOpportunityId(doc.id);
+              });
             setShowOrganizationProfile(true);
             console.log(opportunityData);
+            console.log(opportunityId)
           } catch (error) {
             console.log(error)
           } finally {
@@ -270,7 +279,16 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
                 objectOfDeletation={opportunityData.organizationType}/>}
         </div>
         <div name="opportunityModal" style={{position: "relative"}}>
-            {userType === "Professional" ? <OpportunityModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility} opportunityData={opportunityData}/> : <InitiativeModal onClose={()=>setOpportunityModalVisibility(false)} visibility={opportunityModalVisibility}/>}
+            {userType === "Professional" ? <OpportunityModal 
+                onClose={()=>setOpportunityModalVisibility(false)}
+                visibility={opportunityModalVisibility} 
+                opportunityData={opportunityData} 
+                isEditing={isEditing} 
+                opportunityId={opportunityId}/> 
+            
+            : <InitiativeModal 
+                onClose={()=>setOpportunityModalVisibility(false)} 
+                visibility={opportunityModalVisibility}/>}
         </div>
         <div style={{position: "relative"}}>
             { showOrganizationProfile ? <>
@@ -291,7 +309,10 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
             </div>}
         </div>
         <div className='addOne' style={{transform: "translate(0,-120px)"}}>
-            <EditInformation isAnswered={showOrganizationProfile} questionName={"Opportunity"} onEdit={()=>setOpportunityModalVisibility(true)}/>
+            <EditInformation isAnswered={showOrganizationProfile} questionName={"Opportunity"} onEdit={()=>{
+                setOpportunityModalVisibility(true);
+                setIsEditing(true);
+                }}/>
         </div>
         </>
     )

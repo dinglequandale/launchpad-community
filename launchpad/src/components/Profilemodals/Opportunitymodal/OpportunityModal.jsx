@@ -10,7 +10,7 @@ import { MdEmail } from 'react-icons/md';
 import { CgWebsite } from 'react-icons/cg';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebaseConfig';
 
 const OpportunityContext = createContext({
@@ -22,7 +22,7 @@ const OpportunityContext = createContext({
   organizationQuestionsConfig: {},
 });
 
-export default function OpportunityModal({visibility, onClose, opportunityData}){
+export default function OpportunityModal({visibility, onClose, opportunityData, isEditing, opportunityId}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
   const [showLast, setShowLast] = useState(false);
@@ -47,11 +47,11 @@ export default function OpportunityModal({visibility, onClose, opportunityData})
 
 
 
-  const saveOpportunityData = async () => {
-    const jobsCollectionRef = collection(db, "users", currentUser.uid, "opportunities")
-    localStorage.setItem("userOrganizationData", JSON.stringify(organizationData));
+  const saveOpportunityData = async (docId) => {
+    if(!isEditing){
+    const opportunitiesCollectionRef = collection(db, "users", currentUser.uid, "opportunities")
     await toast.promise(
-      addDoc(jobsCollectionRef, organizationData),
+      addDoc(opportunitiesCollectionRef, organizationData),
       {
         loading: 'Creating job opportunity...',
         success:
@@ -62,6 +62,28 @@ export default function OpportunityModal({visibility, onClose, opportunityData})
         },
       }
     );
+  }
+  else{
+    try {
+      const opportunityRef = doc(db, "users", currentUser.uid, "opportunities", opportunityId);;
+      await toast.promise(
+        updateDoc(opportunityRef, organizationData),
+        {
+          loading: 'Updating job opportunity...',
+          success:
+            'Job opportunity updated successfully!',
+          error: (err) => {
+            console.error("Error updating job opportunity: ", err);
+            return `Failed to update your job opportunity!`;
+          },
+        },
+      );
+    } 
+    catch (error) {
+      console.error("Error updating user profile: ", error);
+    }
+    
+  }
   
     onClose();
   }
