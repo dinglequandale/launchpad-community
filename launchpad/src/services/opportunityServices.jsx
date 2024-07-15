@@ -37,12 +37,13 @@ const uploadImage = async (file, opportunityId) => {
   return getDownloadURL(storageRef);
 };
 
-export const loadOpportunities = (currentUser, setOpportunities) => {
+export const loadOpportunities = (currentUser, setLoading, setOpportunities) => {
   const opportunitiesRef = collection(db, "opportunities");
   const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", currentUser.uid));
   
   return onSnapshot(qUserOpportunity, async (querySnapshot) => {
     try {
+      setLoading(true);
       const opportunitiesArray = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
@@ -58,6 +59,9 @@ export const loadOpportunities = (currentUser, setOpportunities) => {
       setOpportunities(opportunitiesWithLogos[0]);
     } catch (error) {
       console.error("Error processing opportunities:", error);
+    }
+    finally {
+      setLoading(false);
     }
   }, (error) => {
     console.error("Error getting user opportunities: ", error);

@@ -249,14 +249,13 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
 
     useEffect(() => {
         setLoading(true);
-        const unsubscribe = loadOpportunities(currentUser, setOpportunityData);
+        const unsubscribe = loadOpportunities(currentUser, setLoading, setOpportunityData);
         return () => unsubscribe();
       }, [currentUser]);
 
     
     useEffect(()=>{
         if(opportunityData){
-            setLoading(false);
             setOpportunityId(opportunityData.id);
             console.log("Logo:", opportunityData.organizationLogoPreview)
         }
