@@ -8,34 +8,49 @@ import { GrAdd } from 'react-icons/gr';
 import { LuMessagesSquare } from 'react-icons/lu';
 import { MdEmail } from 'react-icons/md';
 import { CgWebsite } from 'react-icons/cg';
+import { useAuth } from '../../../contexts/auth/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
+import { saveOpportunity } from '../../../services/opportunityServices';
 
 
 const InitiativeContext = createContext({
   organizationData: {},
   setOrganizationData: () => {},
+  organizationLogo: null,
+  setOrganizationLogo: () => {},
   currentInitiativePage: 1,
   setCurrentInitiativePage: () => {},
   handleChange: () => {},
   organizationQuestionsConfig: {},
 });
 
-export default function InitiativeModal({visibility, onClose}){
+export default function InitiativeModal({visibility, onClose, opportunityData, isEditing, opportunityId}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentInitiativePage, setCurrentInitiativePage] = useState(1);
   const [showLast, setShowLast] = useState(false);
-
-  const saveInitiativeData = () => {
-    localStorage.setItem("userOrganizationData", JSON.stringify(organizationData));
-    onClose();
-  }
   
+  const [organizationLogo, setOrganizationLogo] = useState(null);
 
-  useEffect(() => {
-    const storedInitiativeData = localStorage.getItem("userOrganizationData");
-    if (storedInitiativeData !== null) {
-        setOrganizationData(JSON.parse(storedInitiativeData));
+  const { currentUser } = useAuth();
+
+  const saveInitiativeData = async () => {
+    try {
+      await toast.promise(
+        saveOpportunity(organizationData, organizationLogo, currentUser, isEditing, opportunityId),
+        {
+          loading: isEditing ? 'Updating initiative...' : 'Creating initiative...',
+          success: isEditing ? 'Initiative updated successfully!' : 'Initiative created successfully!',
+          error: (err) => `Failed to ${isEditing ? 'update' : 'create'} initiative: ${err.message}`,
+        }
+      );
+      onClose();
+    } catch (error) {
+      console.error("Error saving initiative: ", error);
     }
-    }, [visibility]);
+  
+    onClose();
+    }
+  
 
   const customStyles = {
     content: {
@@ -59,11 +74,16 @@ export default function InitiativeModal({visibility, onClose}){
     organizationHostStudent: "",
     organizationMission: "",
     organizationTags: "",
-    learnMore: '',
-    apply: '',
-    organizationLogo: null,
-    organizationLogoPreview: '',
+    learnMore: 'Messages',
+    apply: 'Messages',
+    organizationLogoPreview: "",
   });
+
+  useEffect(() => {
+    if (opportunityData) {
+        setOrganizationData({... opportunityData});
+    }
+    }, [visibility]);
 
   const organizationQuestionsConfig = [
     // Page 1
@@ -113,7 +133,7 @@ export default function InitiativeModal({visibility, onClose}){
       text: "Your Mission",
       type: "textarea",
       maxLength: 500,
-      placeholder: `Summarize your ${organizationData.organizationType}'s mission and values in a few sentences.`,
+      placeholder: `Summarize your ${organizationData.organizationType ?? "initiative"}'s mission and values in a few sentences.`,
       includers: ["Nonprofit", "Club", ""],
       required: true,
       page: 2, 
@@ -122,7 +142,7 @@ export default function InitiativeModal({visibility, onClose}){
     // Page 3
     {
       id: "learnMore",
-      text: `Where would you like users to learn more about your ${organizationData.organizationType.toLowerCase()}?`,
+      text: `Where would you like users to learn more about your ${organizationData.organizationType.toLowerCase() ?? "initiative"}?`,
       type: "link",
       placeholder: "Paste a link here!",
       includers: ["Nonprofit", "Club", ""],
@@ -131,7 +151,7 @@ export default function InitiativeModal({visibility, onClose}){
     },
     {
       id: "apply",
-      text: `How can students take part in your ${organizationData.organizationType.toLowerCase()}?`,
+      text: `How can students take part in your ${organizationData.organizationType.toLowerCase() ?? "initiative"}?`,
       type: "link",
       placeholder: "Paste a link here!",
       includers: ["Nonprofit", "Club", ""],
@@ -139,8 +159,8 @@ export default function InitiativeModal({visibility, onClose}){
       page: 3, 
     },
     {
-      id: "organizationLogo",
-      text: `Upload a logo that embodies your ${organizationData.organizationType.toLowerCase()}! (optional)`,
+      id: "organizationLogoPreview",
+      text: `Upload a logo that embodies your ${organizationData.organizationType.toLowerCase() ?? "initiative"}! (optional)`,
       type: "file",
       accept: ".jpg",
       includers: ["Nonprofit", "Club", ""],
@@ -151,7 +171,9 @@ export default function InitiativeModal({visibility, onClose}){
 
   // fix this later
   useEffect(()=>{
-    if(Object.values(organizationData).filter((data)=>(data !== '')).length = Object.values(organizationData).length){
+    const emptyQuestions = organizationQuestionsConfig.filter(question => (organizationData[question.id] === "" && question.includers.includes(organizationData.organizationType) && question.required === true));
+    if(emptyQuestions.length === 0){
+      console.log()
       setShowLast(true)
     }
     else{
@@ -183,12 +205,18 @@ export default function InitiativeModal({visibility, onClose}){
   }
 
   return (
+    <>
+    <Toaster
+    position="bottom-right"
+    reverseOrder={false}/>
     <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       <InitiativeContext.Provider 
       value={{
         organizationData,
         setOrganizationData, 
+        organizationLogo,
+        setOrganizationLogo,
         currentInitiativePage, 
         setCurrentInitiativePage,
         handleChange,
@@ -224,6 +252,7 @@ export default function InitiativeModal({visibility, onClose}){
         </Modal>
       </InitiativeContext.Provider>
     </div>
+    </>
   );
 };
 
@@ -329,71 +358,67 @@ function InitiativeMission(){
 
 
 function FinalInfo(){
-  const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(InitiativeContext);
+  const { organizationData, setOrganizationData, organizationQuestionsConfig, setOrganizationLogo } = useContext(InitiativeContext);
   const logoRef = useRef();
-  const [logoPreviewURL, setLogoPreviewUrl] = useState(null);
   
-  const learnMoreAndApplyOptions = [["In-Platform Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
+  const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
   
-  // TODO: temporary way of discerning between email / link
-  const [learnMoreType, setLearnMoreType] = useState(organizationData.learnMore.includes("@") ? "Email" : organizationData.learnMore === "Messages" ? "In-Platform Messages" : organizationData.learnMore ? "Website" : "");
-  const [applyType, setApplyType] = useState(organizationData.apply.includes("@") ? "Email" : organizationData.apply === "Messages" ? "In-Platform Messages" : organizationData.apply ? "Website" : "");
-  
-  const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState((learnMoreType && learnMoreType !== "In-Platform Messages") ?? "");
-  const [applyInputVisibility, setApplyInputVisibility] = useState((applyType && applyType !== "In-Platform Messages") ?? "");
-  // logic to load the preview image when user opens tab, not working
+  const [learnMoreType, setLearnMoreType] = useState("");
+  const [applyType, setApplyType] = useState("");
+  const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState(false);
+  const [applyInputVisibility, setApplyInputVisibility] = useState(false);
 
-  // IMPORTANT TODO: files funky with localStorage, need to adjust when transition to database
+  useEffect(()=>{
+    setApplyType(organizationData.apply.split(": ")[0]);
+    setLearnMoreType(organizationData.learnMore.split(": ")[0]);
+  },[]);
+  useEffect(()=>{
+    setApplyInputVisibility(applyType !== "Messages");
+    setLearnMoreInputVisibility(learnMoreType !== "Messages");
+  },[applyType,learnMoreType]);
+
+  useEffect(() => {
+    return () => {
+      if (organizationData.logoPreviewURL) {
+        URL.revokeObjectURL(organizationData.logoPreviewURL);
+      }
+    };
+  }, [organizationData.logoPreviewURL]);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log(file)
+      setOrganizationData(prevData => ({
+        ...prevData,
+        organizationLogoPreview: URL.createObjectURL(file)
+      }));
+      setOrganizationLogo(file);
+    }
+  }
 
   const handleChange = (event) => {
-    const { name, value, type, files } = event.target;
+    const { name, value } = event.target;
 
-    if (type === 'file') {
-      const file = files[0];
-
-      // Create a URL for the preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(file); // Read the file for preview
-
-      setOrganizationData({
-        ...organizationData,
-        [name]: file,
-      });
-
-      setOrganizationData({
-        ...organizationData,
-        organizationLogoPreview: logoPreviewURL,
-      })
-    } else {
-      // TODO: different logic for messages, since user doesn't input anything
-      setOrganizationData({
-        ...organizationData,
-        [name]: value,
-      });
-    }
-  };
+    setOrganizationData({
+      ...organizationData,
+      [name]: value,
+    });
+  }
 
   const handleOptionClick = (event, optionName, questionId) => {
     event.preventDefault();
-    setOrganizationData({...organizationData, [questionId]: ""})
-    if(optionName !== "In-Platform Messages" && questionId === "learnMore"){
+    if(optionName !== "Messages" && questionId === "learnMore"){
       setLearnMoreType(optionName);
-      setLearnMoreInputVisibility(true);
     }
-    else if(optionName !== "In-Platform Messages" && questionId === "apply"){
+    else if(optionName !== "Messages" && questionId === "apply"){
       setApplyType(optionName);
-      setApplyInputVisibility(true);
     }
-    else if(optionName === "In-Platform Messages" && questionId === "apply"){
-      setApplyInputVisibility(false);
+    else if(optionName === "Messages" && questionId === "apply"){
       setApplyType(optionName);
       setOrganizationData({...organizationData, [questionId]: "Messages"});
     }
     else{
-      setLearnMoreInputVisibility(false);
       setLearnMoreType(optionName);
       setOrganizationData({...organizationData, [questionId]: "Messages"})
     }
@@ -431,7 +456,7 @@ function FinalInfo(){
                     type={learnMoreType === "Email" ? "email" : "url"} 
                     id={question.id}
                     name={question.id}
-                    value={organizationData[question.id]}
+                    value={organizationData[question.id].split(": ")[1]}
                     onChange={handleChange}
                     />
                   </div>}
@@ -443,7 +468,7 @@ function FinalInfo(){
                     id={question.id}
                     name={question.id}
                     onChange={handleChange}
-                    value={organizationData[question.id]}/>
+                    value={organizationData[question.id].split(": ")[1]}/>
                   </div>}
                 </div>
               ))}
@@ -463,14 +488,14 @@ function FinalInfo(){
                         type="file"
                         id="organizationLogo"
                         name="organizationLogo"
-                        onChange={handleChange}
+                        onChange={handleFileChange}
                         style={{display: "none"}}
                         ref={logoRef}
                         accept=".jpg"
                     />
-                    {logoPreviewURL && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
+                    {organizationData.organizationLogoPreview && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
                       <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Logo Preview:</span>
-                      <img src={logoPreviewURL} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
+                      <img src={organizationData.organizationLogoPreview} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
                     </div>}
                       </div>
                   </div>

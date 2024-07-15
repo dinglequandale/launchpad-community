@@ -8,32 +8,68 @@ import { GrAdd } from 'react-icons/gr';
 import { LuMessagesSquare } from 'react-icons/lu';
 import { MdEmail } from 'react-icons/md';
 import { CgWebsite } from 'react-icons/cg';
-
+import { useAuth } from '../../../contexts/auth/AuthContext';
+import toast, { Toaster } from 'react-hot-toast';
+import { saveOpportunity } from '../../../services/opportunityServices';
 
 const OpportunityContext = createContext({
   organizationData: {},
   setOrganizationData: () => {},
+  organizationLogo: null,
+  setOrganizationLogo: () => {},
   currentOpportunityPage: 1,
   setCurrentOpportuntityPage: () => {},
   handleChange: () => {},
   organizationQuestionsConfig: {},
 });
 
-export default function OpportunityModal({visibility, onClose}){
+export default function OpportunityModal({visibility, onClose, opportunityData, isEditing, opportunityId}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
   const [showLast, setShowLast] = useState(false);
 
-  const saveOpportunityData = () => {
-    localStorage.setItem("userOrganizationData", JSON.stringify(organizationData));
+  const { currentUser } = useAuth();
+
+  const [organizationData, setOrganizationData] = useState({
+    organizationType: '',
+    organizationHostCompany: '',
+    applicantFieldOfWork: '',
+    applicantPosition: '',
+    applicantExpectations: '',
+    isPaid: 'Unpaid',
+    applicants: 'Either One',
+    workLocation: 'On-site',
+    timeFrame: 'One Week',
+    learnMore: 'Messages',
+    apply: 'Messages',
+    organizationLogoPreview: null,
+  });
+
+  const [organizationLogo,setOrganizationLogo] = useState(null);
+
+
+const saveOpportunityData = async () => {
+  try {
+    await toast.promise(
+      saveOpportunity(organizationData, organizationLogo, currentUser, isEditing, opportunityId),
+      {
+        loading: isEditing ? 'Updating opportunity...' : 'Creating opportunity...',
+        success: isEditing ? 'Opportunity updated successfully!' : 'Opportunity created successfully!',
+        error: (err) => `Failed to ${isEditing ? 'update' : 'create'} opportunity: ${err.message}`,
+      }
+    );
     onClose();
+  } catch (error) {
+    console.error("Error saving opportunity: ", error);
+  }
+
+  onClose();
   }
   
 
   useEffect(() => {
-    const storedOpportunityData = localStorage.getItem("userOrganizationData");
-    if (storedOpportunityData !== null) {
-        setOrganizationData(JSON.parse(storedOpportunityData));
+    if (opportunityData) {
+        setOrganizationData({... opportunityData});
     }
     }, [visibility]);
 
@@ -52,22 +88,6 @@ export default function OpportunityModal({visibility, onClose}){
       zIndex: "3",
     }
   };
-
-  const [organizationData, setOrganizationData] = useState({
-    organizationType: '',
-    organizationHostCompany: '',
-    applicantFieldOfWork: '',
-    applicantPosition: '',
-    applicantExpectations: '',
-    isPaid: 'Unpaid',
-    applicants: 'Either One',
-    workLocation: 'On-site',
-    timeFrame: 'One Week',
-    learnMore: '',
-    apply: '',
-    organizationLogo: null,
-    organizationLogoPreview: '',
-  });
 
   const getApplicantType = () => {
     switch(organizationData.organizationType){
@@ -194,7 +214,7 @@ export default function OpportunityModal({visibility, onClose}){
       page: 4, 
     },
     {
-      id: "organizationLogo",
+      id: "organizationLogoPreview",
       text: "Upload a logo that embodies your opportunity! (optional)",
       type: "file",
       accept: ".jpg",
@@ -206,7 +226,9 @@ export default function OpportunityModal({visibility, onClose}){
 
   // fix this later
   useEffect(()=>{
-    if(Object.values(organizationData).filter((data)=>(data !== '')).length === Object.values(organizationData).length){
+    const emptyQuestions = organizationQuestionsConfig.filter(question => (organizationData[question.id] === "" && question.includers.includes(organizationData.organizationType) && question.required === true));
+    if(emptyQuestions.length === 0){
+      console.log()
       setShowLast(true)
     }
     else{
@@ -215,10 +237,10 @@ export default function OpportunityModal({visibility, onClose}){
   },[organizationData])
 
   const handleChange = (event) => {
-    const { name, value, type, files } = event.target;
+    const { name, value } = event.target;
     setOrganizationData({
       ...organizationData,
-      [name]: type === 'file' ? files[0] : value
+      [name]: value
     });
   };
 
@@ -240,12 +262,19 @@ export default function OpportunityModal({visibility, onClose}){
 }
 
   return (
+    <>
+    <Toaster
+    position="bottom-right"
+    reverseOrder={false}
+    />
     <div>
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       <OpportunityContext.Provider 
       value={{
         organizationData,
-        setOrganizationData, 
+        setOrganizationData,
+        organizationLogo,
+        setOrganizationLogo,
         currentOpportunityPage, 
         setCurrentOpportuntityPage,
         handleChange,
@@ -281,6 +310,7 @@ export default function OpportunityModal({visibility, onClose}){
         </Modal>
       </OpportunityContext.Provider>
     </div>
+    </>
   );
 };
 
@@ -399,70 +429,71 @@ function ApplicantInfo(){
 }
 
 function FinalInfo(){
-  const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(OpportunityContext);
+  const { organizationData, setOrganizationData, organizationQuestionsConfig, setOrganizationLogo } = useContext(OpportunityContext);
   const logoRef = useRef();
-  const [logoPreviewURL, setLogoPreviewUrl] = useState(null);
   
-  const learnMoreAndApplyOptions = [["In-Platform Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
+  const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
+
+  const [learnMoreType, setLearnMoreType] = useState("");
+  const [applyType, setApplyType] = useState("");
+  const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState(false);
+  const [applyInputVisibility, setApplyInputVisibility] = useState(false);
+
+  useEffect(()=>{
+    setApplyType(organizationData.apply.split(": ")[0]);
+    setLearnMoreType(organizationData.learnMore.split(": ")[0]);
+  },[])
+
+  useEffect(()=>{
+    console.log(applyType, learnMoreType)
+    setApplyInputVisibility(applyType !== "Messages");
+    setLearnMoreInputVisibility(learnMoreType !== "Messages");
+  },[applyType,learnMoreType])
+
+
+  // revoke urls to clean up localStorage
+  useEffect(() => {
+    return () => {
+      if (organizationData.logoPreviewURL) {
+        URL.revokeObjectURL(organizationData.logoPreviewURL);
+      }
+    };
+  }, [organizationData.logoPreviewURL]);
+
   
-  // TODO: temporary way of discerning between email / link
-  const [learnMoreType, setLearnMoreType] = useState(organizationData.learnMore.includes("@") ? "Email" : organizationData.learnMore === "Messages" ? "In-Platform Messages" : organizationData.learnMore ? "Website" : "");
-  const [applyType, setApplyType] = useState(organizationData.apply.includes("@") ? "Email" : organizationData.apply === "Messages" ? "In-Platform Messages" : organizationData.apply ? "Website" : "");
-  
-  const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState((learnMoreType && learnMoreType !== "In-Platform Messages") ?? "");
-  const [applyInputVisibility, setApplyInputVisibility] = useState((applyType && applyType !== "In-Platform Messages") ?? "");
-  // logic to load the preview image when user opens tab, not working
-  
-  // IMPORTANT TODO: files funky with localStorage, need to adjust when transition to database
-  const handleChange = (event) => {
-    const { name, value, type, files } = event.target;
-
-    if (type === 'file') {
-      const file = files[0];
-
-      // Create a URL for the preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(file); // Read the file for preview
-
-      setOrganizationData({
-        ...organizationData,
-        [name]: file,
-      });
-
-      setOrganizationData({
-        ...organizationData,
-        organizationLogoPreview: logoPreviewURL,
-      })
-    } else {
-      // TODO: different logic for MESSAGES, since user doesn't input anything
-      setOrganizationData({
-        ...organizationData,
-        [name]: value,
-      });
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log(file)
+      setOrganizationData(prevData => ({
+        ...prevData,
+        organizationLogoPreview: URL.createObjectURL(file)
+      }));
+      setOrganizationLogo(file);
     }
+  }
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setOrganizationData({
+      ...organizationData,
+      [name]: `${name === "learnMore" ? learnMoreType : applyType}: ${value}`,
+    });
   };
 
   const handleOptionClick = (event, optionName, questionId) => {
     event.preventDefault();
-    setOrganizationData({...organizationData, [questionId]: ""})
-    if(optionName !== "In-Platform Messages" && questionId === "learnMore"){
+    if(optionName !== "Messages" && questionId === "learnMore"){
       setLearnMoreType(optionName);
-      setLearnMoreInputVisibility(true);
     }
-    else if(optionName !== "In-Platform Messages" && questionId === "apply"){
+    else if(optionName !== "Messages" && questionId === "apply"){
       setApplyType(optionName);
-      setApplyInputVisibility(true);
     }
-    else if(optionName === "In-Platform Messages" && questionId === "apply"){
-      setApplyInputVisibility(false);
+    else if(optionName === "Messages" && questionId === "apply"){
       setApplyType(optionName);
       setOrganizationData({...organizationData, [questionId]: "Messages"});
     }
     else{
-      setLearnMoreInputVisibility(false);
       setLearnMoreType(optionName);
       setOrganizationData({...organizationData, [questionId]: "Messages"})
     }
@@ -476,6 +507,7 @@ function FinalInfo(){
       <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>You're almost done. Just a few more details.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          
           {/* First two questions (link inputs) */}
           <div style={{ display: "flex", gap: "10px", flexDirection: "column", textAlign: "center"}}> 
             {questionsForPage
@@ -500,7 +532,7 @@ function FinalInfo(){
                     type={learnMoreType === "Email" ? "email" : "url"} 
                     id={question.id}
                     name={question.id}
-                    value={organizationData[question.id]}
+                    value={organizationData[question.id].split(": ")[1]}
                     onChange={handleChange}
                     />
                   </div>}
@@ -512,12 +544,14 @@ function FinalInfo(){
                     id={question.id}
                     name={question.id}
                     onChange={handleChange}
-                    value={organizationData[question.id]}/>
+                    value={organizationData[question.id].split(": ")[1]}/>
                   </div>}
                 </div>
               ))}
           </div>
+
           {/* Logo upload */}
+
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {questionsForPage
               .filter(question => question.type === "file")
@@ -532,14 +566,14 @@ function FinalInfo(){
                         type="file"
                         id="organizationLogo"
                         name="organizationLogo"
-                        onChange={handleChange}
+                        onChange={handleFileChange}
                         style={{display: "none"}}
                         ref={logoRef}
                         accept=".jpg"
                     />
-                    {logoPreviewURL && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
+                    {organizationData.organizationLogoPreview && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
                       <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Logo Preview:</span>
-                      <img src={logoPreviewURL} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
+                      <img src={organizationData.organizationLogoPreview} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
                     </div>}
                       </div>
                   </div>

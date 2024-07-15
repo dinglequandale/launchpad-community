@@ -136,15 +136,6 @@ export default function BasicInfoModal({visibility,onClose,userType}){
         <Toaster
           position="bottom-right"
           reverseOrder={false}
-          toastOptions={{
-            className: '',
-            style: {
-              border: '1.2px solid var(--secondary)',
-              padding: '16px',
-              color: '#713200',
-              backgroundColor: "var(--neutral)",
-            },
-          }}
         />
         </div>
         <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
