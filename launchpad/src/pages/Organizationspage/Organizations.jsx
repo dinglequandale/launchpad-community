@@ -10,12 +10,13 @@ import { collection, getDocs, query } from "firebase/firestore";
 export default function Organizations(){
 
     const [organizationsData, setOrganizationsData] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(()=>{
         const loadAllOpportunities = async () => {
             const opportunitiesRef = collection(db, "opportunities");
-          
             try {
+                setLoading(true);
                 const opportunitiesSnapshot = await getDocs(opportunitiesRef);
                 setOrganizationsData(opportunitiesSnapshot.docs.map(doc => ({
                     id: doc.id,
@@ -23,7 +24,9 @@ export default function Organizations(){
                 })))
     
             } catch (error) {
-              console.log("Error fetching all opportunities:", error);
+                console.log("Error fetching all opportunities:", error);
+            } finally {
+                setLoading(false)
             }
           }
         loadAllOpportunities();
@@ -36,7 +39,7 @@ export default function Organizations(){
         ["Any Category","Community Service", "Student Clubs", "Workplace Opportunities"],
         ["Any Field of Interest", "Relevant Fields of Interest"]
     ]
-
+    
     return(
         <>
             <TopBar/>
@@ -48,9 +51,16 @@ export default function Organizations(){
                         <SearchBar filters = {filterContent} pageName = {pageName}/> 
                     </div>
                     <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px", paddingBottom: "40px"}}>
-                        {organizationsData && organizationsData.map((organization, index)=>(
-                            <OrganizationProfile key={index} organizationData={organization} location={"organizations_page"}/>
-                        ))}
+                        {(organizationsData && !loading) ? organizationsData.map((organization, index)=>(
+                            <OrganizationProfile key={index} organizationData={organization} location={"organizations_page"}/>))
+                            : loading ?
+                            <div>
+                                Loading...
+                            </div> :
+                            <div>
+                                Nothing to see here!
+                            </div>
+                        }
                 </div>
             </div>
                 

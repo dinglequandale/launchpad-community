@@ -1,5 +1,5 @@
 import { db, storage } from '../firebase/firebaseConfig';
-import { collection, addDoc, updateDoc, doc, query, getDocs, where, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, query, getDocs, where, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
 
@@ -37,23 +37,46 @@ const uploadImage = async (file, opportunityId) => {
   return getDownloadURL(storageRef);
 };
 
-export const loadOpportunities = async (currentUser) => {
-    const opportunitiesRef = collection(db, "opportunities");
+export const loadOpportunities = (currentUser, setOpportunities) => {
+  const opportunitiesRef = collection(db, "opportunities");
+  const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", currentUser.uid));
+  
+  return onSnapshot(qUserOpportunity, async (querySnapshot) => {
     try {
-        const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", currentUser.uid));
-        const querySnapshot = await getDocs(qUserOpportunity);
+      const opportunitiesArray = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
 
-        const opportunitiesArray = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+      // we only need this for one opportunity, but easier to expand for the future
+      const opportunitiesWithLogos = await Promise.all(opportunitiesArray.map(async (opportunity) => {
+        const logoDisplay = await loadOpportunityLogo(opportunity.id);
+        console.log(`Logo URL for opportunity ${opportunity.id}:`, logoDisplay);
+        return { ...opportunity, organizationLogoPreview: logoDisplay };
+      }));
 
-        return opportunitiesArray[0];
-        
-        } catch (error) {
-        console.log("Error getting user opportunities: ", error);
-        }
-}
+      setOpportunities(opportunitiesWithLogos[0]);
+    } catch (error) {
+      console.error("Error processing opportunities:", error);
+    }
+  }, (error) => {
+    console.error("Error getting user opportunities: ", error);
+  });
+};
+
+
+const loadOpportunityLogo = async (opportunityId) => {
+  const storageRef = ref(storage, `opportunity-logos/${opportunityId}`);
+
+  try {
+    const url = await getDownloadURL(storageRef);
+    console.log(url);
+    return url;
+  } catch (error) {
+    console.error("Error getting download URL:", error);
+    return null;
+  }
+};
 
 export const handleDeleteOpportunity = async (opportunityId) => {
     console.log(opportunityId)

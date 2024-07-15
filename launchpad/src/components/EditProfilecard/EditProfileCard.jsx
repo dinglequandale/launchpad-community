@@ -241,7 +241,6 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
     const [opportunityData, setOpportunityData] = useState(null);
 
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
-    const [showOrganizationProfile, setShowOrganizationProfile] = useState(false);
     const [deleteWarningVisibility, setDeleteWarningVisibility] = useState(false);
     const [opportunityId, setOpportunityId] = useState("");
     const [loading, setLoading] = useState(false);
@@ -249,28 +248,22 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
     
 
     useEffect(() => {
-        async function fetchOpportunities() {
-          try {
-            setLoading(true);
-            const loadedOpportunities = await loadOpportunities(currentUser);
-            if (loadedOpportunities) {
-              console.log(loadedOpportunities);
-              setOpportunityData(loadedOpportunities);
-              setOpportunityId(loadedOpportunities.id);
-              setShowOrganizationProfile(true);
-            }
-          } catch (error) {
-            console.error("Error loading opportunities:", error);
-          } finally {
+        setLoading(true);
+        const unsubscribe = loadOpportunities(currentUser, setOpportunityData);
+        return () => unsubscribe();
+      }, [currentUser]);
+
+    
+    useEffect(()=>{
+        if(opportunityData){
             setLoading(false);
-          }
+            setOpportunityId(opportunityData.id);
+            console.log("Logo:", opportunityData.organizationLogoPreview)
         }
-        fetchOpportunities();
-      }, [showOrganizationProfile, opportunityModalVisibility]);    
+    },[opportunityData]);
 
     const deleteOpportunity = (opportunityId) => {
         handleDeleteOpportunity(opportunityId);
-        setShowOrganizationProfile(false);
         setOpportunityData(null);
     }
     
@@ -296,7 +289,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
                 opportunityId={opportunityId}/>}
         </div>
         <div style={{position: "relative"}}>
-            { (showOrganizationProfile && opportunityData) ? <>
+            { (opportunityData && !loading) ? <>
             <div style={{textAlign: "center"}}>
             <span 
             style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>
@@ -307,7 +300,13 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
                 <MdDeleteOutline size={30}/>
             </button>
             <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
-            </> : <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
+            </> : loading ?
+            <div>
+                {/* TODO: implement actual loading */}
+                Loading...
+            </div>
+            :
+            <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
                 boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
                 {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
