@@ -19,6 +19,7 @@ import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/fire
 import { db } from '../../firebase/firebaseConfig';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import toast from 'react-hot-toast';
+import { handleDeleteOpportunity, loadOpportunities } from '../../services/opportunityServices';
 
 const ProfileContext = createContext({
     currentUser: null
@@ -245,57 +246,38 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
     const [opportunityId, setOpportunityId] = useState("");
     const [loading, setLoading] = useState(false);
     const [isEditing,setIsEditing] = useState(false);
+    
 
-    const opportunitiesRef = collection(db, "opportunities");
     useEffect(() => {
-        const loadOpportunities = async () => {
-            try {
-                setLoading(true);
-                const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", currentUser.uid));
-                const querySnapshot = await getDocs(qUserOpportunity);
+        async function fetchOpportunities() {
+          try {
+            setLoading(true);
+            const loadedOpportunities = await loadOpportunities(currentUser);
+            if (loadedOpportunities) {
+              console.log(loadedOpportunities);
+              setOpportunityData(loadedOpportunities);
+              setOpportunityId(loadedOpportunities.id);
+              setShowOrganizationProfile(true);
+            }
+          } catch (error) {
+            console.error("Error loading opportunities:", error);
+          } finally {
+            setLoading(false);
+          }
+        }
+        fetchOpportunities();
+      }, [showOrganizationProfile, opportunityModalVisibility]);    
 
-                const opportunitiesArray = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-    
-                setOpportunityData(opportunitiesArray[0]);
-                setShowOrganizationProfile(true);
-                
-                } catch (error) {
-                console.log("Error getting user opportunities: ", error);
-                }
-                finally{
-                setLoading(false);
-                }
-        }
-        loadOpportunities();
-      }, [showOrganizationProfile, opportunityModalVisibility]);
-
-      useEffect(()=>{
-        if(opportunityData){
-            setOpportunityId(opportunityData.id);
-        }
-      },[opportunityData])
-    
-    const handleDeleteOpportunity = async (opportunityId) => {
-        console.log(opportunityId)
-        const opportunityDoc = doc(db, "opportunities", opportunityId);
-        try {
-            await deleteDoc(opportunityDoc);
-            console.log("User profile deleted successfully");
-        } catch (error) {
-            console.error("Error deleting user profile: ", error);
-            toast.error("Error deleting your opportunity!")
-            return;
-        }
+    const deleteOpportunity = (opportunityId) => {
+        handleDeleteOpportunity(opportunityId);
         setShowOrganizationProfile(false);
         setOpportunityData(null);
     }
+    
     return(
         <>
         <div name="deleteWarning">
-            {deleteWarningVisibility && <DeleteWarningModal onCancel={()=>setDeleteWarningVisibility(false)} onVerify={() => handleDeleteOpportunity(opportunityId)} visibility={deleteWarningVisibility}
+            {deleteWarningVisibility && <DeleteWarningModal onCancel={()=>setDeleteWarningVisibility(false)} onVerify={() => deleteOpportunity(opportunityId)} visibility={deleteWarningVisibility}
                 objectOfDeletation={opportunityData.organizationType}/>}
         </div>
         <div name="opportunityModal" style={{position: "relative"}}>
