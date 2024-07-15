@@ -28,7 +28,7 @@ export default function EditProfileCard({userData}) {
     const navigate = useNavigate();
     const location = useLocation();
     // temporary data
-    const userType = "Professional";
+    const userType = "Alumni";
     const userName = "Shuja Gupta";
 
     const { currentUser } = useAuth();

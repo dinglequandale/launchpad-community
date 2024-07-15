@@ -214,7 +214,7 @@ const saveOpportunityData = async () => {
       page: 4, 
     },
     {
-      id: "organizationLogo",
+      id: "organizationLogoPreview",
       text: "Upload a logo that embodies your opportunity! (optional)",
       type: "file",
       accept: ".jpg",
@@ -226,7 +226,9 @@ const saveOpportunityData = async () => {
 
   // fix this later
   useEffect(()=>{
-    if(Object.values(organizationData).filter((data)=>(data !== '')).length === Object.values(organizationData).length){
+    const emptyQuestions = organizationQuestionsConfig.filter(question => (organizationData[question.id] === "" && question.includers.includes(organizationData.organizationType) && question.required === true));
+    if(emptyQuestions.length === 0){
+      console.log()
       setShowLast(true)
     }
     else{
@@ -427,7 +429,7 @@ function ApplicantInfo(){
 }
 
 function FinalInfo(){
-  const { organizationData, setOrganizationData, organizationQuestionsConfig, organizationLogo, setOrganizationLogo } = useContext(OpportunityContext);
+  const { organizationData, setOrganizationData, organizationQuestionsConfig, setOrganizationLogo } = useContext(OpportunityContext);
   const logoRef = useRef();
   
   const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
