@@ -10,12 +10,13 @@ import { MdEmail } from 'react-icons/md';
 import { CgWebsite } from 'react-icons/cg';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
-import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../../firebase/firebaseConfig';
+import { saveOpportunity } from '../../../services/opportunityServices';
 
 const OpportunityContext = createContext({
   organizationData: {},
   setOrganizationData: () => {},
+  organizationLogo: null,
+  setOrganizationLogo: () => {},
   currentOpportunityPage: 1,
   setCurrentOpportuntityPage: () => {},
   handleChange: () => {},
@@ -41,49 +42,28 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
     timeFrame: 'One Week',
     learnMore: 'Messages',
     apply: 'Messages',
-    organizationLogo: null,
-    organizationLogoPreview: '',
+    organizationLogoPreview: null,
   });
+
+  const [organizationLogo,setOrganizationLogo] = useState(null);
 
 
 const saveOpportunityData = async () => {
-  const opportunitiesCollectionRef = collection(db, "opportunities");
-
-  if (!isEditing) {
-    // Creating a new opportunity
+  try {
     await toast.promise(
-      addDoc(opportunitiesCollectionRef, {
-        ...organizationData,
-        createdBy: currentUser.uid,
-        createdAt: new Date()
-      }),
+      saveOpportunity(organizationData, organizationLogo, currentUser, isEditing, opportunityId),
       {
-        loading: 'Creating opportunity...',
-        success: 'Opportunity created successfully!',
-        error: (err) => {
-          console.error("Error creating opportunity: ", err);
-          return `Failed to create opportunity: ${err.message}`;
-        },
+        loading: isEditing ? 'Updating opportunity...' : 'Creating opportunity...',
+        success: isEditing ? 'Opportunity updated successfully!' : 'Opportunity created successfully!',
+        error: (err) => `Failed to ${isEditing ? 'update' : 'create'} opportunity: ${err.message}`,
       }
     );
-  } else {
-    try {
-      const opportunityRef = doc(db, "opportunities", opportunityId);
-      await toast.promise(
-        updateDoc(opportunityRef, organizationData),
-        {
-          loading: 'Updating opportunity...',
-          success: 'Opportunity updated successfully!',
-          error: "Failed to update your opportunity!",
-        }
-      );
-    } catch (error) {
-      console.error("Error updating opportunity: ", error);
-    }
+    onClose();
+  } catch (error) {
+    console.error("Error saving opportunity: ", error);
   }
 
-  
-    onClose();
+  onClose();
   }
   
 
@@ -255,10 +235,10 @@ const saveOpportunityData = async () => {
   },[organizationData])
 
   const handleChange = (event) => {
-    const { name, value, type, files } = event.target;
+    const { name, value } = event.target;
     setOrganizationData({
       ...organizationData,
-      [name]: type === 'file' ? files[0] : value
+      [name]: value
     });
   };
 
@@ -290,7 +270,9 @@ const saveOpportunityData = async () => {
       <OpportunityContext.Provider 
       value={{
         organizationData,
-        setOrganizationData, 
+        setOrganizationData,
+        organizationLogo,
+        setOrganizationLogo,
         currentOpportunityPage, 
         setCurrentOpportuntityPage,
         handleChange,
@@ -445,13 +427,11 @@ function ApplicantInfo(){
 }
 
 function FinalInfo(){
-  const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(OpportunityContext);
+  const { organizationData, setOrganizationData, organizationQuestionsConfig, organizationLogo, setOrganizationLogo } = useContext(OpportunityContext);
   const logoRef = useRef();
-  const [logoPreviewURL, setLogoPreviewUrl] = useState(null);
   
   const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
-  
-  // TODO: temporary way of discerning between email / link
+
   const [learnMoreType, setLearnMoreType] = useState("");
   const [applyType, setApplyType] = useState("");
   const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState(false);
@@ -461,46 +441,42 @@ function FinalInfo(){
     setApplyType(organizationData.apply.split(": ")[0]);
     setLearnMoreType(organizationData.learnMore.split(": ")[0]);
   },[])
-  console.log(applyType, learnMoreType)
 
   useEffect(()=>{
     console.log(applyType, learnMoreType)
     setApplyInputVisibility(applyType !== "Messages");
     setLearnMoreInputVisibility(learnMoreType !== "Messages");
   },[applyType,learnMoreType])
-  console.log(learnMoreInputVisibility, applyInputVisibility)
 
-  // logic to load the preview image when user opens tab, not working
+
+  // revoke urls to clean up localStorage
+  useEffect(() => {
+    return () => {
+      if (organizationData.logoPreviewURL) {
+        URL.revokeObjectURL(organizationData.logoPreviewURL);
+      }
+    };
+  }, [organizationData.logoPreviewURL]);
+
   
-  // IMPORTANT TODO: files funky with localStorage, need to adjust when transition to database
-  const handleChange = (event) => {
-    const { name, value, type, files } = event.target;
-
-    if (type === 'file') {
-      const file = files[0];
-
-      // Create a URL for the preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreviewUrl(reader.result);
-      };
-      reader.readAsDataURL(file); // Read the file for preview
-
-      setOrganizationData({
-        ...organizationData,
-        [name]: file,
-      });
-
-      setOrganizationData({
-        ...organizationData,
-        organizationLogoPreview: logoPreviewURL,
-      })
-    } else {
-      setOrganizationData({
-        ...organizationData,
-        [name]: `${name === "learnMore" ? learnMoreType : applyType}: ${value}`,
-      });
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log(file)
+      setOrganizationData(prevData => ({
+        ...prevData,
+        organizationLogoPreview: URL.createObjectURL(file)
+      }));
+      setOrganizationLogo(file);
     }
+  }
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setOrganizationData({
+      ...organizationData,
+      [name]: `${name === "learnMore" ? learnMoreType : applyType}: ${value}`,
+    });
   };
 
   const handleOptionClick = (event, optionName, questionId) => {
@@ -529,6 +505,7 @@ function FinalInfo(){
       <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>You're almost done. Just a few more details.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+          
           {/* First two questions (link inputs) */}
           <div style={{ display: "flex", gap: "10px", flexDirection: "column", textAlign: "center"}}> 
             {questionsForPage
@@ -570,7 +547,9 @@ function FinalInfo(){
                 </div>
               ))}
           </div>
+
           {/* Logo upload */}
+
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
             {questionsForPage
               .filter(question => question.type === "file")
@@ -585,14 +564,14 @@ function FinalInfo(){
                         type="file"
                         id="organizationLogo"
                         name="organizationLogo"
-                        onChange={handleChange}
+                        onChange={handleFileChange}
                         style={{display: "none"}}
                         ref={logoRef}
                         accept=".jpg"
                     />
-                    {logoPreviewURL && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
+                    {organizationData.organizationLogoPreview && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
                       <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Logo Preview:</span>
-                      <img src={logoPreviewURL} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
+                      <img src={organizationData.organizationLogoPreview} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
                     </div>}
                       </div>
                   </div>
