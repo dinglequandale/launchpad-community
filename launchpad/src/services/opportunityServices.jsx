@@ -74,7 +74,6 @@ const loadOpportunityLogo = async (opportunityId) => {
 
   try {
     const url = await getDownloadURL(storageRef);
-    console.log(url);
     return url;
   } catch (error) {
     console.error("Error getting download URL:", error);
@@ -83,7 +82,6 @@ const loadOpportunityLogo = async (opportunityId) => {
 };
 
 export const handleDeleteOpportunity = async (opportunityId) => {
-    console.log(opportunityId)
     const opportunityDoc = doc(db, "opportunities", opportunityId);
     try {
         await deleteDoc(opportunityDoc);
