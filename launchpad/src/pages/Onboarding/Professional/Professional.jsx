@@ -139,10 +139,19 @@ const professionalQuestionsConfig = [
 export default function Professional() {
   const numOfSections = 3;
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedOptions, setSelectedOptions] = useState({});
+  const [professionalData, setProfessionalData] = useState({
+    retiredStatus: '',
+    lastPosition: '',
+    lastCompany: '',
+    workFields: [],
+    currentPosition: '',
+    currentCompany: '',
+    networkingLevel: [],
+    uploadResume: null
+  });
 
   const handleDropdownChange = (id, value) => {
-    setSelectedOptions(prevState => ({
+    setProfessionalData(prevState => ({
       ...prevState,
       [id]: value,
     }));
@@ -151,11 +160,11 @@ export default function Professional() {
   const renderPage = () => {
     switch (currentPage) {
       case 1:
-        return <FirstPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
+        return <FirstPage selectedOptions={professionalData} handleChange={handleDropdownChange} />;
       case 2:
-        return <SecondPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
+        return <SecondPage selectedOptions={professionalData} handleChange={handleDropdownChange} />;
       case 3:
-        return <LastPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
+        return <LastPage selectedOptions={professionalData} handleChange={handleDropdownChange} />;
       default:
         return null;
     }
