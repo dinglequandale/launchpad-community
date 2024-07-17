@@ -43,7 +43,6 @@ export default function ContentFilter({filterContent}){
                         style={{
                         padding: "7px",
                         fontWeight: "500",
-                        textShadow: "#7883FF 1px 0 5px",
                         cursor: "pointer",
                         }}
                         className={`filterOptions ${

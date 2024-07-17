@@ -33,11 +33,11 @@ export default function Organizations(){
     },[])
 
 
-    const pageName = "Organizations";
+    const pageName = "Opportunities";
 
     const filterContent = [
         ["Any Category","Community Service", "Student Clubs", "Workplace Opportunities"],
-        ["Any Field of Interest", "Relevant Fields of Interest"]
+        ["Any Field of Interest", "Your Interests"]
     ]
     
     return(

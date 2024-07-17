@@ -18,7 +18,7 @@ export default function UserNetwork() {
   const filterContent = [
     ["Any Education Stage", "High School Student", "College Student"],
     ["Any College", "Dream College(s)"],
-    ["Any Interest","Relevant Interest(s)", "Physics", "Finance", "Theatre"]
+    ["Any Interest","Your Interests", "Physics", "Finance", "Theatre"]
   ];
   const [profileModalTop, setProfileModalTop] = useState(0);
 
