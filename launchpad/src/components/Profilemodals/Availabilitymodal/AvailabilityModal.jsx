@@ -113,11 +113,12 @@ export default function AvailabilityModal({visibility, onClose, userType}){
                 </header>
                 <main style={{width: "850px"}}>
                 <div style={{textAlign: "center"}}>
-                    <span style={{color: "black", fontSize: "30px", fontWeight: "450", lineHeight: "1.3"}}> In this app, {userType !== "Professional" ? "high schoolers" : "high schoolers and college students"} will have <br />  the opportunity to connect with you. <br /> <span style={{fontSize: "smaller", fontWeight: "600", color: "var(--secondary)"}}>What are you able and open to do for these students?</span></span>
-                    <div style={{paddingLeft: "2%", paddingRight: "2%", paddingTop: "5px"}}>
-                    <div style={{textAlign: "left", border: "1px solid var(--secondary)", paddingBottom: "20px", paddingLeft: "20px", paddingRight: "20px", backgroundColor: "var(--neutral)", borderRadius: "20px"}}>
+                    <span style={{color: "black", fontSize: "30px", fontWeight: "450", lineHeight: "1.3"}}> Via Launchpad, {userType !== "Professional" ? "high schoolers" : "high schoolers and college students"} will have the opportunity <br /> to connect with you. <br /> <span style={{fontSize: "smaller", fontWeight: "350", color: "var(--secondary)"}}>What are you open to doing for these students?</span></span>
+                    <div style={{padding: "2% 5%"}}>
+                    <div style={{textAlign: "left", boxShadow: "var(--shadowColor)", padding: "13px 20px", backgroundColor: "var(--neutral)", borderRadius: "15px"}}>
+                        <div style={{display: "flex", flexDirection: "column", gap: "25px"}}>
                         {userAvailabilityOptions.map((option)=>(
-                        <div style={{paddingTop: "12px", fontSize: "larger", lineHeight: ".7"}}>
+                        <div style={{fontSize: "larger", lineHeight: ".7", display: "flex"}}>
                             <label htmlFor={option.id}>
                             <input 
                                 type="checkbox"
@@ -128,6 +129,7 @@ export default function AvailabilityModal({visibility, onClose, userType}){
                             <span style={{fontSize: "22px", fontWeight: "bolder", color: "var(--secondary)"}}>{option.value}:</span> <span style={{fontWeight: "300"}}>{option.text}</span>
                             </label>
                         </div>))}
+                        </div>
                     </div>
                     </div>
                 

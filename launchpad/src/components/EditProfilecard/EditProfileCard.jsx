@@ -254,7 +254,6 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
     useEffect(()=>{
         if(opportunityData){
             setOpportunityId(opportunityData.id);
-            console.log("Logo:", opportunityData.organizationLogoPreview)
         }
     },[opportunityData]);
 
@@ -354,12 +353,17 @@ function AboutMeDisplay(){
 function ConnectionAvailability({userType}){
     const [availabilityModalVisibility, setAvailabilityModalVisibility] = useState(false);
     const [availabilityData, setAvailabilityData] = useState(null);
-
+    localStorage.clear()
     useEffect(()=>{
-        const storedAvailabilityData = localStorage.getItem("userAvailabilityData");
-        if(storedAvailabilityData !== null){
-            setAvailabilityData(JSON.parse(storedAvailabilityData));
+        const storedAvailabilityData = JSON.parse(localStorage.getItem("userAvailabilityData"));
+        if(!Array.isArray(storedAvailabilityData)){
+            return;
         }
+        if(storedAvailabilityData.length !== 0){
+            setAvailabilityData(storedAvailabilityData);
+            return;
+        }
+        setAvailabilityData(null);
     },[availabilityModalVisibility,])
 
     return(
