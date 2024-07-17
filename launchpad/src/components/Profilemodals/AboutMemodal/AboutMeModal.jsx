@@ -6,11 +6,10 @@ import MakeChanges from '../../Makechanges/MakeChanges';
 export default function AboutMeModal({visibility, onClose}){
   const [aboutMeContent, setAboutMeContent] = useState("");
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
-  const [reachedWordCount, setReachedWordCount] = useState(false);
 
   const wordLimit = 50;
 
-  // later replace with logic tailored to FireStore
+  // TODO: later replace with logic tailored to FireStore
 
   const saveAboutMe = () => {
     localStorage.setItem("userAboutMe", aboutMeContent);
@@ -63,11 +62,11 @@ export default function AboutMeModal({visibility, onClose}){
         shouldCloseOnOverlayClick={false} 
       >
         <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> My About Me <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>It's your time to shine!</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{paddingTop: "20px"}}>
-          <textarea className='inputAboutMe' placeholder='Tell us more about yourself ...' onChange={e => handleAboutMeChange(e.target.value)} value={aboutMeContent}></textarea>
+          <textarea className='inputAboutMe' placeholder='Tell us more about yourself!' onChange={e => handleAboutMeChange(e.target.value)} value={aboutMeContent}></textarea>
         </main>
         <span style={{fontSize: "smaller"}}>Word Count: {aboutMeContent ? `${getWordCount(aboutMeContent)}` : "0"}/{wordLimit}</span>
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
