@@ -17,6 +17,7 @@ import DeleteWarningModal from '../DeleteWarningmodal/DeleteWarningModal';
 import AvailabilityModal from '../Profilemodals/Availabilitymodal/AvailabilityModal';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import { handleDeleteOpportunity, loadOpportunities } from '../../services/opportunityServices';
+import Loading from '../LoadingAnimation/Loading';
 
 const ProfileContext = createContext({
     currentUser: null
@@ -297,8 +298,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
             <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
             </> : loading ?
             <div>
-                {/* TODO: implement actual loading */}
-                Loading...
+                <Loading/>
             </div>
             :
             <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
