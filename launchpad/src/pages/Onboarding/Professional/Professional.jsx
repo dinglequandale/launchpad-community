@@ -13,7 +13,7 @@ const professionalQuestionsConfig = [
   },
   // If yes
   {
-    id: "lastPosition",
+    id: "companyPosition",
     text: "What was the last position you held?",
     type: "select",
     options: [
@@ -25,21 +25,10 @@ const professionalQuestionsConfig = [
     page: 1,
   },
   {
-    id: "lastCompany",
+    id: "companyName",
     text: "What company / organization did you work for last?",
-    type: "select",
-    options: [
-        "ExxonMobil",
-        "Chevron",
-        "Royal Dutch Shell",
-        "BP (British Petroleum)",
-        "TotalEnergies",
-        "ConocoPhillips",
-        "Saudi Aramco",
-        "PetroChina",
-        "Gazprom",
-        "Schlumberger"
-    ],
+    type: "text-box",
+    options: null,
     page: 1
   },
   {
@@ -60,7 +49,7 @@ const professionalQuestionsConfig = [
   },
   // If no
   {
-    id: "currentPosition",
+    id: "companyPosition",
     text: "What is your current position?",
     type: "select",
     options: [
@@ -72,21 +61,10 @@ const professionalQuestionsConfig = [
     page: 1
   },
   {
-    id: "currentCompany",
+    id: "companyName",
     text: "What company / organization do you currently work at?",
-    type: "select",
-    options: [
-        "ExxonMobil",
-        "Chevron",
-        "Royal Dutch Shell",
-        "BP (British Petroleum)",
-        "TotalEnergies",
-        "ConocoPhillips",
-        "Saudi Aramco",
-        "PetroChina",
-        "Gazprom",
-        "Schlumberger"
-    ],
+    type: "text-box",
+    options: null,
     page: 1
   },
   {
@@ -141,11 +119,9 @@ export default function Professional() {
   const [currentPage, setCurrentPage] = useState(1);
   const [professionalData, setProfessionalData] = useState({
     retiredStatus: '',
-    lastPosition: '',
-    lastCompany: '',
+    companyPosition: '',
+    companyName: '',
     workFields: [],
-    currentPosition: '',
-    currentCompany: '',
     networkingLevel: [],
     uploadResume: null
   });
@@ -184,10 +160,10 @@ export default function Professional() {
 };
 
 const FirstPage = ({ selectedOptions, handleChange }) => {
-  const yesQuestions = professionalQuestionsConfig.slice(1, 4);
-  const noQuestions = professionalQuestionsConfig.slice(4, 7);
-
-  const retiredStatus = selectedOptions['retiredStatus'];
+  // These questions are identical except for the question asked (past vs present tense)
+  const questions = selectedOptions['retiredStatus'] === 'Yes'
+    ? professionalQuestionsConfig.slice(1, 4)
+    : professionalQuestionsConfig.slice(4, 7);
 
   return (
     <div>
@@ -198,26 +174,27 @@ const FirstPage = ({ selectedOptions, handleChange }) => {
         onChange={(value) => handleChange('retiredStatus', value)}
         type={professionalQuestionsConfig[0].type}
       />
-      {retiredStatus === 'Yes' && (yesQuestions.map((question) => (
-        <OnboardingDropdown
-          key={question.id}
-          question={question.text}
-          options={question.options}
-          selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-          onChange={(value) => handleChange(question.id, value)}
-          type={question.type}
-        />
-      )))}
-      {retiredStatus === 'No' && (noQuestions.map((question) => (
-        <OnboardingDropdown
-          key={question.id}
-          question={question.text}
-          options={question.options}
-          selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-          onChange={(value) => handleChange(question.id, value)}
-          type={question.type}
-        />
-      )))}
+      {questions.map((question) => (
+        question.type === 'text-box' ? (
+          <div key={question.id} className="form-group">
+            <label>{question.text}</label>
+            <input
+              type="text"
+              value={selectedOptions[question.id] || ''}
+              onChange={(e) => handleChange(question.id, e.target.value)}
+            />
+          </div>
+        ) : (
+          <OnboardingDropdown
+            key={question.id}
+            question={question.text}
+            options={question.options}
+            selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+            onChange={(value) => handleChange(question.id, value)}
+            type={question.type}
+          />
+        )
+      ))}
     </div>
   );
 };
