@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
-import { highSchools, careerInterests } from './../Options';
+import { highSchools, careerInterests, graduationYears } from './../Options';
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -16,7 +16,7 @@ const highSchoolQuestionsConfig = [
     id: "graduationYear",
     text: "What year do you graduate?",
     type: "select",
-    options: [1999, 2008],
+    options: graduationYears,
     page: 1,
   },
   {

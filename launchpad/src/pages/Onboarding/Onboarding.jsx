@@ -22,7 +22,7 @@ export default function Onboarding() {
                 <>
                     <OnboardingDropdown
                         question="Are you a current high schooler, alumni, or a professional?"
-                        options={["High School", "College Student and Alumni", "Professional"]}
+                        options={["High School", "College Student and Alumni", "Professional"].map(option => ({ value: option, label: option }))}
                         selectedOption={selectedOption}
                         onChange={handleDropdownChange}
                     />

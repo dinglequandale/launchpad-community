@@ -1,4 +1,4 @@
-export const highSchools = [
+const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
     { "value": "bellaire_high", "label": "Bellaire High School" },
     { "value": "lamar_high", "label": "Lamar High School" },
@@ -36,7 +36,7 @@ export const highSchools = [
     { "value": "memorial", "label": "Memorial High School" }
 ];
 
-export const careerInterests = [
+const careerInterests = [
     {"value": "business_management", "label": "Business (Management)"},
     {"value": "business_operations", "label": "Business (Operations)"},
     {"value": "business_sales", "label": "Business (Sales)"},
@@ -98,3 +98,9 @@ export const careerInterests = [
     {"value": "social_work", "label": "Social Work (Social Services, Counseling)"}
 ];
 
+const graduationYears = [];
+for (let year = 1990; year <= 2028; year++) {
+    graduationYears.push({ value: year, label: year.toString() });
+}
+
+export { highSchools, careerInterests, graduationYears };

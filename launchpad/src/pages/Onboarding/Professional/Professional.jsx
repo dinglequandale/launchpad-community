@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
+import careerInterests from './../Options';
 
 const professionalQuestionsConfig = [
   // Page 1
@@ -46,16 +47,7 @@ const professionalQuestionsConfig = [
     id: "workFields",
     text: "What were your main fields at work? (select all that apply)",
     type: "multi-select",
-    options: [
-        "Consumer Electronics",
-        "Consumer Goods",
-        "Consumer Services",
-        "Cosmetics",
-        "Business",
-        "Education",
-        "Healthcare",
-        "Technology"
-    ],
+    options: careerInterests,
     page: 1
   },
   // If no
@@ -93,16 +85,7 @@ const professionalQuestionsConfig = [
     id: "workFields",
     text: "What were your main fields at work? (select all that apply)",
     type: "multi-select",
-    options: [
-        "Consumer Electronics",
-        "Consumer Goods",
-        "Consumer Services",
-        "Cosmetics",
-        "Business",
-        "Education",
-        "Healthcare",
-        "Technology"
-    ],
+    options: careerInterests,
     page: 1
   },
 
