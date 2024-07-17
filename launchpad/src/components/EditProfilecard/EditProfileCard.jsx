@@ -15,10 +15,7 @@ import BasicInfoModal from '../BasicInfomodal/BasicInfoModal';
 import InitiativeModal from '../Profilemodals/Initiativemodal/InitiativeModal';
 import DeleteWarningModal from '../DeleteWarningmodal/DeleteWarningModal';
 import AvailabilityModal from '../Profilemodals/Availabilitymodal/AvailabilityModal';
-import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig';
 import { useAuth } from '../../contexts/auth/AuthContext';
-import toast from 'react-hot-toast';
 import { handleDeleteOpportunity, loadOpportunities } from '../../services/opportunityServices';
 
 const ProfileContext = createContext({
@@ -201,10 +198,10 @@ function BasicInfoCard({userType, userName, descType}){
       }, [basicInfoModalVisibility,]);
 
     const basicInfoContent = {userPreface: userType === "Professional" ? `${basicInfoData.yearsOfExperience} years of experience in ${basicInfoData.industryOfExperience}`
-    : userType === "Alumni" ? `Graduated with Class of [...]`
-    : `[...], Class of [...]`,
+    : userType === "Alumni" ? `Graduated with Class of ${basicInfoData.graduationYear}`
+    : `[...], Class of ${basicInfoData.graduationYear}`,
     userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${basicInfoData.areasOfInterest ?? basicInfoData.fieldsOfExpertise}`,
-    userSecondDesc: `${descType}: ${userType === "Professional" ? basicInfoData.industryPosition : userType === "Alumni" ? basicInfoData.attendingCollege : basicInfoData.dreamColleges}`,
+    userSecondDesc: `${descType}: ${userType === "Professional" ? basicInfoData.industryPosition : userType === "Alumni" ? basicInfoData.collegeAttending : basicInfoData.dreamColleges}`,
     acceptedColleges: `Accepted Colleges: ${basicInfoData.acceptedColleges}`,
 }
 
