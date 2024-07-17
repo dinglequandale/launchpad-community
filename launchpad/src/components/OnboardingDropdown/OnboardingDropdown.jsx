@@ -9,7 +9,8 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
         onChange(value);
     };
 
-    const formattedOptions = options.map(option => ({ value: option, label: option }));
+    // Use if passing solely an array of options instead of an array of value, label pairs
+    // const formattedOptions = options.map(option => ({ value: option, label: option }));
 
     return (
         <div className="form-group">
@@ -17,15 +18,15 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
             {type === 'multi-select' ? (
                 <Select
                     isMulti
-                    value={formattedOptions.filter(option => selectedOption.includes(option.value))}
+                    value={options.filter(option => selectedOption.includes(option.value))}
                     onChange={handleChange}
-                    options={formattedOptions}
+                    options={options}
                 />
             ) : (
                 <Select
-                    value={formattedOptions.find(option => option.value === selectedOption)}
+                    value={options.find(option => option.value === selectedOption)}
                     onChange={handleChange}
-                    options={formattedOptions}
+                    options={options}
                 />
             )}
         </div>

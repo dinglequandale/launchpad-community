@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
+import { highSchools, careerInterests } from './../Options';
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -8,7 +9,7 @@ const highSchoolQuestionsConfig = [
     id: "whatSchool",
     text: "What school do you go to?",
     type: "select",
-    options: ["The Awty International School"],
+    options: highSchools,
     page: 1,
   },
   {
@@ -31,16 +32,7 @@ const highSchoolQuestionsConfig = [
     id: "dreamCareer",
     text: "What is your dream career field? (Select up to 4)",
     type: "multi-select",
-    options: [
-        "Consumer Electronics",
-        "Consumer Goods",
-        "Consumer Services",
-        "Cosmetics",
-        "Business",
-        "Education",
-        "Healthcare",
-        "Technology"
-    ],
+    options: careerInterests,
     page: 2,
   },
 

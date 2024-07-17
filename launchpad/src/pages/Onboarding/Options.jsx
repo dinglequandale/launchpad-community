@@ -1,4 +1,42 @@
-[
+export const highSchools = [
+    { "value": "awty_international", "label": "Awty International School" },
+    { "value": "bellaire_high", "label": "Bellaire High School" },
+    { "value": "lamar_high", "label": "Lamar High School" },
+    { "value": "carnegie_vanguard", "label": "Carnegie Vanguard High School" },
+    { "value": "debakey_high", "label": "DeBakey High School for Health Professions" },
+    { "value": "westside_high", "label": "Westside High School" },
+    { "value": "heights_high", "label": "Heights High School" },
+    { "value": "kinder_high", "label": "Kinder High School for the Performing and Visual Arts" },
+    { "value": "yates_high", "label": "Yates High School" },
+    { "value": "strake_jesuit", "label": "Strake Jesuit College Preparatory" },
+    { "value": "st_agnes", "label": "St. Agnes Academy" },
+    { "value": "st_thomas", "label": "St. Thomas High School" },
+    { "value": "episcopal_high", "label": "Episcopal High School" },
+    { "value": "kinkaid_school", "label": "The Kinkaid School" },
+    { "value": "second_baptist", "label": "Second Baptist School" },
+    { "value": "emery_weiner", "label": "The Emery/Weiner School" },
+    { "value": "st_johns", "label": "St. John's School" },
+    { "value": "incarnate_word", "label": "Incarnate Word Academy" },
+    { "value": "houston_christian", "label": "Houston Christian High School" },
+    { "value": "lutheran_high_north", "label": "Lutheran High North" },
+    { "value": "westbury_christian", "label": "Westbury Christian School" },
+    { "value": "houston_academy", "label": "Houston Academy for International Studies" },
+    { "value": "challenge_early", "label": "Challenge Early College High School" },
+    { "value": "east_early", "label": "East Early College High School" },
+    { "value": "north_houston_early", "label": "North Houston Early College High School" },
+    { "value": "sharpstown_international", "label": "Sharpstown International School" },
+    { "value": "young_womens", "label": "Young Women's College Preparatory Academy" },
+    { "value": "energized_innovative", "label": "Energized for STEM Academy" },
+    { "value": "mickey_leland", "label": "Mickey Leland College Preparatory Academy" },
+    { "value": "harmony_school_excellence", "label": "Harmony School of Excellence" },
+    { "value": "yes_prep_north_central", "label": "YES Prep North Central" },
+    { "value": "kipp_houston", "label": "KIPP Houston High School" },
+    { "value": "spring_woods", "label": "Spring Woods High School" },
+    { "value": "stratford", "label": "Stratford High School" },
+    { "value": "memorial", "label": "Memorial High School" }
+];
+
+export const careerInterests = [
     {"value": "business_management", "label": "Business (Management)"},
     {"value": "business_operations", "label": "Business (Operations)"},
     {"value": "business_sales", "label": "Business (Sales)"},
@@ -58,4 +96,5 @@
     {"value": "theater", "label": "Theater & Movies"},
     {"value": "education", "label": "Education (Teaching, Administration, Counseling)"},
     {"value": "social_work", "label": "Social Work (Social Services, Counseling)"}
-  ]
+];
+
