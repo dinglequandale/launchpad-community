@@ -15,11 +15,9 @@ import BasicInfoModal from '../BasicInfomodal/BasicInfoModal';
 import InitiativeModal from '../Profilemodals/Initiativemodal/InitiativeModal';
 import DeleteWarningModal from '../DeleteWarningmodal/DeleteWarningModal';
 import AvailabilityModal from '../Profilemodals/Availabilitymodal/AvailabilityModal';
-import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig';
 import { useAuth } from '../../contexts/auth/AuthContext';
-import toast from 'react-hot-toast';
 import { handleDeleteOpportunity, loadOpportunities } from '../../services/opportunityServices';
+import Loading from '../LoadingAnimation/Loading';
 
 const ProfileContext = createContext({
     currentUser: null
@@ -29,7 +27,7 @@ export default function EditProfileCard({userData}) {
     const navigate = useNavigate();
     const location = useLocation();
     // temporary data
-    const userType = "Alumni";
+    const userType = "Professional";
     const userName = "Shuja Gupta";
 
     const { currentUser } = useAuth();
@@ -201,10 +199,10 @@ function BasicInfoCard({userType, userName, descType}){
       }, [basicInfoModalVisibility,]);
 
     const basicInfoContent = {userPreface: userType === "Professional" ? `${basicInfoData.yearsOfExperience} years of experience in ${basicInfoData.industryOfExperience}`
-    : userType === "Alumni" ? `Graduated with Class of [...]`
-    : `[...], Class of [...]`,
+    : userType === "Alumni" ? `Graduated with Class of ${basicInfoData.graduationYear}`
+    : `[...], Class of ${basicInfoData.graduationYear}`,
     userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${basicInfoData.areasOfInterest ?? basicInfoData.fieldsOfExpertise}`,
-    userSecondDesc: `${descType}: ${userType === "Professional" ? basicInfoData.industryPosition : userType === "Alumni" ? basicInfoData.attendingCollege : basicInfoData.dreamColleges}`,
+    userSecondDesc: `${descType}: ${userType === "Professional" ? basicInfoData.industryPosition : userType === "Alumni" ? basicInfoData.collegeAttending : basicInfoData.dreamColleges}`,
     acceptedColleges: `Accepted Colleges: ${basicInfoData.acceptedColleges}`,
 }
 
@@ -257,7 +255,6 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
     useEffect(()=>{
         if(opportunityData){
             setOpportunityId(opportunityData.id);
-            console.log("Logo:", opportunityData.organizationLogoPreview)
         }
     },[opportunityData]);
 
@@ -301,8 +298,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
             <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
             </> : loading ?
             <div>
-                {/* TODO: implement actual loading */}
-                Loading...
+                <Loading/>
             </div>
             :
             <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
@@ -357,12 +353,17 @@ function AboutMeDisplay(){
 function ConnectionAvailability({userType}){
     const [availabilityModalVisibility, setAvailabilityModalVisibility] = useState(false);
     const [availabilityData, setAvailabilityData] = useState(null);
-
+    localStorage.clear()
     useEffect(()=>{
-        const storedAvailabilityData = localStorage.getItem("userAvailabilityData");
-        if(storedAvailabilityData !== null){
-            setAvailabilityData(JSON.parse(storedAvailabilityData));
+        const storedAvailabilityData = JSON.parse(localStorage.getItem("userAvailabilityData"));
+        if(!Array.isArray(storedAvailabilityData)){
+            return;
         }
+        if(storedAvailabilityData.length !== 0){
+            setAvailabilityData(storedAvailabilityData);
+            return;
+        }
+        setAvailabilityData(null);
     },[availabilityModalVisibility,])
 
     return(

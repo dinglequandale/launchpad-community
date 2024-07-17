@@ -1,0 +1,146 @@
+.no-results-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 320px;
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--neutral);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .icon-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  .search-icon {
+    font-size: 4rem;
+    color: #9ca3af;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .message {
+    color: #6b7280;
+    margin-bottom: 1rem;
+  }
+  
+  .suggestions {
+    text-align: left;
+    color: #4b5563;
+    font-size: 0.875rem;
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .suggestions li {
+    margin-bottom: 0.5rem;
+    position: relative;
+    padding-left: 1.5rem;
+  }
+  
+  .suggestions li::before {
+    content: '•';
+    position: absolute;
+    left: 0.5rem;
+    color: #9ca3af;
+  }
+  
+  empty-portfolio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+.empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.empty-message {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+  max-width: 350px;
+}
+
+.add-project-btn {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.add-project-btn:hover {
+  background-color: #2563eb;
+}
+
+.empty-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    background-color: #f9fafb;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-message {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    max-width: 300px;
+  }
+  
+  .add-project-btn {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .add-project-btn:hover {
+    background-color: #2563eb;
+  }

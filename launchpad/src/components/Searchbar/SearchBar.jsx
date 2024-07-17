@@ -3,12 +3,21 @@ import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
 
 export default function SearchBar({filters, pageName}) {
+
+    const searchType = () => {
+        switch(pageName){
+            case "Network":
+                return "connections";
+            case "Opportunities":
+                return "opportunities and organizations"
+        }
+    }
     return (
         <div className="searchContainer">
             <h2 style={{paddingLeft: "3%"}}>{pageName}</h2>
             <div style={{dislay: "flex"}} className="search">
                 <CiSearch size={28} style={{color:"grey"}}/>
-                <input type="text" name="fname" className="searchBar" placeholder="Search for connections" />
+                <input type="text" name="fname" className="searchBar" placeholder={`Search for ${searchType()}`} />
             </div>
             <div style={{display: "flex", paddingBottom: "10px", gap: "30px", marginLeft: "5%"}}>
                 {filters.map((filter, index)=>(

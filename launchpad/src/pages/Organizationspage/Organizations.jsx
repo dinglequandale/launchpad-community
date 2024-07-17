@@ -6,6 +6,8 @@ import TopBar from "../../components/Topbar/TopBar";
 import OrganizationProfile from "../../components/Organizationprofile/OrganizationProfile";
 import { db } from "../../firebase/firebaseConfig";
 import { collection, getDocs, query } from "firebase/firestore";
+import NoResults, { EmptyField } from "../../components/NoResultsnotifier/NoResults";
+import Loading from "../../components/LoadingAnimation/Loading";
 
 export default function Organizations(){
 
@@ -32,14 +34,27 @@ export default function Organizations(){
         loadAllOpportunities();
     },[])
 
+    useEffect(()=>{
+        console.log(organizationsData)
+    },[organizationsData])
 
-    const pageName = "Organizations";
+    const pageName = "Opportunities";
 
     const filterContent = [
         ["Any Category","Community Service", "Student Clubs", "Workplace Opportunities"],
-        ["Any Field of Interest", "Relevant Fields of Interest"]
-    ]
-    
+        ["Any Field of Interest", "Your Interests"]
+    ];
+
+
+    // TODO: make these styles more dynamic
+    const loadingStyles = {
+        position: 'absolute',
+        top: "25%",
+        left: "10%",
+        right: 0,
+        bottom: 0,
+    };
+
     return(
         <>
             <TopBar/>
@@ -48,19 +63,22 @@ export default function Organizations(){
             </div>
             <div style={{paddingLeft:"10%"}}>
                 <div className='organizationsContainer'>
-                        <SearchBar filters = {filterContent} pageName = {pageName}/> 
-                    </div>
+                    <SearchBar filters = {filterContent} pageName = {pageName}/> 
+                    
                     <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px", paddingBottom: "40px"}}>
-                        {(organizationsData && !loading) ? organizationsData.map((organization, index)=>(
-                            <OrganizationProfile key={index} organizationData={organization} location={"organizations_page"}/>))
-                            : loading ?
+                        {loading ?
                             <div>
-                                Loading...
-                            </div> :
-                            <div>
-                                Nothing to see here!
+                                <Loading style={loadingStyles}/>
                             </div>
-                        }
+                            : organizationsData.length > 0 ?
+                            organizationsData.map((organization, index)=>(
+                                <OrganizationProfile key={index} organizationData={organization} location={"organizations_page"}/>))
+                            :
+                            <div style={{margin: "0 auto"}}>
+                                <EmptyField/>
+                            </div>
+                            }
+                    </div>
                 </div>
             </div>
                 

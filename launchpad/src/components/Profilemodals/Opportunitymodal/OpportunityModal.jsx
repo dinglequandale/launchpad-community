@@ -290,9 +290,9 @@ const saveOpportunityData = async () => {
         >
           
           <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
-          <hr style={{borderColor: "var(--secondary)"}}/>
-          <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
+            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
+            <hr style={{borderColor: "var(--secondary)"}}/>
+            <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
           </header>
           <main style={{paddingTop:"10px"}}>
           <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
@@ -323,46 +323,40 @@ function OpportunityType(){
     <>
     <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>We need some general information first.</h2>
     <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-    <main style={{ display: "flex", alignItems: "center", justifyContent: "space-around", paddingTop: "1rem" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+    <main style={{ display: "flex", paddingTop: "1rem"}}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "25px", width: "100%" }}>
         {questionsForPage.map((question) => (
-          <label key={question.id} htmlFor={question.id}>
-            {question.text}
-          </label>
+          <div key={question.id} style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+            <label htmlFor={question.id}>
+              {question.text}
+            </label>
+            {question.type === "select" ?
+                (<select
+                  id={question.id}
+                  name={question.id}
+                  value={organizationData[question.id]}
+                  onChange={handleChange}
+                  style={{width: "45%"}}
+                >
+                  {question.options.map((option) => (
+                    <option key={option} value={option === "Select Type" ? "" : option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>)
+            :
+                (<input
+                  key={question.id}
+                  id={question.id}
+                  name={question.id}
+                  value={organizationData[question.id] ?? ''}
+                  onChange={handleChange}
+                  type="text"
+                  style={{width: "42.8%"}}
+                  maxLength={question.maxLength}
+                />)}
+          </div>
         ))}
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-around", width: "50%", gap: "30px" }}>
-        {questionsForPage.map((question) => {
-          if (question.type === "select") {
-            return (
-              <select
-                key={question.id}
-                id={question.id}
-                name={question.id}
-                value={organizationData[question.id]}
-                onChange={handleChange}
-              >
-                {question.options.map((option) => (
-                  <option key={option} value={option === "Select Type" ? "" : option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            );
-          } else if (question.type === "text") {
-            return (
-              <input
-                key={question.id}
-                id={question.id}
-                name={question.id}
-                value={organizationData[question.id] ?? ''}
-                onChange={handleChange}
-                type="text"
-                maxLength={question.maxLength}
-              />
-            );
-          }
-        })}
       </div>
     </main>
     </>

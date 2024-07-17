@@ -3,17 +3,46 @@ import "./basicinfomodal.css"
 import Modal from "react-modal"
 import MakeChanges from "../Makechanges/MakeChanges";
 import toast, { Toaster } from "react-hot-toast";
+import OptionalNotice from "../Optionalnotice/OptionalNotice";
 
 export default function BasicInfoModal({visibility,onClose,userType}){
-    const [basicInfoContent, setBasicInfoContent] = useState({areasOfInterest: "", fieldsOfExpertise: "", dreamColleges: "", acceptedColleges: "", collegeAttending: "", yearsOfExperience: "", industryOfExperience: "", industryPosition: ""});
+    const [basicInfoContent, setBasicInfoContent] = useState(
+      {
+      areasOfInterest: "",
+      fieldsOfExpertise: "",
+      dreamColleges: "",
+      acceptedColleges: "",
+      collegeAttending: "",
+      yearsOfExperience: "",
+      industryOfExperience: "",
+      industryPosition: "",
+      graduationYear: "",
+    });
     const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
     const basicInfoQuestionsConfig = [
       {
+        id: "graduationYear",
+        text: "What year do you graduate?",
+        type: "number",
+        userTypeIncluders: ["High Schooler"],
+        required: true,
+        placeholder: "E.g. 2026",
+      },
+      {
+        id: "graduationYear",
+        text: "What year did you graduate?",
+        type: "number",
+        userTypeIncluders: ["Alumni"],
+        required: true,
+        placeholder: "E.g. 2026",
+      },
+      {
         id: "areasOfInterest",
-        text: "What is are your areas of interest?",
+        text: "What are your areas of interest?",
         type: "text",
         userTypeIncluders: ["High Schooler", "Alumni"],
         required: true,
+        // TODO: steal Jose's code
         placeholder: "E.g. 'finance, data analytics'",
       },
       {
@@ -28,7 +57,7 @@ export default function BasicInfoModal({visibility,onClose,userType}){
         id: "dreamColleges",
         text: "What are your dream colleges?",
         type: "select",
-        // change this later to an actual searchable list
+        // TODO: change this later to an actual searchable list
         options: ["Select Colleges", "Carnegie", "Princton", "Stanford", "Harvard", "etc..."],
         userTypeIncluders: ["High Schooler"],
         required: true,
@@ -37,7 +66,7 @@ export default function BasicInfoModal({visibility,onClose,userType}){
         id: "acceptedColleges",
         text: "What colleges have you been accepted into?",
         type: "select",
-        // change this later to an actual searchable list
+        // TODO: change this later to an actual searchable list
         options: ["Select Colleges", "Carnegie", "Princton", "Stanford", "Harvard", "etc..."],
         userTypeIncluders: ["High Schooler", "Alumni"],
         required: false,
@@ -55,7 +84,6 @@ export default function BasicInfoModal({visibility,onClose,userType}){
         id: "industryOfExperience",
         text: "Primary industry of work:",
         type: "text",
-        // change this later to an actual searchable list
         userTypeIncluders: ["Professional"],
         required: true,
         placeholder: "",
@@ -65,7 +93,6 @@ export default function BasicInfoModal({visibility,onClose,userType}){
         text: "Years of experience:",
         type: "number",
         placeholder: "E.g. '40'",
-        // change this later to an actual searchable list
         userTypeIncluders: ["Professional"],
         required: true,
       },
@@ -74,7 +101,6 @@ export default function BasicInfoModal({visibility,onClose,userType}){
         text: "What is/was your highest position?",
         type: "text",
         placeholder: "",
-        // change this later to an actual searchable list
         userTypeIncluders: ["Professional"],
         required: true,
       },
@@ -155,9 +181,9 @@ export default function BasicInfoModal({visibility,onClose,userType}){
             <form style={{width: "800px", display: "flex", gap: "20px", flexDirection: "column"}}>
               {questionsForUser.map((question,index) => (
                   <div key={question.id} style={{display: "flex", justifyContent: "space-between"}}>
-                    <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
+                    <div style={{position: "relative"}}>
                       <label htmlFor="areasOfInterest">{question.text}</label>
-                      {!question.required &&<span style={{color: "var(--secondary)"}}>(optional)</span>}
+                      {!question.required && <OptionalNotice/>}
                     </div>
                     {question.type !== "select" ? 
                     <input 
