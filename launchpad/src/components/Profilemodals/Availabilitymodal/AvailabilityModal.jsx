@@ -113,7 +113,7 @@ export default function AvailabilityModal({visibility, onClose, userType}){
                 </header>
                 <main style={{width: "850px"}}>
                 <div style={{textAlign: "center"}}>
-                    <span style={{color: "black", fontSize: "30px", fontWeight: "450", lineHeight: "1.3"}}> Via Launchpad, {userType !== "Professional" ? "high schoolers" : "high schoolers and college students"} will have the opportunity <br /> to connect with you. <br /> <span style={{fontSize: "smaller", fontWeight: "350", color: "var(--secondary)"}}>What are you open to doing for these students?</span></span>
+                    <span style={{color: "black", fontSize: "30px", fontWeight: "450", lineHeight: "1.3"}}> {userType !== "Professional" ? "High schoolers" : "High schoolers and college students"} will have the opportunity to connect with you via Launchpad. <br /> <span style={{fontSize: "smaller", fontWeight: "350", color: "var(--secondary)"}}>What are you open to doing for these students?</span></span>
                     <div style={{padding: "2% 5%"}}>
                     <div style={{textAlign: "left", boxShadow: "var(--shadowColor)", padding: "13px 20px", backgroundColor: "var(--neutral)", borderRadius: "15px"}}>
                         <div style={{display: "flex", flexDirection: "column", gap: "25px"}}>
