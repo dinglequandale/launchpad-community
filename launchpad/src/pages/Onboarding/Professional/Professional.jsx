@@ -225,7 +225,7 @@ const LastPage = ({ selectedOptions, handleChange }) => {
         question={professionalQuestionsConfig[8].text}
         options={professionalQuestionsConfig[8].options}
         selectedOption={uploadStatus || ''}
-        onChange={(value) => handleChange('resumeOrDescription', value === "File upload" ? { type: 'file' } : { type: 'text' })}
+        onChange={(value) => handleChange('resumeOrDescription', value === "File upload" ? { type: 'file' } : (value === "Write \"about me\" instead" ? { type: 'text' } : ''))}
         type={professionalQuestionsConfig[8].type}
       />
       {uploadStatus === "File upload" && (
