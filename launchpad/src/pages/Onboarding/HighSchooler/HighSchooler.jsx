@@ -3,9 +3,6 @@ import OnboardingDropdown from '../../../components/OnboardingDropdown/Onboardin
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
 import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
 
-// Fetch college list from Firebase
-const colleges = getColleges();
-
 const highSchoolQuestionsConfig = [
   // Page 1
   {
@@ -51,19 +48,22 @@ const highSchoolQuestionsConfig = [
     id: "collegeInterests",
     text: "What colleges are you interested in attending after highschool?",
     type: "multi-select",
-    options: colleges,
+    options: [], // Will fill this in later from Firebase
     page: 3  
   },
   {
     id: "collegeAttending",
     text: "What college will you be attending?",
     type: "select",
-    options: colleges,
+    options: [], // Will fill this in later from Firebase
     page: 3  
   }
 ];
 
 export default function HighSchooler() {
+  // Fetch college list from Firebase
+  const colleges = getColleges();
+
   const numOfSections = 3;
   const [currentPage, setCurrentPage] = useState(1);
   const [highSchoolerData, setHighSchoolerData] = useState({
@@ -90,7 +90,7 @@ export default function HighSchooler() {
       case 2:
         return <FirstPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} pageNum={2} />;
       case 3:
-        return <LastPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} />;
+        return <LastPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} colleges={colleges} />;
       default:
         return null;
     }
@@ -127,7 +127,7 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
   );
 };
 
-const LastPage = ({ selectedOptions, handleChange }) => {
+const LastPage = ({ selectedOptions, handleChange, colleges }) => {
   const questions = highSchoolQuestionsConfig.filter(question => question.page === 3);
 
   const collegeDecision = selectedOptions['collegeDecision'];
@@ -145,7 +145,7 @@ const LastPage = ({ selectedOptions, handleChange }) => {
         <OnboardingDropdown
           question={questions[1].text}
           options={questions[1].options}
-          selectedOption={selectedOptions['collegeInterests'] || []}
+          selectedOption={colleges || []}
           onChange={(value) => handleChange('collegeInterests', value)}
           type={questions[1].type}
         />
@@ -154,7 +154,7 @@ const LastPage = ({ selectedOptions, handleChange }) => {
         <OnboardingDropdown
           question={questions[2].text}
           options={questions[2].options}
-          selectedOption={selectedOptions['collegeAttending'] || ''}
+          selectedOption={colleges || ''}
           onChange={(value) => handleChange('collegeAttending', value)}
           type={questions[2].type}
         />

@@ -9,7 +9,7 @@ const collegeStudentQuestionsConfig = [
     id: "whatCollege",
     text: "What college do you go to?",
     type: "select",
-    options: getColleges(),
+    options: [], // Fill this in later
     page: 1,
   },
   {
@@ -45,6 +45,9 @@ const collegeStudentQuestionsConfig = [
 ];
 
 export default function CollegeStudent() {
+  // Fetch college list from Firebase
+  const colleges = getColleges();
+
   const numOfSections = 2;
   const [currentPage, setCurrentPage] = useState(1);
   const [collegeStudentData, setCollegeStudentData] = useState({
@@ -70,12 +73,12 @@ export default function CollegeStudent() {
           setCurrentPage={setCurrentPage}
           showLast={true}
       />
-      <FirstPage selectedOptions={collegeStudentData} handleChange={handleDropdownChange} pageNum={currentPage} />
+      <FirstPage selectedOptions={collegeStudentData} handleChange={handleDropdownChange} pageNum={currentPage} colleges={colleges} />
     </div>
   );
 };
 
-const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
+const FirstPage = ({ selectedOptions, handleChange, pageNum, colleges }) => {
     return (
       <div>
         {collegeStudentQuestionsConfig.filter(question => question.page === pageNum)
@@ -83,7 +86,7 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
           <OnboardingDropdown
             key={question.id}
             question={question.text}
-            options={question.options}
+            options={question.id === 'whatCollege' ? colleges : question.options}
             selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
             onChange={(value) => handleChange(question.id, value)}
             type={question.type}
