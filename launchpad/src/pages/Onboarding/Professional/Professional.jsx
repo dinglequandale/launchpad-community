@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
-import careerInterests from './../Options';
+import { careerInterests } from './../Options';
 
 const professionalQuestionsConfig = [
   // Page 1
@@ -9,7 +9,7 @@ const professionalQuestionsConfig = [
     id: "retiredStatus",
     text: "Are you currently retired?",
     type: "select",
-    options: ["Yes", "No"],
+    options: ["Yes", "No"].map(option => ({ value: option, label: option })),
     page: 1,
   },
   // If yes
@@ -22,7 +22,7 @@ const professionalQuestionsConfig = [
         "Geoscientist",
         "Drilling Engineer",
         "Production Manager"
-    ],
+    ].map(option => ({ value: option, label: option })),
     page: 1,
   },
   {
@@ -49,7 +49,7 @@ const professionalQuestionsConfig = [
         "Geoscientist",
         "Drilling Engineer",
         "Production Manager"
-    ],
+    ].map(option => ({ value: option, label: option })),
     page: 1
   },
   {
@@ -82,7 +82,7 @@ const professionalQuestionsConfig = [
         "Project Support",
         "Mentorship",
         "Workplace Opportunities"
-    ],
+    ].map(option => ({ value: option, label: option })),
     page: 2
   },
 
@@ -92,7 +92,7 @@ const professionalQuestionsConfig = [
     text: "Almost done! Please upload any recent resume of yours as a PDF. Resumes will be public so students \
         can understand more about you and your experiences in the simplest way. You may cut out your contact info if you’d like.",
     type: "select",
-    options: ["File upload", "Skip for now", "Write \"about me\" instead"],
+    options: ["File upload", "Skip for now", "Write \"about me\" instead"].map(option => ({ value: option, label: option })),
     page: 3
   }
 ];

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
-import { highSchools, careerInterests, graduationYears } from './../Options';
+import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
 
 const collegeStudentQuestionsConfig = [
   // Page 1
@@ -9,11 +9,7 @@ const collegeStudentQuestionsConfig = [
     id: "whatCollege",
     text: "What college do you go to?",
     type: "select",
-    options: [
-        "Harvard",
-        "Yale",
-        "UT Austin"
-    ],
+    options: getColleges(),
     page: 1,
   },
   {
@@ -34,7 +30,7 @@ const collegeStudentQuestionsConfig = [
     id: "whatSection",
     text: "Were you part of the French or International Section?",
     type: "select",
-    options: ["French", "International"],
+    options: ["French", "International"].map(option => ({ value: option, label: option })),
     page: 1,
   },
 

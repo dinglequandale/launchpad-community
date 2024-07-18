@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
-import { highSchools, careerInterests, graduationYears } from './../Options';
+import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
+
+// Fetch college list from Firebase
+const colleges = getColleges();
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -23,7 +26,7 @@ const highSchoolQuestionsConfig = [
     id: "whatSection",
     text: "Are you part of the French or International Section?",
     type: "select",
-    options: ["French", "International"],
+    options: ["French", "International"].map(option => ({ value: option, label: option })),
     page: 1,
   },
 
@@ -41,29 +44,21 @@ const highSchoolQuestionsConfig = [
     id: "collegeDecision",
     text: "Have you decided what college you will attend after highschool?",
     type: "select",
-    options: ["Yes", "No"],
+    options: ["Yes", "No"].map(option => ({ value: option, label: option })),
     page: 3
   },
   {
     id: "collegeInterests",
     text: "What colleges are you interested in attending after highschool?",
     type: "multi-select",
-    options: [
-        "Harvard",
-        "Yale",
-        "UT Austin"
-    ],
+    options: colleges,
     page: 3  
   },
   {
     id: "collegeAttending",
     text: "What college will you be attending?",
     type: "select",
-    options: [
-        "Harvard",
-        "Yale",
-        "UT Austin"
-    ],
+    options: colleges,
     page: 3  
   }
 ];

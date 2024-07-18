@@ -1,3 +1,6 @@
+import { db } from '../../firebase/firebaseConfig';
+import { useState, useEffect } from 'react';
+
 const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
     { "value": "bellaire_high", "label": "Bellaire High School" },
@@ -103,4 +106,24 @@ for (let year = 1990; year <= 2028; year++) {
     graduationYears.push({ value: year, label: year.toString() });
 }
 
-export { highSchools, careerInterests, graduationYears };
+const getColleges = () => {
+    const [colleges, setColleges] = useState([]);
+
+    useEffect(() => {
+        const fetchColleges = async () => {
+        const collegeData = [];
+        const snapshot = await db.collection('colleges').get();
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            collegeData.push({ label: data.label, value: data.value });
+        });
+        setColleges(collegeData);
+        };
+
+        fetchColleges();
+    }, []);
+
+    return colleges;
+};
+
+export { highSchools, careerInterests, graduationYears, getColleges };
