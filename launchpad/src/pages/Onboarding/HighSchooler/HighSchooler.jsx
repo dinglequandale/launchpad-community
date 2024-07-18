@@ -144,8 +144,8 @@ const LastPage = ({ selectedOptions, handleChange, colleges }) => {
       {collegeDecision === 'Yes' && (
         <OnboardingDropdown
           question={questions[1].text}
-          options={questions[1].options}
-          selectedOption={colleges || []}
+          options={colleges}
+          selectedOption={selectedOptions['collegeInterests'] || []}
           onChange={(value) => handleChange('collegeInterests', value)}
           type={questions[1].type}
         />
@@ -153,8 +153,8 @@ const LastPage = ({ selectedOptions, handleChange, colleges }) => {
       {collegeDecision === 'No' && (
         <OnboardingDropdown
           question={questions[2].text}
-          options={questions[2].options}
-          selectedOption={colleges || ''}
+          options={colleges}
+          selectedOption={selectedOptions['collegeAttending'] || ''}
           onChange={(value) => handleChange('collegeAttending', value)}
           type={questions[2].type}
         />
