@@ -1,4 +1,5 @@
 import { db } from '../../firebase/firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 
 const highSchools = [
@@ -108,21 +109,21 @@ for (let year = 1990; year <= 2028; year++) {
 
 const getColleges = () => {
     const [colleges, setColleges] = useState([]);
-
+  
     useEffect(() => {
-        const fetchColleges = async () => {
+      const fetchColleges = async () => {
         const collegeData = [];
-        const snapshot = await db.collection('colleges').get();
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            collegeData.push({ label: data.label, value: data.value });
+        const querySnapshot = await getDocs(collection(db, "colleges"));
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          collegeData.push({ label: data.label, value: data.value });
         });
         setColleges(collegeData);
-        };
-
-        fetchColleges();
+      };
+  
+      fetchColleges();
     }, []);
-
+  
     return colleges;
 };
 
