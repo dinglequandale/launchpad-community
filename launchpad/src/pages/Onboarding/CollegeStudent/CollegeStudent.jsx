@@ -49,29 +49,35 @@ const collegeStudentQuestionsConfig = [
 ];
 
 export default function CollegeStudent() {
-    const numOfSections = 2;
-    const [currentPage, setCurrentPage] = useState(1);
-    const [selectedOptions, setSelectedOptions] = useState({});
-  
-    const handleDropdownChange = (id, value) => {
-      setSelectedOptions(prevState => ({
-        ...prevState,
-        [id]: value,
-      }));
-    };
-  
-    return (
-      <div>
-        <ProgressBar
-            numOfSections={numOfSections}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            showLast={true}
-        />
-        <FirstPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={currentPage} />
-      </div>
-    );
+  const numOfSections = 2;
+  const [currentPage, setCurrentPage] = useState(1);
+  const [collegeStudentData, setCollegeStudentData] = useState({
+    whatCollege: '',
+    whatSchool: '',
+    graduationYer: '',
+    whatSection: '',
+    dreamCareer: []
+  });
+
+  const handleDropdownChange = (id, value) => {
+    setCollegeStudentData(prevState => ({
+      ...prevState,
+      [id]: value,
+    }));
   };
+
+  return (
+    <div>
+      <ProgressBar
+          numOfSections={numOfSections}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          showLast={true}
+      />
+      <FirstPage selectedOptions={collegeStudentData} handleChange={handleDropdownChange} pageNum={currentPage} />
+    </div>
+  );
+};
 
 const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
     return (

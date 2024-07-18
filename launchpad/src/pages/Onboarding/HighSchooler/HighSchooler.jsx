@@ -71,10 +71,18 @@ const highSchoolQuestionsConfig = [
 export default function HighSchooler() {
   const numOfSections = 3;
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedOptions, setSelectedOptions] = useState({});
+  const [highSchoolerData, setHighSchoolerData] = useState({
+    whatSchool: '',
+    graduationYear: '',
+    whatSection: '',
+    dreamCareer: [],
+    collegeDecision: '',
+    collegeInterests: [],
+    collegeAttending: ''
+  });
 
   const handleDropdownChange = (id, value) => {
-    setSelectedOptions(prevState => ({
+    setHighSchoolerData(prevState => ({
       ...prevState,
       [id]: value,
     }));
@@ -83,11 +91,11 @@ export default function HighSchooler() {
   const renderPage = () => {
     switch (currentPage) {
       case 1:
-        return <FirstPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={1} />;
+        return <FirstPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} pageNum={1} />;
       case 2:
-        return <FirstPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} pageNum={2} />;
+        return <FirstPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} pageNum={2} />;
       case 3:
-        return <LastPage selectedOptions={selectedOptions} handleChange={handleDropdownChange} />;
+        return <LastPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} />;
       default:
         return null;
     }
