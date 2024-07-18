@@ -5,7 +5,7 @@ import SideNav from "../../components/Sidenav/SideNav";
 import TopBar from "../../components/Topbar/TopBar";
 import OrganizationProfile from "../../components/Organizationprofile/OrganizationProfile";
 import { db } from "../../firebase/firebaseConfig";
-import { collection, getDocs, query } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import NoResults, { EmptyField } from "../../components/NoResultsnotifier/NoResults";
 import Loading from "../../components/LoadingAnimation/Loading";
 

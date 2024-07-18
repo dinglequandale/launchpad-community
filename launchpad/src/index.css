@@ -166,6 +166,10 @@ button {
   display: inline-block;
 }
 
+.diff-color{
+  color: var(--secondary);
+}
+
 .btnText:hover{
   background-color: transparent;
   color: var(--highlight);

@@ -76,7 +76,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     organizationTags: "",
     learnMore: 'Messages',
     apply: 'Messages',
-    organizationLogoPreview: "",
+    organizationLogoPreview: null,
   });
 
   useEffect(() => {
