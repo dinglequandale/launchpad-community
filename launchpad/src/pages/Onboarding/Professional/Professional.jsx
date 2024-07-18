@@ -105,7 +105,7 @@ const professionalQuestionsConfig = [
 
   // Page 3
   {
-    id: "uploadResume",
+    id: "resumeOrDescription",
     text: "Almost done! Please upload any recent resume of yours as a PDF. Resumes will be public so students \
         can understand more about you and your experiences in the simplest way. You may cut out your contact info if you’d like.",
     type: "select",
@@ -123,7 +123,7 @@ export default function Professional() {
     companyName: '',
     workFields: [],
     networkingLevel: [],
-    uploadResume: null
+    resumeOrDescription: null
   });
 
   const handleDropdownChange = (id, value) => {
@@ -215,28 +215,36 @@ const SecondPage = ({ selectedOptions, handleChange }) => {
 };
 
 const LastPage = ({ selectedOptions, handleChange }) => {
-    const uploadStatus = selectedOptions['uploadResume'];
+  const uploadStatus = selectedOptions['resumeOrDescription']?.type === 'file'
+    ? "File upload"
+    : (selectedOptions['resumeOrDescription']?.type === 'text' ? "Write \"about me\" instead" : '');
 
-    return (
-      <div>
-        <OnboardingDropdown
-          question={professionalQuestionsConfig[8].text}
-          options={professionalQuestionsConfig[8].options}
-          selectedOption={selectedOptions['uploadResume'] || ''}
-          onChange={(value) => handleChange('uploadResume', value)}
-          type={professionalQuestionsConfig[8].type}
+  return (
+    <div>
+      <OnboardingDropdown
+        question={professionalQuestionsConfig[8].text}
+        options={professionalQuestionsConfig[8].options}
+        selectedOption={uploadStatus || ''}
+        onChange={(value) => handleChange('resumeOrDescription', value === "File upload" ? { type: 'file' } : { type: 'text' })}
+        type={professionalQuestionsConfig[8].type}
+      />
+      {uploadStatus === "File upload" && (
+        <form>
+          <h1>Resume Upload</h1>
+          <input 
+            type="file" 
+            onChange={(e) => handleChange('resumeOrDescription', { type: 'file', file: e.target.files[0] })}
+          />
+          <button type="submit">Upload</button>
+        </form>
+      )}
+      {uploadStatus === "Write \"about me\" instead" && (
+        <input 
+          type="text" 
+          value={selectedOptions['resumeOrDescription']?.text || ''}
+          onChange={(e) => handleChange('resumeOrDescription', { type: 'text', text: e.target.value })}
         />
-        {uploadStatus === "File upload" && (
-            // TODO: Add file handler
-            <form>
-                <h1>Resume Upload</h1>
-                <input type="file" />
-                <button type="submit">Upload</button>
-            </form>       
-        )}
-        {uploadStatus === "Write \"about me\" instead" && (
-            <input type="text" />
-        )}
-      </div>
-    );
+      )}
+    </div>
+  );
 };
