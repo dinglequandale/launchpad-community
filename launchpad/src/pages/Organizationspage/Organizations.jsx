@@ -14,25 +14,27 @@ export default function Organizations(){
     const [organizationsData, setOrganizationsData] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(()=>{
-        const loadAllOpportunities = async () => {
-            const opportunitiesRef = collection(db, "opportunities");
-            try {
-                setLoading(true);
-                const opportunitiesSnapshot = await getDocs(opportunitiesRef);
-                setOrganizationsData(opportunitiesSnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })))
-    
-            } catch (error) {
-                console.log("Error fetching all opportunities:", error);
-            } finally {
-                setLoading(false)
-            }
+    useEffect(() => {
+        const opportunitiesRef = collection(db, "opportunities");
+        setLoading(true);
+      
+        const unsubscribe = onSnapshot(opportunitiesRef, 
+          (snapshot) => {
+            const opportunitiesData = snapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            setOrganizationsData(opportunitiesData);
+            setLoading(false);
+          },
+          (error) => {
+            console.log("Error fetching opportunities:", error);
+            setLoading(false);
           }
-        loadAllOpportunities();
-    },[])
+        );
+      
+        return () => unsubscribe();
+      }, []);
 
     useEffect(()=>{
         console.log(organizationsData)
