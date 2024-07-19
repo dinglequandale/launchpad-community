@@ -5,9 +5,13 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import SideNav from '../../components/Sidenav/SideNav';
 import ProfileModal from '../../components/Profilemodal/ProfileModal';
-import { useState, useEffect, useContext, createContext } from 'react';
+import { useState, useEffect, useContext, createContext, useRef } from 'react';
 import TopBar from "../../components/Topbar/TopBar";
 import SearchBar from "../../components/Searchbar/SearchBar";
+import { motion, AnimatePresence } from 'framer-motion';
+import OrganizationProfile from "../../components/Organizationprofile/OrganizationProfile";
+import { GrNext, GrPrevious } from "react-icons/gr";
+
 
 const NetworkContext = createContext();
 
@@ -46,7 +50,9 @@ export default function UserNetwork() {
     {id: 2, userName: "Ting Skra", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}, 
     {id: 3, userName: "Glug But", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}, 
     {id: 4, userName: "EWEEW", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"},
-    {id: 5, userName: "BuFOFOFbba", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}];
+    {id: 5, userName: "EWEEWoiewfopzewoifoew", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"},
+    {id: 6, userName: "EWEEewoifoew", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"},
+    {id: 7, userName: "EWEfoew", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}];
 
     useEffect(() => {
       if (profileModalVisibility) {
@@ -90,47 +96,66 @@ export default function UserNetwork() {
 }
 
 function UserCarousel({userNetworkData}){
-
-  const CustomArrow = ({ className, style, onClick, direction }) => (
-    <div
-      className={className}
-      style={{ ...style, display: 'block'}}
-      onClick={onClick}
-    >
-      {direction === 'next' ? '>' : '<'}
-    </div>
-  );
-
   const handleOnProfileClick = useContext(NetworkContext);
+  const itemsPerPage = 3;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState('');
+  const carouselRef = useRef(null);
 
-  // const settings = {
-  //         dots: false,
-  //         infinite: true,
-  //         speed: 500,
-  //         slidesToShow: 3,
-  //         slidesToScroll: 1,
-  //         centerPadding: '0px'
-  //       };
-        const settings = {
-          dots: false,
-          infinite: true,
-          speed: 500,
-          slidesToShow: 3,
-          slidesToScroll: 1,
-          prevArrow: <CustomArrow direction="prev" />,
-          nextArrow: <CustomArrow direction="next" />
-        };
-      
-  //TODO: curr localStorage; transition this to firebase!!! all messed up
+  useEffect(() => {
+    if (carouselRef.current) {
+      const itemWidth = carouselRef.current.offsetWidth / itemsPerPage;
+      const offset = currentIndex * (itemWidth);
+      carouselRef.current.style.transform = `translateX(-${offset}px)`;
+    }
+  }, [currentIndex, itemsPerPage]);
+
+
+
+  const nextSlide = () => {
+    setSlideDirection('slide-left');
+    setCurrentIndex(prevIndex => 
+      Math.min(prevIndex + 1, userNetworkData.length - itemsPerPage)
+    );
+  };
+
+  const prevSlide = () => {
+    setSlideDirection('slide-right');
+    setCurrentIndex(prevIndex => 
+      Math.max(prevIndex - 1, 0)
+    );
+  };
+
   return (
-    <>
-    <div style={{width: "1050px", margin: "0 auto"}}>
-      <Slider {...settings}>
-        {userNetworkData.map((profile) => (
-                <UserCard key={profile.id} userData={profile} onProfileClick={handleOnProfileClick}/>
-                ))}
-      </Slider>
+    <div className="carousel" style={{width: "1022px", margin: "0 auto"}}>
+      <div className="carousel-container">
+        <div
+          className={`carousel-content ${slideDirection}`}
+          onAnimationEnd={() => setSlideDirection('')}
+          ref={carouselRef}
+        >
+          {userNetworkData.map((profile, index) => (
+            <div key={index} className="carousel-item">
+              <UserCard userData={profile} onProfileClick={handleOnProfileClick}/>
+            </div>
+          ))}
+        </div>
+      </div>
+      
+      <button 
+        className="carousel-button prev" 
+        onClick={prevSlide}
+        disabled={currentIndex === 0}
+      >
+        <GrPrevious color="var(--accent)"/>
+      </button>
+      <button 
+        className="carousel-button next" 
+        onClick={nextSlide}
+        disabled={currentIndex + itemsPerPage >= userNetworkData.length}
+      >
+        <GrNext color="var(--accent)"/>
+      </button>
     </div>
-  </>
   )
 }

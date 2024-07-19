@@ -3,8 +3,8 @@
     display: flex;
     width: 60%; 
     padding: 10px;
-    background: var(--accent);
-    background: linear-gradient(335deg, var(--neutral) 0%, rgba(255,255,255,1) 100%);
+    background: rgb(255,255,255);
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(209,228,230,1) 100%);
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     margin: 0 auto;
@@ -20,17 +20,42 @@
     width: 95%;
 }
 
+
+.organizationInfo.contracted{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    line-clamp: 8;
+    -webkit-line-clamp: 8;
+    line-height: 1;
+    overflow: hidden;
+    transition: all 0.5s ease-out;
+}
+
+  .organizationInfo.expanded {
+    padding-bottom: px;
+    display: block;
+    line-height: 1.1;
+    max-height: none;
+    background: none;
+    transition: all 0.5s ease-out;
+  }
+  
+
+.organizationInfo.contracted::before{
+    transition: all 0.5s ease-out;
+    content: "";
+    position: absolute;
+    height: 2em;
+    width: 100%;
+    bottom: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, rgba(209,228,230,1));
+}
+
 .btnOrganizationLearnMore{
     padding: 5px;
-    background-color: var(--secondary);
     border-radius: 2px;
     width: 75%;
-    margin: 0 auto; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: aliceblue;
 }
 
 .btnOrganizationConnect{
@@ -38,15 +63,15 @@
     background-color: var(--primary);
     border-radius: 2px;
     width: 75%;
-    margin: 0 auto; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
     color: black;
     border-style: solid;
     border-color: black;
     border-width: 1px;
+}
+
+.organizationDescription{
+    font-size: 14px;
+   line-height: 1;
 }
 
 .logisticOption{
@@ -72,5 +97,5 @@
     width: 145px;
     height: 145px;
     object-fit: cover;
-    left: 0;
+    
 }

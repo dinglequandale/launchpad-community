@@ -37,34 +37,28 @@ const uploadImage = async (file, opportunityId) => {
   return getDownloadURL(storageRef);
 };
 
-export const loadOpportunities = (currentUser, setLoading, setOpportunities) => {
+export const loadOpportunities = (user, setLoading, setOpportunities) => {
   const opportunitiesRef = collection(db, "opportunities");
-  const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", currentUser.uid));
+  const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", user.uid));
   
   return onSnapshot(qUserOpportunity, async (querySnapshot) => {
-    try {
-      setLoading(true);
-      const opportunitiesArray = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+    setLoading(true);
+    const opportunitiesArray = querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
 
-      // we only need this for one opportunity, but easier to expand for the future
-      const opportunitiesWithLogos = await Promise.all(opportunitiesArray.map(async (opportunity) => {
-        const logoDisplay = await loadOpportunityLogo(opportunity.id);
-        console.log(`Logo URL for opportunity ${opportunity.id}:`, logoDisplay);
-        return { ...opportunity, organizationLogoPreview: logoDisplay };
-      }));
+    // we only need this for one opportunity, but easier to expand for the future
+    const opportunitiesWithLogos = await Promise.all(opportunitiesArray.map(async (opportunity) => {
+      const logoDisplay = await loadOpportunityLogo(opportunity.id);
+      return { ...opportunity, organizationLogoPreview: logoDisplay };
+    }));
 
-      setOpportunities(opportunitiesWithLogos[0]);
-    } catch (error) {
-      console.error("Error processing opportunities:", error);
-    }
-    finally {
-      setLoading(false);
-    }
+    setOpportunities(opportunitiesWithLogos[0]);
+    setLoading(false);
   }, (error) => {
-    console.error("Error getting user opportunities: ", error);
+    console.log("Error getting user opportunities: ", error);
+    setLoading(false);
   });
 };
 
@@ -92,26 +86,3 @@ export const handleDeleteOpportunity = async (opportunityId) => {
         return;
     }
 }
-
-// export const loadAllOpportunities = async (setLoading) => {
-//   const opportunitiesRef = collection(db, "opportunities");
-//   setLoading(true);
-
-//   const unsubscribe = onSnapshot(opportunitiesRef, 
-//     (snapshot) => {
-//       const opportunitiesData = snapshot.docs.map(doc => ({
-//         id: doc.id,
-//         ...doc.data()
-//       }));
-//       setLoading(false);
-//       return opportunitiesData;
-//     },
-//     (error) => {
-//       console.log("Error fetching opportunities:", error);
-//       setLoading(false);
-//       return null;
-//     }
-//   );
-
-//   return () => unsubscribe();
-// }

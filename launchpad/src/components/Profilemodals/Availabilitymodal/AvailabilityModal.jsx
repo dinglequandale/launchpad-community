@@ -15,6 +15,7 @@ export default function AvailabilityModal({visibility, onClose, userType}){
     }, [])
 
     const saveAvailabilityData = () => {
+        console.log(selectedOptions)
         localStorage.setItem("userAvailabilityData", JSON.stringify(selectedOptions));
         onClose();
     }

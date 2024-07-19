@@ -353,7 +353,7 @@ function AboutMeDisplay(){
 function ConnectionAvailability({userType}){
     const [availabilityModalVisibility, setAvailabilityModalVisibility] = useState(false);
     const [availabilityData, setAvailabilityData] = useState(null);
-    localStorage.clear()
+
     useEffect(()=>{
         const storedAvailabilityData = JSON.parse(localStorage.getItem("userAvailabilityData"));
         if(!Array.isArray(storedAvailabilityData)){
