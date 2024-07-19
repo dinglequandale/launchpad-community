@@ -16,13 +16,8 @@ const professionalQuestionsConfig = [
   {
     id: "companyPosition",
     text: "What was the last position you held?",
-    type: "select",
-    options: [
-        "Petroleum Engineer",
-        "Geoscientist",
-        "Drilling Engineer",
-        "Production Manager"
-    ].map(option => ({ value: option, label: option })),
+    type: "text-box",
+    options: null,
     page: 1,
   },
   {
@@ -43,13 +38,8 @@ const professionalQuestionsConfig = [
   {
     id: "companyPosition",
     text: "What is your current position?",
-    type: "select",
-    options: [
-        "Petroleum Engineer",
-        "Geoscientist",
-        "Drilling Engineer",
-        "Production Manager"
-    ].map(option => ({ value: option, label: option })),
+    type: "text-box",
+    options: null,
     page: 1
   },
   {

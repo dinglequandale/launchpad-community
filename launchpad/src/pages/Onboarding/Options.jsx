@@ -128,8 +128,8 @@ const getColleges = (searchQuery = '') => {
 
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        collegeData.push({ label: data.label, value: data.value });
+            const data = doc.data();
+            collegeData.push({ label: data.label, value: data.value });
         });
         setColleges(collegeData);
       };
@@ -138,6 +138,6 @@ const getColleges = (searchQuery = '') => {
     }, [searchQuery]);
   
     return colleges;
-  };
+};
 
 export { highSchools, careerInterests, graduationYears, getColleges };
