@@ -13,3 +13,63 @@ body.modal-open {
   .slick-next {
     right: 0 !important; /* Use !important to override Slick's styles */
     /* Add other styles as needed (e.g., top, transform) */
+
+
+.carousel {
+  position: relative;
+  width: 100%;
+}
+
+.carousel-container {
+  overflow: hidden;
+  width: 100%;
+  gap: 10px
+}
+
+.carousel-content {
+  display: flex;
+  transition: transform 0.5s ease;
+  width: 100%;
+}
+
+.carousel-item {
+  flex: 0 0 calc(33.333%);    /* Adjust this value based on your itemsPerPage */
+}
+
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  z-index: 10;
+}
+
+.carousel-button:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.carousel-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.carousel-button.prev {
+  left: -50px;
+}
+
+.carousel-button.next {
+  right: -43px;
+}
+
+.slide-left, .slide-right {
+  transition: transform 0.5s ease;
+}

@@ -23,7 +23,7 @@ export default function UserCard({userData, onProfileClick}) {
                 return "poo";
         }
     }
-    
+    console.log(userData)
     const [basicInfoData, setBasicInfoData] = useState({});
     // const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(null);
     // useEffect(() => {
@@ -47,7 +47,7 @@ export default function UserCard({userData, onProfileClick}) {
         <>
         <div className='networkProfileCard'>
             {bannerVisibility && <ConnectionBanner/>}
-            <button style={{position: "absolute", right: "3%"}} className="btnText" onClick={onProfileClick} userData = {userData}>
+            <button style={{position: "absolute", right: "3%"}} className="btnText" onClick={onProfileClick}>
                 See Profile
             </button>
             <div className='basicInfo'>
@@ -55,7 +55,7 @@ export default function UserCard({userData, onProfileClick}) {
                     <VscAccount size = {60} className='cardPfp'/>
                 </div>
                 <div className='cardNameDescription'>
-                    <span className='cardName'>{userName}</span>
+                    <span className='cardName'>{userData.userName}</span>
                     <span className='cardDescription'>{basicInfoContent.userPreface}</span>
                 </div>
                 </div>
