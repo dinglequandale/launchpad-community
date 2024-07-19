@@ -14,6 +14,8 @@ import "stream-chat-react/dist/css/index.css";
 import { useEffect, useState } from "react";
 import { getAuth } from 'firebase/auth';
 import Loading from '../components/LoadingAnimation/Loading';
+import TopBar from '../components/Topbar/TopBar';
+import SideNav from '../components/Sidenav/SideNav';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -57,19 +59,25 @@ export default function InitializeStream() {
     if(!client) return <Loading/>;
 
     return (
-        <Chat client={client} theme="messaging light">
-            <ChannelList
-            filters={filters}
-            sort={sort}
-            />
-            <Channel>
-                <Window>
-                    <ChannelHeader/>
-                    <MessageList/>
-                    <MessageInput/>
-                </Window>
-                <Thread/>
-            </Channel>
-        </Chat>
+        <>
+        <TopBar/>
+        <SideNav/>
+        <div style={{paddingTop: "3%", paddingLeft: "10%"}}>
+            <Chat client={client} theme="messaging light">
+                <ChannelList
+                filters={filters}
+                sort={sort}
+                />
+                <Channel>
+                    <Window>
+                        <ChannelHeader/>
+                        <MessageList/>
+                        <MessageInput/>
+                    </Window>
+                    <Thread/>
+                </Channel>
+            </Chat>
+        </div>
+        </>
     )
 }
