@@ -87,18 +87,27 @@ export default function OrganizationProfile({organizationData, location}){
                         <div className="organizationPfp">
                             <img src={organizationProfileData.organizationLogoPreview} style={{width: "100px", width: "145px", height: "145px"}}/>
                         </div>
-                        <div style={{padding: "0px 15px"}}>
-                        <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
-                            <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
-                            <span style={{fontWeight: "bold", color: "var(--secondary)", fontSize: "smaller"}}> {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
-                            <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>run by&nbsp;</span>
-                            <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px"}}>{organizationProfileData.organizationHost}</button>
-                            <br />
-                            <div style={{lineHeight: "1"}}>
-                                {organizationProfileData.organizationDescription}
+                        <div name="organizationContent" style={{padding: "0px 15px", paddingBottom: "11px", position: 'relative'}}>
+                            <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
+                                <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
+                                <span style={{fontWeight: "bold", color: "var(--secondary)", fontSize: "smaller"}}> {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
+                                <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>run by&nbsp;</span>
+                                <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px"}}>{organizationProfileData.organizationHost}</button>
+                                <br />
+                                <div style={{lineHeight: "1"}}>
+                                    {organizationProfileData.organizationDescription}
+                                </div>
                             </div>
-                        </div>
-                        <ReadMoreButton handleClick={handleReadMoreClick} isExpanded={isExpanded} isLessText={isLessText}/>
+                            <div style={{
+                                position: "absolute", 
+                                bottom: "-4px", 
+                                left: "15px", 
+                                width: "calc(100% - 30px)", 
+                                textAlign: "center",
+                                zIndex: 2
+                                }}>
+                                <ReadMoreButton handleClick={handleReadMoreClick} isExpanded={isExpanded} isLessText={isLessText}/>
+                            </div>
                         </div>
                     </div>
 

@@ -22,7 +22,6 @@
 
 
 .organizationInfo.contracted{
-    padding-bottom: 7px;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     line-clamp: 8;
@@ -33,7 +32,7 @@
 }
 
   .organizationInfo.expanded {
-    padding-bottom: 7px;
+    padding-bottom: px;
     display: block;
     line-height: 1.1;
     max-height: none;

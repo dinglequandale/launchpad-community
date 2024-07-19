@@ -11,7 +11,7 @@ export default function ReadMoreButton({isExpanded, handleClick, isLessText}){
 
     return(
         <>
-            {showButton && <button onClick={handleClick} className="btnText diff-color" style={{position: "absolute", right: "28%", bottom: "4px", fontSize: "14px", fontWeight: "bolder"}}>{isExpanded ? "Show less" : "Show more ..."}</button>}
+            {showButton && <button onClick={handleClick} className="btnText diff-color" style={{bottom: "4px", fontSize: "14px", fontWeight: "bolder"}}>{isExpanded ? "Show less" : "Show more ..."}</button>}
         </>
     )
 }
