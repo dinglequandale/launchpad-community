@@ -86,26 +86,3 @@ export const handleDeleteOpportunity = async (opportunityId) => {
         return;
     }
 }
-
-// export const loadAllOpportunities = async (setLoading) => {
-//   const opportunitiesRef = collection(db, "opportunities");
-//   setLoading(true);
-
-//   const unsubscribe = onSnapshot(opportunitiesRef, 
-//     (snapshot) => {
-//       const opportunitiesData = snapshot.docs.map(doc => ({
-//         id: doc.id,
-//         ...doc.data()
-//       }));
-//       setLoading(false);
-//       return opportunitiesData;
-//     },
-//     (error) => {
-//       console.log("Error fetching opportunities:", error);
-//       setLoading(false);
-//       return null;
-//     }
-//   );
-
-//   return () => unsubscribe();
-// }

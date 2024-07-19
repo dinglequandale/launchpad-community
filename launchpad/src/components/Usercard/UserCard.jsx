@@ -23,17 +23,7 @@ export default function UserCard({userData, onProfileClick}) {
                 return "poo";
         }
     }
-    console.log(userData)
     const [basicInfoData, setBasicInfoData] = useState({});
-    // const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(null);
-    // useEffect(() => {
-    //     const storedBasicInfoData = localStorage.getItem("userBasicInfo");
-    //     if (storedBasicInfoData !== null) {
-    //       setBasicInfoData(JSON.parse(storedBasicInfoData));
-    //     }
-    //     else{
-    //     }
-    //   }, [basicInfoModalVisibility,]);
 
     const basicInfoContent = {userPreface: userType === "Professional" ? `${basicInfoData.yearsOfExperience} years of experience in ${basicInfoData.industryOfExperience}`
     : userType === "Alumni" ? `Graduated with Class of [...]`

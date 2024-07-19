@@ -54,15 +54,8 @@
 
 .btnOrganizationLearnMore{
     padding: 5px;
-    background-color: var(--secondary);
     border-radius: 2px;
     width: 75%;
-    margin: 0 auto; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: aliceblue;
 }
 
 .btnOrganizationConnect{
@@ -70,11 +63,6 @@
     background-color: var(--primary);
     border-radius: 2px;
     width: 75%;
-    margin: 0 auto; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
     color: black;
     border-style: solid;
     border-color: black;

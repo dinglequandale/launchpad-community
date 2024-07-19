@@ -92,7 +92,7 @@ export default function OrganizationProfile({organizationData, location}){
                                 <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
                                 <span style={{fontWeight: "bold", color: "var(--secondary)", fontSize: "smaller"}}> {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
                                 <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>run by&nbsp;</span>
-                                <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px"}}>{organizationProfileData.organizationHost}</button>
+                                <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHost}</button>
                                 <br />
                                 <div style={{lineHeight: "1"}}>
                                     {organizationProfileData.organizationDescription}
@@ -121,8 +121,8 @@ export default function OrganizationProfile({organizationData, location}){
                     </div>}
                 </div>
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px"}}>
-                    <button className="btnOrganizationLearnMore" onClick={e => handleLearnMore(e)} disabled={isDisabled}> Learn More </button>
-                    <button className="btnOrganizationConnect" onClick={e => handleConnect(e)} disabled={isDisabled}> {organizationProfileData.organizationType==="Volunteering" ? "Volunteer" : ["Club","Nonprofit"].includes(organizationProfileData.organizationType) ? "Join" : "Connect"} </button>
+                    <button className="btnOrganizationLearnMore" onClick={e => handleLearnMore(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> Learn More </button>
+                    <button className="btnOrganizationConnect" onClick={e => handleConnect(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> {organizationProfileData.organizationType==="Volunteering" ? "Volunteer" : ["Club","Nonprofit"].includes(organizationProfileData.organizationType) ? "Join" : "Connect"} </button>
                 </div>
             </div>
         </>

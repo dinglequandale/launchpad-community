@@ -10,6 +10,7 @@ import TopBar from "../../components/Topbar/TopBar";
 import SearchBar from "../../components/Searchbar/SearchBar";
 import { motion, AnimatePresence } from 'framer-motion';
 import OrganizationProfile from "../../components/Organizationprofile/OrganizationProfile";
+import { GrNext, GrPrevious } from "react-icons/gr";
 
 
 const NetworkContext = createContext();
@@ -146,14 +147,14 @@ function UserCarousel({userNetworkData}){
         onClick={prevSlide}
         disabled={currentIndex === 0}
       >
-        &lt;
+        <GrPrevious color="var(--accent)"/>
       </button>
       <button 
         className="carousel-button next" 
         onClick={nextSlide}
         disabled={currentIndex + itemsPerPage >= userNetworkData.length}
       >
-        &gt;
+        <GrNext color="var(--accent)"/>
       </button>
     </div>
   )
