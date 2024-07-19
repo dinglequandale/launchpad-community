@@ -151,7 +151,7 @@ const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange
         onChange={(value) => handleChange('collegeDecision', value)}
         type={questions[0].type}
       />
-      {collegeDecision === 'Yes' && (
+      {collegeDecision === 'No' && (
         <OnboardingDropdown
           question={questions[1].text}
           options={colleges}
@@ -161,7 +161,7 @@ const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange
           onSearchQueryChange={onSearchQueryChange}
         />
       )}
-      {collegeDecision === 'No' && (
+      {collegeDecision === 'Yes' && (
         <OnboardingDropdown
           question={questions[2].text}
           options={colleges}
