@@ -12,6 +12,7 @@ import { AuthProvider } from './contexts/auth/AuthContext.jsx';
 import SignUp from './pages/Authentication/Signup.jsx';
 import Login from './pages/Authentication/Login.jsx';
 import LandingPage from './pages/landing_page/LandingPage.jsx';
+import InitializeStream from './Streamchat/streamChatConfig.jsx';
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,11 @@ const router = createBrowserRouter([
 {
   path: '/UserSchool',
   element: <UserSchool/>,
+  errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+},
+{
+  path: '/messages',
+  element: <InitializeStream/>,
   errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
 },
 {
