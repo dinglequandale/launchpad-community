@@ -62,7 +62,8 @@ const highSchoolQuestionsConfig = [
 
 export default function HighSchooler() {
   // Fetch college list from Firebase
-  const colleges = getColleges();
+  const [searchQuery, setSearchQuery] = useState('');
+  const colleges = getColleges(searchQuery);
 
   const numOfSections = 3;
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,6 +84,10 @@ export default function HighSchooler() {
     }));
   };
 
+  const handleSearchQueryChange = (query) => {
+    setSearchQuery(query);
+  };
+
   const renderPage = () => {
     switch (currentPage) {
       case 1:
@@ -90,7 +95,12 @@ export default function HighSchooler() {
       case 2:
         return <FirstPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} pageNum={2} />;
       case 3:
-        return <LastPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} colleges={colleges} />;
+        return <LastPage 
+                  selectedOptions={highSchoolerData} 
+                  handleChange={handleDropdownChange} 
+                  colleges={colleges}
+                  onSearchQueryChange={handleSearchQueryChange} 
+                />;
       default:
         return null;
     }
@@ -127,7 +137,7 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
   );
 };
 
-const LastPage = ({ selectedOptions, handleChange, colleges }) => {
+const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange }) => {
   const questions = highSchoolQuestionsConfig.filter(question => question.page === 3);
 
   const collegeDecision = selectedOptions['collegeDecision'];
@@ -148,6 +158,7 @@ const LastPage = ({ selectedOptions, handleChange, colleges }) => {
           selectedOption={selectedOptions['collegeInterests'] || []}
           onChange={(value) => handleChange('collegeInterests', value)}
           type={questions[1].type}
+          onSearchQueryChange={onSearchQueryChange}
         />
       )}
       {collegeDecision === 'No' && (
@@ -157,6 +168,7 @@ const LastPage = ({ selectedOptions, handleChange, colleges }) => {
           selectedOption={selectedOptions['collegeAttending'] || ''}
           onChange={(value) => handleChange('collegeAttending', value)}
           type={questions[2].type}
+          onSearchQueryChange={onSearchQueryChange}
         />
       )}
     </div>

@@ -1,5 +1,5 @@
 import { db } from '../../firebase/firebaseConfig';
-import { query, limit, collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, startAt, endAt, and } from 'firebase/firestore';
 import { useState, useEffect } from 'react';
 
 const highSchools = [
@@ -107,26 +107,42 @@ for (let year = 1990; year <= 2028; year++) {
     graduationYears.push({ value: year, label: year.toString() });
 }
 
-const getColleges = (limitCount = 10) => {
+const getColleges = (searchQuery = '') => {
     const [colleges, setColleges] = useState([]);
   
     useEffect(() => {
       const fetchColleges = async () => {
         const collegeData = [];
-        const q = query(collection(db, "colleges"), limit(limitCount));
-        const querySnapshot = await getDocs(q);
-
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          collegeData.push({ label: data.label, value: data.value });
-        });
-        setColleges(collegeData);
+        try {
+          let q = query(collection(db, "colleges"), orderBy('label'));
+          
+          if (searchQuery) {
+            q = query(
+              collection(db, "colleges"),
+              and(
+                startAt(searchQuery),
+                endAt(searchQuery + '~')
+              )
+            );
+            console.log(searchQuery)
+          } 
+  
+          const querySnapshot = await getDocs(q);
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            collegeData.push({ label: data.label, value: data.value });
+          });
+          setColleges(collegeData);
+          console.log("Fetched colleges:", collegeData); // Debugging log
+        } catch (error) {
+          console.error("Error fetching colleges:", error);
+        }
       };
   
       fetchColleges();
-    }, []);
+    }, [searchQuery]);
   
     return colleges;
-};
+  };
 
 export { highSchools, careerInterests, graduationYears, getColleges };
