@@ -113,30 +113,25 @@ const getColleges = (searchQuery = '') => {
     useEffect(() => {
       const fetchColleges = async () => {
         const collegeData = [];
-        try {
-          let q = query(collection(db, "colleges"), orderBy('label'));
-          
-          if (searchQuery) {
+
+        let q = query(collection(db, "colleges"), orderBy('label'));
+        
+        if (searchQuery) {
             q = query(
-              collection(db, "colleges"),
-              and(
-                startAt(searchQuery),
-                endAt(searchQuery + '~')
-              )
+                collection(db, "colleges"),
+                    and(
+                    startAt(searchQuery),
+                    endAt(searchQuery + '~')
+                )
             );
-            console.log(searchQuery)
-          } 
-  
-          const querySnapshot = await getDocs(q);
-          querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            collegeData.push({ label: data.label, value: data.value });
-          });
-          setColleges(collegeData);
-          console.log("Fetched colleges:", collegeData); // Debugging log
-        } catch (error) {
-          console.error("Error fetching colleges:", error);
-        }
+        } 
+
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        collegeData.push({ label: data.label, value: data.value });
+        });
+        setColleges(collegeData);
       };
   
       fetchColleges();

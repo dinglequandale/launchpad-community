@@ -46,7 +46,8 @@ const collegeStudentQuestionsConfig = [
 
 export default function CollegeStudent() {
   // Fetch college list from Firebase
-  const colleges = getColleges();
+  const [searchQuery, setSearchQuery] = useState('');
+  const colleges = getColleges(searchQuery);
 
   const numOfSections = 2;
   const [currentPage, setCurrentPage] = useState(1);
@@ -65,6 +66,10 @@ export default function CollegeStudent() {
     }));
   };
 
+  const handleSearchQueryChange = (query) => {
+    setSearchQuery(query);
+  };
+
   return (
     <div>
       <ProgressBar
@@ -73,12 +78,18 @@ export default function CollegeStudent() {
           setCurrentPage={setCurrentPage}
           showLast={true}
       />
-      <FirstPage selectedOptions={collegeStudentData} handleChange={handleDropdownChange} pageNum={currentPage} colleges={colleges} />
+      <FirstPage 
+        selectedOptions={collegeStudentData} 
+        handleChange={handleDropdownChange} 
+        pageNum={currentPage} 
+        colleges={colleges} 
+        onSearchQueryChange={handleSearchQueryChange} 
+      />
     </div>
   );
 };
 
-const FirstPage = ({ selectedOptions, handleChange, pageNum, colleges }) => {
+const FirstPage = ({ selectedOptions, handleChange, pageNum, colleges, onSearchQueryChange }) => {
     return (
       <div>
         {collegeStudentQuestionsConfig.filter(question => question.page === pageNum)
@@ -90,6 +101,7 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum, colleges }) => {
             selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
             onChange={(value) => handleChange(question.id, value)}
             type={question.type}
+            onSearchQueryChange={question.id === 'whatCollege' ? onSearchQueryChange : null}
           />
         ))}
       </div>
