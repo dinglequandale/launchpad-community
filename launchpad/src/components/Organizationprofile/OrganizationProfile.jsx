@@ -3,16 +3,21 @@ import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { RiGraduationCapLine } from "react-icons/ri";
 import { GoBriefcase } from "react-icons/go";
 import { SlCalender } from "react-icons/sl";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ProfileModal from "../Profilemodal/ProfileModal";
 import { useAuth } from "../../contexts/auth/AuthContext";
+import ReadMoreButton from "../ReadMorebutton/ReadMore";
 
 export default function OrganizationProfile({organizationData, location}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
     const [showPfpCard, setShowPfpCard] = useState(false);
     const [isDisabled, setIsDisabled] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isLessText, setIsLessText] = useState(false);
 
     const { currentUser } = useAuth();
+
+    const descRef = useRef();
 
     const organizationProfileData = {
         organizationName: organizationData.organizationName ?? organizationData.organizationHostCompany,
@@ -34,6 +39,11 @@ export default function OrganizationProfile({organizationData, location}){
         }
       }
 
+    useEffect(()=>{
+        if(descRef.current.clientHeight <= 16*8){
+            setIsLessText(true);
+        }
+    },[organizationProfileData.organizationDescription])
     
     // check if user can click on the available buttons or not
     useEffect(()=>{
@@ -60,23 +70,35 @@ export default function OrganizationProfile({organizationData, location}){
         // input learn more logic here
     }
 
+    const handleReadMoreClick = (e) => {
+        e.preventDefault();
+        setIsExpanded(!isExpanded);
+    }
+
+    console.log("Expanded:", isExpanded)
+
     return(
         <>
             {showPfpCard && <ProfileModal onClose={() => setShowPfpCard(false)}/>}
             <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : location === "user_profile" ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
                 {organizationProfileData.organizationRelevanceTags && <RelevanceBanner relevanceType={organizationProfileData.organizationRelevanceTags}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
-                    <div style={{display: "flex", position: "relative"}}>
+                    <div style={{display: "flex"}}>
                         <div className="organizationPfp">
                             <img src={organizationProfileData.organizationLogoPreview} style={{width: "100px", width: "145px", height: "145px"}}/>
                         </div>
-                        <div style={{padding: "0px 15px", lineHeight: "1.2"}}>
-                            <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.5"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
+                        <div style={{padding: "0px 15px"}}>
+                        <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
+                            <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
                             <span style={{fontWeight: "bold", color: "var(--secondary)", fontSize: "smaller"}}> {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
                             <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>run by&nbsp;</span>
                             <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px"}}>{organizationProfileData.organizationHost}</button>
                             <br />
-                            <span name="organizationDescription" style={{fontSize: "14px", lineHeight: "1"}}>{organizationProfileData.organizationDescription}</span>
+                            <div style={{lineHeight: "1"}}>
+                                {organizationProfileData.organizationDescription}
+                            </div>
+                        </div>
+                        <ReadMoreButton handleClick={handleReadMoreClick} isExpanded={isExpanded} isLessText={isLessText}/>
                         </div>
                     </div>
 
