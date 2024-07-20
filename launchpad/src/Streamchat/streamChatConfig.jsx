@@ -1,23 +1,13 @@
 import { StreamChat } from 'stream-chat';
-import {
-  Chat,
-  Channel,
-  Window,
-  ChannelHeader,
-  MessageList,
-  MessageInput,
-  Thread,
-  LoadingIndicator,
-  ChannelList
-} from "stream-chat-react";
-import "stream-chat-react/dist/css/index.css";
 import { useEffect, useState } from "react";
 import { getAuth } from 'firebase/auth';
 import Loading from '../components/LoadingAnimation/Loading';
 import TopBar from '../components/Topbar/TopBar';
 import SideNav from '../components/Sidenav/SideNav';
+import { CustomChat } from './CustomStream';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
+
 
 export default function InitializeStream() {
     
@@ -36,7 +26,7 @@ export default function InitializeStream() {
 
     useEffect(()=>{
     async function init() {
-        const chatClient = StreamChat.getInstance(apiKey);
+        const chatClient = new StreamChat(apiKey);
         if(currentUser){
             await chatClient.connectUser(user, chatClient.devToken(currentUser.uid));
             
@@ -63,20 +53,7 @@ export default function InitializeStream() {
         <TopBar/>
         <SideNav/>
         <div style={{paddingTop: "3%", paddingLeft: "10%"}}>
-            <Chat client={client} theme="messaging light">
-                <ChannelList
-                filters={filters}
-                sort={sort}
-                />
-                <Channel>
-                    <Window>
-                        <ChannelHeader/>
-                        <MessageList/>
-                        <MessageInput/>
-                    </Window>
-                    <Thread/>
-                </Channel>
-            </Chat>
+          <CustomChat filters={filters} sort={sort} client={client}/>
         </div>
         </>
     )

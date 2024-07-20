@@ -61,7 +61,7 @@ export default function UserNetwork() {
         document.body.classList.remove('modal-open');
       }
     }, [profileModalVisibility]);
-
+    
   return (
     <NetworkContext.Provider value={handleOnProfileClick}>
       <>
