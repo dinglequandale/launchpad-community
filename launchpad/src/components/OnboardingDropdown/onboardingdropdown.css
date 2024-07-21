@@ -1,0 +1,57 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom, #ffffff, #85c1e9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 400px;
+    text-align: center;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    font-size: 14px;
+    color: #34495e;
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .react-select-container .react-select__control {
+    border-color: #dcdcdc;
+    border-radius: 5px;
+    padding: 5px;
+  }
+  
+  .react-select-container .react-select__control:hover {
+    border-color: #b3c3d3;
+  }
+  
+  .continueButton {
+    width: 100%;
+    background: #3498db;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    color: white;
+    font-size: 16px;
+    margin: 20px 0;
+    cursor: pointer;
+  }
+  
+  .continueButton:disabled {
+    background: #b3c3d3;
+    cursor: not-allowed;
+  }
+  
