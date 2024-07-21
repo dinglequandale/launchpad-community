@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
 import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
@@ -48,6 +48,7 @@ export default function CollegeStudent() {
   // Fetch college list from Firebase
   const [searchQuery, setSearchQuery] = useState('');
   const colleges = getColleges(searchQuery);
+  const cachedColleges = useMemo(() => colleges, [colleges]);
 
   const numOfSections = 2;
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,7 +83,7 @@ export default function CollegeStudent() {
         selectedOptions={collegeStudentData} 
         handleChange={handleDropdownChange} 
         pageNum={currentPage} 
-        colleges={colleges} 
+        colleges={cachedColleges} 
         onSearchQueryChange={handleSearchQueryChange} 
       />
     </div>
