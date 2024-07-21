@@ -1,4 +1,5 @@
 import { StreamChat } from 'stream-chat';
+import { getStreamToken } from './setUpUser';
 
 const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -6,6 +7,14 @@ export async function sendConnectMessageWithoutResume(message, currentUserId, co
     const chat = new StreamChat(apiKey);
 
     if (!chat || !connectingUserId) return;
+
+    const userToken = await getStreamToken();
+
+    await chat.connectUser(
+        { id: currentUserId },
+        userToken
+    );
+    
 
     const newChannel = chat.channel("messaging", {
         members: [currentUserId, connectingUserId]
@@ -28,7 +37,7 @@ export async function sendConnectMessageWithoutResume(message, currentUserId, co
 export async function sendConnectMessageWithResume(message, resumeURL, metaData, currentUserId, connectingUserId, setChannelId){
     const chat = new StreamChat(apiKey);
 
-    
+
 
     if (!chat || !connectingUserId) return;
 
