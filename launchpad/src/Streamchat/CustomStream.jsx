@@ -84,7 +84,7 @@ const ChannelPreviewCustom = (props) => {
   );
 };
 
-export const CustomChat = ({client, filters, sort, channels}) => {
+export const CustomChat = ({client, filters, sort, channels, activeChannel, setActiveChannel}) => {
 
   console.log(channels)
 
@@ -103,6 +103,9 @@ export const CustomChat = ({client, filters, sort, channels}) => {
               // sort={sort}
               channels={channels}
               options={{ state: true, presence: true, limit: 10 }}
+              onSelect={(channel) => {
+                setActiveChannel(channel)
+              }}
               List={(listProps) => (
                 <ChannelList {...listProps} Preview={ChannelPreviewCustom} />
               )}
@@ -116,7 +119,7 @@ export const CustomChat = ({client, filters, sort, channels}) => {
                 subtitle="Select a contact from the list or start a new conversation."
               />
             ) : (
-              <Channel>
+              <Channel channel={activeChannel}>
               <Window>
                 <ChannelHeaderContainer>
                   <ChannelHeader />

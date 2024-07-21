@@ -7,8 +7,12 @@ import SideNav from '../Sidenav/SideNav';
 import { useState, useEffect, useRef } from 'react';
 import { FaLink } from 'react-icons/fa6';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
+import ConnectModal from '../Connectmodal/ConnectModal';
 
 export default function ProfileCard({user, onClose, top}) {
+
+    const [connectModalVisiblilty,setConnectModalVisibility] = useState(false);
+
     // TODO: currently localStorage, transition to database IMPORTANT
     const userType = "Professional";
     const userName = "Shuja Gupta";
@@ -18,6 +22,7 @@ export default function ProfileCard({user, onClose, top}) {
     const userPdfUrl = null;
     const resumePublicity = "Public";
     const userAvailability = ["Brug", "Sug", "Mug"];
+
 
     const tempUserOpportunity = {
         // initiative data format
@@ -81,6 +86,7 @@ export default function ProfileCard({user, onClose, top}) {
 
     return(
         <>
+            {connectModalVisiblilty && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} visibility={connectModalVisiblilty}/>}
             <div className='blurOverlay'>
                 <div className='profileModalContent' style={{ top: top }} ref={menuRef}>
                     <IoCloseOutline className='closeProfileModal' size={30} onClick={onClose}/>
@@ -101,7 +107,7 @@ export default function ProfileCard({user, onClose, top}) {
                                 {basicInfoData.acceptedColleges && <span>{basicInfoContent.acceptedColleges}</span>}
                             </div>
                         </div>
-                        <button style={{width: "80%", borderRadius: "5px", margin: "0 auto"}}> 
+                        <button style={{width: "80%", borderRadius: "5px", margin: "0 auto"}} onClick={()=>setConnectModalVisibility(true)}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>
