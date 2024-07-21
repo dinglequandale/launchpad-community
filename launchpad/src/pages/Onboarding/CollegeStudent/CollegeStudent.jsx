@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
 import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
+import { saveCollegeStudent } from '../../../services/onboardingServices';
 
 const collegeStudentQuestionsConfig = [
   // Page 1
@@ -60,15 +61,21 @@ export default function CollegeStudent() {
     dreamCareer: []
   });
 
-  const handleDropdownChange = (id, value) => {
+  const handleDropdownChange = (id, label) => {
     setCollegeStudentData(prevState => ({
       ...prevState,
-      [id]: value,
+      [id]: label,
     }));
   };
 
   const handleSearchQueryChange = (query) => {
     setSearchQuery(query);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await saveCollegeStudent(collegeStudentData);
+    alert('Data saved successfully');
   };
 
   return (
@@ -86,25 +93,30 @@ export default function CollegeStudent() {
         colleges={cachedColleges} 
         onSearchQueryChange={handleSearchQueryChange} 
       />
+      {currentPage == numOfSections && (
+        <button type="button" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: 'blue', color: 'white', fontSize: '16px' }}>
+          Submit
+        </button>
+      )}
     </div>
   );
 };
 
 const FirstPage = ({ selectedOptions, handleChange, pageNum, colleges, onSearchQueryChange }) => {
-    return (
-      <div>
-        {collegeStudentQuestionsConfig.filter(question => question.page === pageNum)
-                  .map((question) => (
-          <OnboardingDropdown
-            key={question.id}
-            question={question.text}
-            options={question.id === 'whatCollege' ? colleges : question.options}
-            selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-            onChange={(value) => handleChange(question.id, value)}
-            type={question.type}
-            onSearchQueryChange={question.id === 'whatCollege' ? onSearchQueryChange : null}
-          />
-        ))}
-      </div>
-    );
+  return (
+    <div>
+      {collegeStudentQuestionsConfig.filter(question => question.page === pageNum)
+                .map((question) => (
+        <OnboardingDropdown
+          key={question.id}
+          question={question.text}
+          options={question.id === 'whatCollege' ? colleges : question.options}
+          selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+          onChange={(label) => handleChange(question.id, label)}
+          type={question.type}
+          onSearchQueryChange={question.id === 'whatCollege' ? onSearchQueryChange : null}
+        />
+      ))}
+    </div>
+  );
 };

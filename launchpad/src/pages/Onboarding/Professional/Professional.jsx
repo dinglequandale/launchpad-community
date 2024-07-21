@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
 import { careerInterests } from './../Options';
+import { saveProfessional } from '../../../services/onboardingServices';
 
 const professionalQuestionsConfig = [
   // Page 1
@@ -99,11 +100,17 @@ export default function Professional() {
     resumeOrDescription: null
   });
 
-  const handleDropdownChange = (id, value) => {
+  const handleDropdownChange = (id, label) => {
     setProfessionalData(prevState => ({
       ...prevState,
-      [id]: value,
+      [id]: label,
     }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await saveProfessional(professionalData);
+    alert('Data saved successfully');
   };
 
   const renderPage = () => {
@@ -113,7 +120,14 @@ export default function Professional() {
       case 2:
         return <SecondPage selectedOptions={professionalData} handleChange={handleDropdownChange} />;
       case 3:
-        return <LastPage selectedOptions={professionalData} handleChange={handleDropdownChange} />;
+        return (
+          <>
+            <LastPage selectedOptions={professionalData} handleChange={handleDropdownChange} />
+            <button type="button" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: 'blue', color: 'white', fontSize: '16px' }}>
+              Submit
+            </button>
+          </>
+        );
       default:
         return null;
     }
@@ -144,7 +158,7 @@ const FirstPage = ({ selectedOptions, handleChange }) => {
         question={professionalQuestionsConfig[0].text}
         options={professionalQuestionsConfig[0].options}
         selectedOption={selectedOptions['retiredStatus'] || ''}
-        onChange={(value) => handleChange('retiredStatus', value)}
+        onChange={(label) => handleChange('retiredStatus', label)}
         type={professionalQuestionsConfig[0].type}
       />
       {questions.map((question) => (
@@ -163,7 +177,7 @@ const FirstPage = ({ selectedOptions, handleChange }) => {
             question={question.text}
             options={question.options}
             selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-            onChange={(value) => handleChange(question.id, value)}
+            onChange={(label) => handleChange(question.id, label)}
             type={question.type}
           />
         )
@@ -180,7 +194,7 @@ const SecondPage = ({ selectedOptions, handleChange }) => {
             question={professionalQuestionsConfig[7].text}
             options={professionalQuestionsConfig[7].options}
             selectedOption={selectedOptions['networkingLevel'] || []}
-            onChange={(value) => handleChange('networkingLevel', value)}
+            onChange={(label) => handleChange('networkingLevel', label)}
             type={professionalQuestionsConfig[7].type}
           />
       </div>
@@ -198,7 +212,7 @@ const LastPage = ({ selectedOptions, handleChange }) => {
         question={professionalQuestionsConfig[8].text}
         options={professionalQuestionsConfig[8].options}
         selectedOption={uploadStatus || ''}
-        onChange={(value) => handleChange('resumeOrDescription', value === "File upload" ? { type: 'file' } : (value === "Write \"about me\" instead" ? { type: 'text' } : ''))}
+        onChange={(label) => handleChange('resumeOrDescription', label === "File upload" ? { type: 'file' } : (label === "Write \"about me\" instead" ? { type: 'text' } : ''))}
         type={professionalQuestionsConfig[8].type}
       />
       {uploadStatus === "File upload" && (

@@ -3,10 +3,10 @@ import Select from 'react-select';
 
 export default function OnboardingDropdown({ question, options, selectedOption, onChange, type, onSearchQueryChange }) {
     const handleChange = (selectedOptions) => {
-        const value = type === 'multi-select'
-            ? selectedOptions.map(option => option.value)
-            : selectedOptions.value;
-        onChange(value);
+        const label = type === 'multi-select'
+            ? selectedOptions.map(option => option.label)
+            : selectedOptions.label;
+        onChange(label);
     };
 
     const handleInputChange = (inputValue) => {
@@ -24,14 +24,14 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
             {type === 'multi-select' ? (
                 <Select
                     isMulti
-                    value={options.filter(option => selectedOption.includes(option.value))}
+                    value={options.filter(option => selectedOption.includes(option.label))}
                     onChange={handleChange}
                     onInputChange={handleInputChange}
                     options={options}
                 />
             ) : (
                 <Select
-                    value={options.find(option => option.value === selectedOption)}
+                    value={options.find(option => option.label === selectedOption)}
                     onChange={handleChange}
                     onInputChange={handleInputChange}
                     options={options}

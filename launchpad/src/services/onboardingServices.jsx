@@ -15,29 +15,29 @@ export const saveHighSchooler = async (highSchoolerData) => {
     }
 };
 
-export const saveCollegeStudent = async () => {
+export const saveCollegeStudent = async (collegeStudentData) => {
     try {
         const dataWithUserType = {
             userType: 'collegeStudent',
-            ...highSchoolerData
+            ...collegeStudentData
         };
 
         const docRef = await addDoc(collection(db, 'users'), dataWithUserType);
-        console.log("High Schooler info saved -- written with ID: ", docRef.id);
+        console.log("College Student info saved -- written with ID: ", docRef.id);
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 };
 
-export const saveProfessional = async () => {
+export const saveProfessional = async (professionalData) => {
     try {
         const dataWithUserType = {
             userType: 'professional',
-            ...highSchoolerData
+            ...professionalData
         };
 
         const docRef = await addDoc(collection(db, 'users'), dataWithUserType);
-        console.log("High Schooler info saved -- written with ID: ", docRef.id);
+        console.log("Professional info saved -- written with ID: ", docRef.id);
     } catch (e) {
         console.error("Error adding document: ", e);
     }

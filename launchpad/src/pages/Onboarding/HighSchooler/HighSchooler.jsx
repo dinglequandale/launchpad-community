@@ -79,10 +79,10 @@ export default function HighSchooler() {
     collegeAttending: ''
   });
 
-  const handleDropdownChange = (id, value) => {
+  const handleDropdownChange = (id, label) => {
     setHighSchoolerData(prevState => ({
       ...prevState,
-      [id]: value,
+      [id]: label,
     }));
   };
 
@@ -103,13 +103,19 @@ export default function HighSchooler() {
       case 2:
         return <FirstPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} pageNum={2} />;
       case 3:
-        return <LastPage 
-                  selectedOptions={highSchoolerData} 
-                  handleChange={handleDropdownChange} 
-                  colleges={cachedColleges}
-                  onSearchQueryChange={handleSearchQueryChange} 
-                  handleSubmit={handleSubmit}
-                />;
+        return (
+          <>
+            <LastPage 
+                    selectedOptions={highSchoolerData} 
+                    handleChange={handleDropdownChange} 
+                    colleges={cachedColleges}
+                    onSearchQueryChange={handleSearchQueryChange} 
+            />
+            <button type="button" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: 'blue', color: 'white', fontSize: '16px' }}>
+              Submit
+            </button>
+          </>
+        );
       default:
         return null;
     }
@@ -138,7 +144,7 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
           question={question.text}
           options={question.options}
           selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-          onChange={(value) => handleChange(question.id, value)}
+          onChange={(label) => handleChange(question.id, label)}
           type={question.type}
         />
       ))}
@@ -146,7 +152,7 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
   );
 };
 
-const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange, handleSubmit}) => {
+const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange }) => {
   const questions = highSchoolQuestionsConfig.filter(question => question.page === 3);
 
   const collegeDecision = selectedOptions['collegeDecision'];
@@ -157,7 +163,7 @@ const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange
         question={questions[0].text}
         options={questions[0].options}
         selectedOption={selectedOptions['collegeDecision'] || ''}
-        onChange={(value) => handleChange('collegeDecision', value)}
+        onChange={(label) => handleChange('collegeDecision', label)}
         type={questions[0].type}
       />
       {collegeDecision === 'No' && (
@@ -165,7 +171,7 @@ const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange
           question={questions[1].text}
           options={colleges}
           selectedOption={selectedOptions['collegeInterests'] || []}
-          onChange={(value) => handleChange('collegeInterests', value)}
+          onChange={(label) => handleChange('collegeInterests', label)}
           type={questions[1].type}
           onSearchQueryChange={onSearchQueryChange}
         />
@@ -175,14 +181,11 @@ const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange
           question={questions[2].text}
           options={colleges}
           selectedOption={selectedOptions['collegeAttending'] || ''}
-          onChange={(value) => handleChange('collegeAttending', value)}
+          onChange={(label) => handleChange('collegeAttending', label)}
           type={questions[2].type}
           onSearchQueryChange={onSearchQueryChange}
         />
       )}
-      <button type="button" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: 'blue', color: 'white', fontSize: '16px' }}>
-        Submit
-      </button>
     </div>
   );
 };
