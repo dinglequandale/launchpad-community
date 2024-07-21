@@ -1,7 +1,8 @@
-import React, { useState, useMemo, useDebugValue } from 'react';
+import React, { useState, useMemo } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import ProgressBar from '../../../components/Progressbar/ProgressBar';
 import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
+import { saveHighSchooler } from '../../../services/onboardingServices';
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -89,6 +90,12 @@ export default function HighSchooler() {
     setSearchQuery(query);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await saveHighSchooler(highSchoolerData);
+    alert('Data saved successfully');
+  };
+
   const renderPage = () => {
     switch (currentPage) {
       case 1:
@@ -101,6 +108,7 @@ export default function HighSchooler() {
                   handleChange={handleDropdownChange} 
                   colleges={cachedColleges}
                   onSearchQueryChange={handleSearchQueryChange} 
+                  handleSubmit={handleSubmit}
                 />;
       default:
         return null;
@@ -138,7 +146,7 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
   );
 };
 
-const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange }) => {
+const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange, handleSubmit}) => {
   const questions = highSchoolQuestionsConfig.filter(question => question.page === 3);
 
   const collegeDecision = selectedOptions['collegeDecision'];
@@ -172,6 +180,9 @@ const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange
           onSearchQueryChange={onSearchQueryChange}
         />
       )}
+      <button type="button" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: 'blue', color: 'white', fontSize: '16px' }}>
+        Submit
+      </button>
     </div>
   );
 };

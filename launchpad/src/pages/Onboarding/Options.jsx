@@ -119,7 +119,7 @@ const getColleges = (searchQuery = '') => {
         if (searchQuery) {
             q = query(
                 collection(db, "colleges"),
-                    and(
+                and(
                     startAt(searchQuery),
                     endAt(searchQuery + '~')
                 )
