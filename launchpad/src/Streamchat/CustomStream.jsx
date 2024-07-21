@@ -10,8 +10,8 @@ import {
   } from "stream-chat-react";
 import styled from 'styled-components';
 import 'stream-chat-react/dist/css/v2/index.css';
-import "./stream_styles.css"
-
+import "./stream_styles.css";
+import EmptyState from "./EmptyState";
 
 const ChannelHeaderContainer = styled.div`
   width: 100%;
@@ -84,32 +84,49 @@ const ChannelPreviewCustom = (props) => {
   );
 };
 
-export const CustomChat = ({client, filters, sort}) => {
+export const CustomChat = ({client, filters, sort, channels}) => {
+
+  console.log(channels)
+
   return(
     <ChatContainer>
     <Chat client={client} theme="messaging light">
-      <ChannelListContainer>
-        <ChannelList
-          filters={filters}
-          sort={sort}
-          options={{ state: true, presence: true, limit: 10 }}
-          List={(listProps) => (
-            <ChannelList {...listProps} Preview={ChannelPreviewCustom} />
+    <ChannelListContainer>
+          {channels.length === 0 ? (
+            <EmptyState
+              title="No Contacts Yet"
+              subtitle="Start a conversation or add a new contact to begin chatting."
+            />
+          ) : (
+            <ChannelList
+              // filters={filters}
+              // sort={sort}
+              channels={channels}
+              options={{ state: true, presence: true, limit: 10 }}
+              List={(listProps) => (
+                <ChannelList {...listProps} Preview={ChannelPreviewCustom} />
+              )}
+            />
           )}
-        />
-      </ChannelListContainer>
-      <ChannelContainer>
-        <Channel>
-          <Window>
-            <ChannelHeaderContainer>
-                <ChannelHeader />
-            </ChannelHeaderContainer>
-            <MessageList />
-            <MessageInput />
-          </Window>
-          <Thread />
-        </Channel>
-      </ChannelContainer>
+        </ChannelListContainer>
+        <ChannelContainer>
+            {channels.length === 0 ? (
+              <EmptyState
+                title="No Active Conversation"
+                subtitle="Select a contact from the list or start a new conversation."
+              />
+            ) : (
+              <Channel>
+              <Window>
+                <ChannelHeaderContainer>
+                  <ChannelHeader />
+                </ChannelHeaderContainer>
+                <MessageList />
+                <MessageInput />
+              </Window>
+              </Channel>
+            )}
+        </ChannelContainer>
     </Chat>
   </ChatContainer>
   )

@@ -12,39 +12,38 @@ const apiKey = import.meta.env.VITE_STREAM_API_KEY;
 
 
 export default function InitializeStream() {
-    
-    const {currentUser} = getAuth();
+  const [channels, setChannels] = useState(null)
+  const {currentUser} = getAuth();
+  const [token, setToken] = useState("");
+  const [client, setClient] = useState(null);
 
-    const [token, setToken] = useState("");
+  const user = {
+      id: currentUser.uid,
+      name: "Konrad Tittel",
+      image: "/assets/awty-logo.jpg"
+  }
 
-    const user = {
-        id: currentUser.uid,
-        name: "Konrad Tittel",
-        image: "/assets/awty-logo.jpg"
-    }
-
-    const [client, setClient] = useState(null);
-
-    const filters = {type: "messaging", members: {$in: [currentUser.uid]}};
-    const sort = {last_message_at: -1};
-
-    const getToken = async () => {
-      const getStreamToken = httpsCallable(getFunctions(),"createStreamToken");
-      try {
-        const result = await getStreamToken();
-        if (result.data && result.data.token) {
-          setToken(result.data.token);
-        } else {
-          console.error('Failed to get token:', result.data);
-        }
-      } catch (error) {
-        console.error('Error getting token:', error);
+  const getToken = async () => {
+    const getStreamToken = httpsCallable(getFunctions(),"createStreamToken");
+    try {
+      const result = await getStreamToken();
+      if (result.data && result.data.token) {
+        setToken(result.data.token);
+      } else {
+        console.error('Failed to get token:', result.data);
       }
-  
+    } catch (error) {
+      console.error('Error getting token:', error);
     }
-  
-    useEffect(()=>{
-      getToken();
+
+  }
+
+  const filters = {type: "messaging", members: {$in: [currentUser.uid]}};
+  const sort = {last_message_at: -1};
+
+  useEffect(()=>{
+    async function init(){
+      await getToken();
       const chat = new StreamChat(apiKey);
       if(chat.tokenManager.token === token && chat.userID === user.id){
         return;
@@ -56,7 +55,11 @@ export default function InitializeStream() {
         image: "/assets/awty-logo.jpg"}, token).then(()=>{
           if(isInterrupted) return
           setClient(chat)
-        });
+      });
+      console.log("Wassup")
+      
+      const channels = await chat.queryChannels(filters, sort);
+      setChannels(channels);
       return () => {
         isInterrupted = true;
         setClient(undefined);
@@ -65,40 +68,21 @@ export default function InitializeStream() {
         })
       }
     }
-  // if(streamChat) return () => streamChat.disconnectUser
-    , [token, currentUser])
-
-    useEffect(()=>{
-    async function init() {
-        const chatClient = new StreamChat(apiKey);
-        if(currentUser){
-            await chatClient.connectUser(user, chatClient.devToken(currentUser.uid));
-            
-            const channel = chatClient.channel("messaging", "launchpad-messaging", {
-                image: "/assets/awty-logo.jpg",
-                name: "Connect",
-                members: [user.id]
-            })
-
-            await channel.watch();
-            setClient(chatClient);
-        }
-    }
 
     init();
+  }
+// if(streamChat) return () => streamChat.disconnectUser
+  , [token, currentUser])
 
-    if(client) return () => client.disconnectUser
-    }, [])
+  if(!client || !channels) return <Loading/>;
 
-    if(!client) return <Loading/>;
-
-    return (
-        <>
-        <TopBar/>
-        <SideNav/>
-        <div style={{paddingTop: "3%", paddingLeft: "10%"}}>
-          <CustomChat filters={filters} sort={sort} client={client}/>
-        </div>
-        </>
+  return (
+      <>
+      <TopBar/>
+      <SideNav/>
+      <div style={{paddingTop: "3%", paddingLeft: "10%"}}>
+        <CustomChat filters={filters} sort={sort} client={client} channels={channels}/>
+      </div>
+      </>
     )
 }
