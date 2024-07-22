@@ -40,7 +40,7 @@ const router = createBrowserRouter([
     element: <GlobalAuthWrapper/>,
     children: [
     {
-      path: 'Home',
+      path: '/Home',
       element: <Home/>,
       errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>,
     },

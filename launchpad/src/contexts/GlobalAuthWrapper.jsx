@@ -1,23 +1,39 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
 import { useStreamConnection } from '../Streamchat/chatFunctions/setUpUser';
+import PageLoading from '../components/LoadingAnimation/PageLoading';
 
 function GlobalAuthWrapper() {
-  const { currentUser } = useAuth();
-  const { chatClient, isConnected } = useStreamConnection();
+  const { currentUser, loading } = useAuth();
+  const { chatClient, isConnected, connectToStream } = useStreamConnection();
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  useEffect(() => {
+    async function initializeApp() {
+      if (currentUser && !isConnected) {
+        await connectToStream(currentUser);
+      }
+      setIsInitializing(false);
+    }
+
+    if (!loading) {
+      console.log("Ello")
+      initializeApp();
+    }
+  }, [currentUser, isConnected, connectToStream, loading]);
+
+  if (loading || isInitializing) {
+    return <PageLoading />;
+  }
 
   if (!currentUser) {
-    // Redirect to login page if user is not authenticated
     return <Navigate to="/Login" />;
   }
 
-
-  // TODO: revamp loading
   if (!isConnected) {
-    return <div>Connecting to chat...</div>;
+    return <PageLoading />;
   }
-
   return <Outlet context={{ chatClient, isConnected }} />;
 }
 

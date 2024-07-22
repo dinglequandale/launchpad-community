@@ -6,6 +6,7 @@ import TopBar from '../components/Topbar/TopBar';
 import SideNav from '../components/Sidenav/SideNav';
 import { CustomChat } from './CustomStream';
 import { useLocation, useOutletContext } from 'react-router-dom';
+import PageLoading from '../components/LoadingAnimation/PageLoading';
 
 
 // const apiKey = import.meta.env.VITE_STREAM_API_KEY;
@@ -63,18 +64,13 @@ export default function InitializeStream() {
   useEffect(()=>{
     async function setExistingChannel(channelId){
       try {
-        // Get the channel using the ID
-
         const channel = chatClient.channel('messaging', channelId);
         
-        // Watch the channel to receive real-time updates
         await channel.watch();
-        
-        // Set it as the active channel
+  
         setActiveChannel(channel);
       } catch (error) {
         console.error('Error opening channel:', error);
-        // Handle error (e.g., channel not found)
       }
   
     }
@@ -84,21 +80,14 @@ export default function InitializeStream() {
     }
   },[selectedConnection])
 
-  if(!chatClient || !channels) return (
-  <div style={{position: "absolute", transform: "translateY(35%)", width: "100%", height: "100%"}}>
-    <div style={{display: "flex", justifyContent: "center"}}>
-    <img src="assets/launchpad_logo.png" alt="" style={{width: "500px"}}/>
-    </div>
-    <Loading/>
-  </div>
-);
+  if(!chatClient || !channels) return ( <PageLoading/> );
 
   return (
       <>
       <TopBar/>
       <SideNav/>
       <div style={{paddingTop: "3%", paddingLeft: "10%"}}>
-        <CustomChat client={chatClient} channels={channels} activeChannel={activeChannel} filters={filters}/>
+        <CustomChat client={chatClient} channels={channels} initialActiveChannel={activeChannel} filters={filters}/>
       </div>
       </>
     )

@@ -7,15 +7,9 @@ const chat = new StreamChat(apiKey);
 export async function sendConnectMessageWithoutResume(message, currentUserId, connectingUserId, setChannelId, chat){
     if (!chat || !connectingUserId) return;
 
-    // const userToken = await getStreamToken();
-
-    // await chat.connectUser(
-    //     { id: currentUserId },
-    //     userToken
-    // );
-
     const newChannel = chat.channel("messaging", {
-        // name: ,
+        name:"Brongle",
+        image: "/assets/awty-logo.jpg",
         members: [currentUserId, connectingUserId]
     })
 

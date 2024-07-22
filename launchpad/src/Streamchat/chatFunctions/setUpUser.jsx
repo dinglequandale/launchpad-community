@@ -1,5 +1,5 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { StreamChat } from 'stream-chat';
 import { useAuth } from '../../contexts/auth/AuthContext';
 
@@ -27,43 +27,59 @@ export const getStreamToken = async () => {
 
   export function useStreamConnection() {
     const [isConnected, setIsConnected] = useState(false);
-    const { currentUser } = useAuth();
-  
-    useEffect(() => {
-      async function connectStreamUser() {
-        if (currentUser && !isConnected && !chatClient.userID) {
-          try {
-            const token = await getStreamToken();
-            
-            await chatClient.connectUser(
-              {
-                id: currentUser.uid,
-                // name: currentUser.displayName || "New User",
-                // image: currentUser.photoURL || "/assets/default-avatar.jpg"
-              },
-              token
-            ).then(()=>{
-              setIsConnected(true);
-            });
-          } catch (error) {
-            console.error('Error connecting to Stream:', error);
-          }
+
+    console.log(isConnected, chatClient.userID)
+
+    const connectToStream = useCallback(async (user) => {
+      console.log('Attempting to connect to Stream');
+      console.log('Current chatClient.userID:', chatClient.userID);
+      console.log('Current user:', user.uid);
+
+      if(chatClient.userID){
+        setIsConnected(true);
+      }
+
+      if (!isConnected && !chatClient.userID) {
+        
+        try {
+          const token = await getStreamToken();
+          await chatClient.connectUser(
+            {
+              id: user.uid,
+              // name: user.displayName || "New User",
+              // image: user.photoURL || "/assets/default-avatar.jpg"
+            },
+            token
+          );
+          console.log("Connected!")
+          setIsConnected(true);
+        } catch (error) {
+          console.error('Error connecting to Stream:', error);
         }
       }
+    }, [isConnected]);
+
+
+    // unload the user when they close their session
+    useEffect(() => {
+      const handleBeforeUnload = () => {
+        if (isConnected) {
+          chatClient.disconnectUser();
+        }
+      };
   
-      connectStreamUser();
+      window.addEventListener('beforeunload', handleBeforeUnload);
   
       return () => {
-        // chatClient.disconnectUser();
+        window.removeEventListener('beforeunload', handleBeforeUnload);
       };
-    }, [currentUser]);
+    }, [isConnected]);  
   
-    return { chatClient, isConnected };
+    return { chatClient, isConnected, connectToStream };
   }
-  
+
   export function disconnectFromStream() {
     if (chatClient.userID) {
       chatClient.disconnectUser();
     }
   }
-  
