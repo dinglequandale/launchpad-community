@@ -3,6 +3,7 @@ import { FiLogOut } from "react-icons/fi";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { doSignOut } from "../../firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { disconnectFromStream } from '../../Streamchat/chatFunctions/setUpUser';
 
 export default function LogoutButton() {
     const {userLoggedIn } = useAuth();
@@ -10,14 +11,17 @@ export default function LogoutButton() {
     const handleLogout = (e) => {
         e.preventDefault();
         doSignOut().then(() => {
-            // Clear any auth-related local storage
+            // clear any auth-related local storage
             localStorage.removeItem('authToken');
             
-            // Replace the current history entry
+            // replace the current history entry
             window.history.replaceState(null, '', '/Landing');
-        
-            // Redirect to login page
+            
+            // redirect to login page
             navigate('/Landing', { replace: true });
+            
+            // unmount user from Stream
+            disconnectFromStream();
             }
         )
     }

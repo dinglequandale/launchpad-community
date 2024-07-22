@@ -136,7 +136,7 @@ button {
 }
 
 .btnClose:hover{
-  color: var(--highlight);
+  color: var(--highlight) !important;
 }
 
 .btnCircle{

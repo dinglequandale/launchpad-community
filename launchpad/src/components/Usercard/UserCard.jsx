@@ -4,7 +4,8 @@ import ConnectionBanner from "../Connectionbanner/ConnectionBanner";
 import { useState } from "react";
 import { FaLink } from "react-icons/fa6";
 
-export default function UserCard({userData, onProfileClick}) {
+export default function UserCard({userData, onProfileClick, onConnectClick}) {
+    // todo: actual banner
     const [bannerVisibility, setBannerVisibility] = useState(false);
 
     // TODO: currently localStorage, transition to database
@@ -20,10 +21,12 @@ export default function UserCard({userData, onProfileClick}) {
             case "Professional":
                 return "Current Position";
             default:
-                return "poo";
+                return "";
         }
     }
     const [basicInfoData, setBasicInfoData] = useState({});
+
+    // TODO: change to userData
 
     const basicInfoContent = {userPreface: userType === "Professional" ? `${basicInfoData.yearsOfExperience} years of experience in ${basicInfoData.industryOfExperience}`
     : userType === "Alumni" ? `Graduated with Class of [...]`
@@ -56,7 +59,7 @@ export default function UserCard({userData, onProfileClick}) {
                     {basicInfoData.acceptedColleges && <span>{basicInfoContent.acceptedColleges}</span>}
                 </div>
             </div>
-            <button style={{width: "80%", borderRadius: "5px", margin: "0 auto"}}> 
+            <button style={{width: "80%", borderRadius: "5px", margin: "0 auto"}} onClick={onConnectClick}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={20}/>
                     <span style={{fontWeight: "550"}}>Connect</span>

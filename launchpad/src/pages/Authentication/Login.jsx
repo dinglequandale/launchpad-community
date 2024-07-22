@@ -14,7 +14,6 @@ export default function Login(){
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
     const [userIsSigningIn, setUserIsSigningIn] = useState(false);
-
     const handleSubmit = async (e) => {
         e.preventDefault(); 
         if(!userIsSigningIn){

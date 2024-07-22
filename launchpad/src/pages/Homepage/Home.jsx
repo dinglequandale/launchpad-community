@@ -5,11 +5,11 @@ import ReactPlayer from "react-player";
 import ProfileStrength from "../../components/Profilestrength/ProfileStrength";
 import { FaArrowCircleDown } from "react-icons/fa";
 import { useAuth } from "../../contexts/auth/AuthContext";
+import { useEffect } from "react";
 
 export default function Home({userData}){
 
     const { currentUser } = useAuth();
-    
     const userName = "Username";
     const resourceSections = ["How-To Network", "Discover Your Career", "SAT/ACT Study Tips", "Launchpad Help"];
     const tutorialData = [

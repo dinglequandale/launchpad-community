@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 export default function SideNav({show}){
     
     const navList = [[<IoHomeOutline size={35}/>, "Home", "/Home"], [<TbUserHexagon size={35}/>, "Network", "/UserNetwork"],
-        [<GoOrganization size={35}/>, "Opportunities", "/Organizations"], [<LuMessagesSquare size={35}/>, "Messages", "/"]];
+        [<GoOrganization size={35}/>, "Opportunities", "/Organizations"], [<LuMessagesSquare size={35}/>, "Messages", "/messages"]];
 
     const [selectedNav, setSelectedNav] = useState(null);
 
