@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { sendConnectMessageWithoutResume, sendConnectMessageWithResume } from '../../Streamchat/chatFunctions/sendConnectMessage';
-import { getAuth } from 'firebase/auth';
+import { useAuth } from '../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { storage } from '../../firebase/firebaseConfig';
 import toast from 'react-hot-toast';
 
 // TODO: actually implement clickedUser logic
-export default function ConnectModal({visibility, onClose, clickedUser="PsDKvfLr3KUX1jXXZG89B1DRwXc2"}){
+export default function ConnectModal({visibility, chat, onClose, clickedUser="EUVGKcqLdkbINcp6EEgUASaW2rI3"}){
+  
   const [introMessage, setIntroMessage] = useState("");
   const [sendWithResume, setSendWithResume] = useState(false);
   const [channelId, setChannelId] = useState("")
-
-  const {currentUser} = getAuth();
+  const {currentUser} = useAuth();
 
   const wordLimit = 50;
 
@@ -49,10 +49,10 @@ export default function ConnectModal({visibility, onClose, clickedUser="PsDKvfLr
 
             // TODO: user resume read logic
 
-            await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, clickedUser, setChannelId);
+            await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, clickedUser, setChannelId, chat);
         }
         else{
-            await sendConnectMessageWithoutResume(introMessage, currentUser.uid, clickedUser, setChannelId);
+            await sendConnectMessageWithoutResume(introMessage, currentUser.uid, clickedUser, setChannelId, chat);
         }
     }catch(error){
         console.log(error);

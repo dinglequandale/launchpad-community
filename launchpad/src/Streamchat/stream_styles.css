@@ -2,7 +2,7 @@
     --str-chat__background-color: var(--primary);
     --str-chat__secondary-background-color: var(--primary);
     --str-chat__surface-color: var(--primary);
-    --str-chat__secondary-surface-color: var(--highlight);
+    --str-chat__secondary-surface-color: var(--neutral);
     --str-chat__tertiary-surface-color: var(--secondary);
     --str-chat__text-color: var(--secondary);
     --str-chat__text-low-emphasis-color: var(--accent);

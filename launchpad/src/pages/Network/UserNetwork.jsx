@@ -9,11 +9,14 @@ import TopBar from "../../components/Topbar/TopBar";
 import SearchBar from "../../components/Searchbar/SearchBar";
 import { GrNext, GrPrevious } from "react-icons/gr";
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
+import { useOutletContext } from "react-router-dom";
 
 
 const NetworkContext = createContext();
 
 export default function UserNetwork() {
+
+  const { chatClient, isConnected } = useOutletContext();
 
   const pageName = "Network";
   const [profileModalVisibility, setProfileModalVisibility] = useState(false);
@@ -65,7 +68,7 @@ export default function UserNetwork() {
   return (
     <NetworkContext.Provider value={{handleOnProfileClick, setConnectModalVisibility}}>
       <>
-        {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} visibility={connectModalVisibility}/>}
+        {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} visibility={connectModalVisibility} chat={chatClient}/>}
         <div>
             <TopBar/>
             <SideNav/>
@@ -87,7 +90,7 @@ export default function UserNetwork() {
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
                 <UserCarousel userNetworkData={bsData}/>
-                {profileModalVisibility && <ProfileModal onClose={()=>setProfileModalVisibility(false)} top={profileModalTop}/>}
+                {profileModalVisibility && <ProfileModal onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={()=>setConnectModalVisibility(true)}/>}
               </div>
             </div>
         </div>

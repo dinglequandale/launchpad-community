@@ -4,7 +4,7 @@ const { StreamChat } = require('stream-chat');
 
 admin.initializeApp();
 
-const serverClient = StreamChat.getInstance(
+const serverClient = new StreamChat(
   process.env.STREAM_API_KEY,
   process.env.STREAM_SECRET
 );
@@ -17,24 +17,24 @@ exports.createStreamToken = functions.https.onCall(async (data, context) => {
   const uid = context.auth.uid;
   console.log(uid);
   try {
-    const { users } = await serverClient.queryUsers({ id: uid });
+    // const { users } = await serverClient.queryUsers({ id: uid });
     
-    if (users.length === 0) {
-      await serverClient.upsertUser({ 
-        id: uid, 
-        name: 'Anonymous',
-        image: ""
-      });
-    }
+    // if (users.length === 0) {
+    //   await serverClient.upsertUser({ 
+    //     id: uid, 
+    //     name: 'Anonymous',
+    //     image: ""
+    //   });
+    // }
 
-    // Generate a Stream token with appropriate permissions
+    console.log('Attempting to create Stream token');
     const streamToken = serverClient.createToken(uid);
+    console.log('Stream token created successfully');
 
     return {
       success: true,
       token: streamToken,
-      userId: uid,
-      client: serverClient
+      userId: uid
     };
   } catch (error) {
     console.log('Error in createStreamToken:', error);

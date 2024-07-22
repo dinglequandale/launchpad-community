@@ -1,15 +1,16 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { useState, useEffect } from 'react';
 import { StreamChat } from 'stream-chat';
-
-const chatClient = StreamChat.getInstance(import.meta.env.STREAM_API_KEY);
+import { useAuth } from '../../contexts/auth/AuthContext';
 
 // IMPORTANT TODO: call this on this to onboarding
 
 export const getStreamToken = async () => {
-    const getStreamToken = httpsCallable(getFunctions(),"createStreamToken");
+    const getToken = httpsCallable(getFunctions(),"createStreamToken");
     try {
-      const result = await getStreamToken();
+      const result = await getToken();
       if (result.data && result.data.token) {
+        console.log("success!")
         return result.data.token;
       } else {
         console.error('Failed to get token:', result.data);
@@ -22,36 +23,47 @@ export const getStreamToken = async () => {
 
   }
 
-export async function setupStreamUser(userId, userName="Anonymous") {
-    const userToken = await getStreamToken();
+  const chatClient = StreamChat.getInstance(import.meta.env.VITE_STREAM_API_KEY);
 
-    try {
-        await chatClient.connectUser(
-        {
-            id: userId,
-            name: userName,
-            // You can add other user data here, such as:
-            // image: 'https://example.com/user-image.jpg',
-        },
-        userToken
-        );
-
-        console.log('User connected to Stream Chat successfully');
-
-
-        // const channel = chatClient.channel('messaging', `welcome-${userId}`, {
-        // name: 'Welcome Channel',
-        // members: [userId],
-        // });
-
-        // await channel.create();
-
-        return { success: true };
-    } catch (error) {
-        console.error('Error setting up Stream user:', error);
-        return { success: false, error: error.message };
-    } finally {
-        // Disconnect the client after setup
-        await chatClient.disconnectUser();
+  export function useStreamConnection() {
+    const [isConnected, setIsConnected] = useState(false);
+    const { currentUser } = useAuth();
+  
+    useEffect(() => {
+      async function connectStreamUser() {
+        if (currentUser && !isConnected && !chatClient.userID) {
+          try {
+            const token = await getStreamToken();
+            
+            await chatClient.connectUser(
+              {
+                id: currentUser.uid,
+                // name: currentUser.displayName || "New User",
+                // image: currentUser.photoURL || "/assets/default-avatar.jpg"
+              },
+              token
+            ).then(()=>{
+              setIsConnected(true);
+            });
+          } catch (error) {
+            console.error('Error connecting to Stream:', error);
+          }
+        }
+      }
+  
+      connectStreamUser();
+  
+      return () => {
+        // chatClient.disconnectUser();
+      };
+    }, [currentUser]);
+  
+    return { chatClient, isConnected };
+  }
+  
+  export function disconnectFromStream() {
+    if (chatClient.userID) {
+      chatClient.disconnectUser();
     }
-}
+  }
+  

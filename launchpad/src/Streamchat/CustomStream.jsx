@@ -12,6 +12,7 @@ import styled from 'styled-components';
 import 'stream-chat-react/dist/css/v2/index.css';
 import "./stream_styles.css";
 import EmptyState from "./EmptyState";
+import { useState } from "react";
 
 const ChannelHeaderContainer = styled.div`
   width: 100%;
@@ -42,12 +43,16 @@ const ChannelContainer = styled.div`
 `;
 
 const ChannelPreviewCustom = (props) => {
-  const { channel, setActiveChannel } = props;
+  const { channel, setActiveChannel, activeChannel } = props;
   const { name = 'Unnamed Channel' } = channel.data || {};
 
+  const lastMessage = channel.state.messages[channel.state.messages.length - 1];
+  const [isHovering, setIsHovering] = useState(false);
   return (
     <div
       onClick={() => setActiveChannel(channel)}
+      onMouseEnter={()=>setIsHovering(true)}
+      onMouseLeave={()=>setIsHovering(false)}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -58,9 +63,10 @@ const ChannelPreviewCustom = (props) => {
         margin: "0 auto",
         marginTop: "20px",
         borderRadius: "20px",
-        zIndex: "1",
+        zIndex: "4",
         transition: 'background-color 0.3s',
-        backgroundColor: "var(--neutral)",
+        backgroundColor: `${channel === activeChannel || isHovering ? "#9b7bd4" : "var(--neutral)"}`,
+        color: "var(--primary)",
       }}
     >
       <div
@@ -69,15 +75,15 @@ const ChannelPreviewCustom = (props) => {
           height: '40px',
           borderRadius: '50%',
           backgroundColor: '#e0e0e0',
-          zIndex: "2",
-          boxShadow: "box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1)",
+          zIndex: "3",
+          boxShadow: "2px 0 10px rgba(0, 0, 0, 0.1)",
           marginRight: '10px',
         }}
       />
       <div>
         <div style={{ fontWeight: 'bold' }}>{name}</div>
         <div style={{ fontSize: '0.8em', color: '#888' }}>
-          {channel.state.messages[channel.state.messages.length - 1]?.text || 'No messages yet'}
+          {lastMessage?.text || 'No messages yet'}
         </div>
       </div>
     </div>
@@ -85,9 +91,6 @@ const ChannelPreviewCustom = (props) => {
 };
 
 export const CustomChat = ({client, filters, sort, channels, activeChannel, setActiveChannel}) => {
-
-  console.log(channels)
-
   return(
     <ChatContainer>
     <Chat client={client} theme="messaging light">
@@ -99,16 +102,13 @@ export const CustomChat = ({client, filters, sort, channels, activeChannel, setA
             />
           ) : (
             <ChannelList
-              // filters={filters}
-              // sort={sort}
-              channels={channels}
+              filters={filters}
+              sort={sort}
               options={{ state: true, presence: true, limit: 10 }}
               onSelect={(channel) => {
                 setActiveChannel(channel)
               }}
-              List={(listProps) => (
-                <ChannelList {...listProps} Preview={ChannelPreviewCustom} />
-              )}
+              Preview={ChannelPreviewCustom}
             />
           )}
         </ChannelListContainer>
