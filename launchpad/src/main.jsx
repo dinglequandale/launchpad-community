@@ -4,7 +4,7 @@ import App from './App.jsx';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import UserNetwork from './pages/Network/UserNetwork.jsx';
-import UserSchool from './pages/Onboarding/Initialphase/Userschool/UserSchool.jsx';
+import Onboarding from './pages/Onboarding/Onboarding.jsx';
 import Organizations from './pages/Organizationspage/Organizations.jsx';
 import EditProfilePage from './pages/Editprofilepage/EditProfilePage.jsx';
 import Home from './pages/Homepage/Home.jsx';
@@ -50,8 +50,8 @@ const router = createBrowserRouter([
       errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
     },
     {
-      path: '/UserSchool',
-      element: <UserSchool/>,
+      path: '/Onboarding',
+      element: <Onboarding/>,
       errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
     },
     {
