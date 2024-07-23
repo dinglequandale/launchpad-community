@@ -7,28 +7,28 @@ import { saveCollegeStudent } from '../../../services/onboardingServices';
 const collegeStudentQuestionsConfig = [
   // Page 1
   {
-    id: "whatCollege",
+    id: "collegeAttending",
     text: "What college do you go to?",
     type: "select",
     options: [], // Fill this in later
     page: 1,
   },
   {
-    id: "whatSchool",
+    id: "schoolAttending",
     text: "What high school did you attend?",
     type: "select",
     options: highSchools,
     page: 1,
   },
   {
-    id: "graduationYer",
+    id: "graduationYear",
     text: "What year did you graduate high school?",
     type: "select",
     options: graduationYears,
     page: 1,
   },
   {
-    id: "whatSection",
+    id: "sectionAttending",
     text: "Were you part of the French or International Section?",
     type: "select",
     options: ["French", "International"].map(option => ({ value: option, label: option })),
@@ -37,29 +37,31 @@ const collegeStudentQuestionsConfig = [
 
   // Page 2
   {
-    id: "dreamCareer",
-    text: "What is your dream career field? (Select up to 4)",
+    id: "areasOfInterest",
+    text: "What is your fields of interest? (select up to 4)",
     type: "multi-select",
     options: careerInterests,
     page: 2,
   },
 ];
 
-export default function CollegeStudent() {
+export default function CollegeStudent({currentPage, isSubmitting}) {
   // Fetch college list from Firebase
   const [searchQuery, setSearchQuery] = useState('');
   const colleges = getColleges(searchQuery);
   const cachedColleges = useMemo(() => colleges, [colleges]);
 
-  const numOfSections = 2;
-  const [currentPage, setCurrentPage] = useState(1);
   const [collegeStudentData, setCollegeStudentData] = useState({
-    whatCollege: '',
-    whatSchool: '',
-    graduationYer: '',
-    whatSection: '',
-    dreamCareer: []
+    collegeAttending: '',
+    schoolAttending: '',
+    graduationYear: '',
+    sectionAttending: '',
+    areasOfInterest: []
   });
+
+  if(isSubmitting){
+    saveCollegeStudent(collegeStudentData);
+  }
 
   const handleDropdownChange = (id, label) => {
     setCollegeStudentData(prevState => ({
@@ -72,39 +74,20 @@ export default function CollegeStudent() {
     setSearchQuery(query);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await saveCollegeStudent(collegeStudentData);
-    alert('Data saved successfully');
-  };
-
   return (
-    <div>
-      <ProgressBar
-          numOfSections={numOfSections}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          showLast={true}
-      />
       <FirstPage 
-        selectedOptions={collegeStudentData} 
-        handleChange={handleDropdownChange} 
-        pageNum={currentPage} 
-        colleges={cachedColleges} 
-        onSearchQueryChange={handleSearchQueryChange} 
+        selectedOptions={collegeStudentData}
+        handleChange={handleDropdownChange}
+        pageNum={currentPage}
+        colleges={cachedColleges}
+        onSearchQueryChange={handleSearchQueryChange}
       />
-      {currentPage == numOfSections && (
-        <button type="button" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: 'blue', color: 'white', fontSize: '16px' }}>
-          Submit
-        </button>
-      )}
-    </div>
   );
 };
 
 const FirstPage = ({ selectedOptions, handleChange, pageNum, colleges, onSearchQueryChange }) => {
   return (
-    <div>
+    <div className='onboardingQuestions'>
       {collegeStudentQuestionsConfig.filter(question => question.page === pageNum)
                 .map((question) => (
         <OnboardingDropdown

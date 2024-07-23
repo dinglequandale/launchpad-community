@@ -15,7 +15,7 @@ const professionalQuestionsConfig = [
   },
   // If yes
   {
-    id: "companyPosition",
+    id: "industryPosition",
     text: "What was the last position you held?",
     type: "text-box",
     options: null,
@@ -29,8 +29,8 @@ const professionalQuestionsConfig = [
     page: 1
   },
   {
-    id: "workFields",
-    text: "What were your main fields at work? (select all that apply)",
+    id: "fieldsOfExpertise",
+    text: "What are your main fields of expertise? (select all that apply)",
     type: "multi-select",
     options: careerInterests,
     page: 1
@@ -45,13 +45,13 @@ const professionalQuestionsConfig = [
   },
   {
     id: "companyName",
-    text: "What company / organization do you currently work at?",
+    text: "Where do you currently work?",
     type: "text-box",
     options: null,
     page: 1
   },
   {
-    id: "workFields",
+    id: "fieldsOfExpertise",
     text: "What were your main fields at work? (select all that apply)",
     type: "multi-select",
     options: careerInterests,
@@ -88,29 +88,27 @@ const professionalQuestionsConfig = [
   }
 ];
 
-export default function Professional() {
-  const numOfSections = 3;
-  const [currentPage, setCurrentPage] = useState(1);
+export default function Professional({currentPage, isSubmitting}) {
+
   const [professionalData, setProfessionalData] = useState({
     retiredStatus: '',
-    companyPosition: '',
+    industryPosition: '',
     companyName: '',
-    workFields: [],
+    fieldsOfExpertise: [],
     networkingLevel: [],
-    resumeOrDescription: null
+    resumeOrDescription: null,
+    userType: "Professional"
   });
+
+  if(isSubmitting){
+    saveProfessional(professionalData);
+  }
 
   const handleDropdownChange = (id, label) => {
     setProfessionalData(prevState => ({
       ...prevState,
       [id]: label,
     }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await saveProfessional(professionalData);
-    alert('Data saved successfully');
   };
 
   const renderPage = () => {
@@ -123,9 +121,6 @@ export default function Professional() {
         return (
           <>
             <LastPage selectedOptions={professionalData} handleChange={handleDropdownChange} />
-            <button type="button" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: 'blue', color: 'white', fontSize: '16px' }}>
-              Submit
-            </button>
           </>
         );
       default:
@@ -135,12 +130,6 @@ export default function Professional() {
 
   return (
     <div>
-      <ProgressBar
-          numOfSections={numOfSections}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          showLast={true}
-      />
       {renderPage()}
     </div>
   );
@@ -153,7 +142,7 @@ const FirstPage = ({ selectedOptions, handleChange }) => {
     : professionalQuestionsConfig.slice(4, 7);
 
   return (
-    <div>
+    <div className='onboardingQuestions'>
       <OnboardingDropdown
         question={professionalQuestionsConfig[0].text}
         options={professionalQuestionsConfig[0].options}
@@ -188,7 +177,7 @@ const FirstPage = ({ selectedOptions, handleChange }) => {
 
 const SecondPage = ({ selectedOptions, handleChange }) => {
     return (
-      <div>
+      <div className='onboardingQuestions'>
           <OnboardingDropdown
             key={professionalQuestionsConfig[7].id}
             question={professionalQuestionsConfig[7].text}
@@ -207,7 +196,7 @@ const LastPage = ({ selectedOptions, handleChange }) => {
     : (selectedOptions['resumeOrDescription']?.type === 'text' ? "Write \"about me\" instead" : '');
 
   return (
-    <div>
+    <div className='onboardingQuestions'>
       <OnboardingDropdown
         question={professionalQuestionsConfig[8].text}
         options={professionalQuestionsConfig[8].options}

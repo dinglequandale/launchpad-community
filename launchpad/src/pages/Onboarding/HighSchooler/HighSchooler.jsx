@@ -1,13 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import ProgressBar from '../../../components/Progressbar/ProgressBar';
 import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
 import { saveHighSchooler } from '../../../services/onboardingServices';
 
 const highSchoolQuestionsConfig = [
   // Page 1
   {
-    id: "whatSchool",
+    id: "schoolAttending",
     text: "What school do you go to?",
     type: "select",
     options: highSchools,
@@ -21,7 +20,7 @@ const highSchoolQuestionsConfig = [
     page: 1,
   },
   {
-    id: "whatSection",
+    id: "sectionAttending",
     text: "Are you part of the French or International Section?",
     type: "select",
     options: ["French", "International"].map(option => ({ value: option, label: option })),
@@ -30,7 +29,7 @@ const highSchoolQuestionsConfig = [
 
   // Page 2
   {
-    id: "dreamCareer",
+    id: "areasOfInterest",
     text: "What is your dream career field? (Select up to 4)",
     type: "multi-select",
     options: careerInterests,
@@ -61,23 +60,25 @@ const highSchoolQuestionsConfig = [
   }
 ];
 
-export default function HighSchooler() {
+export default function HighSchooler({currentPage, isSubmitting}) {
   // Fetch college list from Firebase
   const [searchQuery, setSearchQuery] = useState('');
   const colleges = getColleges(searchQuery);
   const cachedColleges = useMemo(() => colleges, [colleges]);
-
-  const numOfSections = 3;
-  const [currentPage, setCurrentPage] = useState(1);
   const [highSchoolerData, setHighSchoolerData] = useState({
-    whatSchool: '',
+    schoolAttending: '',
     graduationYear: '',
-    whatSection: '',
-    dreamCareer: [],
+    sectionAttending: '',
+    areasOfInterest: [],
     collegeDecision: '',
-    collegeInterests: [],
-    collegeAttending: ''
+    dreamColleges: [],
+    collegeAttending: '',
+    userType: "Alumni",
   });
+
+  if(isSubmitting){
+    saveHighSchooler(highSchoolerData);
+  }
 
   const handleDropdownChange = (id, label) => {
     setHighSchoolerData(prevState => ({
@@ -90,12 +91,6 @@ export default function HighSchooler() {
     setSearchQuery(query);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await saveHighSchooler(highSchoolerData);
-    alert('Data saved successfully');
-  };
-
   const renderPage = () => {
     switch (currentPage) {
       case 1:
@@ -106,14 +101,11 @@ export default function HighSchooler() {
         return (
           <>
             <LastPage 
-                    selectedOptions={highSchoolerData} 
-                    handleChange={handleDropdownChange} 
-                    colleges={cachedColleges}
-                    onSearchQueryChange={handleSearchQueryChange} 
+              selectedOptions={highSchoolerData} 
+              handleChange={handleDropdownChange} 
+              colleges={cachedColleges}
+              onSearchQueryChange={handleSearchQueryChange} 
             />
-            <button type="button" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: 'blue', color: 'white', fontSize: '16px' }}>
-              Submit
-            </button>
           </>
         );
       default:
@@ -122,21 +114,15 @@ export default function HighSchooler() {
   };
 
   return (
-    <div>
-      <ProgressBar
-          numOfSections={numOfSections}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          showLast={true}
-      />
+    <>
       {renderPage()}
-    </div>
+    </>
   );
 };
   
 const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
   return (
-    <div>
+    <div className='onboardingQuestions'>
       {highSchoolQuestionsConfig.filter(question => question.page === pageNum)
                 .map((question) => (
         <OnboardingDropdown
@@ -158,7 +144,7 @@ const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange
   const collegeDecision = selectedOptions['collegeDecision'];
 
   return (
-    <div>
+    <div className='onboadingQuestions'>
       <OnboardingDropdown
         question={questions[0].text}
         options={questions[0].options}

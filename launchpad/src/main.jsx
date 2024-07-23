@@ -37,6 +37,11 @@ const router = createBrowserRouter([
     errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
   },
   {
+    path: '/Onboarding',
+    element: <Onboarding/>,
+    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+  },
+  {
     element: <GlobalAuthWrapper/>,
     children: [
     {
@@ -47,11 +52,6 @@ const router = createBrowserRouter([
     {
       path: '/UserNetwork',
       element: <UserNetwork/>,
-      errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
-    },
-    {
-      path: '/Onboarding',
-      element: <Onboarding/>,
       errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
     },
     {
