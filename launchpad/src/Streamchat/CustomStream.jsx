@@ -103,11 +103,13 @@ const CustomChannelPreview = ({
   displayTitle,
   lastMessage,
   latestMessage,
+  setActiveChannel
 }) => {
   const isActive = channel === activeChannel;
   
   return (
-    <div 
+    <div
+      onClick={()=>setActiveChannel(channel)}
       className={`custom-channel-preview ${isActive ? 'active' : ''}`}
       style={{
         display: 'flex',
