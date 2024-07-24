@@ -15,6 +15,7 @@ but you probably should also make an individual personalized CSS file for each p
     display: flex;
     flex-direction: column;
     gap: 15px;
+    width: 100%;
 }
 
 .onboarding-container {
@@ -34,7 +35,72 @@ but you probably should also make an individual personalized CSS file for each p
     width: 500px;
     background-color: var(--primary);
     padding: 2rem;
+    border-radius: 10px;
+}
 
+.onboardingInput{
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgb(193, 191, 191);
+    border-radius: 5px;
+    width: 97%;
+    color: var(--secondary);
+    padding: 7px;
+    font-size: 18px;
+    opacity: .8;
+}
+
+.onboardingInput:focus{
+    outline-color: rgb(0, 140, 255);
+}
+  
+  .file-upload-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  
+  .preview-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .file-preview {
+    max-width: 150px;
+    max-height: 150px;
+    object-fit: cover;
+  }
+  
+  .preview-actions {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+  }
+
+  
+  .file-name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 0.8em;
+    margin-top: 5px;
+  }
+  
+
+.onboardingQuestion{
+    font-size: 14px;
+    color: var(--secondary);
+    display: block;
+    margin-bottom: 5px;
+    font-size: larger;
 }
 
 .continueButton:disabled {
@@ -42,6 +108,12 @@ but you probably should also make an individual personalized CSS file for each p
     cursor: not-allowed;
     opacity: .5;
 }
+
+.optional-label {
+    font-size: 0.8em;
+    color: var(--accent);
+  }
+  
 
 /* For the user type selector */
 .userType-options-container {

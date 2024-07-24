@@ -22,9 +22,9 @@ export default function Onboarding() {
             case "High Schooler":
                 return 3;
             case "College Student":
-                return 2;
-            case "Professional":
                 return 3;
+            case "Professional":
+                return 5;
             default:
                 return null;
         }
@@ -49,9 +49,9 @@ export default function Onboarding() {
     return (
         <div className='onboarding-container'>
             <div className='onboarding-body'>
-            <header style={{marginBottom: "3rem"}}>
+            <header style={{marginBottom: "2rem"}}>
                 <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
-                    display: "flex", justifyContent: "center", alignItems: "center", height: "100px"}}>
+                    display: "flex", justifyContent: "center", alignItems: "center", height: "100px",  marginBottom: "20px"}}>
                     <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
                 </div>
                 {(currentPage !== 0) && <ProgressBar
@@ -74,7 +74,7 @@ export default function Onboarding() {
                 </>
             )}    
             </main>
-            <footer style={{paddingTop: "30px", display: "flex", justifyContent: "space-between", width: "100%"}}>
+            <footer style={{paddingTop: "10px", display: "flex", justifyContent: "space-between", width: "100%"}}>
                 <button style={{visibility: `${currentPage === 0 ? "hidden" : "visible"}`}} className="btnUnfilled continueButton" onClick={handlePrev}>
                     Previous
                 </button>
@@ -83,7 +83,7 @@ export default function Onboarding() {
                 Continue
                 </button>
                 : 
-                <button onClick={()=>setIsSubmitting(true)} style={{ padding: '10px 20px', fontSize: '16px' }}>
+                <button onClick={()=>setIsSubmitting(true)} className='continueButton'>
                     Submit
                 </button>}
             </footer>

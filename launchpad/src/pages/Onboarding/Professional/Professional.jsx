@@ -1,69 +1,93 @@
-import React, { useState } from 'react';
+import React, { createContext, useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import ProgressBar from '../../../components/Progressbar/ProgressBar';
 import { careerInterests } from './../Options';
 import { saveProfessional } from '../../../services/onboardingServices';
+import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 
 const professionalQuestionsConfig = [
   // Page 1
+  {
+    id: "userName",
+    text: "Please enter your full name:",
+    placeholder: "E.g. Jimmy Fallon",
+    type: "text",
+    page: 1
+  },
+  {
+    id: "userPfpPreview",
+    text: "Upload a profile picture: ",
+    type: "file",
+    optional: true,
+    page: 1
+  },
+  {
+    id: "fieldsOfExpertise",
+    text: "What are your main fields of expertise?",
+    type: "multi-select",
+    options: careerInterests,
+    page: 1
+  },
+  {
+    id: "userResume",
+    text: "Please attach your resume:",
+    type: "file",
+    page: 1
+  },
+  // Page 2
   {
     id: "retiredStatus",
     text: "Are you currently retired?",
     type: "select",
     options: ["Yes", "No"].map(option => ({ value: option, label: option })),
-    page: 1,
+    page: 2,
   },
+
+  // Page 3
   // If yes
   {
     id: "industryPosition",
     text: "What was the last position you held?",
     type: "text-box",
+    placeholder: "E.g. 'financial analyist'",
+    retired: true,
     options: null,
-    page: 1,
+    retired: true,
+    page: 3,
   },
   {
     id: "companyName",
-    text: "What company / organization did you work for last?",
+    text: "Where did you work last?",
+    placeholder: "Company name ...",
     type: "text-box",
     options: null,
-    page: 1
-  },
-  {
-    id: "fieldsOfExpertise",
-    text: "What are your main fields of expertise? (select all that apply)",
-    type: "multi-select",
-    options: careerInterests,
-    page: 1
+    retired: true,
+    page: 3
   },
   // If no
   {
     id: "companyPosition",
     text: "What is your current position?",
     type: "text-box",
+    placeholder: "E.g. 'financial analyist'",
     options: null,
-    page: 1
+    retired: false,
+    page: 3
   },
   {
     id: "companyName",
     text: "Where do you currently work?",
+    placeholder: "Company name ...",
     type: "text-box",
+    retired: false,
     options: null,
-    page: 1
+    page: 3
   },
-  {
-    id: "fieldsOfExpertise",
-    text: "What were your main fields at work? (select all that apply)",
-    type: "multi-select",
-    options: careerInterests,
-    page: 1
-  },
-
-  // Page 2
+  // Page 4
   // TODO: add descriptions to the options
   {
     id: "networkingLevel",
-    text: "With our app, high school and college students will have the opportunity to connect with you. \
-            What is your level of networking commitment to these students? (select all that apply)",
+    text: "You're knowledge and mentorship is a valuable reasource for students on this app.  \
+          Please roughly assess your level of commitment:",
     type: "multi-select",
     options: [
         "Casual Connections",
@@ -74,37 +98,31 @@ const professionalQuestionsConfig = [
         "Mentorship",
         "Workplace Opportunities"
     ].map(option => ({ value: option, label: option })),
-    page: 2
+    page: 4
   },
-
-  // Page 3
-  {
-    id: "resumeOrDescription",
-    text: "Almost done! Please upload any recent resume of yours as a PDF. Resumes will be public so students \
-        can understand more about you and your experiences in the simplest way. You may cut out your contact info if you’d like.",
-    type: "select",
-    options: ["File upload", "Skip for now", "Write \"about me\" instead"].map(option => ({ value: option, label: option })),
-    page: 3
-  }
 ];
 
 export default function Professional({currentPage, isSubmitting}) {
 
   const [professionalData, setProfessionalData] = useState({
-    retiredStatus: '',
+    retiredStatus: false,
     industryPosition: '',
     companyName: '',
     fieldsOfExpertise: [],
     networkingLevel: [],
-    resumeOrDescription: null,
-    userType: "Professional"
+    resume: null,
+    userResume: null,
+    userResumePreview: "",
+    userType: "Professional",
+    userPfpPreview: "",
+    userPfp: null,
   });
 
   if(isSubmitting){
     saveProfessional(professionalData);
   }
 
-  const handleDropdownChange = (id, label) => {
+  const handleChange = (id, label) => {
     setProfessionalData(prevState => ({
       ...prevState,
       [id]: label,
@@ -114,15 +132,15 @@ export default function Professional({currentPage, isSubmitting}) {
   const renderPage = () => {
     switch (currentPage) {
       case 1:
-        return <FirstPage selectedOptions={professionalData} handleChange={handleDropdownChange} />;
+        return <BasicUserInfo selectedOptions={professionalData} questionsForPage={professionalQuestionsConfig.filter((question)=>question.page === 1)} handleChange={handleChange}/>
       case 2:
-        return <SecondPage selectedOptions={professionalData} handleChange={handleDropdownChange} />;
+        return <RetiredStatus selectedOptions={professionalData} handleChange={handleChange} />;
       case 3:
-        return (
-          <>
-            <LastPage selectedOptions={professionalData} handleChange={handleDropdownChange} />
-          </>
-        );
+        return <WorkDetails selectedOptions={professionalData} handleChange={handleChange} />;
+      case 4:
+        return <ConnectionLevel selectedOptions={professionalData} handleChange={handleChange} />;
+      case 5:
+        return <FinalTouches selectedOptions={professionalData} handleChange={handleChange}/>
       default:
         return null;
     }
@@ -135,29 +153,38 @@ export default function Professional({currentPage, isSubmitting}) {
   );
 };
 
-const FirstPage = ({ selectedOptions, handleChange }) => {
+const RetiredStatus = ({ selectedOptions, handleChange }) => {
+  const questionsForPage = professionalQuestionsConfig.filter((question)=>question.page === 2);
   // These questions are identical except for the question asked (past vs present tense)
-  const questions = selectedOptions['retiredStatus'] === 'Yes'
-    ? professionalQuestionsConfig.slice(1, 4)
-    : professionalQuestionsConfig.slice(4, 7);
-
   return (
-    <div className='onboardingQuestions'>
-      <OnboardingDropdown
-        question={professionalQuestionsConfig[0].text}
-        options={professionalQuestionsConfig[0].options}
-        selectedOption={selectedOptions['retiredStatus'] || ''}
-        onChange={(label) => handleChange('retiredStatus', label)}
-        type={professionalQuestionsConfig[0].type}
-      />
-      {questions.map((question) => (
+    <div className='onboardingQuestions' style={{width: "460px", textAlign: "center"}}>
+      {questionsForPage.map((question)=>(<OnboardingDropdown
+        question={question.text}
+        options={question.options}
+        selectedOption={(selectedOptions[question.id] ? "Yes" : "No") || ''}
+        onChange={(label) => handleChange(question.id, label === "Yes")}
+        type={question.type}
+      />))}
+    </div>
+  );
+};
+
+const WorkDetails = ({selectedOptions, handleChange}) => {
+  // These questions are identical except for the question asked (past vs present tense)
+  const isRetired = selectedOptions.retiredStatus;
+  const questionsForPage = professionalQuestionsConfig.filter((question)=>(question.page === 3 && question.retired === isRetired));
+  return (
+    <div className='onboardingQuestions' style={{width: "460px"}}>
+      {questionsForPage.map((question) => (
         question.type === 'text-box' ? (
           <div key={question.id} className="form-group">
-            <label>{question.text}</label>
+            <label className='onboardingQuestion'>{question.text}</label>
             <input
               type="text"
               value={selectedOptions[question.id] || ''}
               onChange={(e) => handleChange(question.id, e.target.value)}
+              className='onboardingInput'
+              placeholder={question.placeholder}
             />
           </div>
         ) : (
@@ -172,55 +199,100 @@ const FirstPage = ({ selectedOptions, handleChange }) => {
         )
       ))}
     </div>
-  );
-};
+    );
+  };
+  const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
 
-const SecondPage = ({ selectedOptions, handleChange }) => {
+    const OptionalLabel = () => (
+      <span className="optional-label" style={{fontSize: "15px"}}>(Optional)</span>
+    );
+  
+    // const questionsForPage = collegeStudentQuestionsConfig.filter((question)=>question.page === 3);
+  
+    const handleOptionChange = (event) => {
+      const value = event.target.value;
+      setSelectedOptions(prevState => ({
+        ...prevState,
+        networkingLevel: selectedOptions.networkingLevel.includes(value)
+          ? selectedOptions.networkingLevel.filter(option => option !== value) // Remove if selected
+          : [...selectedOptions.networkingLevel, value] // Add if not selected
+      }));
+    };
+    
+  
+    const availabilityOptionsConfig = [
+      { 
+          id: "casualConnection",
+          text: "Occasional messages and casual networking regarding your career field",
+          value: "Casual Connection",
+      },
+      { 
+          id: "generalInquiries",
+          text: "Entertain student inquiries about any opportunities you know of in your field",
+          value: "General Inquiries",
+      },
+      { 
+          id: "informationalInterview",
+          text: "Informational interview to discuss your career path and field",
+          value: "Informational Interview",
+      },
+      { 
+          id: "workplaceOpportunities",
+          text: "Open to applicants interested in shadowing / volunteering / job opportunities",
+          value: "Workplace",
+      },
+    ];
+  
     return (
-      <div className='onboardingQuestions'>
-          <OnboardingDropdown
-            key={professionalQuestionsConfig[7].id}
-            question={professionalQuestionsConfig[7].text}
-            options={professionalQuestionsConfig[7].options}
-            selectedOption={selectedOptions['networkingLevel'] || []}
-            onChange={(label) => handleChange('networkingLevel', label)}
-            type={professionalQuestionsConfig[7].type}
-          />
+        <div className='onboardingQuestions'>
+          <div style={{border: "solid 1.5px var(--secondary)", textAlign: "center", padding: "8px 0px", background: "var(--neutral)"}}>
+            <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and mentorship</span> <br /> is a valuable reasource for students on this app.</span></div>
+          <div style={{position: "relative"}}>
+          <label className='onboardingQuestion'>Please roughly assess your commitment:</label>
+          <div style={{position: "absolute", bottom: "-13px"}}>
+              <OptionalLabel />
+              </div>
+          </div>
+          <div style={{display: "flex", flexDirection: "column", gap: "25px"}}>
+            {availabilityOptionsConfig.map((option)=>(
+            <div style={{fontSize: "larger", lineHeight: ".6", display: "flex"}}>
+                <label htmlFor={option.id}>
+                <input 
+                    type="checkbox"
+                    value={option.value}
+                    checked={selectedOptions.networkingLevel.includes(option.value)}
+                    onChange={(e) => {
+                      handleOptionChange(e);
+                    }}
+                />
+                <span style={{fontSize: "22px", fontWeight: "bolder", color: "var(--secondary)"}}>{option.value}:</span> <span style={{fontWeight: "300"}}>{option.text}</span>
+                </label>
+            </div>))}
+            </div>
+          
       </div>
     );
-};
+  };
+  
 
-const LastPage = ({ selectedOptions, handleChange }) => {
-  const uploadStatus = selectedOptions['resumeOrDescription']?.type === 'file'
-    ? "File upload"
-    : (selectedOptions['resumeOrDescription']?.type === 'text' ? "Write \"about me\" instead" : '');
+const FinalTouches = ({ selectedOptions, handleChange }) => {
+
+  const OptionalLabel = () => (
+    <span className="optional-label" style={{fontSize: "15px"}}>(Optional)</span>
+  );
+
 
   return (
     <div className='onboardingQuestions'>
-      <OnboardingDropdown
-        question={professionalQuestionsConfig[8].text}
-        options={professionalQuestionsConfig[8].options}
-        selectedOption={uploadStatus || ''}
-        onChange={(label) => handleChange('resumeOrDescription', label === "File upload" ? { type: 'file' } : (label === "Write \"about me\" instead" ? { type: 'text' } : ''))}
-        type={professionalQuestionsConfig[8].type}
-      />
-      {uploadStatus === "File upload" && (
-        <form>
-          <h1>Resume Upload</h1>
-          <input 
-            type="file" 
-            onChange={(e) => handleChange('resumeOrDescription', { type: 'file', file: e.target.files[0] })}
-          />
-          <button type="submit">Upload</button>
-        </form>
-      )}
-      {uploadStatus === "Write \"about me\" instead" && (
-        <input 
-          type="text" 
-          value={selectedOptions['resumeOrDescription']?.text || ''}
-          onChange={(e) => handleChange('resumeOrDescription', { type: 'text', text: e.target.value })}
-        />
-      )}
+      <div style={{position: "relative"}}>
+      <label className='onboardingQuestion' style={{textAlign: "center"}}>Optionally, writing a little blurb about yourself would help prime students on what it is you do.</label>
+      <div style={{position: "absolute", width: "100%", bottom: "-13px", transform: "translateX(44%)"}}>
+            <OptionalLabel />
+      </div>
+      </div>
+      <div style={{margin: "0 auto", marginTop: "10px"}}>
+        <textarea style={{width: "460px", height: "160px"}} placeholder='Introduce yourself to prospective students!'></textarea>
+      </div>
     </div>
   );
 };

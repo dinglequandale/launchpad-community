@@ -2,53 +2,75 @@ import React, { useState, useMemo } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
 import { saveHighSchooler } from '../../../services/onboardingServices';
+import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 
 const highSchoolQuestionsConfig = [
   // Page 1
+  {
+    id: "userName",
+    text: "What's your full name?",
+    type: "text",
+    placeholder: "E.g. Quandale Dingle",
+    page: 1
+  },
+  {
+    id: "userPfpPreview",
+    text: "Upload a profile picture:",
+    type: "file",
+    optional: true,
+    page: 1
+  },
+  {
+    id: "areasOfInterest",
+    text: "What are you interested in?",
+    type: "multi-select",
+    options: careerInterests,
+    page: 1,
+  },
+  {
+    id: "userResume",
+    text: "If you have a resume, feel free to attach it:",
+    type: "file",
+    optional: true,
+    page: 1
+  },
+  // Page 2
   {
     id: "schoolAttending",
     text: "What school do you go to?",
     type: "select",
     options: highSchools,
-    page: 1,
+    page: 2,
   },
   {
     id: "graduationYear",
     text: "What year do you graduate?",
     type: "select",
     options: graduationYears,
-    page: 1,
+    page: 2,
   },
   {
     id: "sectionAttending",
     text: "Are you part of the French or International Section?",
     type: "select",
     options: ["French", "International"].map(option => ({ value: option, label: option })),
-    page: 1,
-  },
-
-  // Page 2
-  {
-    id: "areasOfInterest",
-    text: "What is your dream career field? (Select up to 4)",
-    type: "multi-select",
-    options: careerInterests,
     page: 2,
   },
 
   // Page 3
   {
     id: "collegeDecision",
-    text: "Have you decided what college you will attend after highschool?",
+    text: "Have you decided on a college yet?",
     type: "select",
     options: ["Yes", "No"].map(option => ({ value: option, label: option })),
     page: 3
   },
   {
     id: "collegeInterests",
-    text: "What colleges are you interested in attending after highschool?",
+    text: "What colleges are you interested in attending?",
     type: "multi-select",
     options: [], // Will fill this in later from Firebase
+    optional: true,
     page: 3  
   },
   {
@@ -57,7 +79,7 @@ const highSchoolQuestionsConfig = [
     type: "select",
     options: [], // Will fill this in later from Firebase
     page: 3  
-  }
+  },
 ];
 
 export default function HighSchooler({currentPage, isSubmitting}) {
@@ -66,6 +88,7 @@ export default function HighSchooler({currentPage, isSubmitting}) {
   const colleges = getColleges(searchQuery);
   const cachedColleges = useMemo(() => colleges, [colleges]);
   const [highSchoolerData, setHighSchoolerData] = useState({
+    userName: '',
     schoolAttending: '',
     graduationYear: '',
     sectionAttending: '',
@@ -73,14 +96,18 @@ export default function HighSchooler({currentPage, isSubmitting}) {
     collegeDecision: '',
     dreamColleges: [],
     collegeAttending: '',
+    userResume: null,
+    userResumePreview: "",
     userType: "Alumni",
+    userPfpPreview: "",
+    userPfp: null,
   });
 
   if(isSubmitting){
     saveHighSchooler(highSchoolerData);
   }
 
-  const handleDropdownChange = (id, label) => {
+  const handleChange = (id, label) => {
     setHighSchoolerData(prevState => ({
       ...prevState,
       [id]: label,
@@ -94,20 +121,12 @@ export default function HighSchooler({currentPage, isSubmitting}) {
   const renderPage = () => {
     switch (currentPage) {
       case 1:
-        return <FirstPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} pageNum={1} />;
+        return <BasicUserInfo questionsForPage={highSchoolQuestionsConfig.filter((question)=>(question.page === 1))} setSelectedOptions={setHighSchoolerData} selectedOptions={highSchoolerData} handleChange={handleChange}/>;
       case 2:
-        return <FirstPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} pageNum={2} />;
+        return <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange}/>;
       case 3:
-        return (
-          <>
-            <LastPage 
-              selectedOptions={highSchoolerData} 
-              handleChange={handleDropdownChange} 
-              colleges={cachedColleges}
-              onSearchQueryChange={handleSearchQueryChange} 
-            />
-          </>
-        );
+        return <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} colleges={cachedColleges}
+        onSearchQueryChange={handleSearchQueryChange} />;
       default:
         return null;
     }
@@ -120,11 +139,13 @@ export default function HighSchooler({currentPage, isSubmitting}) {
   );
 };
   
-const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
+const SchoolInfo = ({ selectedOptions, handleChange }) => {
+
+  const questionsForPage = highSchoolQuestionsConfig.filter(question => question.page === 2);
+
   return (
     <div className='onboardingQuestions'>
-      {highSchoolQuestionsConfig.filter(question => question.page === pageNum)
-                .map((question) => (
+      {questionsForPage.map((question) => (
         <OnboardingDropdown
           key={question.id}
           question={question.text}
@@ -138,7 +159,7 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
   );
 };
 
-const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange }) => {
+const HSCollegeInfo = ({ selectedOptions, handleChange, colleges, onSearchQueryChange }) => {
   const questions = highSchoolQuestionsConfig.filter(question => question.page === 3);
 
   const collegeDecision = selectedOptions['collegeDecision'];

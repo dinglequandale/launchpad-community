@@ -439,7 +439,6 @@ function FinalInfo(){
   },[])
 
   useEffect(()=>{
-    console.log(applyType, learnMoreType)
     setApplyInputVisibility(applyType !== "Messages");
     setLearnMoreInputVisibility(learnMoreType !== "Messages");
   },[applyType,learnMoreType])

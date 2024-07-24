@@ -1,18 +1,17 @@
+.dropDownContainer label {
+  font-size: 14px;
+  color: var(--secondary);
+  display: block;
+  margin-bottom: 6px;
+  font-size: larger;
+}
 
-  .dropDownContainer label {
-    font-size: 14px;
-    color: var(--secondary);
-    display: block;
-    margin-bottom: 6px;
-    font-size: larger;
-  }
-  
-  .react-select-container .react-select__control {
-    border-color: var(--secondary);
-    border-radius: 5px;
-    padding: 5px;
-  }
-  
-  .react-select-container .react-select__control:hover {
-    border-color: var(--secondary);
-  }
+.react-select-container.react-select__control {
+  border-color: var(--secondary);
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.react-select-container.react-select__control:hover {
+  border-color: var(--secondary);
+}

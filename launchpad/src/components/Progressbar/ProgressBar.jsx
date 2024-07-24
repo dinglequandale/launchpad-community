@@ -62,16 +62,16 @@ export default function ProgressBar({numOfSections, currentPage, setCurrentPage,
             <hr style={{width:"20%", borderColor: "var(--secondary)", borderWidth: "2px"}}/>
             <p style={{fontWeight: "300", fontSize: "larger"}}>Please fill out the remainder of the form before proceeding.</p>
         </Modal>
-        <div style={{display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "10px"}}>
-            <button onClick={goPrevious} style={{visibility: `${!showArrows ? "hidden" : "visible"}`}} className={`btnNavigate ${currentPage === 1 ? "hidden" : ""} btnUnfilled`}> <GrFormPrevious size={20}/> Previous </button>
-            <div style={{display: "flex", gap: "4px", width: "40%", overflow: "hidden", borderRadius: "10px",boxShadow: "var(--shadowColor)"}}>
+        <div style={{display: "flex", alignItems: "center", justifyContent: `${showArrows ? "space-between" : "center"}`, paddingTop: "10px"}}>
+            {showArrows && <button onClick={goPrevious} className={`btnNavigate ${currentPage === 1 ? "hidden" : ""} btnUnfilled`}> <GrFormPrevious size={20}/> Previous </button>}
+            <div style={{display: "flex", gap: "4px", width: "50%", overflow: "hidden", borderRadius: "10px"}}>
             {emptyArray.map((num, index)=>(
                 <div key={index} onClick={()=>handleClick(num)} className={`bar ${num <= currentPage ? "filled" : "unfilled"}`} style={{width: `${sectionWidth}%`, height: "12px", cursor: "pointer"}}>
                     <br />
                 </div>
             ))}
             </div>
-            <button onClick={goNext} style={{visibility: `${!showArrows ? "hidden" : "visible"}`}} className={`btnNavigate ${currentPage === numOfSections ? "hidden" : ""} btnUnfilled`}> Next <GrFormNext size={20}/> </button>
+            {showArrows && <button onClick={goNext} className={`btnNavigate ${currentPage === numOfSections ? "hidden" : ""} btnUnfilled`}> Next <GrFormNext size={20}/> </button>}
         </div>
         </>
     )

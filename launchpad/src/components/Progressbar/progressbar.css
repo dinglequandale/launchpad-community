@@ -3,7 +3,8 @@
 }
 
 .bar.unfilled{
-    background-color: var(--primary);
+    background-color: var(--neutral);
+    opacity: .6;
 }
 
 .btnNavigate{
