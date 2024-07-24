@@ -165,7 +165,7 @@ const HSCollegeInfo = ({ selectedOptions, handleChange, colleges, onSearchQueryC
   const collegeDecision = selectedOptions['collegeDecision'];
 
   return (
-    <div className='onboadingQuestions'>
+    <div className='onboardingQuestions' style={{width: "460px"}}>
       <OnboardingDropdown
         question={questions[0].text}
         options={questions[0].options}
