@@ -9,6 +9,7 @@ import { GiGraduateCap } from 'react-icons/gi';
 import { BiBriefcase } from 'react-icons/bi';
 import { LuGraduationCap } from 'react-icons/lu';
 import ProgressBar from '../../components/Progressbar/ProgressBar';
+import { useNavigate } from 'react-router-dom';
 
 export default function Onboarding() {
     const [showComponent, setShowComponent] = useState(false);
@@ -16,6 +17,8 @@ export default function Onboarding() {
     const [currentPage, setCurrentPage] = useState(0);
     const [selectedOption, setSelectedOption] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [canSubmit, setCanSubmit] = useState(false);
+    const navigate = useNavigate();
 
     const getNumOfSections = () => {
         switch(selectedOption){
@@ -68,9 +71,9 @@ export default function Onboarding() {
                 </>
             ) : (
                 <>
-                    {selectedOption === "High Schooler" && <HighSchooler currentPage={currentPage} isSubmitting={isSubmitting}/>}
-                    {selectedOption === "College Student" && <CollegeStudent currentPage={currentPage} isSubmitting={isSubmitting}/>}
-                    {selectedOption === "Professional" && <Professional currentPage={currentPage} isSubmitting={isSubmitting}/>}
+                    {selectedOption === "High Schooler" && <HighSchooler currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "College Student" && <CollegeStudent currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "Professional" && <Professional currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
                 </>
             )}    
             </main>
@@ -83,7 +86,9 @@ export default function Onboarding() {
                 Continue
                 </button>
                 : 
-                <button onClick={()=>setIsSubmitting(true)} className='continueButton'>
+                <button onClick={()=>{if(canSubmit){
+                    setIsSubmitting(true);
+                }}} className='continueButton'>
                     Submit
                 </button>}
             </footer>

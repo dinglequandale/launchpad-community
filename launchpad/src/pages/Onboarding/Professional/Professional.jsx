@@ -1,8 +1,9 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import { careerInterests } from './../Options';
-import { saveProfessional } from '../../../services/onboardingServices';
+import { requiredQuestionsAnswered, saveProfessional } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
+import { useAuth } from '../../../contexts/auth/AuthContext';
 
 const professionalQuestionsConfig = [
   // Page 1
@@ -102,7 +103,9 @@ const professionalQuestionsConfig = [
   },
 ];
 
-export default function Professional({currentPage, isSubmitting}) {
+export default function Professional({currentPage, isSubmitting, setCanSubmit}) {
+
+  const {currentUser} = useAuth();
 
   const [professionalData, setProfessionalData] = useState({
     retiredStatus: false,
@@ -115,11 +118,19 @@ export default function Professional({currentPage, isSubmitting}) {
     userResumePreview: "",
     userType: "Professional",
     userPfpPreview: "",
+    userAboutMe: "",
     userPfp: null,
   });
 
+  useEffect(()=>{
+    if(requiredQuestionsAnswered(professionalQuestionsConfig,professionalData)){
+      console.log("Can submit")
+      setCanSubmit(true);
+    }
+  },[professionalData])
+
   if(isSubmitting){
-    saveProfessional(professionalData);
+    saveProfessional(currentUser, professionalData);
   }
 
   const handleChange = (id, label) => {
@@ -132,13 +143,13 @@ export default function Professional({currentPage, isSubmitting}) {
   const renderPage = () => {
     switch (currentPage) {
       case 1:
-        return <BasicUserInfo selectedOptions={professionalData} questionsForPage={professionalQuestionsConfig.filter((question)=>question.page === 1)} handleChange={handleChange}/>
+        return <BasicUserInfo selectedOptions={professionalData} questionsForPage={professionalQuestionsConfig.filter((question)=>question.page === 1)} setSelectedOptions={setProfessionalData} handleChange={handleChange}/>
       case 2:
         return <RetiredStatus selectedOptions={professionalData} handleChange={handleChange} />;
       case 3:
         return <WorkDetails selectedOptions={professionalData} handleChange={handleChange} />;
       case 4:
-        return <ConnectionLevel selectedOptions={professionalData} handleChange={handleChange} />;
+        return <ConnectionLevel selectedOptions={professionalData} setSelectedOptions={setProfessionalData} />;
       case 5:
         return <FinalTouches selectedOptions={professionalData} handleChange={handleChange}/>
       default:
@@ -233,7 +244,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
       },
       { 
           id: "informationalInterview",
-          text: "Informational interview to discuss your career path and field",
+          text: "Interview with the student to discuss your career path and field",
           value: "Informational Interview",
       },
       { 
@@ -265,7 +276,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
                       handleOptionChange(e);
                     }}
                 />
-                <span style={{fontSize: "22px", fontWeight: "bolder", color: "var(--secondary)"}}>{option.value}:</span> <span style={{fontWeight: "300"}}>{option.text}</span>
+                <span style={{fontSize: "20px", fontWeight: "bolder", color: "var(--secondary)"}}>{option.value}:</span> <span style={{fontWeight: "300"}}>{option.text}</span>
                 </label>
             </div>))}
             </div>
@@ -282,6 +293,7 @@ const FinalTouches = ({ selectedOptions, handleChange }) => {
   );
 
 
+
   return (
     <div className='onboardingQuestions'>
       <div style={{position: "relative"}}>
@@ -291,7 +303,11 @@ const FinalTouches = ({ selectedOptions, handleChange }) => {
       </div>
       </div>
       <div style={{margin: "0 auto", marginTop: "10px"}}>
-        <textarea style={{width: "460px", height: "160px"}} placeholder='Introduce yourself to prospective students!'></textarea>
+        <textarea 
+        style={{width: "460px", height: "160px"}} 
+        placeholder='Introduce yourself to prospective students!' 
+        onChange={(e) => handleChange("userAboutMe",e.target.value)} 
+        value={selectedOptions["userAboutMe"]}></textarea>
       </div>
     </div>
   );

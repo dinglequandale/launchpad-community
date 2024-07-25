@@ -25,8 +25,8 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
 
       setSelectedOptions(prevData => ({
         ...prevData,
-        [fileType === 'pfp' ? 'userPfpPreview' : 'resumePreview']: URL.createObjectURL(file),
-        [fileType === 'pfp' ? 'userPfp' : 'resume']: file
+        [fileType === 'pfp' ? 'userPfpPreview' : 'userResumePreview']: URL.createObjectURL(file),
+        [fileType === 'pfp' ? 'userPfp' : 'userResume']: file
       }));
 
       // if (fileType === 'pfp') setPfpError(null);
@@ -121,10 +121,10 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
             </div>}
           </label>
           <div className="file-upload-preview">
-            {selectedOptions.resumePreview ? (
+            {selectedOptions.userResumePreview ? (
               <div className="btnFileUpload" style={{display: "flex", flexDirection: "column", width: "200px", padding: "14px", borderRadius: "5px", marginTop: "10px", fontSize: "larger", position: "relative"}}>
                 <FaRegFilePdf size={25} />
-                <span className="file-name">{selectedOptions.resume.name}</span>
+                <span className="file-name">{selectedOptions.userResume.name}</span>
   
                 <div className="preview-actions" style={{top: "-15px"}}>
                   <button onClick={() => triggerFileInput(resumeInputRef)} className="action-button">

@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
-import { saveCollegeStudent } from '../../../services/onboardingServices';
+import { requiredQuestionsAnswered, saveCollegeStudent } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
+import { useAuth } from '../../../contexts/auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const collegeStudentQuestionsConfig = [
   {
@@ -21,7 +23,7 @@ const collegeStudentQuestionsConfig = [
   },
   {
     id: "areasOfInterest",
-    text: "What are you interested in?",
+    text: "What are you're fields of study?",
     type: "multi-select",
     options: careerInterests,
     page: 1,
@@ -80,12 +82,16 @@ const collegeStudentQuestionsConfig = [
 ];
 
 
-export default function CollegeStudent({currentPage, isSubmitting}) {
+export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}) {
   const [searchQuery, setSearchQuery] = useState('');
   const colleges = getColleges(searchQuery);
   const cachedColleges = useMemo(() => colleges, [colleges]);
+  const {currentUser} = useAuth();
+
+  const navigate = useNavigate();
 
   const [collegeStudentData, setCollegeStudentData] = useState({
+    userName: '',
     collegeAttending: '',
     schoolAttending: '',
     graduationYear: '',
@@ -100,7 +106,7 @@ export default function CollegeStudent({currentPage, isSubmitting}) {
   });
 
   if(isSubmitting){
-    saveCollegeStudent(collegeStudentData);
+    saveCollegeStudent(currentUser, collegeStudentData, navigate("/Home"));
   }
 
   const handleChange = (id, label) => {
@@ -110,6 +116,13 @@ export default function CollegeStudent({currentPage, isSubmitting}) {
     }));
   };
 
+  useEffect(()=>{
+    if(requiredQuestionsAnswered(collegeStudentQuestionsConfig,collegeStudentData)){
+      console.log("Can submit")
+      setCanSubmit(true);
+    }
+  },[collegeStudentData])
+
   const handleSearchQueryChange = (query) => {
     setSearchQuery(query);
   };
@@ -117,7 +130,7 @@ export default function CollegeStudent({currentPage, isSubmitting}) {
   const renderPage = () => {
     switch (currentPage) {
       case 1:
-        return <BasicUserInfo selectedOptions={collegeStudentData} questionsForPage={collegeStudentQuestionsConfig.filter((question)=>question.page === 1)} handleChange={handleChange}/>
+        return <BasicUserInfo selectedOptions={collegeStudentData} questionsForPage={collegeStudentQuestionsConfig.filter((question)=>question.page === 1)} setSelectedOptions={setCollegeStudentData} handleChange={handleChange}/>
       case 2:
         return <CollegeInfo 
         selectedOptions={collegeStudentData}
@@ -190,7 +203,7 @@ const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
     },
     { 
         id: "informationalInterview",
-        text: "Informational interview to discuss your career path and field",
+        text: "Interview with the student to discuss your career path and field",
         value: "Informational Interview",
     },
     {
@@ -222,7 +235,7 @@ const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
                     handleOptionChange(e);
                   }}
               />
-              <span style={{fontSize: "22px", fontWeight: "bolder", color: "var(--secondary)"}}>{option.value}:</span> <span style={{fontWeight: "300"}}>{option.text}</span>
+              <span style={{fontSize: "20px", fontWeight: "bolder", color: "var(--secondary)"}}>{option.value}:</span> <span style={{fontWeight: "300"}}>{option.text}</span>
               </label>
           </div>))}
           </div>

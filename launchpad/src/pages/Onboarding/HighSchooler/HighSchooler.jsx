@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
-import { saveHighSchooler } from '../../../services/onboardingServices';
+import { requiredQuestionsAnswered, saveHighSchooler } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
+import { useAuth } from '../../../contexts/auth/AuthContext';
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -66,23 +67,17 @@ const highSchoolQuestionsConfig = [
     page: 3
   },
   {
-    id: "collegeInterests",
-    text: "What colleges are you interested in attending?",
-    type: "multi-select",
-    options: [], // Will fill this in later from Firebase
-    optional: true,
-    page: 3  
-  },
-  {
-    id: "collegeAttending",
-    text: "What college will you be attending?",
-    type: "select",
+    id: "collegeInterestsOrDecision",
+    text: (collegeChosen) => `${collegeChosen ? "What college will you be attending?" : "What colleges are you interested in attending?"}`,
+    type: (collegeChosen) => `${collegeChosen ? "select" : "multi-select"}`,
     options: [], // Will fill this in later from Firebase
     page: 3  
   },
 ];
 
-export default function HighSchooler({currentPage, isSubmitting}) {
+export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) {
+
+  const {currentUser} = useAuth();
   // Fetch college list from Firebase
   const [searchQuery, setSearchQuery] = useState('');
   const colleges = getColleges(searchQuery);
@@ -94,8 +89,7 @@ export default function HighSchooler({currentPage, isSubmitting}) {
     sectionAttending: '',
     areasOfInterest: [],
     collegeDecision: '',
-    dreamColleges: [],
-    collegeAttending: '',
+    collegeInterestsOrDecision: [],
     userResume: null,
     userResumePreview: "",
     userType: "Alumni",
@@ -103,8 +97,15 @@ export default function HighSchooler({currentPage, isSubmitting}) {
     userPfp: null,
   });
 
+  useEffect(()=>{
+    if(requiredQuestionsAnswered(highSchoolQuestionsConfig,highSchoolerData)){
+      console.log("Can submit")
+      setCanSubmit(true);
+    }
+  },[highSchoolerData])
+
   if(isSubmitting){
-    saveHighSchooler(highSchoolerData);
+    saveHighSchooler(currentUser, highSchoolerData);
   }
 
   const handleChange = (id, label) => {
@@ -161,8 +162,8 @@ const SchoolInfo = ({ selectedOptions, handleChange }) => {
 
 const HSCollegeInfo = ({ selectedOptions, handleChange, colleges, onSearchQueryChange }) => {
   const questions = highSchoolQuestionsConfig.filter(question => question.page === 3);
-
-  const collegeDecision = selectedOptions['collegeDecision'];
+  
+  const collegeChosen = selectedOptions['collegeDecision'] === "Yes";
 
   return (
     <div className='onboardingQuestions' style={{width: "460px"}}>
@@ -173,26 +174,15 @@ const HSCollegeInfo = ({ selectedOptions, handleChange, colleges, onSearchQueryC
         onChange={(label) => handleChange('collegeDecision', label)}
         type={questions[0].type}
       />
-      {collegeDecision === 'No' && (
-        <OnboardingDropdown
-          question={questions[1].text}
+
+      <OnboardingDropdown
+          question={questions[1].text(collegeChosen)}
           options={colleges}
-          selectedOption={selectedOptions['collegeInterests'] || []}
-          onChange={(label) => handleChange('collegeInterests', label)}
-          type={questions[1].type}
+          selectedOption={selectedOptions['collegeInterestsOrDecision'] || []}
+          onChange={(label) => handleChange('collegeInterestsOrDecision', label)}
+          type={questions[1].type(collegeChosen)}
           onSearchQueryChange={onSearchQueryChange}
         />
-      )}
-      {collegeDecision === 'Yes' && (
-        <OnboardingDropdown
-          question={questions[2].text}
-          options={colleges}
-          selectedOption={selectedOptions['collegeAttending'] || ''}
-          onChange={(label) => handleChange('collegeAttending', label)}
-          type={questions[2].type}
-          onSearchQueryChange={onSearchQueryChange}
-        />
-      )}
     </div>
   );
 };

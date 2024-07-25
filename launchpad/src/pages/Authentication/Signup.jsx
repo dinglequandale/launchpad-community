@@ -34,7 +34,8 @@ export default function SignUp(){
                 );
                 
                 // Redirect to homepage after successful account creation
-                navigate('/Home');
+                // navigate('/Home');
+                navigate("/Onboarding");
             } catch (error) {
                 console.error("Error creating account:", error);
             } finally {
@@ -52,6 +53,7 @@ export default function SignUp(){
                 toast.error("Sorry! There was an issue signing you in. Try again!");
             })
         }
+        navigate("/Onboarding");
     }
 
     return(
@@ -62,7 +64,7 @@ export default function SignUp(){
         reverseOrder={false}/>
         </div>
         
-        {userLoggedIn && (<Navigate to='/Home' replace={true}/>)}
+        {/* {userLoggedIn && (<Navigate to='/Home' replace={true}/>)} */}
         <div className="signup-container">
             <div className="signup-card">
                 <div style={{textAlign: "center", paddingBottom: "8px"}}><span style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "600"}}>Welcome to</span></div>
