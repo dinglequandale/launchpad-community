@@ -4,13 +4,17 @@ import SideNav from "../../components/Sidenav/SideNav";
 import ReactPlayer from "react-player";
 import ProfileStrength from "../../components/Profilestrength/ProfileStrength";
 import { FaArrowCircleDown } from "react-icons/fa";
-import { useAuth } from "../../contexts/auth/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export default function Home({userData}){
+export default function Home(){
 
-    const { currentUser } = useAuth();
-    const userName = "Username";
+    const [userBasicInfo, setUserBasicInfo] = useState(null);
+
+    useEffect(()=>{
+        const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
+        setUserBasicInfo(JSON.parse(storedUserBasicInfo));
+    },[userBasicInfo]);
+
     const resourceSections = ["How-To Network", "Discover Your Career", "SAT/ACT Study Tips", "Launchpad Help"];
     const tutorialData = [
         {
@@ -39,7 +43,7 @@ export default function Home({userData}){
             <SideNav/>
             <div className='homeContainer' style={{paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>
                 <div style={{paddingTop: "20px"}}>
-                    <InviteContacts userName={userName}/>
+                    <InviteContacts userName={userBasicInfo.userName.split(" ")[0] ?? "user"}/>
                 </div>
                 <div style={{display: "flex", paddingTop: "30px", position: "relative", width: "fitParent", height: "400px"}}>
                     <div className="launchpadIntro" style={

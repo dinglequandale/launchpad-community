@@ -17,7 +17,8 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
         // console.log("High Schooler info saved -- written with ID: ", docRef.id);
-
+        pushInitialProfileCompletion(highSchoolerData);
+        packageBasicUserInfoToLS(highSchoolerData);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -40,7 +41,8 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
         // console.log("College Student info saved -- written with ID: ", docRef.id);
-
+        pushInitialProfileCompletion(collegeStudentData);
+        packageBasicUserInfoToLS(collegeStudentData);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -64,6 +66,8 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
         // console.log("Professional info saved -- written with ID: ", docRef.id);
 
+        pushInitialProfileCompletion(professionalData);
+        packageBasicUserInfoToLS(professionalData);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -93,3 +97,19 @@ const uploadFileToStorage = async (file, fileName, folderName) => {
       return null;
     }
   };
+
+const packageBasicUserInfoToLS = (userData) => {
+    const userShortDescription = userData.userType === "High Schooler" ? `Class of ${userData.graduationYear}, ${userData.sectionAttending}` : "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}` : `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`;
+
+    const basicUserInfo = {userName: userData.userName, userPfpPreview: userData.userPfpPreview, userShortDescription: userShortDescription};
+
+    localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));
+}
+
+const pushInitialProfileCompletion = (userData) => {
+    const emptyQuestions = Object.values(userData).filter((answer)=>(answer === "" || answer === null || (Array.isArray(answer) && answer.length===0)));
+    const exactPercentage = (emptyQuestions.length/Object.keys(userData).length)*100;
+    const roundedPercentage = Math.ceil(exactPercentage / 10) * 10;
+    console.log(roundedPercentage);
+    localStorage.setItem("userProfileProgress", `${roundedPercentage/100}`);
+}

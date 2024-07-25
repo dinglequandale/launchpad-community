@@ -50,10 +50,9 @@ const professionalQuestionsConfig = [
     id: "industryPosition",
     text: "What was the last position you held?",
     type: "text-box",
-    placeholder: "E.g. 'financial analyist'",
+    placeholder: "E.g. 'financial analyst'",
     retired: true,
     options: null,
-    retired: true,
     page: 3,
   },
   {
@@ -65,12 +64,22 @@ const professionalQuestionsConfig = [
     retired: true,
     page: 3
   },
+  {
+    id: "yearsOfExperience",
+    text: "How many years of experience do you currently have?",
+    type: "text-box",
+    placeholder: "E.g. 10",
+    retired: true,
+    options: null,
+    retired: true,
+    page: 3,
+  },
   // If no
   {
-    id: "companyPosition",
+    id: "industryPosition",
     text: "What is your current position?",
     type: "text-box",
-    placeholder: "E.g. 'financial analyist'",
+    placeholder: "E.g. 'financial analyst'",
     options: null,
     retired: false,
     page: 3
@@ -83,6 +92,15 @@ const professionalQuestionsConfig = [
     retired: false,
     options: null,
     page: 3
+  },
+  {
+    id: "yearsOfExperience",
+    text: "How many years of experience do you have?",
+    type: "text-box",
+    placeholder: "E.g. 10",
+    retired: false,
+    options: null,
+    page: 3,
   },
   // Page 4
   // TODO: add descriptions to the options
@@ -120,6 +138,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
     userResumePreview: "",
     userType: "Professional",
     userPfpPreview: "",
+    yearsOfExperience: "",
     userAboutMe: "",
     userPfp: null,
   });
@@ -193,7 +212,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
           <div key={question.id} className="form-group">
             <label className='onboardingQuestion'>{question.text}</label>
             <input
-              type="text"
+              type={`${question.id === "yearsOfExperience" ? "number" : "text"}`}
               value={selectedOptions[question.id] || ''}
               onChange={(e) => handleChange(question.id, e.target.value)}
               className='onboardingInput'
