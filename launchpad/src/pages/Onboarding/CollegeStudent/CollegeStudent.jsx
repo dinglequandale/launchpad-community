@@ -83,12 +83,13 @@ const collegeStudentQuestionsConfig = [
 
 
 export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}) {
+
+  const navigate = useNavigate();
+
   const [searchQuery, setSearchQuery] = useState('');
   const colleges = getColleges(searchQuery);
   const cachedColleges = useMemo(() => colleges, [colleges]);
   const {currentUser} = useAuth();
-
-  const navigate = useNavigate();
 
   const [collegeStudentData, setCollegeStudentData] = useState({
     userName: '',
@@ -106,7 +107,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
   });
 
   if(isSubmitting){
-    saveCollegeStudent(currentUser, collegeStudentData, navigate("/Home"));
+    saveCollegeStudent(currentUser, collegeStudentData, () => {navigate("/Home")});
   }
 
   const handleChange = (id, label) => {

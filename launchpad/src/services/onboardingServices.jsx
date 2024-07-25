@@ -1,8 +1,8 @@
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase/firebaseConfig';
-import { collection, setDoc } from 'firebase/firestore';
+import { collection, doc, setDoc } from 'firebase/firestore';
 
-export const saveHighSchooler = async (currentUser, highSchoolerData) => {
+export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess) => {
     try {
         const { userPfp, userResume, ...otherData } = highSchoolerData;
 
@@ -15,14 +15,16 @@ export const saveHighSchooler = async (currentUser, highSchoolerData) => {
         userResumePreview: resumeURL,
         };
 
-        const docRef = await setDoc(collection(db, 'users', currentUser.uid), dataToSave);
-        console.log("High Schooler info saved -- written with ID: ", docRef.id);
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        // console.log("High Schooler info saved -- written with ID: ", docRef.id);
+
+        onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 };
 
-export const saveCollegeStudent = async (currentUser, collegeStudentData, goHome) => {
+export const saveCollegeStudent = async (currentUser, collegeStudentData, onSuccess) => {
 
     try {
         const { userPfp, userResume, ...otherData } = collegeStudentData;
@@ -36,15 +38,17 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, goHome
         userResumePreview: resumeURL,
         };
 
-        const docRef = await setDoc(collection(db, 'users', currentUser.uid), dataToSave);
-        console.log("College Student info saved -- written with ID: ", docRef.id);
-        goHome();
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        // console.log("College Student info saved -- written with ID: ", docRef.id);
+
+        onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 };
 
-export const saveProfessional = async (currentUser, professionalData) => {
+export const saveProfessional = async (currentUser, professionalData, onSuccess) => {
+
     try {
         const { userPfp, userResume, ...otherData } = professionalData;
 
@@ -57,8 +61,10 @@ export const saveProfessional = async (currentUser, professionalData) => {
         userResumePreview: resumeURL,
         };
 
-        const docRef = await setDoc(collection(db, 'users', currentUser.uid), dataToSave);
-        console.log("Professional info saved -- written with ID: ", docRef.id);
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        // console.log("Professional info saved -- written with ID: ", docRef.id);
+
+        onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
     }

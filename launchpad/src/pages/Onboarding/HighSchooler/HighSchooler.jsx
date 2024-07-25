@@ -4,6 +4,7 @@ import { highSchools, careerInterests, graduationYears, getColleges } from './..
 import { requiredQuestionsAnswered, saveHighSchooler } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -77,6 +78,8 @@ const highSchoolQuestionsConfig = [
 
 export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) {
 
+  const navigate = useNavigate();
+
   const {currentUser} = useAuth();
   // Fetch college list from Firebase
   const [searchQuery, setSearchQuery] = useState('');
@@ -105,7 +108,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
   },[highSchoolerData])
 
   if(isSubmitting){
-    saveHighSchooler(currentUser, highSchoolerData);
+    saveHighSchooler(currentUser, highSchoolerData, () => {navigate("/Home")});
   }
 
   const handleChange = (id, label) => {

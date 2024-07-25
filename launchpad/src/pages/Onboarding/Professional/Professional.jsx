@@ -4,6 +4,7 @@ import { careerInterests } from './../Options';
 import { requiredQuestionsAnswered, saveProfessional } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const professionalQuestionsConfig = [
   // Page 1
@@ -105,6 +106,8 @@ const professionalQuestionsConfig = [
 
 export default function Professional({currentPage, isSubmitting, setCanSubmit}) {
 
+  const navigate = useNavigate();
+
   const {currentUser} = useAuth();
 
   const [professionalData, setProfessionalData] = useState({
@@ -113,7 +116,6 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
     companyName: '',
     fieldsOfExpertise: [],
     networkingLevel: [],
-    resume: null,
     userResume: null,
     userResumePreview: "",
     userType: "Professional",
@@ -130,7 +132,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
   },[professionalData])
 
   if(isSubmitting){
-    saveProfessional(currentUser, professionalData);
+    saveProfessional(currentUser, professionalData, () => {navigate("/Home")});
   }
 
   const handleChange = (id, label) => {

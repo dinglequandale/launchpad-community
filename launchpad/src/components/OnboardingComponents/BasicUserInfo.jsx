@@ -41,8 +41,8 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
   const removeFile = (fileType) => {
     setSelectedOptions(prevData => ({
       ...prevData,
-      [fileType === 'pfp' ? 'userPfpPreview' : 'resumePreview']: null,
-      [fileType === 'pfp' ? 'userPfp' : 'resume']: null
+      [fileType === 'pfp' ? 'userPfpPreview' : 'userResumePreview']: null,
+      [fileType === 'pfp' ? 'userPfp' : 'userResume']: null
     }));
   }
 

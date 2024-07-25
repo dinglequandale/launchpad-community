@@ -5,11 +5,9 @@ import HighSchooler from './HighSchooler/HighSchooler';
 import "./onboarding.css"
 import Professional from './Professional/Professional';
 import { BsBackpack } from 'react-icons/bs';
-import { GiGraduateCap } from 'react-icons/gi';
 import { BiBriefcase } from 'react-icons/bi';
 import { LuGraduationCap } from 'react-icons/lu';
 import ProgressBar from '../../components/Progressbar/ProgressBar';
-import { useNavigate } from 'react-router-dom';
 
 export default function Onboarding() {
     const [showComponent, setShowComponent] = useState(false);
@@ -18,7 +16,6 @@ export default function Onboarding() {
     const [selectedOption, setSelectedOption] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [canSubmit, setCanSubmit] = useState(false);
-    const navigate = useNavigate();
 
     const getNumOfSections = () => {
         switch(selectedOption){
