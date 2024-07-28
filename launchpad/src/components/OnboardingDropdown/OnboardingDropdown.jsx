@@ -1,5 +1,6 @@
 import React from 'react';
 import Select from 'react-select';
+import "./onboardingdropdown.css";
 
 export default function OnboardingDropdown({ question, options, selectedOption, onChange, type, onSearchQueryChange }) {
     const handleChange = (selectedOptions) => {
@@ -19,7 +20,7 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
     // const formattedOptions = options.map(option => ({ value: option, label: option }));
 
     return (
-        <div className="form-group">
+        <div className="dropDownContainer">
             <label>{question}</label>
             {type === 'multi-select' ? (
                 <Select

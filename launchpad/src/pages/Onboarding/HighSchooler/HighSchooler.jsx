@@ -1,85 +1,144 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import ProgressBar from '../../../components/Progressbar/ProgressBar';
 import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
-import { saveHighSchooler } from '../../../services/onboardingServices';
+import { requiredQuestionsAnswered, saveHighSchooler } from '../../../services/onboardingServices';
+import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
+import { useAuth } from '../../../contexts/auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const highSchoolQuestionsConfig = [
   // Page 1
   {
-    id: "whatSchool",
+    id: "userName",
+    text: "What's your full name?",
+    type: "text",
+    placeholder: "E.g. Quandale Dingle",
+    page: 1
+  },
+  {
+    id: "userPfpPreview",
+    text: "Upload a profile picture:",
+    type: "file",
+    optional: true,
+    page: 1
+  },
+  {
+    id: "areasOfInterest",
+    text: "What are you interested in?",
+    type: "multi-select",
+    options: careerInterests,
+    page: 1,
+  },
+  {
+    id: "userResume",
+    text: "If you have a resume, feel free to attach it:",
+    type: "file",
+    optional: true,
+    page: 1
+  },
+  // Page 2
+  {
+    id: "schoolAttending",
     text: "What school do you go to?",
     type: "select",
     options: highSchools,
-    page: 1,
+    page: 2,
   },
   {
     id: "graduationYear",
     text: "What year do you graduate?",
     type: "select",
     options: graduationYears,
-    page: 1,
+    page: 2,
   },
   {
-    id: "whatSection",
+    id: "sectionAttending",
     text: "Are you part of the French or International Section?",
     type: "select",
     options: ["French", "International"].map(option => ({ value: option, label: option })),
-    page: 1,
-  },
-
-  // Page 2
-  {
-    id: "dreamCareer",
-    text: "What is your dream career field? (Select up to 4)",
-    type: "multi-select",
-    options: careerInterests,
     page: 2,
   },
 
   // Page 3
   {
     id: "collegeDecision",
-    text: "Have you decided what college you will attend after highschool?",
+    text: "Have you decided on a college yet?",
     type: "select",
     options: ["Yes", "No"].map(option => ({ value: option, label: option })),
     page: 3
   },
   {
-    id: "collegeInterests",
-    text: "What colleges are you interested in attending after highschool?",
-    type: "multi-select",
+    id: "collegeInterestsOrDecision",
+    text: (collegeChosen) => `${collegeChosen ? "What college will you be attending?" : "What colleges are you interested in attending?"}`,
+    type: (collegeChosen) => `${collegeChosen ? "select" : "multi-select"}`,
     options: [], // Will fill this in later from Firebase
     page: 3  
   },
-  {
-    id: "collegeAttending",
-    text: "What college will you be attending?",
-    type: "select",
-    options: [], // Will fill this in later from Firebase
-    page: 3  
-  }
 ];
 
-export default function HighSchooler() {
+export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) {
+
+  const navigate = useNavigate();
+
+  const {currentUser} = useAuth();
   // Fetch college list from Firebase
   const [searchQuery, setSearchQuery] = useState('');
   const colleges = getColleges(searchQuery);
   const cachedColleges = useMemo(() => colleges, [colleges]);
-
-  const numOfSections = 3;
-  const [currentPage, setCurrentPage] = useState(1);
   const [highSchoolerData, setHighSchoolerData] = useState({
-    whatSchool: '',
+    userAboutMe: '',
+    userName: '',
+    schoolAttending: '',
     graduationYear: '',
-    whatSection: '',
-    dreamCareer: [],
+    sectionAttending: '',
+    areasOfInterest: [],
     collegeDecision: '',
-    collegeInterests: [],
-    collegeAttending: ''
+    collegeInterestsOrDecision: [],
+    userResume: null,
+    userResumePreview: "",
+    userType: "High Schooler",
+    userPfpPreview: "",
+    userPfp: null,
   });
 
-  const handleDropdownChange = (id, label) => {
+  const handleSubmit = async () => {
+    
+    const loadingToast = toast.loading('Saving your information...');
+
+    try {
+      await saveHighSchooler(
+        currentUser, 
+        highSchoolerData,
+        () => {
+          // Success callback
+          toast.success('Information saved successfully!', {
+            id: loadingToast,
+          });
+          navigate("/Home");
+        }
+      );
+    } catch (error) {
+      // Error callback
+      toast.error('Failed to save information. Please try again.', {
+        id: loadingToast,
+      });
+    } finally {
+      // setIsSubmitting(false);
+    }
+  };
+
+  useEffect(()=>{
+    if(requiredQuestionsAnswered(highSchoolQuestionsConfig,highSchoolerData)){
+      setCanSubmit(true);
+    }
+  },[highSchoolerData])
+
+  if(isSubmitting){
+    handleSubmit();
+  }
+
+  const handleChange = (id, label) => {
     setHighSchoolerData(prevState => ({
       ...prevState,
       [id]: label,
@@ -90,55 +149,34 @@ export default function HighSchooler() {
     setSearchQuery(query);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await saveHighSchooler(highSchoolerData);
-    alert('Data saved successfully');
-  };
-
   const renderPage = () => {
     switch (currentPage) {
       case 1:
-        return <FirstPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} pageNum={1} />;
+        return <BasicUserInfo questionsForPage={highSchoolQuestionsConfig.filter((question)=>(question.page === 1))} setSelectedOptions={setHighSchoolerData} selectedOptions={highSchoolerData} handleChange={handleChange}/>;
       case 2:
-        return <FirstPage selectedOptions={highSchoolerData} handleChange={handleDropdownChange} pageNum={2} />;
+        return <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange}/>;
       case 3:
-        return (
-          <>
-            <LastPage 
-                    selectedOptions={highSchoolerData} 
-                    handleChange={handleDropdownChange} 
-                    colleges={cachedColleges}
-                    onSearchQueryChange={handleSearchQueryChange} 
-            />
-            <button type="button" onClick={handleSubmit} style={{ padding: '10px 20px', backgroundColor: 'blue', color: 'white', fontSize: '16px' }}>
-              Submit
-            </button>
-          </>
-        );
+        return <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} colleges={cachedColleges}
+        onSearchQueryChange={handleSearchQueryChange} />;
       default:
         return null;
     }
   };
 
   return (
-    <div>
-      <ProgressBar
-          numOfSections={numOfSections}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          showLast={true}
-      />
+    <>
       {renderPage()}
-    </div>
+    </>
   );
 };
   
-const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
+const SchoolInfo = ({ selectedOptions, handleChange }) => {
+
+  const questionsForPage = highSchoolQuestionsConfig.filter(question => question.page === 2);
+
   return (
-    <div>
-      {highSchoolQuestionsConfig.filter(question => question.page === pageNum)
-                .map((question) => (
+    <div className='onboardingQuestions'>
+      {questionsForPage.map((question) => (
         <OnboardingDropdown
           key={question.id}
           question={question.text}
@@ -152,13 +190,13 @@ const FirstPage = ({ selectedOptions, handleChange, pageNum }) => {
   );
 };
 
-const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange }) => {
+const HSCollegeInfo = ({ selectedOptions, handleChange, colleges, onSearchQueryChange }) => {
   const questions = highSchoolQuestionsConfig.filter(question => question.page === 3);
-
-  const collegeDecision = selectedOptions['collegeDecision'];
+  
+  const collegeChosen = selectedOptions['collegeDecision'] === "Yes";
 
   return (
-    <div>
+    <div className='onboardingQuestions' style={{width: "460px"}}>
       <OnboardingDropdown
         question={questions[0].text}
         options={questions[0].options}
@@ -166,26 +204,15 @@ const LastPage = ({ selectedOptions, handleChange, colleges, onSearchQueryChange
         onChange={(label) => handleChange('collegeDecision', label)}
         type={questions[0].type}
       />
-      {collegeDecision === 'No' && (
-        <OnboardingDropdown
-          question={questions[1].text}
+
+      <OnboardingDropdown
+          question={questions[1].text(collegeChosen)}
           options={colleges}
-          selectedOption={selectedOptions['collegeInterests'] || []}
-          onChange={(label) => handleChange('collegeInterests', label)}
-          type={questions[1].type}
+          selectedOption={selectedOptions['collegeInterestsOrDecision'] || []}
+          onChange={(label) => handleChange('collegeInterestsOrDecision', label)}
+          type={questions[1].type(collegeChosen)}
           onSearchQueryChange={onSearchQueryChange}
         />
-      )}
-      {collegeDecision === 'Yes' && (
-        <OnboardingDropdown
-          question={questions[2].text}
-          options={colleges}
-          selectedOption={selectedOptions['collegeAttending'] || ''}
-          onChange={(label) => handleChange('collegeAttending', label)}
-          type={questions[2].type}
-          onSearchQueryChange={onSearchQueryChange}
-        />
-      )}
     </div>
   );
 };

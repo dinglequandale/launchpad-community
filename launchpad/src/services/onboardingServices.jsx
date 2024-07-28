@@ -1,44 +1,115 @@
-import { db } from '../firebase/firebaseConfig';
-import { collection, addDoc } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { db, storage } from '../firebase/firebaseConfig';
+import { collection, doc, setDoc } from 'firebase/firestore';
 
-export const saveHighSchooler = async (highSchoolerData) => {
+export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess) => {
     try {
-        const dataWithUserType = {
-            userType: 'highSchooler',
-            ...highSchoolerData
+        const { userPfp, userResume, ...otherData } = highSchoolerData;
+
+        const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
+        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
+
+        const dataToSave = {
+        ...otherData,
+        userPfpPreview: pfpURL,
+        userResumePreview: resumeURL,
         };
 
-        const docRef = await addDoc(collection(db, 'users'), dataWithUserType);
-        console.log("High Schooler info saved -- written with ID: ", docRef.id);
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        // console.log("High Schooler info saved -- written with ID: ", docRef.id);
+        pushInitialProfileCompletion(dataToSave);
+        packageBasicUserInfoToLS(dataToSave);
+        onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 };
 
-export const saveCollegeStudent = async (collegeStudentData) => {
+export const saveCollegeStudent = async (currentUser, collegeStudentData, onSuccess) => {
+
     try {
-        const dataWithUserType = {
-            userType: 'collegeStudent',
-            ...collegeStudentData
+        const { userPfp, userResume, ...otherData } = collegeStudentData;
+
+        const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
+        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
+
+        const dataToSave = {
+        ...otherData,
+        userPfpPreview: pfpURL,
+        userResumePreview: resumeURL,
         };
 
-        const docRef = await addDoc(collection(db, 'users'), dataWithUserType);
-        console.log("College Student info saved -- written with ID: ", docRef.id);
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        // console.log("College Student info saved -- written with ID: ", docRef.id);
+        pushInitialProfileCompletion(dataToSave);
+        packageBasicUserInfoToLS(dataToSave);
+        onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 };
 
-export const saveProfessional = async (professionalData) => {
+export const saveProfessional = async (currentUser, professionalData, onSuccess) => {
+
     try {
-        const dataWithUserType = {
-            userType: 'professional',
-            ...professionalData
+        const { userPfp, userResume, ...otherData } = professionalData;
+
+        const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
+        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
+
+        const dataToSave = {
+        ...otherData,
+        userPfpPreview: pfpURL,
+        userResumePreview: resumeURL,
         };
 
-        const docRef = await addDoc(collection(db, 'users'), dataWithUserType);
-        console.log("Professional info saved -- written with ID: ", docRef.id);
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        // console.log("Professional info saved -- written with ID: ", docRef.id);
+
+        pushInitialProfileCompletion(dataToSave);
+        packageBasicUserInfoToLS(dataToSave);
+        onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 };
+
+export const requiredQuestionsAnswered = (questionConfig, userData) => {
+    const requiredQuestions = questionConfig.filter((question)=>!question.optional);
+    const emptyRequiredQuestions = requiredQuestions.filter((question)=>(userData[question.id] === "" || userData[question.id] === null || (Array.isArray(userData[question.id]) && userData[question.id].length===0)));
+    console.log(emptyRequiredQuestions);
+    return emptyRequiredQuestions.length === 0;
+}
+
+const uploadFileToStorage = async (file, fileName, folderName) => {
+
+    if (!file) return null;
+  
+    const fileExtension = file.name.split('.').pop();
+    const storageRef = ref(storage, `${folderName}/${fileName}.${fileExtension}`);
+  
+    try {
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
+    } catch (error) {
+      console.error(`Error uploading ${folderName}:`, error);
+      return null;
+    }
+  };
+
+const packageBasicUserInfoToLS = (userData) => {
+    const userShortDescription = userData.userType === "High Schooler" ? `Class of ${userData.graduationYear}, ${userData.sectionAttending}` : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}` : `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`;
+
+    const basicUserInfo = {userName: userData.userName, userType: userData.userType, userPfpPreview: userData.userPfpPreview, userShortDescription: userShortDescription};
+
+    localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));
+}
+
+const pushInitialProfileCompletion = (userData) => {
+    const emptyQuestions = Object.values(userData).filter((answer)=>(answer === "" || answer === null || (Array.isArray(answer) && answer.length===0)));
+    const exactPercentage = ((Object.keys(userData).length - emptyQuestions.length)/Object.keys(userData).length)*100;
+    const roundedPercentage = Math.ceil(exactPercentage / 10) * 10;
+    console.log(roundedPercentage, emptyQuestions, exactPercentage);
+    localStorage.setItem("userProfileProgress", `${roundedPercentage/100}`);
+}

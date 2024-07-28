@@ -8,7 +8,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   const handleJoin = () => {
-    if(!userLoggedIn){navigate("/Signup");}
+    if(!userLoggedIn){navigate("/Login");}
     else{navigate("/Home");}
   }
 

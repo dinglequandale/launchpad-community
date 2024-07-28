@@ -2,41 +2,125 @@ import React, { useState } from 'react';
 import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
 import CollegeStudent from './CollegeStudent/CollegeStudent';
 import HighSchooler from './HighSchooler/HighSchooler';
+import "./onboarding.css"
 import Professional from './Professional/Professional';
+import { BsBackpack } from 'react-icons/bs';
+import { BiBriefcase } from 'react-icons/bi';
+import { LuGraduationCap } from 'react-icons/lu';
+import ProgressBar from '../../components/Progressbar/ProgressBar';
 
 export default function Onboarding() {
-    const [selectedOption, setSelectedOption] = useState('');
     const [showComponent, setShowComponent] = useState(false);
+    const [numOfSections, setNumOfSections] = useState(0);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [selectedOption, setSelectedOption] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [canSubmit, setCanSubmit] = useState(false);
 
-    const handleDropdownChange = (value) => {
-        setSelectedOption(value);
-    };
+    const getNumOfSections = () => {
+        switch(selectedOption){
+            case "High Schooler":
+                return 3;
+            case "College Student":
+                return 3;
+            case "Professional":
+                return 5;
+            default:
+                return null;
+        }
+    }
 
     const handleContinue = () => {
-        setShowComponent(true);
+        if(!showComponent){
+            setShowComponent(true);
+            setNumOfSections(getNumOfSections());
+            console.log(numOfSections);
+        }
+        setCurrentPage(currentPage+1); 
     };
 
+    const handlePrev = () => {
+        if(currentPage === 1){
+            setShowComponent(false);
+        }
+        setCurrentPage(currentPage-1);
+    }
+
+    const disabledSubmitStyles = {cursor: "not-allowed", background: "gray"};
     return (
-        <div>
+        <div className='onboarding-container'>
+            <div className='onboarding-body'>
+            <header style={{marginBottom: "2rem"}}>
+                <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
+                    display: "flex", justifyContent: "center", alignItems: "center", height: "100px",  marginBottom: "20px"}}>
+                    <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
+                </div>
+                {(currentPage !== 0) && <ProgressBar
+                    numOfSections={numOfSections}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                    showArrows={false}
+                />}
+            </header>
+            <main style={{marginBottom: "2rem"}}>
             {!showComponent ? (
                 <>
-                    <OnboardingDropdown
-                        question="Are you a current high schooler, alumni, or a professional?"
-                        options={["High School", "College Student and Alumni", "Professional"].map(option => ({ value: option, label: option }))}
-                        selectedOption={selectedOption}
-                        onChange={handleDropdownChange}
-                    />
-                    <button className="continueButton" onClick={handleContinue} disabled={!selectedOption}>
-                        Continue
-                    </button>
+                    <UserType setSelectedOption={setSelectedOption} selectedOption={selectedOption}/>
                 </>
             ) : (
                 <>
-                    {selectedOption === "High School" && <HighSchooler />}
-                    {selectedOption === "College Student and Alumni" && <CollegeStudent />}
-                    {selectedOption === "Professional" && <Professional />}
+                    {selectedOption === "High Schooler" && <HighSchooler currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "College Student" && <CollegeStudent currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "Professional" && <Professional currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
                 </>
-            )}
+            )}    
+            </main>
+            <footer style={{paddingTop: "10px", display: "flex", justifyContent: "space-between", width: "100%"}}>
+                <button style={{visibility: `${currentPage === 0 ? "hidden" : "visible"}`}} className="btnUnfilled continueButton" onClick={handlePrev}>
+                    Previous
+                </button>
+                {(currentPage !== numOfSections || numOfSections === 0) ? 
+                <button className="continueButton" onClick={handleContinue} disabled={!selectedOption}>
+                Continue
+                </button>
+                : 
+                <button onClick={()=>{if(canSubmit){
+                    setIsSubmitting(true);
+                }}} className='continueButton' style={!canSubmit ? disabledSubmitStyles : {}}>
+                    Submit
+                </button>}
+            </footer>
+            </div>
         </div>
     );
 };
+
+function UserType({setSelectedOption, selectedOption}) {
+    const userTypes = [
+        { id: 'highschool', label: 'High Schooler', icon: <BsBackpack size={25}/> },
+        { id: 'college', label: 'College Student', icon: <LuGraduationCap size={30}/> },
+        { id: 'professional', label: 'Professional', icon: <BiBriefcase size={25}/> },
+      ];
+
+    const handleUserTypeSelection = (userType) => {
+        setSelectedOption(userType);
+    }
+    
+    return(
+        <div style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+            <span style={{marginBottom: "15px", fontSize: "large", color: "secondary"}}>Which best describes you?</span>
+            <div className="userType-options-container">
+            {userTypes.map((type) => (
+            <button
+                key={type.id}
+                className={`btnUnfilled userType-option ${selectedOption === type.label ? 'selected' : ''}`}
+                onClick={() => handleUserTypeSelection(type.label)}
+            >
+                {type.icon}
+                <span className="userType-label">{type.label}</span>
+            </button>
+            ))}
+            </div>
+        </div>
+    )    
+}

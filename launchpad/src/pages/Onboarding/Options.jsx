@@ -1,6 +1,6 @@
 import { db } from '../../firebase/firebaseConfig';
-import { collection, getDocs, query, orderBy, startAt, endAt, and } from 'firebase/firestore';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
 
 const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
@@ -107,37 +107,39 @@ for (let year = 1990; year <= 2028; year++) {
     graduationYears.push({ value: year, label: year.toString() });
 }
 
-const getColleges = (searchQuery = '') => {
+const getColleges = (searchQuery = null) => {
     const [colleges, setColleges] = useState([]);
-  
-    useEffect(() => {
-      const fetchColleges = async () => {
-        const collegeData = [];
 
-        let q = query(collection(db, "colleges"), orderBy('label'));
-        
-        if (searchQuery) {
-            q = query(
-                collection(db, "colleges"),
-                and(
-                    startAt(searchQuery),
-                    endAt(searchQuery + '~')
-                )
-            );
-        } 
+  const fetchColleges = useCallback(async () => {
+    if (searchQuery.length < 2) {
+      setColleges([]);
+      return;
+    }
 
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            collegeData.push({ label: data.label, value: data.value });
-        });
-        setColleges(collegeData);
-      };
-  
-      fetchColleges();
-    }, [searchQuery]);
-  
-    return colleges;
+    const collegesRef = collection(db, "colleges");
+    const q = query(
+      collegesRef,
+      orderBy('label'),
+      startAt(searchQuery),
+      endAt(searchQuery + '\uf8ff'),
+      limit(5) // Limit the number of results
+    );
+
+    const querySnapshot = await getDocs(q);
+    const collegeData = querySnapshot.docs.map(doc => ({
+      label: doc.data().label,
+      value: doc.data().value
+    }));
+
+    setColleges(collegeData);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    fetchColleges();
+  }, [fetchColleges]);
+
+  return colleges;
 };
+
 
 export { highSchools, careerInterests, graduationYears, getColleges };
