@@ -13,7 +13,9 @@ export default function Home(){
     useEffect(()=>{
         const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
         setUserBasicInfo(JSON.parse(storedUserBasicInfo));
-    },[userBasicInfo]);
+    },[]);
+
+    console.log(userBasicInfo)
 
     const resourceSections = ["How-To Network", "Discover Your Career", "SAT/ACT Study Tips", "Launchpad Help"];
     const tutorialData = [
@@ -43,7 +45,7 @@ export default function Home(){
             <SideNav/>
             <div className='homeContainer' style={{paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>
                 <div style={{paddingTop: "20px"}}>
-                    <InviteContacts userName={userBasicInfo.userName.split(" ")[0] ?? "user"}/>
+                    {userBasicInfo && <InviteContacts userName={userBasicInfo.userName.split(" ")[0] ?? "user"}/>}
                 </div>
                 <div style={{display: "flex", paddingTop: "30px", position: "relative", width: "fitParent", height: "400px"}}>
                     <div className="launchpadIntro" style={
@@ -68,7 +70,7 @@ export default function Home(){
                         {padding: "10px", backgroundColor: "white", width: "40%", marginLeft: "auto", borderRadius: "10px",
                             boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
                         }>
-                        <ProfileStrength/>
+                        <ProfileStrength userData={userBasicInfo}/>
                     </div>
                 </div>
                 <div className="resourceCenter">

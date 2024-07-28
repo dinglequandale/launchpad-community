@@ -5,6 +5,7 @@ import { requiredQuestionsAnswered, saveHighSchooler } from '../../../services/o
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -86,6 +87,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
   const colleges = getColleges(searchQuery);
   const cachedColleges = useMemo(() => colleges, [colleges]);
   const [highSchoolerData, setHighSchoolerData] = useState({
+    userAboutMe: '',
     userName: '',
     schoolAttending: '',
     graduationYear: '',
@@ -95,20 +97,45 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
     collegeInterestsOrDecision: [],
     userResume: null,
     userResumePreview: "",
-    userType: "Alumni",
+    userType: "High Schooler",
     userPfpPreview: "",
     userPfp: null,
   });
 
+  const handleSubmit = async () => {
+    
+    const loadingToast = toast.loading('Saving your information...');
+
+    try {
+      await saveHighSchooler(
+        currentUser, 
+        highSchoolerData,
+        () => {
+          // Success callback
+          toast.success('Information saved successfully!', {
+            id: loadingToast,
+          });
+          navigate("/Home");
+        }
+      );
+    } catch (error) {
+      // Error callback
+      toast.error('Failed to save information. Please try again.', {
+        id: loadingToast,
+      });
+    } finally {
+      // setIsSubmitting(false);
+    }
+  };
+
   useEffect(()=>{
     if(requiredQuestionsAnswered(highSchoolQuestionsConfig,highSchoolerData)){
-      console.log("Can submit")
       setCanSubmit(true);
     }
   },[highSchoolerData])
 
   if(isSubmitting){
-    saveHighSchooler(currentUser, highSchoolerData, () => {navigate("/Home")});
+    handleSubmit();
   }
 
   const handleChange = (id, label) => {

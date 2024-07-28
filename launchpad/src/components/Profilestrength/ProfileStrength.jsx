@@ -27,7 +27,7 @@ export default function ProfileStrength({userData}){
                 
             <div style={{ height: "330px", display: "flex", flexDirection: "column", alignItems: "center", position: "relative"}}>
                 <div style={{width: "100%", display: 'flex', flexDirection: "column", justifyContent: "center", alignItems: "center", marginTop: "30px"}}>
-                <ProfileIcon/>
+                {userData && <ProfileIcon userData={userData}/>}
                 <div style={{width: "100%", display: 'flex', flexDirection: "column", gap: "7px", justifyContent: "center", alignItems: "center"}}>
                     <ProfileBar profileProgress={profileProgress}/>
                     <span style={{paddingTop: "4px", paddingBottom: "15px", color: "var(--secondary)", fontSize: "17.5px"}}>Your profile is {profileProgress * 100}% completed!</span>
@@ -65,14 +65,15 @@ function ProfileBar({profileProgress}){
     )
 }
 
-function ProfileIcon(){
+function ProfileIcon({userData}){
+    console.log(userData.userPfpPreview);
     return(
         <div style={{display: "flex", gap: "10px", alignItems: "center", paddingTop: "20px", paddingBottom: "20px"}}>
-            <img src="https://purepng.com/public/uploads/large/big-chungus-jkg.png" alt="" style={
+            <img src={userData.userPfpPreview ?? "/assets/awty-logo.jpg"} alt="" style={
                 {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/>
             <div>
-                <span style={{fontWeight: "bolder", fontSize: "22px"}}>Juan Gallo</span> <br />
-                <span style={{fontWeight: "300"}}>Class of 2026, International</span>
+                <span style={{fontWeight: "bolder", fontSize: "22px"}}>{userData.userName}</span> <br />
+                <span style={{fontWeight: "300"}}>{userData.userShortDescription}</span>
             </div>
         </div>
     )

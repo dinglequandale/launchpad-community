@@ -5,6 +5,7 @@ import { requiredQuestionsAnswered, saveProfessional } from '../../../services/o
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const professionalQuestionsConfig = [
   // Page 1
@@ -143,6 +144,32 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
     userPfp: null,
   });
 
+  const handleSubmit = async () => {
+    
+    const loadingToast = toast.loading('Saving your information...');
+
+    try {
+      await saveProfessional(
+        currentUser, 
+        highSchoolerData,
+        () => {
+          // Success callback
+          toast.success('Information saved successfully!', {
+            id: loadingToast,
+          });
+          navigate("/Home");
+        }
+      );
+    } catch (error) {
+      // Error callback
+      toast.error('Failed to save information. Please try again.', {
+        id: loadingToast,
+      });
+    } finally {
+      // setIsSubmitting(false);
+    }
+  };
+
   useEffect(()=>{
     if(requiredQuestionsAnswered(professionalQuestionsConfig,professionalData)){
       console.log("Can submit")
@@ -151,7 +178,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
   },[professionalData])
 
   if(isSubmitting){
-    saveProfessional(currentUser, professionalData, () => {navigate("/Home")});
+    handleSubmit();
   }
 
   const handleChange = (id, label) => {

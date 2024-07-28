@@ -5,6 +5,7 @@ import { requiredQuestionsAnswered, saveCollegeStudent } from '../../../services
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const collegeStudentQuestionsConfig = [
   {
@@ -92,6 +93,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
   const {currentUser} = useAuth();
 
   const [collegeStudentData, setCollegeStudentData] = useState({
+    userAboutMe: '',
     userName: '',
     collegeAttending: '',
     schoolAttending: '',
@@ -106,8 +108,34 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
     userPfp: null,
   });
 
+  const handleSubmit = async () => {
+    
+    const loadingToast = toast.loading('Saving your information...');
+
+    try {
+      await saveCollegeStudent(
+        currentUser, 
+        highSchoolerData,
+        () => {
+          // Success callback
+          toast.success('Information saved successfully!', {
+            id: loadingToast,
+          });
+          navigate("/Home");
+        }
+      );
+    } catch (error) {
+      // Error callback
+      toast.error('Failed to save information. Please try again.', {
+        id: loadingToast,
+      });
+    } finally {
+      // setIsSubmitting(false);
+    }
+  };
+
   if(isSubmitting){
-    saveCollegeStudent(currentUser, collegeStudentData, () => {navigate("/Home")});
+    handleSubmit();
   }
 
   const handleChange = (id, label) => {

@@ -46,6 +46,7 @@ export default function Onboarding() {
         setCurrentPage(currentPage-1);
     }
 
+    const disabledSubmitStyles = {cursor: "not-allowed", background: "gray"};
     return (
         <div className='onboarding-container'>
             <div className='onboarding-body'>
@@ -85,7 +86,7 @@ export default function Onboarding() {
                 : 
                 <button onClick={()=>{if(canSubmit){
                     setIsSubmitting(true);
-                }}} className='continueButton'>
+                }}} className='continueButton' style={!canSubmit ? disabledSubmitStyles : {}}>
                     Submit
                 </button>}
             </footer>
