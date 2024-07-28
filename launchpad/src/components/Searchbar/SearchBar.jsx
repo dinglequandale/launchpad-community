@@ -1,9 +1,10 @@
+import React, { useState } from 'react';
 import ContentFilter from "../Contentfilter/ContentFilter";
 import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
+import { searchDocuments } from "../../services/searchServices";
 
 export default function SearchBar({filters, pageName}) {
-
     const searchType = () => {
         switch(pageName){
             case "Network":
@@ -12,19 +13,44 @@ export default function SearchBar({filters, pageName}) {
                 return "opportunities and organizations"
         }
     }
+
+    const [queryText, setQueryText] = useState('');
+    const [results, setResults] = useState([]);
+  
+    const handleSearch = async (e) => {
+      e.preventDefault();
+      const matches = await searchDocuments(pageName.toLowerCase(), queryText);
+      setResults(matches);
+    };
+  
     return (
         <div className="searchContainer">
-            <h2 style={{paddingLeft: "3%"}}>{pageName}</h2>
-            <div style={{dislay: "flex"}} className="search">
-                <CiSearch size={28} style={{color:"grey"}}/>
-                <input type="text" name="fname" className="searchBar" placeholder={`Search for ${searchType()}`} />
-            </div>
-            <div style={{display: "flex", paddingBottom: "10px", gap: "30px", marginLeft: "5%"}}>
-                {filters.map((filter, index)=>(
-                    <ContentFilter filterContent={filters[index]}/>
-                ))}
-            </div>
+        <h2 style={{ paddingLeft: "3%" }}>{pageName}</h2>
+        <div style={{ display: "flex" }} className="search">
+          <CiSearch size={28} style={{ color: "grey" }} />
+          <form onSubmit={handleSearch} style={{ display: "flex", flex: 1 }}>
+            <input 
+              type="text" 
+              name="fname" 
+              className="searchBar" 
+              placeholder={`Search for ${searchType()}`} 
+              value={queryText}
+              onChange={(e) => setQueryText(e.target.value)}
+            />
+          </form>
         </div>
-        
-    )
+        <div style={{ display: "flex", paddingBottom: "10px", gap: "30px", marginLeft: "5%" }}>
+          {filters.map((filter, index) => (
+            <ContentFilter key={index} filterContent={filter} />
+          ))}
+        </div>
+        <div>
+          <ul>
+            {results.map((result, index) => (
+              <li key={index}>{result}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
 }
