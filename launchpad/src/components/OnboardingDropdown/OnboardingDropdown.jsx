@@ -2,7 +2,7 @@ import React from 'react';
 import Select from 'react-select';
 import "./onboardingdropdown.css";
 
-export default function OnboardingDropdown({ question, options, selectedOption, onChange, type, onSearchQueryChange }) {
+export default function OnboardingDropdown({ question, options, selectedOption, onChange, type, onSearchQueryChange, showQuestion=true }) {
     const handleChange = (selectedOptions) => {
         const label = type === 'multi-select'
             ? selectedOptions.map(option => option.label)
@@ -21,7 +21,7 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
 
     return (
         <div className="dropDownContainer">
-            <label>{question}</label>
+            {showQuestion && <label>{question}</label>}
             {type === 'multi-select' ? (
                 <Select
                     isMulti

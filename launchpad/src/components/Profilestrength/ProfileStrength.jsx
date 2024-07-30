@@ -68,7 +68,7 @@ function ProfileBar({profileProgress}){
 function ProfileIcon({userData}){
     console.log(userData.userPfpPreview);
     return(
-        <div style={{display: "flex", gap: "10px", alignItems: "center", paddingTop: "20px", paddingBottom: "20px"}}>
+        <div style={{display: "flex", gap: "10px", alignItems: "center", paddingTop: "20px", paddingBottom: "20px", maxWidth: "340px"}}>
             <img src={userData.userPfpPreview ?? "/assets/awty-logo.jpg"} alt="" style={
                 {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/>
             <div>

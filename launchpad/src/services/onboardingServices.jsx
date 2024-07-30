@@ -60,7 +60,7 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         const dataToSave = {
         ...otherData,
         userPfpPreview: pfpURL,
-        userResumePreview: resumeURL,
+        userResumePreview: resumeURL
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
@@ -101,7 +101,25 @@ const uploadFileToStorage = async (file, fileName, folderName) => {
 const packageBasicUserInfoToLS = (userData) => {
     const userShortDescription = userData.userType === "High Schooler" ? `Class of ${userData.graduationYear}, ${userData.sectionAttending}` : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}` : `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`;
 
-    const basicUserInfo = {userName: userData.userName, userType: userData.userType, userPfpPreview: userData.userPfpPreview, userShortDescription: userShortDescription};
+    // Check whether user is upperclassman or lowerclassman
+    const currYear = new Date().getFullYear();
+    
+    const userHighSchoolType = (graduationYear) => {
+        if(currYear + 2 >= graduationYear){
+            return "Upperclassman"
+        }
+        else{
+            return "Lowerclassman"
+        }
+    }
+
+    const basicUserInfo = {
+        userName: userData.userName,
+        userType: userData.userType,
+        userPfpPreview: userData.userPfpPreview,
+        userShortDescription: userShortDescription,
+        userHighSchoolType: (userData.userType === "High Schooler") ? userHighSchoolType(userData.graduationYear) : null
+    };
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));
 }

@@ -140,6 +140,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
     userType: "Professional",
     userPfpPreview: "",
     yearsOfExperience: "",
+    userName: "",
     userAboutMe: "",
     userPfp: null,
   });
@@ -151,7 +152,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
     try {
       await saveProfessional(
         currentUser, 
-        highSchoolerData,
+        professionalData,
         () => {
           // Success callback
           toast.success('Information saved successfully!', {
