@@ -7,8 +7,8 @@ import { storage } from '../../firebase/firebaseConfig';
 import toast from 'react-hot-toast';
 
 // TODO: actually implement clickedUser logic
-export default function ConnectModal({visibility, chat, onClose, clickedUser="EUVGKcqLdkbINcp6EEgUASaW2rI3"}){
-  
+export default function ConnectModal({visibility, chat, onClose, userId}){
+
   const [introMessage, setIntroMessage] = useState("");
   const [sendWithResume, setSendWithResume] = useState(false);
   const [channelId, setChannelId] = useState("")
@@ -49,10 +49,10 @@ export default function ConnectModal({visibility, chat, onClose, clickedUser="EU
 
             // TODO: user resume read logic
             
-            await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, clickedUser, setChannelId, chat);
+            await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, userId, setChannelId, chat);
         }
         else{
-            await sendConnectMessageWithoutResume(introMessage, currentUser.uid, clickedUser, setChannelId, chat);
+            await sendConnectMessageWithoutResume(introMessage, currentUser.uid, userId, setChannelId, chat);
         }
     }catch(error){
         console.log(error);
@@ -96,7 +96,7 @@ export default function ConnectModal({visibility, chat, onClose, clickedUser="EU
         shouldCloseOnOverlayClick={false} 
       >
         <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Connect with [clickedUser] <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Gain valuable internships amd mentorship</span></h2>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> {userId} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Gain valuable internships and mentorship</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{paddingTop: "20px", display: "flex", flexDirection: "column", gap: "7px"}}>

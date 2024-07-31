@@ -13,6 +13,7 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         ...otherData,
         userPfpPreview: pfpURL,
         userResumePreview: resumeURL,
+        userId: currentUser.uid
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
@@ -37,6 +38,7 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         ...otherData,
         userPfpPreview: pfpURL,
         userResumePreview: resumeURL,
+        userId: currentUser.uid
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
@@ -60,7 +62,8 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         const dataToSave = {
         ...otherData,
         userPfpPreview: pfpURL,
-        userResumePreview: resumeURL
+        userResumePreview: resumeURL,
+        userId: currentUser.uid
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);

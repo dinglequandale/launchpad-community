@@ -76,7 +76,6 @@ export default function EditProfileCard() {
     const descType = () => {
         switch(userData.userType){
             case "High Schooler":
-                
                 return userData.collegeDecision === "No" ? "Dream Colleges" : "Commited College";
             case "Alumni":
                 return "Attending College";

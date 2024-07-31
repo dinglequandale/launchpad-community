@@ -89,7 +89,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     // Page 1
     {
       id: "organizationType",
-      text: "Workplace Initiative Type:",
+      text: "Initiative Type:",
       type: "select",
       options: ["Select Type", "Club", "Nonprofit"],
       includers: ["Nonprofit", "Club", ""],

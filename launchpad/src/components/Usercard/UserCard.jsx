@@ -3,14 +3,14 @@ import { VscAccount } from "react-icons/vsc";
 import ConnectionBanner from "../Connectionbanner/ConnectionBanner";
 import { useState } from "react";
 import { FaLink } from "react-icons/fa6";
+import { displayFieldsOfInterest, lowerAndCapitalize } from "../../services/userProfileServices";
 
 export default function UserCard({userData, onProfileClick, onConnectClick}) {
     // todo: actual banner
     const [bannerVisibility, setBannerVisibility] = useState(false);
 
     // TODO: currently localStorage, transition to database
-    const userType = "Professional";
-    const userName = "Shuja Gupta";
+    const userType = userData.userType;
     
     const descType = () => {
         switch(userType){
@@ -24,28 +24,28 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                 return "";
         }
     }
-    const [basicInfoData, setBasicInfoData] = useState({});
 
     // TODO: change to userData
 
-    const basicInfoContent = {userPreface: userType === "Professional" ? `${basicInfoData.yearsOfExperience} years of experience in ${basicInfoData.industryOfExperience}`
-    : userType === "Alumni" ? `Graduated with Class of [...]`
-    : `[...], Class of [...]`,
-    userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${basicInfoData.areasOfInterest ?? basicInfoData.fieldsOfExpertise}`,
-    userSecondDesc: `${descType()}: ${userType === "Professional" ? basicInfoData.industryPosition : userType === "Alumni" ? basicInfoData.attendingCollege : basicInfoData.dreamColleges}`,
-    acceptedColleges: `Accepted Colleges: ${basicInfoData.acceptedColleges}`,
+    const basicInfoContent ={userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`
+    : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
+    : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
+    userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${userData.areasOfInterest ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
+    userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition? (lowerAndCapitalize(userData.industryPosition)) : "None") : userType === "Alumni" ? userData.collegeAttending : userData.collegeInterestsOrDecision}`,
+    acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
 }
 
     return(
         <>
         <div className='networkProfileCard'>
             {bannerVisibility && <ConnectionBanner/>}
-            <button style={{position: "absolute", right: "3%"}} className="btnText" onClick={onProfileClick}>
+            <button style={{position: "absolute", right: "3%"}} className="btnText" onClick={() => onProfileClick(userData.userId)}>
                 See Profile
             </button>
             <div className='basicInfo'>
                 <div>
-                    <VscAccount size = {60} className='cardPfp'/>
+                    {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
+                {width: "60px", height: "60px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <VscAccount size = {60} className='cardPfp'/>}
                 </div>
                 <div className='cardNameDescription'>
                     <span className='cardName'>{userData.userName}</span>
@@ -56,10 +56,10 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                 <div className='userInfo' style={{fontSize: "16px"}}>
                     <span>{basicInfoContent.userFirstDesc}</span>
                     <span>{basicInfoContent.userSecondDesc}</span>
-                    {basicInfoData.acceptedColleges && <span>{basicInfoContent.acceptedColleges}</span>}
+                    {userData.acceptedColleges && (userData.acceptedColleges.length > 0) && <span>{basicInfoContent.acceptedColleges}</span>}
                 </div>
             </div>
-            <button style={{width: "80%", borderRadius: "5px", margin: "0 auto"}} onClick={onConnectClick}> 
+            <button style={{width: "80%", borderRadius: "5px", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={20}/>
                     <span style={{fontWeight: "550"}}>Connect</span>
