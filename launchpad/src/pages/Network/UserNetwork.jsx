@@ -24,6 +24,7 @@ export default function UserNetwork() {
   const [profileModalVisibility, setProfileModalVisibility] = useState(false);
   const [connectModalVisibility, setConnectModalVisibility] = useState(false);
   const [profileTargetUserId, setProfileTargetUserId] = useState("");
+  const [connectTargetUserId, setConnectTargetUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const [allUserData, setAllUserData] = useState([]);
 
@@ -44,6 +45,10 @@ export default function UserNetwork() {
     }
   }
 
+  const handleConnectClick = (userId) => {
+    setConnectTargetUserId(userId);
+    setProfileModalVisibility(false);
+  }
   const handleOnProfileClick = (userId) => {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2);
@@ -88,7 +93,7 @@ export default function UserNetwork() {
   return (
     <NetworkContext.Provider value={{handleOnProfileClick, setConnectModalVisibility}}>
       <>
-        {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} visibility={connectModalVisibility} chat={chatClient}/>}
+        {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
         <div>
             <TopBar/>
             <SideNav/>
@@ -96,7 +101,7 @@ export default function UserNetwork() {
               <SearchBar filters = {filterContent} pageName={pageName}/>
               <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px"}}>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
-                  <h3>Upperclassmen</h3>
+                  <h3>High Schoolers</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
                 <UserCarousel userNetworkData={allUserData.filter((user) => user.userType === "High Schooler")}/>
@@ -110,7 +115,7 @@ export default function UserNetwork() {
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
                 <UserCarousel userNetworkData={allUserData.filter((user) => user.userType === "Professional")}/>
-                {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={()=>setConnectModalVisibility(true)} userId={profileTargetUserId}/>}
+                {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} userId={profileTargetUserId}/>}
               </div>
             </div>
         </div>

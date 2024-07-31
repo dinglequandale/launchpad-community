@@ -59,7 +59,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                     {userData.acceptedColleges && (userData.acceptedColleges.length > 0) && <span>{basicInfoContent.acceptedColleges}</span>}
                 </div>
             </div>
-            <button style={{width: "80%", borderRadius: "5px", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={onConnectClick}> 
+            <button style={{width: "80%", borderRadius: "5px", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={20}/>
                     <span style={{fontWeight: "550"}}>Connect</span>
