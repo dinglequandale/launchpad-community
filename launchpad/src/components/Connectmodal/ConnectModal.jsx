@@ -40,15 +40,15 @@ export default function ConnectModal({visibility, chat, onClose, clickedUser="EU
   const verifySend = async () => {
     try{
         if(sendWithResume){
-            const resumeRef = ref(storage, `resumes/${currentUser.uid}_resume.pdf`);
-
+            const resumeRef = ref(storage, `resumes/resume_${currentUser.uid}.pdf`);
+            //TODO: Check this
             const resumeURL = await storage.getDownloadURL(resumeRef);
 
             // Get the file metadata
             const metaData = await storage.getMetadata(resumeRef);
 
             // TODO: user resume read logic
-
+            
             await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, clickedUser, setChannelId, chat);
         }
         else{

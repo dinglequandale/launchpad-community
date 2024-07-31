@@ -18,20 +18,54 @@ import AvailabilityModal from '../Profilemodals/Availabilitymodal/AvailabilityMo
 import { useAuth } from '../../contexts/auth/AuthContext';
 import { handleDeleteOpportunity, loadOpportunities } from '../../services/opportunityServices';
 import Loading from '../LoadingAnimation/Loading';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../../firebase/firebaseConfig';
+import { displayFieldsOfInterest, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
 
 const ProfileContext = createContext({
-    currentUser: null
+    currentUser: null,
+    userData: {},
   });
 
-export default function EditProfileCard({userData}) {
+export default function EditProfileCard() {
     const navigate = useNavigate();
     const location = useLocation();
     // temporary data
-    const userType = "Professional";
-    const userName = "Shuja Gupta";
+    // const [userBasicInfo, setUserBasicInfo] = useState(null);
+    // const userType = "Professional";
+
+    const [userData, setUserData] = useState(null);
 
     const { currentUser } = useAuth();
+    const [loading, setLoading] = useState(false);
     
+    useEffect(() => {
+        let unsubscribe;
+        setLoading(true);
+
+        if (currentUser) {
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            unsubscribe = onSnapshot(userDocRef, (doc) => {
+                if (doc.exists()) {
+                    setUserData(doc.data());
+                } else {
+                    console.log("No such document!");
+                    setUserData(null);
+                }
+            });
+        } else {
+            setUserData(null);
+        }
+        setLoading(false);
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
+    }, [currentUser]);
+
+    console.log(userData)
+
     const opportunitiesOptions = {highSchool: 
     <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
     alum:
@@ -40,9 +74,10 @@ export default function EditProfileCard({userData}) {
     <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</span>
 };
     const descType = () => {
-        switch(userType){
+        switch(userData.userType){
             case "High Schooler":
-                return "Dream Colleges";
+                
+                return userData.collegeDecision === "No" ? "Dream Colleges" : "Commited College";
             case "Alumni":
                 return "Attending College";
             case "Professional":
@@ -53,32 +88,36 @@ export default function EditProfileCard({userData}) {
     }
     return(
         <>
-            <ProfileContext.Provider value={{currentUser}}>
+            <ProfileContext.Provider value={{currentUser, userData}}>
             <div className='editprofileCard'>
+                {(!loading && userData) ? <>
                 <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", borderWidth: "1.7px", paddingBottom: "5px"}}>
                     <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
                     onClick={() => {location.state ? navigate(location.state) : navigate("/")}}>
                         <RiArrowGoBackFill size={20}/>
                         <span>Go Back</span>
                     </div>
-                    <BasicInfoCard userName={userName} userType={userType} descType={descType()}/>
+                    <BasicInfoCard descType={descType()}/>
                 </div>
                 <div style={{paddingTop: "20px"}}>
-                    <OpportunityPopup userName={userName} userType={userType} opportunitiesOptions={opportunitiesOptions}/>
+                    <OpportunityPopup opportunitiesOptions={opportunitiesOptions}/>
                 </div>
                 <AboutMeDisplay/>
-                <div className={`userResume ${userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px"}}>
+                <div className={`userResume ${userData.userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px"}}>
                     <div style={{display: "flex", justifyContent: "space-between"}} id="Resume">
-                        <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px"}}>{userName}'s Resume ...</span>
+                        <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px"}}>{userData.userName.split(" ")[0]}'s Resume ...</span>
                         <PublicPrivateDropdown/>
                     </div>
                     <ResumeUpload/>
                 </div>
-                {(userType === "Professional" || userType === "Alumni") && <hr style={{width: "100%"}}/>}
-                {(userType === "Professional" || userType === "Alumni") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
-                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userName}</span> is <span style={{fontWeight: "450"}}>open to</span> ... </h>
-                    <ConnectionAvailability userType={userType}/>
+                {(userData.userType === "Professional" || userData.userType === "Alumni") && <hr style={{width: "100%"}}/>}
+                {(userData.userType === "Professional" || userData.userType === "Alumni") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
+                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userData.userName}</span> is <span style={{fontWeight: "450"}}>open to</span> ... </h>
+                    <ConnectionAvailability/>
                 </div>}
+                </>
+                :
+                <Loading/>}
             </div>
             </ProfileContext.Provider>
         </>
@@ -149,22 +188,27 @@ function PrivacyComponent({icon, privacy}){
 function ResumeUpload(){
     const inputRef = useRef();
 
+    const { userData, currentUser } = useContext(ProfileContext);
+
     const handleUploadClick = () => {
         inputRef.current.click();
     }
-    // IMPORTANT TODO: files funky with localStorage, need to adjust when transition to database
-    const [pdfUrl, setPdfUrl] = useState(null);
+
+    const [pdfUrl, setPdfUrl] = useState(userData.userResumePreview);
     useEffect(() => {
         return () => {
           if (pdfUrl) {
+            // TODO: Check this:
             URL.revokeObjectURL(pdfUrl);
           }
         };
       }, [pdfUrl]); 
 
-    function onFileChange(event) {
-    const file = event.target.files[0];
-    setPdfUrl(URL.createObjectURL(file));
+    async function onFileChange(event) {
+        const file = event.target.files[0];
+        const userResumePreview = await handleUserResumeUpdate(userData, file, currentUser);
+        setPdfUrl(userResumePreview);
+        // setPdfUrl(URL.createObjectURL(file));
   }
   
     return (
@@ -185,36 +229,37 @@ function ResumeUpload(){
     </>
     );
 }
-function BasicInfoCard({userType, userName, descType}){
-
-    const [basicInfoData, setBasicInfoData] = useState({});
+function BasicInfoCard({descType}){
+    // const [basicInfoData, setBasicInfoData] = useState({});
     const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(null);
-    useEffect(() => {
-        const storedBasicInfoData = localStorage.getItem("userBasicInfo");
-        if (storedBasicInfoData !== null) {
-          setBasicInfoData(JSON.parse(storedBasicInfoData));
-        }
-        else{
-        }
-      }, [basicInfoModalVisibility,]);
 
-    const basicInfoContent = {userPreface: userType === "Professional" ? `${basicInfoData.yearsOfExperience} years of experience in ${basicInfoData.industryOfExperience}`
-    : userType === "Alumni" ? `Graduated with Class of ${basicInfoData.graduationYear}`
-    : `[...], Class of ${basicInfoData.graduationYear}`,
-    userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${basicInfoData.areasOfInterest ?? basicInfoData.fieldsOfExpertise}`,
-    userSecondDesc: `${descType}: ${userType === "Professional" ? basicInfoData.industryPosition : userType === "Alumni" ? basicInfoData.collegeAttending : basicInfoData.dreamColleges}`,
-    acceptedColleges: `Accepted Colleges: ${basicInfoData.acceptedColleges}`,
-}
+    const { userData } = useContext(ProfileContext);
+
+    const userType = userData.userType;
+    
+    const [basicInfoContent, setBasicInfoContent] = useState(null);
+
+    useEffect(()=>{
+        setBasicInfoContent({userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`
+        : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
+        : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
+        userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${userData.areasOfInterest ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
+        userSecondDesc: `${descType}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? userData.collegeAttending : userData.collegeInterestsOrDecision}`,
+        acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
+    })
+    },[userData])
 
     return(
         <>
-        <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userType={userType}/>
+        {basicInfoModalVisibility && <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userData={userData} userType={userType}/>}
+        {basicInfoContent && <>
         <div className='basicInfo'>
             <div>
-                <VscAccount size = {80} className='cardPfp'/>
+                {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
+                {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <VscAccount size = {80} className='cardPfp'/>}
             </div>
             <div className='cardNameDescription'>
-                <span className='cardName'>{userName}</span>
+                <span className='cardName'>{userData.userName}</span>
                 <span className='cardDescription'>{basicInfoContent.userPreface}</span>
             </div>   
             </div>
@@ -222,19 +267,20 @@ function BasicInfoCard({userType, userName, descType}){
             <div className='userInfo' style={{fontSize: "16px"}}>
                 <span>{basicInfoContent.userFirstDesc}</span>
                 <span>{basicInfoContent.userSecondDesc}</span>
-                {basicInfoData.acceptedColleges && <span>{basicInfoContent.acceptedColleges}</span>}
+                {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <span>{basicInfoContent.acceptedColleges}</span>}
             </div>
         </div>
         <div className='addOne' style={{transform: "translate(0,-70px)"}}>
                 <EditInformation isAnswered={true} questionName={"Intro"} onEdit={()=>setBasicInfoModalVisibility(true)}/>
             </div>
+        </>}
         </>
     )
 }
 
-function OpportunityPopup({userType, userName, opportunitiesOptions}){
+function OpportunityPopup({opportunitiesOptions}){
 
-    const { currentUser } = useContext(ProfileContext);
+    const { currentUser, userData } = useContext(ProfileContext);
 
     const [opportunityData, setOpportunityData] = useState(null);
 
@@ -270,7 +316,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
                 objectOfDeletation={opportunityData.organizationType}/>}
         </div>
         <div name="opportunityModal" style={{position: "relative"}}>
-            {userType === "Professional" ? <OpportunityModal 
+            {userData.userType === "Professional" ? <OpportunityModal 
                 onClose={()=>setOpportunityModalVisibility(false)}
                 visibility={opportunityModalVisibility} 
                 opportunityData={opportunityData} 
@@ -289,7 +335,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
             <div style={{textAlign: "center"}}>
             <span 
             style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>
-                {userName.split(" ")[0]} is {userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userType === "Professional" && " opportunity"}!</span>
+                {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
             </span>
             </div>
             <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "-13px", top: "28px", background: "red", zIndex: "2"}}>
@@ -304,7 +350,7 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
             <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
                 boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
-                {userType === "High Schooler" ? opportunitiesOptions.highSchool : userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
+                {userData.userType === "High Schooler" ? opportunitiesOptions.highSchool : userData.userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
                 <hr style={{width:"50%", borderColor: "var(--accent)"}}/>
                 <div className="addOne" onClick={()=>setOpportunityModalVisibility(true)}>
                     <IoAdd size={25} />
@@ -324,7 +370,12 @@ function OpportunityPopup({userType, userName, opportunitiesOptions}){
 
 function AboutMeDisplay(){
     // editting functionality
-    const aboutMe = localStorage.getItem("userAboutMe");
+    const { userData } = useContext(ProfileContext);
+    const [aboutMe, setAboutMe] = useState("");
+
+    useEffect(()=>{
+        setAboutMe(userData.userAboutMe);
+    },[userData])
 
     const [aboutMeModalVisibility, setAboutMeModalVisibility] = useState(false);
     const onModalClose = () => {
@@ -332,7 +383,7 @@ function AboutMeDisplay(){
     }
     return(
         <>
-        <AboutMeModal visibility={aboutMeModalVisibility} onClose={onModalClose}/>
+        <AboutMeModal visibility={aboutMeModalVisibility} onClose={onModalClose} userData={userData}/>
         <div className="aboutMe" style={{paddingTop: "20px"}}>
             <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me ...</span> <br />
 
@@ -350,12 +401,14 @@ function AboutMeDisplay(){
     )
 }
 
-function ConnectionAvailability({userType}){
+function ConnectionAvailability(){
     const [availabilityModalVisibility, setAvailabilityModalVisibility] = useState(false);
     const [availabilityData, setAvailabilityData] = useState(null);
 
+    const { userData } = useContext(ProfileContext);
+
     useEffect(()=>{
-        const storedAvailabilityData = JSON.parse(localStorage.getItem("userAvailabilityData"));
+        const storedAvailabilityData = userData.networkingLevel;
         if(!Array.isArray(storedAvailabilityData)){
             return;
         }
@@ -364,11 +417,11 @@ function ConnectionAvailability({userType}){
             return;
         }
         setAvailabilityData(null);
-    },[availabilityModalVisibility,])
+    },[userData]);
 
     return(
         <>
-            {availabilityModalVisibility && <AvailabilityModal visibility={availabilityModalVisibility} onClose={()=>setAvailabilityModalVisibility(false)} userType={userType}/>}
+            {availabilityModalVisibility && <AvailabilityModal visibility={availabilityModalVisibility} onClose={()=>setAvailabilityModalVisibility(false)} userType={userData.userType}/>}
             <div>
                 {!availabilityData && <span style={{fontWeight: "250", fontSize: "15px"}}>How are you open to assisting prospective students?</span>}
                 {!availabilityData && <div className='addOne' onClick={()=>setAvailabilityModalVisibility(true)}>

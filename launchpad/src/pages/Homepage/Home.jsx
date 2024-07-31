@@ -103,13 +103,12 @@ export default function Home(){
 function InviteContacts({userName}){
     return(
         <div style={
-            {position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "var(--accent)",
-         height: "fitContent", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
+            {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "#bae7ec",
+         height: "fitContent", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)", border: "solid 1.4px var(--secondary)"}
          }>
-            <span> &emsp; Hey, {userName}!</span> <br />
-            <span>&emsp; &emsp; &emsp; Know any college students or working professionals not on the app? Invite them below!</span>
+            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>Hey, {userName}!</span> <br /> Know any <span style={{textDecoration: "underline", color: "var(--secondary)"}}>college students </span>or <span style={{textDecoration: "underline", color: "var(--secondary)"}}>working professionals</span> not on the app? Invite them below!</span>
             <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
-                <button style={{borderRadius: "10px", color: "white", fontWeight: "bold", fontSize: "17px", padding: "10px"}}>Invite Contacts</button>
+                <button className="btnUnfilled" style={{borderRadius: "10px", background: "var(--primary)", fontWeight: "550", fontSize: "20px", padding: "10px", width: "200px"}}>Invite Contacts</button>
             </div>
         </div>
     )

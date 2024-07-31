@@ -59,6 +59,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
             type="text"
             onChange={(e) => handleChange(questionsForPage[0].id, e.target.value)}
             className="onboardingInput"
+            value={selectedOptions[questionsForPage[0].id]}
             placeholder={questionsForPage[0].placeholder}
           />
         </div>

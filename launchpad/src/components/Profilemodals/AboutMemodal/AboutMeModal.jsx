@@ -2,17 +2,22 @@ import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import "./aboutmemodal.css"
 import MakeChanges from '../../Makechanges/MakeChanges';
+import { editUserData } from '../../../services/userProfileServices';
+import { useAuth } from '../../../contexts/auth/AuthContext';
 
-export default function AboutMeModal({visibility, onClose}){
-  const [aboutMeContent, setAboutMeContent] = useState("");
+export default function AboutMeModal({userData, visibility, onClose}){
+  const [aboutMeContent, setAboutMeContent] = useState(userData.userAboutMe ?? "");
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
-
+  const {currentUser} = useAuth();
   const wordLimit = 50;
 
   // TODO: later replace with logic tailored to FireStore
 
-  const saveAboutMe = () => {
-    localStorage.setItem("userAboutMe", aboutMeContent);
+  const saveAboutMe = async () => {
+
+    const newUserData = {...userData, userAboutMe: aboutMeContent};
+    await editUserData(newUserData, currentUser);
+
     onClose();
   }
 
@@ -26,14 +31,6 @@ export default function AboutMeModal({visibility, onClose}){
   const getWordCount = (text) => {
     return text.trim().split(/\s+/).length;
   }
-
-  useEffect(() => {
-    const storedAboutMe = localStorage.getItem("userAboutMe");
-    if (storedAboutMe || storedAboutMe === "") {
-        setAboutMeContent(storedAboutMe);
-    }
-}, [visibility]);
-
 
   const customStyles = {
     content: {

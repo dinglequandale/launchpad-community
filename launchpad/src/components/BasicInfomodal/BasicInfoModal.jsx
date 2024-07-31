@@ -1,225 +1,242 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import "./basicinfomodal.css"
 import Modal from "react-modal"
 import MakeChanges from "../Makechanges/MakeChanges";
 import toast, { Toaster } from "react-hot-toast";
 import OptionalNotice from "../Optionalnotice/OptionalNotice";
+import { careerInterests, getColleges } from "../../pages/Onboarding/Options";
+import OnboardingDropdown from "../OnboardingDropdown/OnboardingDropdown";
+import { editUserData } from "../../services/userProfileServices";
+import { useAuth } from "../../contexts/auth/AuthContext";
 
-export default function BasicInfoModal({visibility,onClose,userType}){
-    const [basicInfoContent, setBasicInfoContent] = useState(
-      {
-      areasOfInterest: "",
-      fieldsOfExpertise: "",
-      dreamColleges: "",
-      acceptedColleges: "",
-      collegeAttending: "",
-      yearsOfExperience: "",
-      industryOfExperience: "",
-      industryPosition: "",
-      graduationYear: "",
-    });
-    const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
-    const basicInfoQuestionsConfig = [
-      {
-        id: "graduationYear",
-        text: "What year do you graduate?",
-        type: "number",
-        userTypeIncluders: ["High Schooler"],
-        required: true,
-        placeholder: "E.g. 2026",
-      },
-      {
-        id: "graduationYear",
-        text: "What year did you graduate?",
-        type: "number",
-        userTypeIncluders: ["Alumni"],
-        required: true,
-        placeholder: "E.g. 2026",
-      },
-      {
-        id: "areasOfInterest",
-        text: "What are your areas of interest?",
-        type: "text",
-        userTypeIncluders: ["High Schooler", "Alumni"],
-        required: true,
-        // TODO: steal Jose's code
-        placeholder: "E.g. 'finance, data analytics'",
-      },
-      {
-        id: "fieldsOfExpertise",
-        text: "What is are your fields of expertise?",
-        type: "text",
-        userTypeIncluders: ["Professional"],
-        required: true,
-        placeholder: "E.g. 'finance, data analytics'",
-      },
-      {
-        id: "dreamColleges",
-        text: "What are your dream colleges?",
-        type: "select",
-        // TODO: change this later to an actual searchable list
-        options: ["Select Colleges", "Carnegie", "Princton", "Stanford", "Harvard", "etc..."],
-        userTypeIncluders: ["High Schooler"],
-        required: true,
-      },
-      {
-        id: "acceptedColleges",
-        text: "What colleges have you been accepted into?",
-        type: "select",
-        // TODO: change this later to an actual searchable list
-        options: ["Select Colleges", "Carnegie", "Princton", "Stanford", "Harvard", "etc..."],
-        userTypeIncluders: ["High Schooler", "Alumni"],
-        required: false,
-      },
-      {
-        id: "collegeAttending",
-        text: "What college are you attending?",
-        type: "select",
-        // change this later to an actual searchable list
-        options: ["Select College", "Carnegie", "Princton", "Stanford", "Harvard", "etc..."],
-        userTypeIncluders: ["Alumni"],
-        required: true,
-      },
-      {
-        id: "industryOfExperience",
-        text: "Primary industry of work:",
-        type: "text",
-        userTypeIncluders: ["Professional"],
-        required: true,
-        placeholder: "",
-      },
-      {
-        id: "yearsOfExperience",
-        text: "Years of experience:",
-        type: "number",
-        placeholder: "E.g. '40'",
-        userTypeIncluders: ["Professional"],
-        required: true,
-      },
-      {
-        id: "industryPosition",
-        text: "What is/was your highest position?",
-        type: "text",
-        placeholder: "",
-        userTypeIncluders: ["Professional"],
-        required: true,
-      },
-    ]
+export default function BasicInfoModal({visibility,onClose,userType,userData}){
 
-    useEffect(() => {
-      const storedBasicInfo = JSON.parse(localStorage.getItem("userBasicInfo"));
-      console.log(storedBasicInfo)
-      if (storedBasicInfo) {
-        setBasicInfoContent(storedBasicInfo);
-      }},[visibility]);
+  const {currentUser} = useAuth();
 
-    const questionsForUser = basicInfoQuestionsConfig.filter((question) => question.userTypeIncluders.includes(userType));
+  const handleSearchQueryChange = (query) => {
+    setSearchQuery(query);
+  };
 
-    const isEmpty = () => {
-      return (questionsForUser.filter((question)=>(question.required && (basicInfoContent[question.id] === "")))).length > 0;
-    }
-    const saveBasicInfo = () => {
-      if(!isEmpty()){
-        const filteredBasicInfo = Object.entries(basicInfoContent).reduce((acc, [key, value]) => {
-          if (value !== "") {  // Filter out empty values
-            acc[key] = value; 
-          }
-          return acc;
-        }, {});
-        console.log(filteredBasicInfo)
-        localStorage.setItem("userBasicInfo", JSON.stringify(filteredBasicInfo));
-        onClose();
-      }
-      else{
+  const [basicInfoContent, setBasicInfoContent] = useState(
+    {
+    areasOfInterest: userData.areasOfInterest ?? [],
+    fieldsOfExpertise: userData.fieldsOfExpertise ?? [],
+    // TODO: fix
+    collegeInterestsOrDecision: userData.collegeInterestsOrDecision ?? [],
+    acceptedColleges: userData.acceptedColleges ?? [],
+    collegeAttending: userData.collegeAttending ?? [],
+    yearsOfExperience: userData.yearsOfExperience ?? "",
+    // industryOfExperience: userData.industryOfExperience ?? "",
+    industryPosition: userData.industryPosition ?? "",
+    graduationYear: userData.graduationYear ?? "",
+  });
 
-        toast.error("Please fill out the required questions!")
-      }
-    }
+  const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
+  const basicInfoQuestionsConfig = [
+    {
+      id: "graduationYear",
+      text: "What year do you graduate?",
+      type: "number",
+      userTypeIncluders: ["High Schooler"],
+      required: true,
+      placeholder: "E.g. 2026",
+    },
+    {
+      id: "graduationYear",
+      text: "What year did you graduate?",
+      type: "number",
+      userTypeIncluders: ["Alumni"],
+      required: true,
+      placeholder: "E.g. 2026",
+    },
+    {
+      id: "areasOfInterest",
+      text: "What are your areas of interest?",
+      type: "multi-select",
+      userTypeIncluders: ["High Schooler", "Alumni"],
+      options: careerInterests,
+      required: true,
+    },
+    {
+      id: "fieldsOfExpertise",
+      text: "What are your fields of expertise?",
+      type: "multi-select",
+      options: careerInterests,
+      userTypeIncluders: ["Professional"],
+      required: true,
+    },
+    {
+      id: "collegeInterestsOrDecision",
+      text: userData.collegeDecision === "No" ? "What colleges are you interested in?" : "What college will you attend?",
+      type: userData.collegeDecision === "No" ? "multi-select" : "select",
+      options: [],
+      userTypeIncluders: ["High Schooler"],
+      required: true,
+    },
+    {
+      id: "acceptedColleges",
+      text: "What colleges have you been accepted into?",
+      type: "multi-select",
+      options: [],
+      userTypeIncluders: ["High Schooler", "Alumni"],
+      required: false,
+    },
+    {
+      id: "collegeAttending",
+      text: "What college are you attending?",
+      type: "select",
+      // change this later to an actual searchable list
+      options: [],
+      userTypeIncluders: ["Alumni"],
+      required: true,
+    },
+    // {
+    //   id: "industryOfExperience",
+    //   text: "Primary industry of work:",
+    //   type: "text",
+    //   userTypeIncluders: ["Professional"],
+    //   required: true,
+    //   placeholder: "",
+    // },
+    {
+      id: "yearsOfExperience",
+      text: "Years of experience:",
+      type: "number",
+      placeholder: "E.g. '40'",
+      userTypeIncluders: ["Professional"],
+      required: true,
+    },
+    {
+      id: "industryPosition",
+      text: "What is/was your highest position?",
+      type: "text",
+      placeholder: "",
+      userTypeIncluders: ["Professional"],
+      required: true,
+    },
+  ]
 
-    const customStyles = {
-        content: {
-          top: '50%',
-          left: '50%',
-          right: 'auto',
-          bottom: 'auto',
-          marginRight: '-50%',
-          transform: 'translate(-50%, -50%)',
-        },
-        overlay: {
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(5px)',
-          zIndex: "3",
+  const [searchQuery, setSearchQuery] = useState('');
+  const colleges = getColleges(searchQuery);
+  const cachedColleges = useMemo(() => colleges, [colleges]);
+
+  const questionsForUser = basicInfoQuestionsConfig.filter((question) => question.userTypeIncluders.includes(userType));
+
+  const isEmpty = () => {
+    return (questionsForUser.filter((question)=>(question.required && (basicInfoContent[question.id] === "")))).length > 0;
+  }
+  const saveBasicInfo = async () => {
+    if(!isEmpty()){
+      const filteredBasicInfo = Object.entries(basicInfoContent).reduce((acc, [key, value]) => {
+        if (value !== "" || questionsForUser.filter((question)=>question.id === key) > 0) {  // Filter out empty and unapplicable values values
+          acc[key] = value; 
         }
-      };
+        return acc;
+      }, {});
 
-      const handleOnChange = (e) => {
-        setBasicInfoContent({...basicInfoContent, [e.target.name] : e.target.value});
+      console.log(filteredBasicInfo)
+
+      const newUserData = {...userData, ...filteredBasicInfo};
+      await editUserData(newUserData, currentUser);
+
+      onClose();
+    }
+    else{
+      toast.error("Please fill out the required questions!")
+    }
+  }
+
+  const customStyles = {
+      content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+      },
+      overlay: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backdropFilter: 'blur(5px)',
+        zIndex: "3",
       }
-      
-    return(
-        <div>
-        <div>
-        <Toaster
-          position="bottom-right"
-          reverseOrder={false}
-        />
-        </div>
-        <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
-        <Modal
-          isOpen={visibility}
-          onRequestClose={onClose}
-          style={customStyles}
-          contentLabel="Basic Info Modal"
-          shouldCloseOnOverlayClick={false} 
-          shouldCloseOnEsc={false}
-        >
-          <header>
-            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px", color: "var(--secondary)", lineHeight: "1.2"}}> My Introduction <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Enlighten us with your {userType==="Professional" ? "expertise" : "interests"} and {userType==="Professional" ? "work experience" : userType==="Alumni" ? "accepted colleges" : "dream colleges"}!</span></h2>
-            <hr style={{borderColor: "var(--secondary)"}}/>
-          </header>
-          <main style={{paddingTop: "20px"}}>
-            <form style={{width: "800px", display: "flex", gap: "20px", flexDirection: "column"}}>
-              {questionsForUser.map((question,index) => (
-                  <div key={question.id} style={{display: "flex", justifyContent: "space-between"}}>
-                    <div style={{position: "relative"}}>
-                      <label htmlFor="areasOfInterest">{question.text}</label>
-                      {!question.required && <OptionalNotice/>}
-                    </div>
-                    {question.type !== "select" ? 
-                    <input 
-                    id={question.id}
-                    type={question.type}
-                    name={question.id}
-                    value={basicInfoContent[question.id]}
-                    placeholder={question.placeholder}
-                    onChange={handleOnChange}
-                    style={{width: "284px"}}/> :
-                    
-                    <select 
-                    id={question.id}
-                    name={question.id}
-                    value={basicInfoContent[question.id]}
-                    onChange={handleOnChange}
-                    style={{width: "300px"}}>
-                      {question.options.map((option) => (
-                        <option value={(option === "Select College" || option === "Select Colleges") ? "" : option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>}
-                  </div>
-              ))}
-            </form>
-          </main>
-          <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-            <button onClick={
-              ()=>setMakeChangesVisibility(true)
-              } style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Cancel</button>
-            <button onClick={saveBasicInfo} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Save Changes</button>
-          </footer>
-        </Modal>
+    };
+    console.log(basicInfoContent)
+    const handleOnChange = (e) => {
+      setBasicInfoContent({...basicInfoContent, [e.target.name] : e.target.value});
+    }
+    
+  const handleDropdownChange = (id, label) => {
+    setBasicInfoContent(prevState => ({
+      ...prevState,
+      [id]: label,
+    }));
+  };
+
+  return(
+      <div>
+      <div>
+      <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+      />
       </div>
-    )
+      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
+      <Modal
+        isOpen={visibility}
+        onRequestClose={onClose}
+        style={customStyles}
+        contentLabel="Basic Info Modal"
+        shouldCloseOnOverlayClick={false} 
+        shouldCloseOnEsc={false}
+      >
+        <header>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px", color: "var(--secondary)", lineHeight: "1.2"}}> My Introduction <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Enlighten us with your {userType==="Professional" ? "expertise" : "interests"} and {userType==="Professional" ? "work experience" : userType==="Alumni" ? "accepted colleges" : "dream colleges"}!</span></h2>
+          <hr style={{borderColor: "var(--secondary)"}}/>
+        </header>
+        <main style={{paddingTop: "20px"}}>
+          <form style={{width: "800px", display: "flex", gap: "20px", flexDirection: "column"}}>
+            {questionsForUser.map((question,index) => (
+                <div key={question.id} style={{display: "flex", justifyContent: "space-between"}}>
+                  <div style={{position: "relative"}}>
+                    <label>{question.text}</label>
+                    {!question.required && <OptionalNotice/>}
+                  </div>
+                  {(question.type !== "multi-select" && question.type !== "select") ? 
+                  <input 
+                  id={question.id}
+                  type={question.type}
+                  name={question.id}
+                  value={basicInfoContent[question.id]}
+                  placeholder={question.placeholder}
+                  onChange={handleOnChange}
+                  style={{width: "42.8%"}}/> 
+                  :
+                  <div style={{width: "45%"}}><OnboardingDropdown
+                    showQuestion={false}
+                    key={question.id}
+                    question={question.text}
+                    options={question.id.toLowerCase().includes("college") ? cachedColleges : question.options}
+                    selectedOption={basicInfoContent[question.id] || (question.type === 'multi-select' ? [] : '')}
+                    onChange={(label) => handleDropdownChange(question.id, label)}
+                    type={question.type}
+                    onSearchQueryChange={question.id.toLowerCase().includes("college") ? handleSearchQueryChange : null}
+                  />
+                  </div>
+                  }
+                </div>
+            ))}
+          </form>
+        </main>
+        <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
+          <button onClick={
+            ()=>setMakeChangesVisibility(true)
+            } style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+            Cancel</button>
+          <button onClick={saveBasicInfo} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+            Save Changes</button>
+        </footer>
+      </Modal>
+    </div>
+  )
 }
