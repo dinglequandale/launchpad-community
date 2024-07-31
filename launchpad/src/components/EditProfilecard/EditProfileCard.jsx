@@ -78,7 +78,8 @@ export default function EditProfileCard() {
     const descType = () => {
         switch(userData.userType){
             case "High Schooler":
-                return "Dream Colleges";
+                
+                return userData.collegeDecision === "No" ? "Dream Colleges" : "Commited College";
             case "Alumni":
                 return "Attending College";
             case "Professional":
@@ -245,7 +246,7 @@ function BasicInfoCard({descType}){
         : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
         : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
         userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${userData.areasOfInterest ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
-        userSecondDesc: `${descType}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? userData.collegeAttending : userData.dreamColleges}`,
+        userSecondDesc: `${descType}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? userData.collegeAttending : userData.collegeInterestsOrDecision}`,
         acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
     })
     },[userData])
@@ -268,7 +269,7 @@ function BasicInfoCard({descType}){
             <div className='userInfo' style={{fontSize: "16px"}}>
                 <span>{basicInfoContent.userFirstDesc}</span>
                 <span>{basicInfoContent.userSecondDesc}</span>
-                {userData.acceptedColleges && <span>{basicInfoContent.acceptedColleges}</span>}
+                {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <span>{basicInfoContent.acceptedColleges}</span>}
             </div>
         </div>
         <div className='addOne' style={{transform: "translate(0,-70px)"}}>

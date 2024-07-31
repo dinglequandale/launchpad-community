@@ -59,7 +59,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     },
     {
       id: "fieldsOfExpertise",
-      text: "What is are your fields of expertise?",
+      text: "What are your fields of expertise?",
       type: "multi-select",
       options: careerInterests,
       userTypeIncluders: ["Professional"],
@@ -128,7 +128,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   const saveBasicInfo = async () => {
     if(!isEmpty()){
       const filteredBasicInfo = Object.entries(basicInfoContent).reduce((acc, [key, value]) => {
-        if (value !== "" || questionsForUser.filter((question)=>question.id === value) > 0) {  // Filter out empty and unapplicable values values
+        if (value !== "" || questionsForUser.filter((question)=>question.id === key) > 0) {  // Filter out empty and unapplicable values values
           acc[key] = value; 
         }
         return acc;

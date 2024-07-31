@@ -25,14 +25,17 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
             {type === 'multi-select' ? (
                 <Select
                     isMulti
-                    value={options.filter(option => selectedOption.includes(option.label))}
+                    value={selectedOption ? selectedOption.map(option => ({ value: option, label: option })) : null}
+                    // value={options.filter(option => selectedOption.includes(option.label))}
+                    // value={selectedOption}
                     onChange={handleChange}
                     onInputChange={handleInputChange}
                     options={options}
                 />
             ) : (
                 <Select
-                    value={options.find(option => option.label === selectedOption)}
+                    // value={options.find(option => option.label === selectedOption)}
+                    value={selectedOption ? { value: selectedOption, label: selectedOption } : null}
                     onChange={handleChange}
                     onInputChange={handleInputChange}
                     options={options}
