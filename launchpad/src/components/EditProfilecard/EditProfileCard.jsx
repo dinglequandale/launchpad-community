@@ -43,8 +43,6 @@ export default function EditProfileCard() {
         let unsubscribe;
         setLoading(true);
 
-        // setUserBasicInfo(JSON.parse(localStorage.getItem("basicUserInfo")));
-
         if (currentUser) {
             const userDocRef = doc(db, 'users', currentUser.uid);
             unsubscribe = onSnapshot(userDocRef, (doc) => {
@@ -195,7 +193,7 @@ function ResumeUpload(){
     const handleUploadClick = () => {
         inputRef.current.click();
     }
-    // IMPORTANT TODO: files funky with localStorage, need to adjust when transition to database
+
     const [pdfUrl, setPdfUrl] = useState(userData.userResumePreview);
     useEffect(() => {
         return () => {
@@ -378,7 +376,6 @@ function AboutMeDisplay(){
     useEffect(()=>{
         setAboutMe(userData.userAboutMe);
     },[userData])
-    // const aboutMe = localStorage.getItem("userAboutMe");
 
     const [aboutMeModalVisibility, setAboutMeModalVisibility] = useState(false);
     const onModalClose = () => {

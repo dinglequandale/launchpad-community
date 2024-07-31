@@ -18,7 +18,6 @@ export default function AboutMeModal({userData, visibility, onClose}){
     const newUserData = {...userData, userAboutMe: aboutMeContent};
     await editUserData(newUserData, currentUser);
 
-    localStorage.setItem("userAboutMe", aboutMeContent);
     onClose();
   }
 

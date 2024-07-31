@@ -139,7 +139,6 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       const newUserData = {...userData, ...filteredBasicInfo};
       await editUserData(newUserData, currentUser);
 
-      localStorage.setItem("userBasicInfo", JSON.stringify(filteredBasicInfo));
       onClose();
     }
     else{
