@@ -18,7 +18,7 @@ export const displayFieldsOfInterest = (fieldsOfInterest) => {
         if(currentList.length !== 1){currentList[currentList.length-1] = ` ${currentList[currentList.length-1]}`}
         return currentList;
     }
-    const currentList = fieldsOfInterest.slice(0,3);
+    const currentList = fieldsOfInterest.slice(0,2);
     currentList[-1] = ` ${currentList[-1]}`;
     return currentList;
 }

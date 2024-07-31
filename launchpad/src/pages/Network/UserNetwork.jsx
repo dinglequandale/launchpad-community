@@ -10,6 +10,8 @@ import SearchBar from "../../components/Searchbar/SearchBar";
 import { GrNext, GrPrevious } from "react-icons/gr";
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
 
 
 const NetworkContext = createContext();
@@ -21,6 +23,9 @@ export default function UserNetwork() {
   const pageName = "Network";
   const [profileModalVisibility, setProfileModalVisibility] = useState(false);
   const [connectModalVisibility, setConnectModalVisibility] = useState(false);
+  const [profileTargetUserId, setProfileTargetUserId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [allUserData, setAllUserData] = useState([]);
 
   const filterContent = [
     ["Any Education Stage", "High School Student", "College Student"],
@@ -39,23 +44,38 @@ export default function UserNetwork() {
     }
   }
 
-  const handleOnProfileClick = () => {
+  const handleOnProfileClick = (userId) => {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2);
-
+    
     setProfileModalTop(modalTop);
+
+    setProfileTargetUserId(userId);
+
     setProfileModalVisibility(true);
   }
-  
-  // transition to actual database PLEASE  
 
-  const bsData = [{id: 1, userName: "Bubba", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}, 
-    {id: 2, userName: "Ting Skra", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}, 
-    {id: 3, userName: "Glug But", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}, 
-    {id: 4, userName: "EWEEW", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"},
-    {id: 5, userName: "EWEEWoiewfopzewoifoew", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"},
-    {id: 6, userName: "EWEEewoifoew", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"},
-    {id: 7, userName: "EWEfoew", userDescription: "stupid and dumb x30", userFOI: "TIG TING", userLocation: "Dingle-ville"}];
+  useEffect(() => {
+    const usersRef = collection(db, "users");
+    setLoading(true);
+  
+    const unsubscribe = onSnapshot(usersRef, 
+      (snapshot) => {
+        const userData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setAllUserData(userData);
+        setLoading(false);
+      },
+      (error) => {
+        console.log("Error fetching opportunities:", error);
+        setLoading(false);
+      }
+    );
+  
+    return () => unsubscribe();
+  }, []);
 
     useEffect(() => {
       if (profileModalVisibility) {
@@ -79,18 +99,18 @@ export default function UserNetwork() {
                   <h3>Upperclassmen</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
-                <UserCarousel userNetworkData={bsData}/>
+                <UserCarousel userNetworkData={allUserData.filter((user) => user.userType === "High Schooler")}/>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>Alumni</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
-                <UserCarousel userNetworkData={bsData}/>
+                <UserCarousel userNetworkData={allUserData.filter((user) => user.userType === "Alumni")}/>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>Professionals</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
-                <UserCarousel userNetworkData={bsData}/>
-                {profileModalVisibility && <ProfileModal onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={()=>setConnectModalVisibility(true)}/>}
+                <UserCarousel userNetworkData={allUserData.filter((user) => user.userType === "Professional")}/>
+                {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={()=>setConnectModalVisibility(true)} userId={profileTargetUserId}/>}
               </div>
             </div>
         </div>
@@ -135,6 +155,7 @@ function UserCarousel({userNetworkData}){
       <div className="carousel-container">
         <div
           className={`carousel-content ${slideDirection}`}
+          style={{justifyContent: `${userNetworkData.length <= 3 ? "center" : ""}`}}
           onAnimationEnd={() => setSlideDirection('')}
           ref={carouselRef}
         >
