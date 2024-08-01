@@ -23,10 +23,11 @@ export default function UserNetwork() {
   const pageName = "Network";
   const [profileModalVisibility, setProfileModalVisibility] = useState(false);
   const [connectModalVisibility, setConnectModalVisibility] = useState(false);
-  const [profileTargetUserId, setProfileTargetUserId] = useState("");
   const [connectTargetUserId, setConnectTargetUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const [allUserData, setAllUserData] = useState([]);
+  const [profileTargetData, setProfileTargetData] = useState(null);
+  const [connectTargerUserName, setConnectTargetUserName] = useState("");
 
   const filterContent = [
     ["Any Education Stage", "High School Student", "College Student"],
@@ -45,17 +46,27 @@ export default function UserNetwork() {
     }
   }
 
+  const getUserClassData = (userData) => {
+    const highSchoolers = userData.filter((user) => user.userType === "High Schooler");
+    const alums = userData.filter((user) => user.userType === "Alumni");
+    const professionals = userData.filter((user) => user.userType === "Professional");
+    return {highSchoolers, alums, professionals}
+  }
+
   const handleConnectClick = (userId) => {
     setConnectTargetUserId(userId);
+    setConnectTargetUserName(allUserData.filter((user)=>(user.userId === userId))[0].userName);
     setProfileModalVisibility(false);
+    setConnectModalVisibility(true);
   }
   const handleOnProfileClick = (userId) => {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2);
     
     setProfileModalTop(modalTop);
-
-    setProfileTargetUserId(userId);
+    if(allUserData){
+      setProfileTargetData(allUserData.filter((user) => (user.userId === userId))[0]);
+    }
 
     setProfileModalVisibility(true);
   }
@@ -91,31 +102,37 @@ export default function UserNetwork() {
     }, [profileModalVisibility]);
     
   return (
-    <NetworkContext.Provider value={{handleOnProfileClick, setConnectModalVisibility}}>
+    <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick}}>
       <>
-        {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
+        {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={connectTargerUserName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
         <div>
             <TopBar/>
             <SideNav/>
             <div className='networkContainer' id="networkContainer" style={{paddingTop: "3%", paddingLeft: "10%"}}>
               <SearchBar filters = {filterContent} pageName={pageName}/>
-              <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px"}}>
+              <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh"}}>
+                {getUserClassData(allUserData).highSchoolers.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>High Schoolers</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
-                <UserCarousel userNetworkData={allUserData.filter((user) => user.userType === "High Schooler")}/>
+                <UserCarousel userNetworkData={getUserClassData(allUserData).highSchoolers}/>
+                </>}
+                {getUserClassData(allUserData).alums.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>Alumni</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
-                <UserCarousel userNetworkData={allUserData.filter((user) => user.userType === "Alumni")}/>
+                <UserCarousel userNetworkData={getUserClassData(allUserData).alums}/>
+                </>}
+                {getUserClassData(allUserData).professionals.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>Professionals</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
-                <UserCarousel userNetworkData={allUserData.filter((user) => user.userType === "Professional")}/>
-                {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} userId={profileTargetUserId}/>}
+                <UserCarousel userNetworkData={getUserClassData(allUserData).professionals}/>
+                </>}
+                {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={profileTargetData}/>}
               </div>
             </div>
         </div>
@@ -125,7 +142,7 @@ export default function UserNetwork() {
 }
 
 function UserCarousel({userNetworkData}){
-  const { handleOnProfileClick,setConnectModalVisibility } = useContext(NetworkContext);
+  const { handleOnProfileClick,handleConnectClick } = useContext(NetworkContext);
   const itemsPerPage = 3;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState('');
@@ -166,7 +183,7 @@ function UserCarousel({userNetworkData}){
         >
           {userNetworkData.map((profile, index) => (
             <div key={index} className="carousel-item">
-              <UserCard userData={profile} onProfileClick={handleOnProfileClick} onConnectClick={()=>setConnectModalVisibility(true)}/>
+              <UserCard userData={profile} onProfileClick={() => handleOnProfileClick(profile.userId)} onConnectClick={handleConnectClick}/>
             </div>
           ))}
         </div>
