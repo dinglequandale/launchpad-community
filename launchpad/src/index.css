@@ -166,6 +166,13 @@ button {
   color: var(--highlight);
 }
 
+.btnConnect{
+  background-color: #5da0ed;
+  border-radius: 5px;
+  font-weight: 550;
+  font-size: 18px;
+}
+
 .btnCircle{
   overflow: hidden;
   border-radius: 50%;

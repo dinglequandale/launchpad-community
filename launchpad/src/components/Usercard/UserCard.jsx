@@ -39,7 +39,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
         <>
         <div className='networkProfileCard'>
             {bannerVisibility && <ConnectionBanner/>}
-            <button style={{position: "absolute", right: "3%"}} className="btnText" onClick={() => onProfileClick(userData.userId)}>
+            <button style={{position: "absolute", right: "3%"}} className="btnText" onClick={onProfileClick}>
                 See Profile
             </button>
             <div className='basicInfo'>
@@ -59,10 +59,10 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                     {userData.acceptedColleges && (userData.acceptedColleges.length > 0) && <span>{basicInfoContent.acceptedColleges}</span>}
                 </div>
             </div>
-            <button style={{width: "80%", borderRadius: "5px", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
+            <button className="btnConnect" style={{width: "80%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
-                    <FaLink size={20}/>
-                    <span style={{fontWeight: "550"}}>Connect</span>
+                    <FaLink size={22}/>
+                    <span>Connect</span>
                 </div>
             </button>
         </div>

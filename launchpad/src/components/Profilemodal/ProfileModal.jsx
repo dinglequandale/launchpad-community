@@ -13,38 +13,33 @@ import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
 import { displayFieldsOfInterest, lowerAndCapitalize } from '../../services/userProfileServices';
 
-export default function ProfileCard({userId, visibility, onClose, top, onConnectClick}) {
+export default function ProfileCard({userData, visibility, onClose, top, onConnectClick}) {
 
     // TODO: currently localStorage, transition to database IMPORTANT
-    const userType = "Professional";
-    const userName = "Shuja Gupta";
-    const userHasAboutMe = true;
+    const userType = userData.userType;
+    const userName = userData.userName;
     const userAboutMe = "ewofioerfi ewife ofiefo iewofi eoifoei ofiwo fieifi eifeufue fueuf yfeyfy ywye fyy fyefy ywfyeu fuye yfye yfe fyewf. weyfyuef yeyf yfeyf yfyef ef e f."
-    const userPdfUrl = null;
     const resumePublicity = "Public";
-    const userAvailability = ["Brug", "Sug", "Mug"];
-    const [userData, setUserData] = useState(null);
     const [opportunityData, setOpportunityData] = useState(null);
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
     const [opportunityLoading, setOpportunityLoading] = useState(false);
-    const [basicInfoContent, setBasicInfoContent] = useState(null);
 
     useEffect(()=>{
-        const getUserData = async () => {
-            setLoading(true);
-            const userSnap = await getDoc(doc(db, "users", userId));
-            if (userSnap.exists()) {
-                setUserData(userSnap.data());
-              } else {
-                console.log("No such document!");
-              }
-            setLoading(false);
-        }
+        // const getUserData = async () => {
+        //     setLoading(true);
+        //     const userSnap = await getDoc(doc(db, "users", userId));
+        //     if (userSnap.exists()) {
+        //         setUserData(userSnap.data());
+        //       } else {
+        //         console.log("No such document!");
+        //       }
+        //     setLoading(false);
+        // }
 
         const getOpportunityData = async () => {
             setOpportunityLoading(true);
             const opportunitiesRef = collection(db, "opportunities");
-            const userOpportunityQuery = query(opportunitiesRef, where("createdBy", "==", userId));
+            const userOpportunityQuery = query(opportunitiesRef, where("createdBy", "==", userData.userId));
 
             const opportunitySnapshot = await getDocs(userOpportunityQuery)
             opportunitySnapshot.forEach((doc) => {
@@ -53,7 +48,7 @@ export default function ProfileCard({userId, visibility, onClose, top, onConnect
             setOpportunityLoading(false);
         }
 
-        getUserData();
+        // getUserData();
         getOpportunityData();
     },[visibility])
 
@@ -72,7 +67,7 @@ export default function ProfileCard({userId, visibility, onClose, top, onConnect
     // }
     
     const descType = () => {
-        switch(userType){
+        switch(userData.userType){
             case "High Schooler":
                 return "Dream Colleges";
             case "Alumni":
@@ -84,17 +79,13 @@ export default function ProfileCard({userId, visibility, onClose, top, onConnect
         }
     }
 
-    useEffect(()=>{
-        if(userData){
-            setBasicInfoContent({userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`
-                : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
-                : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
-                userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${userData.areasOfInterest ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
-                userSecondDesc: `${descType()}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? userData.collegeAttending : userData.collegeInterestsOrDecision}`,
-                acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
-            })
-    }
-    },[userData])
+    const basicInfoContent = {userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`
+        : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
+        : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
+        userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
+        userSecondDesc: `${descType()}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? userData.collegeAttending : userData.collegeInterestsOrDecision}`,
+        acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
+    };
 
     const menuRef = useRef();
 
@@ -124,7 +115,6 @@ export default function ProfileCard({userId, visibility, onClose, top, onConnect
             <div className='blurOverlay'>
                 <div className='profileModalContent' style={{ top: top }} ref={menuRef}>
                     <IoCloseOutline className='closeProfileModal' size={30} onClick={onClose}/>
-                    {(!loading && !opportunityLoading && userData) ?
                     <>
                     <header name="userIntro" style={{paddingBottom: "10px"}}>
                         <div className='basicInfo'>
@@ -140,10 +130,10 @@ export default function ProfileCard({userId, visibility, onClose, top, onConnect
                             <div className='userInfo' style={{fontSize: "16px"}}>
                                 <span>{basicInfoContent.userFirstDesc}</span>
                                 <span>{basicInfoContent.userSecondDesc}</span>
-                                {userData.acceptedColleges && <span>{basicInfoContent.acceptedColleges}</span>}
+                                {(userData.acceptedColleges && userData.acceptedColleges.length > 0) && <span>{basicInfoContent.acceptedColleges}</span>}
                             </div>
                         </div>
-                        <button style={{width: "80%", borderRadius: "5px", margin: "0 auto"}} onClick={() => onConnectClick(userId)}> 
+                        <button style={{width: "80%", borderRadius: "5px", margin: "0 auto"}} onClick={() => onConnectClick(userData.userId)}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>
@@ -152,17 +142,17 @@ export default function ProfileCard({userId, visibility, onClose, top, onConnect
                     </header>
                     <hr style={{width: "95%"}}/>
                     <main style={{padding: "0px 8px"}}>
-                        {opportunityData && <div>
+                        {(!opportunityLoading && opportunityData) ? <div>
                             <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", display: "flex", justifyContent: "center", paddingBottom: "10px"}}>{userName} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
-                            <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/> </div>}
+                            <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/> </div> : opportunityLoading ? <Loading/> : null}
                         {userData.userAboutMe && <div name="userAboutMe" style={{paddingTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName}'s About Me</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             <div style={{background: "var(--neutral)", padding: "10px", borderRadius: "5px", boxShadow: "var(--shadowColor)", paddingTop: "15px"}}>
-                                <span>{userAboutMe}</span>
+                                <span>{userData.userAboutMe}</span>
                             </div>
                         </div>}
-                        {(userData.userResumePreview && resumePublicity === "Public") && <div name="userResume">
+                        {(userData.userResumePreview && resumePublicity === "Public") && <div name="userResume" style={{marginTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName}'s Resume</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             <iframe src={userData.userResumePreview} frameborder="0" style={{width: "100%", height: "500px"}}></iframe></div>}
@@ -170,7 +160,7 @@ export default function ProfileCard({userId, visibility, onClose, top, onConnect
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1", paddingTop: "20px"}}>{userName}'s Commitment</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px", paddingTop: "10px"}}>
-                                {userAvailability.map((availability)=>(
+                                {userData.networkingLevel.map((availability)=>(
                                     <div key={availability} style={{background: "var(--neutral)", padding: "6px 11px", borderRadius: "5px"}}>
                                         <a href='/' style={{lineHeight: "1.5", fontSize: "22px", textDecoration: "underline"}}>{availability}</a>
                                     </div>
@@ -178,7 +168,7 @@ export default function ProfileCard({userId, visibility, onClose, top, onConnect
                             </div>
                     </div>}
                     </main>
-                    </>  : <Loading/>}
+                    </>
                 </div>
             </div>
         </>   
