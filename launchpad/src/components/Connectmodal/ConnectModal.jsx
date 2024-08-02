@@ -7,7 +7,7 @@ import { storage } from '../../firebase/firebaseConfig';
 import toast from 'react-hot-toast';
 
 // TODO: actually implement clickedUser logic
-export default function ConnectModal({visibility, chat, onClose, userId, userName}){
+export default function ConnectModal({visibility, chat, onClose, userId, currentUserPfpPreview, targetUserPfpPreview, userName}){
 
   const [introMessage, setIntroMessage] = useState("");
   const [sendWithResume, setSendWithResume] = useState(false);

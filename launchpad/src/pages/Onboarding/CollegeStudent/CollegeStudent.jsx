@@ -115,7 +115,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
     try {
       await saveCollegeStudent(
         currentUser, 
-        highSchoolerData,
+        collegeStudentData,
         () => {
           // Success callback
           toast.success('Information saved successfully!', {

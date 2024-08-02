@@ -42,6 +42,7 @@ export const loadUserData = async (currentUser, setLoading, setUserData) => {
         unsubscribe = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
                 setUserData(doc.data());
+                console.log("Yo we up in here")
             } else {
                 console.log("No such document!");
                 setUserData(null);

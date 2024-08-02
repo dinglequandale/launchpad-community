@@ -4,22 +4,50 @@ import { doSignInWithEmailAndPassword, doSignInWithGoogle, doPasswordReset } fro
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { loadUserData } from "../../services/userProfileServices";
+import { packageBasicUserInfoToLS } from "../../services/onboardingServices";
 
 export default function Login(){
 
-    const { userLoggedIn } = useAuth();
+    const { userLoggedIn, currentUser } = useAuth();
 
     const navigate = useNavigate();
 
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
+
+    const [userData, setUserData] = useState(null);
+
+    const updateBasicUserData = async (user) => {
+        if (!user || !user.uid) {
+            throw new Error('User or user ID is undefined after login');
+        }
+
+        // Create a promise that resolves when userData is set
+        const userDataPromise = new Promise((resolve) => {
+            loadUserData(user, () => {}, (newUserData) => {
+                setUserData(newUserData);
+                resolve(newUserData);
+            });
+        });
+
+        // Wait for userData to be loaded
+        const newUserData = await userDataPromise;
+
+        if (!newUserData) {
+            throw new Error('Failed to load user data');
+        }
+
+        packageBasicUserInfoToLS(newUserData);
+    };
+
     const [userIsSigningIn, setUserIsSigningIn] = useState(false);
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
-        if(!userIsSigningIn){
+        e.preventDefault();
+        if (!userIsSigningIn) {
             setUserIsSigningIn(true);
             try {
-                await toast.promise(
+                const userCredential = await toast.promise(
                     doSignInWithEmailAndPassword(userEmail, userPassword),
                     {
                         loading: 'Logging you in ...',
@@ -27,17 +55,21 @@ export default function Login(){
                         error: (err) => `Error! ${err.message}`
                     }
                 );
-                
-                // Redirect to homepage after successful account creation
+    
+                const user = userCredential.user;
+    
+                await updateBasicUserData(user);
+    
                 navigate('/Home');
             } catch (error) {
                 console.error("Error logging in:", error);
+                toast.error(`Login failed: ${error.message}`);
             } finally {
                 setUserIsSigningIn(false);
             }
         }
-
     }
+    
 
     const handlePasswordReset = async (e) => {
         e.preventDefault();
@@ -57,16 +89,29 @@ export default function Login(){
         }
     }
 
-    const onContinueWithGoogle = (e) => {
+    const onContinueWithGoogle = async (e) => {
         e.preventDefault();
-        if(!userIsSigningIn){
+        if (!userIsSigningIn) {
             setUserIsSigningIn(true);
-            doSignInWithGoogle().catch(error => {
-                setUserIsSigningIn(false);
+            try {
+                // Sign in with Google
+                const userCredential = await doSignInWithGoogle();
+                const user = userCredential.user;
+    
+                await updateBasicUserData(user);
+    
+                // Optionally, navigate to home page or desired route
+                navigate('/Home');
+    
+            } catch (error) {
+                console.error("Error signing in with Google:", error);
                 toast.error("Sorry! There was an issue signing you in. Try again!");
-            })
+            } finally {
+                setUserIsSigningIn(false);
+            }
         }
     }
+    
 
     return(
         <>
