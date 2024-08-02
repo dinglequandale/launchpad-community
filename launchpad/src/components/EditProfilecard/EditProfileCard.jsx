@@ -20,7 +20,7 @@ import { handleDeleteOpportunity, loadOpportunities } from '../../services/oppor
 import Loading from '../LoadingAnimation/Loading';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
-import { displayFieldsOfInterest, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
+import { displayColleges, displayFieldsOfInterest, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -76,7 +76,7 @@ export default function EditProfileCard() {
     const descType = () => {
         switch(userData.userType){
             case "High Schooler":
-                return userData.collegeDecision === "No" ? "Dream Colleges" : "Commited College";
+                return userData.collegeDecision === "No" ? "Dream Colleges" : "Committed College";
             case "Alumni":
                 return "Attending College";
             case "Professional":
@@ -111,7 +111,7 @@ export default function EditProfileCard() {
                 </div>
                 {(userData.userType === "Professional" || userData.userType === "Alumni") && <hr style={{width: "100%"}}/>}
                 {(userData.userType === "Professional" || userData.userType === "Alumni") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
-                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userData.userName}</span> is <span style={{fontWeight: "450"}}>open to</span> ... </h>
+                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userData.userName.split(" ")[0]}</span> is <span style={{fontWeight: "450"}}>open to</span> ... </h>
                     <ConnectionAvailability/>
                 </div>}
                 </>
@@ -243,7 +243,7 @@ function BasicInfoCard({descType}){
         : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
         : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
         userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
-        userSecondDesc: `${descType}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? userData.collegeAttending : userData.collegeInterestsOrDecision}`,
+        userSecondDesc: `${descType}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
         acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
     })
     },[userData])

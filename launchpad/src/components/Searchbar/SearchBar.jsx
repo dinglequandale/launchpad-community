@@ -20,8 +20,8 @@ export default function SearchBar({filters, pageName}) {
                 <input type="text" name="fname" className="searchBar" placeholder={`Search for ${searchType()}`} />
             </div>
             <div style={{display: "flex", paddingBottom: "10px", gap: "30px", marginLeft: "5%"}}>
-                {filters.map((filter, index)=>(
-                    <ContentFilter filterContent={filters[index]}/>
+                {Object.values(filters).filter((filter) => filter !== null).map((filter)=>(
+                    <ContentFilter filterContent={filter}/>
                 ))}
             </div>
         </div>

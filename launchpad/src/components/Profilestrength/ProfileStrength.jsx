@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./profilestrength.css";
 import { useNavigate } from "react-router-dom";
+import { displayShortenedName } from "../../services/userProfileServices";
 
 export default function ProfileStrength({userData}){
 
@@ -72,7 +73,7 @@ function ProfileIcon({userData}){
             <img src={userData.userPfpPreview ?? "/assets/awty-logo.jpg"} alt="" style={
                 {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/>
             <div>
-                <span style={{fontWeight: "bolder", fontSize: "22px"}}>{userData.userName}</span> <br />
+                <span style={{fontWeight: "bolder", fontSize: "22px"}}>{displayShortenedName(userData.userName)}</span> <br />
                 <span style={{fontWeight: "300"}}>{userData.userShortDescription}</span>
             </div>
         </div>

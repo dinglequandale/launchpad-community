@@ -29,11 +29,13 @@ export default function UserNetwork() {
   const [profileTargetData, setProfileTargetData] = useState(null);
   const [connectTargerUserName, setConnectTargetUserName] = useState("");
 
-  const filterContent = [
-    ["Any Education Stage", "High School Student", "College Student"],
-    ["Any College", "Dream College(s)"],
-    ["Any Interest","Your Interests", "Physics", "Finance", "Theatre"]
-  ];
+
+  const { userType } = JSON.parse(localStorage.getItem("basicUserInfo"));
+  const filterContent = {
+    f1: ["Any User", "High Schoolers", "College Students", "Professionals"],
+    f2: userType === "High Schooler" ? ["Any College", "Your Dream College(s)"] : null,
+    f3: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`]
+  };
   const [profileModalTop, setProfileModalTop] = useState(0);
 
   useEffect(() => {
@@ -173,11 +175,11 @@ function UserCarousel({userNetworkData}){
   };
 
   return (
-    <div className="carousel" style={{width: "1022px", margin: "0 auto"}}>
+    <div className="carousel" style={{width: `${userNetworkData.length === 1 ? "340.66px" : userNetworkData.length === 2 ? "681.33px" : "1022px"}`, margin: "0 auto"}}>
       <div className="carousel-container">
         <div
           className={`carousel-content ${slideDirection}`}
-          style={{justifyContent: `${userNetworkData.length <= 3 ? "center" : ""}`}}
+          style={{justifyContent: `${userNetworkData.length <= 3 ? "center" : ""}`, gap: `${userNetworkData.length < 3 ? "10px" : ""}`}}
           onAnimationEnd={() => setSlideDirection('')}
           ref={carouselRef}
         >

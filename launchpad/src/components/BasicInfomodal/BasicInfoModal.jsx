@@ -128,7 +128,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   const saveBasicInfo = async () => {
     if(!isEmpty()){
       const filteredBasicInfo = Object.entries(basicInfoContent).reduce((acc, [key, value]) => {
-        if (value !== "" || questionsForUser.filter((question)=>question.id === key) > 0) {  // Filter out empty and unapplicable values values
+        if (value !== "" && questionsForUser.filter((question)=>question.id === key) > 0) {  // Filter out empty and unapplicable values values
           acc[key] = value; 
         }
         return acc;
@@ -161,7 +161,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
         zIndex: "3",
       }
     };
-    console.log(basicInfoContent)
+
     const handleOnChange = (e) => {
       setBasicInfoContent({...basicInfoContent, [e.target.name] : e.target.value});
     }

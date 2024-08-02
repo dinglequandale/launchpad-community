@@ -42,10 +42,10 @@ export default function Organizations(){
 
     const pageName = "Opportunities";
 
-    const filterContent = [
-        ["Any Category","Community Service", "Student Clubs", "Workplace Opportunities"],
-        ["Any Field of Interest", "Your Interests"]
-    ];
+    const filterContent = {
+        f1: ["Any Category","Community Service", "Clubs", "Workplace Opportunities", "Youth Voices"],
+        f2: ["Any Subject Matter", "Your Interests"]
+};
 
 
     // TODO: make these styles more dynamic
