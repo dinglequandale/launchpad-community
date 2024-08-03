@@ -13,16 +13,13 @@ export default function SearchBar({filters, pageName}) {
                 return "opportunities and organizations"
         }
     }
-
     const [queryText, setQueryText] = useState('');
-    const [results, setResults] = useState([]);
-  
+
     const handleSearch = async (e) => {
       e.preventDefault();
-      const matches = await searchDocuments(pageName.toLowerCase(), queryText);
-      setResults(matches);
+      await searchDocuments(pageName.toLowerCase(), queryText);
     };
-  
+
     return (
         <div className="searchContainer">
         <h2 style={{ paddingLeft: "3%" }}>{pageName}</h2>
@@ -43,13 +40,6 @@ export default function SearchBar({filters, pageName}) {
           {filters.map((filter, index) => (
             <ContentFilter key={index} filterContent={filter} />
           ))}
-        </div>
-        <div>
-          <ul>
-            {results.map((result, index) => (
-              <li key={index}>{result}</li>
-            ))}
-          </ul>
         </div>
       </div>
     );
