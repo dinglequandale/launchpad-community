@@ -11,6 +11,8 @@ import { CgWebsite } from 'react-icons/cg';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { saveOpportunity } from '../../../services/opportunityServices';
+import OnboardingDropdown from '../../OnboardingDropdown/OnboardingDropdown';
+import { careerInterests } from '../../../pages/Onboarding/Options';
 
 const OpportunityContext = createContext({
   organizationData: {},
@@ -33,7 +35,7 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
   const [organizationData, setOrganizationData] = useState({
     organizationType: '',
     organizationHostCompany: '',
-    applicantFieldOfWork: '',
+    organizationTags: [],
     applicantPosition: '',
     applicantExpectations: '',
     isPaid: 'Unpaid',
@@ -132,14 +134,13 @@ const saveOpportunityData = async () => {
   
     // Page 2
     {
-      id: "applicantFieldOfWork",
-      text: `${organizationData.organizationType} Field of Work`,
-      type: "text",
-      maxLength: 40,
-      placeholder: 'e.g. "finance"',
-      includers: ["Internship", "Shadowing", ""],
+      id: "organizationTags",
+      text: `${organizationData.organizationType} Fields of Work`,
+      type: "multi-select",
+      includers: ["Internship", "Shadowing", "Job", ""],
       required: true,
-      page: 2, 
+      page: 2,
+      options: careerInterests,
     },
     {
       id: "applicantPosition",
@@ -250,12 +251,20 @@ const saveOpportunityData = async () => {
     });
   };
 
+  const handleDropdownChange = (id, label) => {
+    setOrganizationData(prevState => ({
+      ...prevState,
+      [id]: label,
+    }));
+  };
+
+
   const renderPage = () => {
     switch(currentOpportunityPage){
       case 1:
         return <OpportunityType/>;
       case 2:
-        return <ApplicantInfo/>;
+        return <ApplicantInfo handleDropdownChange={handleDropdownChange}/>;
       case 3:
         return <BasicLogistics/>;
       case 4:
@@ -369,7 +378,7 @@ function OpportunityType(){
   )
 }
 
-function ApplicantInfo(){
+function ApplicantInfo({handleDropdownChange}){
   const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
   const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 2 && question.includers.includes(organizationData.organizationType)));
 
@@ -383,7 +392,7 @@ function ApplicantInfo(){
             {questionsForPage
               .filter(
                 (question) =>
-                  (question.id === "applicantFieldOfWork" && !question.includers.includes(question.id)) ||
+                  (question.id === "organizationTags" && !question.includers.includes(question.id)) ||
                   (question.id === "applicantPosition"  && !question.includers.includes(question.id))
               )
               .map((question) => (
@@ -391,15 +400,26 @@ function ApplicantInfo(){
                   {question.required && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "center", justifyContent: "center" }}>
                       <label htmlFor={question.id}>{question.text}</label>
-                      <input
-                        id={question.id}
-                        name={question.id}
-                        value={organizationData[question.id]}
-                        onChange={handleChange}
-                        type="text"
-                        maxLength={question.maxLength}
-                        placeholder={question.placeholder}
-                      />
+                    {question.id === "organizationTags" ? <div style={{width: "350px", textAlign: "left"}}>
+                      <OnboardingDropdown
+                        showQuestion={false}
+                        key={question.id}
+                        question={question.text}
+                        options={question.options}
+                        selectedOption={organizationData[question.id] || (question.type === 'multi-select' ? [] : '')}
+                        onChange={(label) => handleDropdownChange(question.id, label)}
+                        type={question.type}
+                      /> 
+                    </div> : 
+                    <input
+                      style={{width: "300px"}}
+                      id={question.id}
+                      name={question.id}
+                      value={organizationData[question.id]}
+                      onChange={handleChange}
+                      maxLength={question.maxLength}
+                      placeholder={question.placeholder}
+                    />}
                     </div>
                   )}
                 </div>

@@ -28,7 +28,7 @@ export default function OrganizationProfile({organizationData, location}){
     const [userData, setUserData] = useState(null);
 
     const organizationProfileData = {
-        organizationName: organizationData.organizationName ?? organizationData.organizationHostCompany,
+        organizationName: organizationData.organizationName ?? (organizationData.applicantPosition ? `${organizationData.applicantPosition} at ${organizationData.organizationHostCompany}` : organizationData.organizationHostCompany),
         organizationType : organizationData.organizationType,
         organizationHost : organizationData.organizationHostCompany ?? organizationData.organizationHostStudent,
         organizationDescription: organizationData.applicantExpectations ?? organizationData.organizationMission,

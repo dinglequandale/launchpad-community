@@ -335,9 +335,9 @@ function OpportunityPopup({opportunitiesOptions}){
         </div>
         <div style={{position: "relative"}}>
             { (opportunityData && !loading) ? <>
-            <div style={{textAlign: "center"}}>
-            <span 
-            style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>
+            <div style={{textAlign: "center", marginBottom: "12px"}}>
+            <span
+            style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)"}}>
                 {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
             </span>
             </div>
