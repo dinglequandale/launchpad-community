@@ -43,6 +43,7 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
     learnMore: 'Messages',
     apply: 'Messages',
     organizationLogoPreview: null,
+    createdByUserName: "",
   });
 
   const [organizationLogo,setOrganizationLogo] = useState(null);
@@ -70,7 +71,12 @@ const saveOpportunityData = async () => {
   useEffect(() => {
     if (opportunityData) {
         setOrganizationData({... opportunityData});
+        return;
     }
+
+    const {userName} = JSON.parse(localStorage.getItem("basicUserInfo"));
+    setOrganizationData({...organizationData, createdByUserName: userName});
+
     }, [visibility]);
 
   const customStyles = {

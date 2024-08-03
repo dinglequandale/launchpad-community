@@ -12,11 +12,14 @@ import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
+import { useAuth } from "../../contexts/auth/AuthContext";
 
 
 const NetworkContext = createContext();
 
 export default function UserNetwork() {
+
+  const {currentUser} = useAuth();
 
   const { chatClient, isConnected } = useOutletContext();
 
@@ -28,14 +31,7 @@ export default function UserNetwork() {
   const [allUserData, setAllUserData] = useState([]);
   const [profileTargetData, setProfileTargetData] = useState(null);
   const [connectTargerUserName, setConnectTargetUserName] = useState("");
-
-
-  const { userType } = JSON.parse(localStorage.getItem("basicUserInfo"));
-  const filterContent = {
-    f1: ["Any User", "High Schoolers", "College Students", "Professionals"],
-    f2: userType === "High Schooler" ? ["Any College", "Your Dream College(s)"] : null,
-    f3: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`]
-  };
+  
   const [profileModalTop, setProfileModalTop] = useState(0);
 
   useEffect(() => {
@@ -47,6 +43,17 @@ export default function UserNetwork() {
       setProfileModalVisibility(false);
     }
   }
+
+  const { userType } = JSON.parse(localStorage.getItem("basicUserInfo"));
+  const filterContent = {
+    userType: ["Any User", "High Schoolers", "College Students", "Professionals"],
+    collegeInterestsOrDecision: userType === "High Schooler" ? ["Any College", "My Dream Colleges"] : null,
+    areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`]
+  };
+
+  const handleFilterChange = (filterKey, value) => {
+    setFilters(prev => ({...prev, [filterKey]: value}));
+  };
 
   const getUserClassData = (userData) => {
     const highSchoolers = userData.filter((user) => user.userType === "High Schooler");
@@ -111,7 +118,7 @@ export default function UserNetwork() {
             <TopBar/>
             <SideNav/>
             <div className='networkContainer' id="networkContainer" style={{paddingTop: "3%", paddingLeft: "10%"}}>
-              <SearchBar filters = {filterContent} pageName={pageName}/>
+              <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange}/>
               <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh"}}>
                 {getUserClassData(allUserData).highSchoolers.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>

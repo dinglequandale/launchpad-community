@@ -80,12 +80,18 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     learnMore: 'Messages',
     apply: 'Messages',
     organizationLogoPreview: null,
+    createdByUserName: "",
   });
 
   useEffect(() => {
     if (opportunityData) {
         setOrganizationData({... opportunityData});
+        return;
     }
+
+    const {userName} = JSON.parse(localStorage.getItem("basicUserInfo"));
+    setOrganizationData({...organizationData, createdByUserName: userName});
+
     }, [visibility]);
 
   const organizationQuestionsConfig = [
@@ -446,7 +452,7 @@ function FinalInfo(){
                   <div style={{display: "flex", justifyContent: "center", gap: "25px", paddingTop: "10px"}}>
                   {learnMoreAndApplyOptions.map((option)=>(
                     <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: "100px"}}>
-                      <button key={option[0]} style={{padding: "10px"}} className={`btnCircle ${option[0] === (question.id === "learnMore" ? learnMoreType : applyType) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
+                      <button key={option[0]} style={{padding: "10px"}} className={`btnCircle ${(option[0] === (question.id === "learnMore" ? learnMoreType : applyType)) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
                         {option[1]}
                       </button>
                       <span>{option[0]}</span>

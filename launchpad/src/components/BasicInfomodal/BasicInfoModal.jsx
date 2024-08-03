@@ -128,13 +128,14 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   const saveBasicInfo = async () => {
     if(!isEmpty()){
       const filteredBasicInfo = Object.entries(basicInfoContent).reduce((acc, [key, value]) => {
-        if (value !== "" && questionsForUser.filter((question)=>question.id === key) > 0) {  // Filter out empty and unapplicable values values
+        console.log(`Desired questions for ${key}, ${value}:`, questionsForUser.filter((question)=>question.id === key))
+        if (value !== "" && questionsForUser.filter((question)=>question.id === key).length > 0) {  // Filter out empty and unapplicable values values
           acc[key] = value; 
         }
         return acc;
       }, {});
 
-      console.log(filteredBasicInfo)
+      console.log("Filtered:", filteredBasicInfo)
 
       const newUserData = {...userData, ...filteredBasicInfo};
       await editUserData(newUserData, currentUser);

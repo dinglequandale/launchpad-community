@@ -150,13 +150,15 @@ function PublicPrivateDropdown({userResumePublicity}){
     }
     useEffect(()=>{
         let onClickHandler = (e) => {
+            try{
             if(!dropdownRef.current.contains(e.target)){
                 setDropdownVisibility(false);
             }
+        }catch{}
         }
 
         document.addEventListener("mousedown", onClickHandler)
-    })
+    },[])
     return(
         <div className="dropdownContainer" ref={dropdownRef}>
             <div style={{display: "flex", alignItems: "center", cursor: "pointer", justifyContent: "space-between", gap:"5px"}} className="filterTop" onClick={handleClick}>
@@ -307,7 +309,9 @@ function OpportunityPopup({opportunitiesOptions}){
         handleDeleteOpportunity(opportunityId);
         setOpportunityData(null);
     }
-    
+
+    console.log(opportunityData)
+
     return(
         <>
         <div name="deleteWarning">

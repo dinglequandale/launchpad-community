@@ -8,44 +8,40 @@ import { db } from "../../firebase/firebaseConfig";
 import { collection, onSnapshot } from "firebase/firestore";
 import NoResults, { EmptyField } from "../../components/NoResultsnotifier/NoResults";
 import Loading from "../../components/LoadingAnimation/Loading";
+import { getFilteredData } from "../../services/filteringServices";
+import { useAuth } from "../../contexts/auth/AuthContext";
+
+const filterContent = {
+    organizationType: ["Any Category","Community Service", "Clubs", "Workplace Opportunities", "Nonprofits"],
+    areasOfInterestOrExpertise: ["Any Subject Matter", "My Interests"]
+};
 
 export default function Organizations(){
+
+    const {currentUser} = useAuth();
 
     const [organizationsData, setOrganizationsData] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const opportunitiesRef = collection(db, "opportunities");
-        setLoading(true);
-      
-        const unsubscribe = onSnapshot(opportunitiesRef, 
-          (snapshot) => {
-            const opportunitiesData = snapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            }));
-            setOrganizationsData(opportunitiesData);
-            setLoading(false);
-          },
-          (error) => {
-            console.log("Error fetching opportunities:", error);
-            setLoading(false);
-          }
-        );
-      
-        return () => unsubscribe();
-      }, []);
+    const [filters, setFilters] = useState({
+        category: 'Any Category',
+        subjectMatter: 'Any Subject Matter'
+    });
 
-    useEffect(()=>{
-        console.log(organizationsData)
-    },[organizationsData])
+    useEffect(() => {
+        fetchOpportunities();
+    }, [filters]);
+
+    const fetchOpportunities = async () => {
+        const filteredData = await getFilteredData('opportunities', filters, currentUser.uid);
+        setOrganizationsData(filteredData);
+    };
+
+  const handleFilterChange = (filterKey, value) => {
+    setFilters(prev => ({...prev, [filterKey]: value}));
+  };
 
     const pageName = "Opportunities";
-
-    const filterContent = {
-        f1: ["Any Category","Community Service", "Clubs", "Workplace Opportunities", "Youth Voices"],
-        f2: ["Any Subject Matter", "Your Interests"]
-};
 
 
     // TODO: make these styles more dynamic
@@ -65,7 +61,7 @@ export default function Organizations(){
             </div>
             <div style={{paddingLeft:"10%"}}>
                 <div className='organizationsContainer'>
-                    <SearchBar filters = {filterContent} pageName = {pageName}/> 
+                    <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange}/> 
                     
                     <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px", paddingBottom: "40px"}}>
                         {loading ?

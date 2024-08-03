@@ -36,25 +36,23 @@ export default function OrganizationProfile({organizationData, location}){
         organizationRelevanceTags: (organizationData.organizationTags && organizationData.organizationTags.length > 0) ? displayFieldsOfInterest(organizationData.organizationTags) : organizationData.applicantFieldOfWork ? (organizationData.applicantFieldOfWork + ", " + organizationData.applicantPosition) : null,
         organizationLogoPreview: organizationData.organizationLogoPreview ?? "/assets/awty-logo.jpg",
         organizationCreatedBy: organizationData.createdBy,
+        organizationHostName: organizationData.createdByUserName,
     }
 
-    const getUserName = async (userId) => {
+    const getUserData = async (userId) => {
         const userSnap = await getDoc(doc(db, "users", userId));
         if (userSnap.exists()) {
-            setOrganizationCreatorName(displayShortenedName(userSnap.data().userName));
             setUserData(userSnap.data());
             } else {
-            console.log("No such document!");
-            setOrganizationCreatorName(organizationProfileData.organizationName);
+                console.log("No such document!");
             }
     }
 
     useEffect(()=>{
         if(location !== "organizations_page"){
-            getUserName(currentUser.uid);
             return;
         }
-        getUserName(organizationProfileData.organizationCreatedBy);
+        getUserData(organizationProfileData.organizationCreatedBy);
     },[])
 
     useEffect(() => {
@@ -103,8 +101,7 @@ export default function OrganizationProfile({organizationData, location}){
         setIsExpanded(!isExpanded);
     }
 
-    console.log("Expanded:", isExpanded)
-    console.log(organizationProfileData.organizationRelevanceTags)
+    console.log("Current organization tags:", organizationProfileData.organizationRelevanceTags)
     return(
         <>
             {showPfpCard && <ProfileModal userData={userData} onClose={() => setShowPfpCard(false)}/>}
@@ -120,7 +117,7 @@ export default function OrganizationProfile({organizationData, location}){
                                 <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
                                 <span style={{fontWeight: "bold", color: "var(--secondary)", fontSize: "smaller"}}> {organizationProfileData.organizationType} {["Club", "Initiative"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
                                 <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>run by&nbsp;</span>
-                                <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationCreatorName}</button>
+                                <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHostName}</button>
                                 <br />
                                 <div style={{lineHeight: "1"}}>
                                     {organizationProfileData.organizationDescription}
