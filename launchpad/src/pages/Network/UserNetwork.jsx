@@ -13,6 +13,7 @@ import { useOutletContext } from "react-router-dom";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { useAuth } from "../../contexts/auth/AuthContext";
+import { getFilteredData } from "../../services/filteringServices";
 
 
 const NetworkContext = createContext();
@@ -45,15 +46,30 @@ export default function UserNetwork() {
   }
 
   const { userType } = JSON.parse(localStorage.getItem("basicUserInfo"));
+  const [filters, setFilters] = useState({
+    userType: 'Any User',
+    collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
+    areasOfInterestOrExpertise: `My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`
+  });
+
   const filterContent = {
     userType: ["Any User", "High Schoolers", "College Students", "Professionals"],
     collegeInterestsOrDecision: userType === "High Schooler" ? ["Any College", "My Dream Colleges"] : null,
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`]
   };
 
-  const handleFilterChange = (filterKey, value) => {
-    setFilters(prev => ({...prev, [filterKey]: value}));
-  };
+useEffect(() => {
+    fetchOpportunities();
+}, [filters]);
+
+const fetchOpportunities = async () => {
+    const filteredData = await getFilteredData('users', filters, currentUser.uid);
+    setAllUserData(filteredData);
+};
+
+const handleFilterChange = (filterKey, value) => {
+  setFilters(prev => ({...prev, [filterKey]: value}));
+};
 
   const getUserClassData = (userData) => {
     const highSchoolers = userData.filter((user) => user.userType === "High Schooler");
@@ -80,27 +96,27 @@ export default function UserNetwork() {
     setProfileModalVisibility(true);
   }
 
-  useEffect(() => {
-    const usersRef = collection(db, "users");
-    setLoading(true);
+  // useEffect(() => {
+  //   const usersRef = collection(db, "users");
+  //   setLoading(true);
   
-    const unsubscribe = onSnapshot(usersRef, 
-      (snapshot) => {
-        const userData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setAllUserData(userData);
-        setLoading(false);
-      },
-      (error) => {
-        console.log("Error fetching opportunities:", error);
-        setLoading(false);
-      }
-    );
+  //   const unsubscribe = onSnapshot(usersRef, 
+  //     (snapshot) => {
+  //       const userData = snapshot.docs.map(doc => ({
+  //         id: doc.id,
+  //         ...doc.data()
+  //       }));
+  //       setAllUserData(userData);
+  //       setLoading(false);
+  //     },
+  //     (error) => {
+  //       console.log("Error fetching opportunities:", error);
+  //       setLoading(false);
+  //     }
+  //   );
   
-    return () => unsubscribe();
-  }, []);
+  //   return () => unsubscribe();
+  // }, []);
 
     useEffect(() => {
       if (profileModalVisibility) {

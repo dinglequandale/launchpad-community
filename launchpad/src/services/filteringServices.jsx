@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, getDoc, doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, or } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig'; // Adjust this import based on your Firebase setup
 import { careerInterests } from '../pages/Onboarding/Options';
 
@@ -7,49 +7,62 @@ export async function getFilteredData(collectionName, filters, currentUserId) {
 
     const {userType} = JSON.parse(localStorage.getItem("basicUserInfo"));
 
-    const userInterests = await getUserData(userType === "Professional" ? "fieldsOfExpertise" : "areasOfInterest", currentUserId);
-    console.log("Interests:", userInterests)
-    // Create an array to hold all filter operations
+    const {userInterests, userColleges} = await getUserData(userType === "Professional" ? "fieldsOfExpertise" : "areasOfInterest", currentUserId);
+
     const filterOperations = await Promise.all(Object.entries(filters).map(async ([key, value]) => {
         if (value && (Array.isArray(value) || !value.startsWith('Any'))) {
-            if (key === "areasOfInterestOrExpertise" || key === "collegeInterestsOrDecision") {
+            if (key === "areasOfInterestOrExpertise") {
             const dataType = value;
             //   const userInterests = await getUserData(dataType, currentUserId);
             const userInterestsExtended = getExtendedInterests(userInterests);
             
+            if (collectionName === "opportunities") {
+                return { key: "organizationTags", operation: "array-contains-any", value: userInterestsExtended };
+              } else {
+                return { key: ["fieldsOfExpertise", "areasOfInterest"], operation: "array-contains-any", value: userInterestsExtended };
+              }
+        } 
+        else if(key === "collegeInterestsOrDecision"){
             return {
-                key: `${collectionName === "opportunities" ? "organizationTags" : dataType}`,
+                key: "collegeInterestsOrDecision",
                 operation: "array-contains-any",
-                value: userInterestsExtended
+                value: userColleges,
             };
         } else if (Array.isArray(value)) {
-          return { key, operation: 'in', value };
+            return { key, operation: 'in', value };
         } else {
-          return { key, operation: '==', value };
+            return { key, operation: '==', value };
         }
     }
     return null;
     }));
   
-    // Apply all filters to the query
     filterOperations.forEach(filter => {
-      if (filter) {
-        q = query(q, where(filter.key, filter.operation, filter.value));
-      }
-    });
+        if (filter) {
+          if (Array.isArray(filter.key)) {
+            q = query(q, or(
+              where(filter.key[0], filter.operation, filter.value),
+              where(filter.key[1], filter.operation, filter.value)
+            ));
+          } else {
+            q = query(q, where(filter.key, filter.operation, filter.value));
+          }
+        }
+      });
+    
 
   
     // IMPORTANT TODO: PAGINATION / MAX LOAD
     const querySnapshot = await getDocs(q);
     const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    // Sort results by relevance
+    // sort results by relevance
     try{
     const originalInterests = new Set(userInterests);
     results.sort((a, b) => {
       const aMatches = a.organizationTags.filter(tag => originalInterests.has(tag)).length;
       const bMatches = b.organizationTags.filter(tag => originalInterests.has(tag)).length;
-      return bMatches - aMatches; // Descending order
+      return bMatches - aMatches; // descending order
     });
     }catch{}
   
@@ -60,7 +73,7 @@ export async function getFilteredData(collectionName, filters, currentUserId) {
 const getUserData = async (dataType, currentUserId) => {
     const userSnap = await getDoc(doc(db, "users", currentUserId));
     if(userSnap.exists()){
-        return userSnap.data()[dataType];
+        return {userInterests: userSnap.data()[dataType], userColleges :userSnap.data()["collegeInterestsOrDecision"]};
     }else{
         console.log("User not found!");
         return null

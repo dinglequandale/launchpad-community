@@ -2,7 +2,7 @@ import ContentFilter from "../Contentfilter/ContentFilter";
 import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
 
-export default function SearchBar({filters, pageName, handleFilterChange={handleFilterChange}}) {
+export default function SearchBar({filters, pageName, handleFilterChange}) {
 
     const searchType = () => {
         switch(pageName){
