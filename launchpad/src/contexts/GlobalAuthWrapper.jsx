@@ -11,9 +11,11 @@ function GlobalAuthWrapper() {
   const { chatClient, isConnected, connectToStream } = useStreamConnection();
   const [isInitializing, setIsInitializing] = useState(true);
   const navigate = useNavigate();
+  const [userData,setUserData] = useState(null);
 
   useEffect(() => {
     let unsubscribe;
+    if(!currentUser){navigate("/Login")}
     const userRef = doc(db, 'users', currentUser.uid);
     async function initializeApp() {
       if (currentUser && !isConnected) {
@@ -22,8 +24,9 @@ function GlobalAuthWrapper() {
             navigate("/Onboarding");
             return;
           }
+          setUserData({...doc.data()});
         });
-        await connectToStream(currentUser);
+        await connectToStream(currentUser,userData);
       }
       setIsInitializing(false);
     }

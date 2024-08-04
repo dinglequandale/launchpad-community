@@ -29,14 +29,16 @@ export const getStreamToken = async () => {
     const [isConnected, setIsConnected] = useState(false);
     // const [userName, setUserName] = useState("");
     // const [userPfp, setUserPfp] = useState("");
-    const { userName, userPfpPreview } = JSON.parse(localStorage.getItem("basicUserInfo"));
+    // const { userName, userPfpPreview } = JSON.parse(localStorage.getItem("basicUserInfo"));
 
     // console.log(isConnected, chatClient.userID)
 
-    const connectToStream = useCallback(async (user) => {
+    const connectToStream = useCallback(async (user, userData) => {
       console.log('Attempting to connect to Stream');
       console.log('Current chatClient.userID:', chatClient.userID);
       console.log('Current user:', user.uid);
+
+      const {userName, userPfpPreview} = userData ?? {userName:null, userPfpPreview:null};
 
       if(chatClient.userID){
         setIsConnected(true);
