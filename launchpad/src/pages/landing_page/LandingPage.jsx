@@ -26,34 +26,40 @@ export default function LandingPage() {
           </ul>
         </nav>
         <div style={{paddingTop: "30px"}}>
-          <h1 className="landing-title"><span style={{color: "var(--neutral)", textDecoration: "underline"}}>Launch</span> Your Career Into the Future</h1>
+          <h1 className="landing-title"><span style={{color: "var(--neutral)", textDecoration: "underline"}}>Empowering</span> Student Excellence</h1>
         </div>
-        <p className="subheader"><span style={{fontWeight: "bolder",color: "var(--neutral)",textDecoration: "underline"}}>Connect</span> with professionals and <span style={{fontWeight: "bolder",color: "var(--neutral)", textDecoration: "underline"}}>gain</span> valuable on-site job experience</p>
+        <p className="subheader"><span style={{fontWeight: "bolder",color: "var(--neutral)",textDecoration: "underline"}}>Launching</span> Houston’s youth into <span style={{fontWeight: "bolder",color: "var(--neutral)", textDecoration: "underline"}}>collegiate</span> and <span style={{fontWeight: "bolder",color: "var(--neutral)", textDecoration: "underline"}}>professional</span> success</p>
         <button className="cta-button btnUnfilled" onClick={handleJoin}>Get Started</button>
       </header>
 
       <main className="main-content">
         <section className="feature-section">
           <div className="feature-card">
-            <i className="icon-connections"></i>
-            <h2 style={{color: "var(--secondary)"}}>Seamless Connections</h2>
-            <p>
-              Discover how easy it is to connect with industry professionals. With just one click, you open the door to a world of opportunities and meaningful experiences.
-            </p>
+            {/* <i className="icon-connections"></i> */}
+            <span className="pillarTitle">Make Invaluable Connections</span>
+            <div className="pillarText" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
+            <span>
+            <span className="txtEmphasis">Connect</span> with industry professionals, undergraduates at your dream school, and like-minded peers— all committed to helping you. With just one click, you gain access to a world of opportunities.
+            </span>
+            </div>
           </div>
           <div className="feature-card">
-            <i className="icon-potential"></i>
-            <h2 style={{color: "var(--secondary)"}}>Unlock Your Potential</h2>
-            <p>
-              Our platform is designed to empower high school students, providing access to invaluable connections and real-world job experiences that shape your future.
-            </p>
+            {/* <i className="icon-potential"></i> */}
+            <span className="pillarTitle">Discover Meaningful Opportunities</span>
+            <div className="pillarText" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
+            <span>
+            <span className="txtEmphasis">Find</span> volunteer and leadership positions at community organizations, in line with your interests. Discover workplace opportunities while learning from undergrads and professionals who have done what you want to do!
+            </span>
+            </div>
           </div>
           <div className="feature-card">
-            <i className="icon-community"></i>
-            <h2 style={{color: "var(--secondary)"}}>Join the Revolution</h2>
-            <p>
-              Be part of a community that values your growth. Sign up now, go through our seamless onboarding process, and start your journey to a brighter future.
-            </p>
+            {/* <i className="icon-community"></i> */}
+            <span className="pillarTitle">Explore Careers & Colleges</span>
+            <div className="pillarText">
+            <span>
+            <span className="txtEmphasis">Complete</span> reputed surveys to find the careers that best suit you. Connect with undergrads and professionals in your fields of interest to gain insight on college and work life. Explore shadow, intern, and job opportunities.
+            </span>
+            </div>
           </div>
         </section>
 
