@@ -2,11 +2,6 @@ import { collection, query, where, getDocs, startAt, endAt, orderBy, and } from 
 import { db } from '../firebase/firebaseConfig';
 
 const searchDocuments = async (collectionName, searchText) => {
-    if (searchText.trim() === '') {
-      console.log('No search text provided');
-      return;
-    }
-  
     try {
       const docsRef = collection(db, collectionName);
       
