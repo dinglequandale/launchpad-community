@@ -55,8 +55,7 @@ export default function Organizations(){
         const searchResults = await searchDocuments(pageName.toLowerCase(), queryText);
 
         setOrganizationsData(searchResults);
-
-      };
+    };
 
 
     // TODO: make these styles more dynamic
