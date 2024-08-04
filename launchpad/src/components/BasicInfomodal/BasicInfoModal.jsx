@@ -20,7 +20,6 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   const [basicInfoContent, setBasicInfoContent] = useState(
     {
     areasOfInterest: userData.areasOfInterest ?? [],
-    fieldsOfExpertise: userData.fieldsOfExpertise ?? [],
     // TODO: fix
     collegeInterestsOrDecision: userData.collegeInterestsOrDecision ?? [],
     acceptedColleges: userData.acceptedColleges ?? [],
@@ -58,7 +57,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       required: true,
     },
     {
-      id: "fieldsOfExpertise",
+      id: "areasOfInterest",
       text: "What are your fields of expertise?",
       type: "multi-select",
       options: careerInterests,
@@ -128,13 +127,14 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   const saveBasicInfo = async () => {
     if(!isEmpty()){
       const filteredBasicInfo = Object.entries(basicInfoContent).reduce((acc, [key, value]) => {
-        if (value !== "" || questionsForUser.filter((question)=>question.id === key) > 0) {  // Filter out empty and unapplicable values values
+        console.log(`Desired questions for ${key}, ${value}:`, questionsForUser.filter((question)=>question.id === key))
+        if (value !== "" && questionsForUser.filter((question)=>question.id === key).length > 0) {  // Filter out empty and unapplicable values values
           acc[key] = value; 
         }
         return acc;
       }, {});
 
-      console.log(filteredBasicInfo)
+      console.log("Filtered:", filteredBasicInfo)
 
       const newUserData = {...userData, ...filteredBasicInfo};
       await editUserData(newUserData, currentUser);
@@ -161,7 +161,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
         zIndex: "3",
       }
     };
-    console.log(basicInfoContent)
+
     const handleOnChange = (e) => {
       setBasicInfoContent({...basicInfoContent, [e.target.name] : e.target.value});
     }

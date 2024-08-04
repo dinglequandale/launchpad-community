@@ -1,6 +1,5 @@
 import './editprofilecard.css';
 import React, { createContext, useContext } from 'react';
-import { VscAccount } from "react-icons/vsc";
 import { useState, useEffect, useRef } from 'react';
 import { IoAdd } from "react-icons/io5";
 import { IoLockClosedOutline } from "react-icons/io5";
@@ -20,7 +19,7 @@ import { handleDeleteOpportunity, loadOpportunities } from '../../services/oppor
 import Loading from '../LoadingAnimation/Loading';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
-import { displayFieldsOfInterest, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
+import { displayColleges, displayFieldsOfInterest, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -76,7 +75,7 @@ export default function EditProfileCard() {
     const descType = () => {
         switch(userData.userType){
             case "High Schooler":
-                return userData.collegeDecision === "No" ? "Dream Colleges" : "Commited College";
+                return userData.collegeDecision === "No" ? "Dream Colleges" : "Committed College";
             case "Alumni":
                 return "Attending College";
             case "Professional":
@@ -111,7 +110,7 @@ export default function EditProfileCard() {
                 </div>
                 {(userData.userType === "Professional" || userData.userType === "Alumni") && <hr style={{width: "100%"}}/>}
                 {(userData.userType === "Professional" || userData.userType === "Alumni") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
-                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userData.userName}</span> is <span style={{fontWeight: "450"}}>open to</span> ... </h>
+                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userData.userName.split(" ")[0]}</span> is <span style={{fontWeight: "450"}}>open to</span> ... </h>
                     <ConnectionAvailability/>
                 </div>}
                 </>
@@ -150,13 +149,15 @@ function PublicPrivateDropdown({userResumePublicity}){
     }
     useEffect(()=>{
         let onClickHandler = (e) => {
+            try{
             if(!dropdownRef.current.contains(e.target)){
                 setDropdownVisibility(false);
             }
+        }catch{}
         }
 
         document.addEventListener("mousedown", onClickHandler)
-    })
+    },[])
     return(
         <div className="dropdownContainer" ref={dropdownRef}>
             <div style={{display: "flex", alignItems: "center", cursor: "pointer", justifyContent: "space-between", gap:"5px"}} className="filterTop" onClick={handleClick}>
@@ -239,11 +240,11 @@ function BasicInfoCard({descType}){
     const [basicInfoContent, setBasicInfoContent] = useState(null);
 
     useEffect(()=>{
-        setBasicInfoContent({userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`
+        setBasicInfoContent({userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`
         : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
         : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
-        userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
-        userSecondDesc: `${descType}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? userData.collegeAttending : userData.collegeInterestsOrDecision}`,
+        userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
+        userSecondDesc: `${descType}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
         acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
     })
     },[userData])
@@ -255,7 +256,8 @@ function BasicInfoCard({descType}){
         <div className='basicInfo'>
             <div>
                 {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
-                {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <VscAccount size = {80} className='cardPfp'/>}
+                {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
+                    {width: "80px", height: "80px"}}/>}
             </div>
             <div className='cardNameDescription'>
                 <span className='cardName'>{userData.userName}</span>
@@ -307,7 +309,9 @@ function OpportunityPopup({opportunitiesOptions}){
         handleDeleteOpportunity(opportunityId);
         setOpportunityData(null);
     }
-    
+
+    console.log(opportunityData)
+
     return(
         <>
         <div name="deleteWarning">
@@ -331,9 +335,9 @@ function OpportunityPopup({opportunitiesOptions}){
         </div>
         <div style={{position: "relative"}}>
             { (opportunityData && !loading) ? <>
-            <div style={{textAlign: "center"}}>
-            <span 
-            style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", alignItems: "center", justifyContent: "center", lineHeight: "2"}}>
+            <div style={{textAlign: "center", marginBottom: "12px"}}>
+            <span
+            style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)"}}>
                 {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
             </span>
             </div>

@@ -1,6 +1,5 @@
 .filterContainer{
     align-items: center;
-    width: fit-content;
     position: relative;
     padding-bottom: 10px;
 }
@@ -14,6 +13,7 @@
     transition: max-height 0.3s ease-in-out; /* Smooth transition */
     position: absolute;
     width: 100%;
+    min-width: 120px;
     z-index: 2;
 }
   

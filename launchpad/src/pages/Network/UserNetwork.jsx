@@ -12,11 +12,15 @@ import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
+import { useAuth } from "../../contexts/auth/AuthContext";
+import { getFilteredData } from "../../services/filteringServices";
 
 
 const NetworkContext = createContext();
 
 export default function UserNetwork() {
+
+  const {currentUser} = useAuth();
 
   const { chatClient, isConnected } = useOutletContext();
 
@@ -28,12 +32,7 @@ export default function UserNetwork() {
   const [allUserData, setAllUserData] = useState([]);
   const [profileTargetData, setProfileTargetData] = useState(null);
   const [connectTargerUserName, setConnectTargetUserName] = useState("");
-
-  const filterContent = [
-    ["Any Education Stage", "High School Student", "College Student"],
-    ["Any College", "Dream College(s)"],
-    ["Any Interest","Your Interests", "Physics", "Finance", "Theatre"]
-  ];
+  
   const [profileModalTop, setProfileModalTop] = useState(0);
 
   useEffect(() => {
@@ -45,6 +44,32 @@ export default function UserNetwork() {
       setProfileModalVisibility(false);
     }
   }
+
+  const { userType } = JSON.parse(localStorage.getItem("basicUserInfo"));
+  const [filters, setFilters] = useState({
+    userType: 'Any User',
+    collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
+    areasOfInterestOrExpertise: `My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`
+  });
+
+  const filterContent = {
+    userType: ["Any User", "High Schoolers", "College Students", "Professionals"],
+    collegeInterestsOrDecision: userType === "High Schooler" ? ["Any College", "My Dream Colleges"] : null,
+    areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`]
+  };
+
+useEffect(() => {
+    fetchOpportunities();
+}, [filters]);
+
+const fetchOpportunities = async () => {
+    const filteredData = await getFilteredData('users', filters, currentUser.uid);
+    setAllUserData(filteredData);
+};
+
+const handleFilterChange = (filterKey, value) => {
+  setFilters(prev => ({...prev, [filterKey]: value}));
+};
 
   const getUserClassData = (userData) => {
     const highSchoolers = userData.filter((user) => user.userType === "High Schooler");
@@ -71,27 +96,27 @@ export default function UserNetwork() {
     setProfileModalVisibility(true);
   }
 
-  useEffect(() => {
-    const usersRef = collection(db, "users");
-    setLoading(true);
+  // useEffect(() => {
+  //   const usersRef = collection(db, "users");
+  //   setLoading(true);
   
-    const unsubscribe = onSnapshot(usersRef, 
-      (snapshot) => {
-        const userData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        setAllUserData(userData);
-        setLoading(false);
-      },
-      (error) => {
-        console.log("Error fetching opportunities:", error);
-        setLoading(false);
-      }
-    );
+  //   const unsubscribe = onSnapshot(usersRef, 
+  //     (snapshot) => {
+  //       const userData = snapshot.docs.map(doc => ({
+  //         id: doc.id,
+  //         ...doc.data()
+  //       }));
+  //       setAllUserData(userData);
+  //       setLoading(false);
+  //     },
+  //     (error) => {
+  //       console.log("Error fetching opportunities:", error);
+  //       setLoading(false);
+  //     }
+  //   );
   
-    return () => unsubscribe();
-  }, []);
+  //   return () => unsubscribe();
+  // }, []);
 
     useEffect(() => {
       if (profileModalVisibility) {
@@ -109,7 +134,7 @@ export default function UserNetwork() {
             <TopBar/>
             <SideNav/>
             <div className='networkContainer' id="networkContainer" style={{paddingTop: "3%", paddingLeft: "10%"}}>
-              <SearchBar filters = {filterContent} pageName={pageName}/>
+              <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange}/>
               <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh"}}>
                 {getUserClassData(allUserData).highSchoolers.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
@@ -173,11 +198,11 @@ function UserCarousel({userNetworkData}){
   };
 
   return (
-    <div className="carousel" style={{width: "1022px", margin: "0 auto"}}>
+    <div className="carousel" style={{width: `${userNetworkData.length === 1 ? "340.66px" : userNetworkData.length === 2 ? "681.33px" : "1022px"}`, margin: "0 auto"}}>
       <div className="carousel-container">
         <div
           className={`carousel-content ${slideDirection}`}
-          style={{justifyContent: `${userNetworkData.length <= 3 ? "center" : ""}`}}
+          style={{justifyContent: `${userNetworkData.length <= 3 ? "center" : ""}`, gap: `${userNetworkData.length < 3 ? "10px" : ""}`}}
           onAnimationEnd={() => setSlideDirection('')}
           ref={carouselRef}
         >

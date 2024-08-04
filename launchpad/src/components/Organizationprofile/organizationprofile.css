@@ -53,20 +53,20 @@
 }
 
 .btnOrganizationLearnMore{
-    padding: 5px;
+    font-size: 17px;
+    padding: 7px;
     border-radius: 2px;
-    width: 75%;
+    width: 80%;
 }
 
 .btnOrganizationConnect{
-    padding: 5px;
-    background-color: var(--primary);
-    border-radius: 2px;
-    width: 75%;
-    color: black;
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;
+    border-radius: 5px;
+    padding: 7px;
+    font-size: 17px;
+    width: 80%;
+    font-weight: bolder;
+    border-width: 1.9px;
+    background-color: var(--);
 }
 
 .organizationDescription{

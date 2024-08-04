@@ -33,7 +33,6 @@ form input{
   color: var(--secondary);
   padding: 7px;
   font-size: 18px;
-  font-weight: bolder;
 }
 
 .btnFileUpload{
@@ -103,7 +102,6 @@ form select{
   color: var(--secondary);
   padding: 7px;
   font-size: 18px;
-  font-weight: bolder;
 }
 
 textarea{
@@ -173,6 +171,11 @@ button {
   font-size: 18px;
 }
 
+.pfpImage{
+  border-radius: 50%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
 .btnCircle{
   overflow: hidden;
   border-radius: 50%;
@@ -181,7 +184,6 @@ button {
 
 .btnCircle:hover{
   box-shadow: 0 0 11px rgba(33,33,33,.2); 
-  color: var(--highlight)
 }
 
 .btnUnfilled{

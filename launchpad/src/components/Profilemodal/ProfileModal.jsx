@@ -1,40 +1,24 @@
 import './profilemodal.css';
 import React from 'react';
-import { VscAccount } from "react-icons/vsc";
-import { SlLink } from "react-icons/sl";   
 import { IoCloseOutline } from "react-icons/io5";
-import SideNav from '../Sidenav/SideNav';
 import { useState, useEffect, useRef } from 'react';
 import { FaLink } from 'react-icons/fa6';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
-import ConnectModal from '../Connectmodal/ConnectModal';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
-import { displayFieldsOfInterest, lowerAndCapitalize } from '../../services/userProfileServices';
+import { displayColleges, displayFieldsOfInterest, displayShortenedName, lowerAndCapitalize } from '../../services/userProfileServices';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick}) {
 
-    // TODO: currently localStorage, transition to database IMPORTANT
     const userType = userData.userType;
     const userName = userData.userName;
-    const userAboutMe = "ewofioerfi ewife ofiefo iewofi eoifoei ofiwo fieifi eifeufue fueuf yfeyfy ywye fyy fyefy ywfyeu fuye yfye yfe fyewf. weyfyuef yeyf yfeyf yfyef ef e f."
     const resumePublicity = "Public";
     const [opportunityData, setOpportunityData] = useState(null);
     // const [loading, setLoading] = useState(false);
     const [opportunityLoading, setOpportunityLoading] = useState(false);
 
     useEffect(()=>{
-        // const getUserData = async () => {
-        //     setLoading(true);
-        //     const userSnap = await getDoc(doc(db, "users", userId));
-        //     if (userSnap.exists()) {
-        //         setUserData(userSnap.data());
-        //       } else {
-        //         console.log("No such document!");
-        //       }
-        //     setLoading(false);
-        // }
 
         const getOpportunityData = async () => {
             setOpportunityLoading(true);
@@ -48,44 +32,29 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
             setOpportunityLoading(false);
         }
 
-        // getUserData();
         getOpportunityData();
     },[visibility])
-
-    // const tempUserOpportunity = {
-    //     // initiative data format
-    //     id: Math.random(10**5),
-    //     organizationType: "Club",
-    //     organizationName: "Financial Literacy Club",
-    //     organizationHostStudent: "Juan Gallo Bonilla",
-    //     organizationMission: "Description Description Description Description Description Description",
-    //     organizationTags: ["engineering", "fortnite"],
-    //     learnMore: '',
-    //     apply: '',
-    //     organizationLogo: null,
-    //     organizationLogoPreview: '',
-    // }
     
     const descType = () => {
         switch(userData.userType){
             case "High Schooler":
-                return "Dream Colleges";
+                return userData.collegeDecision === "No" ? "Dream Colleges" : "Committed College";
             case "Alumni":
                 return "Attending College";
             case "Professional":
                 return "Current Position";
             default:
-                return "poo";
+                return "";
         }
     }
 
-    const basicInfoContent = {userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`
-        : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
-        : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
-        userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
-        userSecondDesc: `${descType()}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? userData.collegeAttending : userData.collegeInterestsOrDecision}`,
-        acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
-    };
+    const basicInfoContent = {userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`
+    : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
+    : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
+    userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
+    userSecondDesc: `${descType()}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
+    acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
+};
 
     const menuRef = useRef();
 
@@ -119,7 +88,9 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                     <header name="userIntro" style={{paddingBottom: "10px"}}>
                         <div className='basicInfo'>
                             <div>
-                                <VscAccount size = {80} className='cardPfp'/>
+                                {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
+                            {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
+                                {width: "80px", height: "80px"}}/>}
                             </div>
                             <div className='cardNameDescription'>
                                 <span className='cardName'>{userData.userName}</span>
@@ -133,7 +104,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 {(userData.acceptedColleges && userData.acceptedColleges.length > 0) && <span>{basicInfoContent.acceptedColleges}</span>}
                             </div>
                         </div>
-                        <button style={{width: "80%", borderRadius: "5px", margin: "0 auto"}} onClick={() => onConnectClick(userData.userId)}> 
+                        <button className='btnConnect' style={{width: "80%", borderRadius: "5px", margin: "0 auto"}} onClick={() => onConnectClick(userData.userId)}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>
@@ -143,21 +114,23 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                     <hr style={{width: "95%"}}/>
                     <main style={{padding: "0px 8px"}}>
                         {(!opportunityLoading && opportunityData) ? <div>
-                            <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", display: "flex", justifyContent: "center", paddingBottom: "10px"}}>{userName} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
-                            <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/> </div> : opportunityLoading ? <Loading/> : null}
+                            <div style={{textAlign: "center", marginBottom: ".6rem"}}>
+                            <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", paddingBottom: "3rem"}}>{userName.split(" ")[0]} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"}<span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
+                            </div>
+                            <OrganizationProfile location={"user_profile_public"} organizationData={opportunityData}/> </div> : opportunityLoading ? <Loading/> : null}
                         {userData.userAboutMe && <div name="userAboutMe" style={{paddingTop: "20px"}}>
-                            <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName}'s About Me</span>
+                            <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s About Me</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             <div style={{background: "var(--neutral)", padding: "10px", borderRadius: "5px", boxShadow: "var(--shadowColor)", paddingTop: "15px"}}>
                                 <span>{userData.userAboutMe}</span>
                             </div>
                         </div>}
                         {(userData.userResumePreview && resumePublicity === "Public") && <div name="userResume" style={{marginTop: "20px"}}>
-                            <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName}'s Resume</span>
+                            <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s Resume</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             <iframe src={userData.userResumePreview} frameborder="0" style={{width: "100%", height: "500px"}}></iframe></div>}
                         {userData.networkingLevel && userData.networkingLevel.length > 0 && <div>
-                            <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1", paddingTop: "20px"}}>{userName}'s Commitment</span>
+                            <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1", paddingTop: "20px"}}>{userName.split(" ")[0]}'s Commitment</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px", paddingTop: "10px"}}>
                                 {userData.networkingLevel.map((availability)=>(

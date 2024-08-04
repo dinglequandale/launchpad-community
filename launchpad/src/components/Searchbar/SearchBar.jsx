@@ -2,7 +2,7 @@ import ContentFilter from "../Contentfilter/ContentFilter";
 import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
 
-export default function SearchBar({filters, pageName}) {
+export default function SearchBar({filters, pageName, handleFilterChange}) {
 
     const searchType = () => {
         switch(pageName){
@@ -20,8 +20,8 @@ export default function SearchBar({filters, pageName}) {
                 <input type="text" name="fname" className="searchBar" placeholder={`Search for ${searchType()}`} />
             </div>
             <div style={{display: "flex", paddingBottom: "10px", gap: "30px", marginLeft: "5%"}}>
-                {filters.map((filter, index)=>(
-                    <ContentFilter filterContent={filters[index]}/>
+                {Object.keys(filters).filter((filterKey) => filters[filterKey] !== null).map((filterKey)=>(
+                    <ContentFilter filterKey={filterKey} filterContent={filters[filterKey]} onFilterChange={handleFilterChange}/>
                 ))}
             </div>
         </div>

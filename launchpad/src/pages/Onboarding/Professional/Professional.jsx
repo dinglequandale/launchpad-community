@@ -24,7 +24,7 @@ const professionalQuestionsConfig = [
     page: 1
   },
   {
-    id: "fieldsOfExpertise",
+    id: "areasOfInterest",
     text: "What are your main fields of expertise?",
     type: "multi-select",
     options: careerInterests,
@@ -133,7 +133,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
     retiredStatus: false,
     industryPosition: '',
     companyName: '',
-    fieldsOfExpertise: [],
+    areasOfInterest: [],
     networkingLevel: [],
     userResume: null,
     userResumePreview: "",
