@@ -130,9 +130,10 @@ export default function UserNetwork() {
   const handleSearch = async (e, queryText) => {
     e.preventDefault();
     // setIsSearching(false);
-    const searchResults = await searchDocuments('users', queryText);
-
-    setAllUserData(searchResults);
+    if (queryText) {
+      const searchResults = await searchDocuments('users', queryText);
+      setAllUserData(searchResults);
+    }
   };
     
   return (

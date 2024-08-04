@@ -52,9 +52,10 @@ export default function Organizations(){
     const handleSearch = async (e, queryText) => {
         e.preventDefault();
         // setIsSearching(false);
-        const searchResults = await searchDocuments(pageName.toLowerCase(), queryText);
-
-        setOrganizationsData(searchResults);
+        if (queryText) {
+            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText);
+            setOrganizationsData(searchResults);
+        }
     };
 
 
