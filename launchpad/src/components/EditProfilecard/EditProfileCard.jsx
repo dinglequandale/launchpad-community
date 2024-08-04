@@ -1,6 +1,5 @@
 import './editprofilecard.css';
 import React, { createContext, useContext } from 'react';
-import { VscAccount } from "react-icons/vsc";
 import { useState, useEffect, useRef } from 'react';
 import { IoAdd } from "react-icons/io5";
 import { IoLockClosedOutline } from "react-icons/io5";
@@ -241,10 +240,10 @@ function BasicInfoCard({descType}){
     const [basicInfoContent, setBasicInfoContent] = useState(null);
 
     useEffect(()=>{
-        setBasicInfoContent({userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`
+        setBasicInfoContent({userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`
         : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
         : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
-        userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
+        userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
         userSecondDesc: `${descType}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
         acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
     })
@@ -257,7 +256,8 @@ function BasicInfoCard({descType}){
         <div className='basicInfo'>
             <div>
                 {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
-                {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <VscAccount size = {80} className='cardPfp'/>}
+                {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
+                    {width: "80px", height: "80px"}}/>}
             </div>
             <div className='cardNameDescription'>
                 <span className='cardName'>{userData.userName}</span>

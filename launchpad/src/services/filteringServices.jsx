@@ -5,23 +5,21 @@ import { careerInterests } from '../pages/Onboarding/Options';
 export async function getFilteredData(collectionName, filters, currentUserId) {
     let q = collection(db, collectionName);
 
-    const {userType} = JSON.parse(localStorage.getItem("basicUserInfo"));
-
-    const {userInterests, userColleges} = await getUserData(userType === "Professional" ? "fieldsOfExpertise" : "areasOfInterest", currentUserId);
+    const {userInterests, userColleges} = await getUserData("areasOfInterest", currentUserId);
 
     const filterOperations = await Promise.all(Object.entries(filters).map(async ([key, value]) => {
         if (value && (Array.isArray(value) || !value.startsWith('Any'))) {
             if (key === "areasOfInterestOrExpertise") {
-            const dataType = value;
+            // const dataType = value;
             //   const userInterests = await getUserData(dataType, currentUserId);
             const userInterestsExtended = getExtendedInterests(userInterests);
             
             if (collectionName === "opportunities") {
                 return { key: "organizationTags", operation: "array-contains-any", value: userInterestsExtended };
-              } else {
-                return { key: ["fieldsOfExpertise", "areasOfInterest"], operation: "array-contains-any", value: userInterestsExtended };
-              }
-        } 
+            } else {
+                return { key: "areasOfInterest", operation: "array-contains-any", value: userInterestsExtended };
+            }
+        }
         else if(key === "collegeInterestsOrDecision"){
             return {
                 key: "collegeInterestsOrDecision",
@@ -39,14 +37,7 @@ export async function getFilteredData(collectionName, filters, currentUserId) {
   
     filterOperations.forEach(filter => {
         if (filter) {
-          if (Array.isArray(filter.key)) {
-            q = query(q, or(
-              where(filter.key[0], filter.operation, filter.value),
-              where(filter.key[1], filter.operation, filter.value)
-            ));
-          } else {
             q = query(q, where(filter.key, filter.operation, filter.value));
-          }
         }
       });
     

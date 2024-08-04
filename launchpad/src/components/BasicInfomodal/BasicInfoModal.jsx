@@ -20,7 +20,6 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   const [basicInfoContent, setBasicInfoContent] = useState(
     {
     areasOfInterest: userData.areasOfInterest ?? [],
-    fieldsOfExpertise: userData.fieldsOfExpertise ?? [],
     // TODO: fix
     collegeInterestsOrDecision: userData.collegeInterestsOrDecision ?? [],
     acceptedColleges: userData.acceptedColleges ?? [],
@@ -58,7 +57,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       required: true,
     },
     {
-      id: "fieldsOfExpertise",
+      id: "areasOfInterest",
       text: "What are your fields of expertise?",
       type: "multi-select",
       options: careerInterests,

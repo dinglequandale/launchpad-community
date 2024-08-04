@@ -4,14 +4,14 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 
 const filterDisplayToIdPairs = {
     "My Interests":"areasOfInterest",
-    "My Fields of Expertise":"fieldsOfExpertise",
+    "My Fields of Expertise":"areasOfInterest",
     "High Schoolers":"High Schooler",
     "College Students":"Alumni",
     "Professionals": "Professional",
     "Workplace Opportunities":["Internship", "Shadowing", "Job"],
     "Community Service":"Community Service",
     "My Interests":"areasOfInterest",
-    "My Fields of Expertise":"fieldsOfExpertise",
+    "My Fields of Expertise":"areasOfInterest",
     "Clubs": "Club",
     "Nonprofits":"Nonprofit",
     "My Dream Colleges":"collegeInterestsOrDecision",

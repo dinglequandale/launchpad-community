@@ -1,13 +1,9 @@
 import './profilemodal.css';
 import React from 'react';
-import { VscAccount } from "react-icons/vsc";
-import { SlLink } from "react-icons/sl";   
 import { IoCloseOutline } from "react-icons/io5";
-import SideNav from '../Sidenav/SideNav';
 import { useState, useEffect, useRef } from 'react';
 import { FaLink } from 'react-icons/fa6';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
-import ConnectModal from '../Connectmodal/ConnectModal';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
@@ -15,10 +11,8 @@ import { displayColleges, displayFieldsOfInterest, displayShortenedName, lowerAn
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick}) {
 
-    // TODO: currently localStorage, transition to database IMPORTANT
     const userType = userData.userType;
     const userName = userData.userName;
-    const userAboutMe = "ewofioerfi ewife ofiefo iewofi eoifoei ofiwo fieifi eifeufue fueuf yfeyfy ywye fyy fyefy ywfyeu fuye yfye yfe fyewf. weyfyuef yeyf yfeyf yfyef ef e f."
     const resumePublicity = "Public";
     const [opportunityData, setOpportunityData] = useState(null);
     // const [loading, setLoading] = useState(false);
@@ -38,7 +32,6 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
             setOpportunityLoading(false);
         }
 
-        // getUserData();
         getOpportunityData();
     },[visibility])
     
@@ -55,10 +48,10 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         }
     }
 
-    const basicInfoContent = {userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`
+    const basicInfoContent = {userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`
     : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
     : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
-    userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.fieldsOfExpertise)}`,
+    userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
     userSecondDesc: `${descType()}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
     acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
 };
@@ -96,7 +89,8 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                         <div className='basicInfo'>
                             <div>
                                 {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
-                            {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <VscAccount size = {80} className='cardPfp'/>}
+                            {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
+                                {width: "80px", height: "80px"}}/>}
                             </div>
                             <div className='cardNameDescription'>
                                 <span className='cardName'>{userData.userName}</span>
@@ -110,7 +104,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 {(userData.acceptedColleges && userData.acceptedColleges.length > 0) && <span>{basicInfoContent.acceptedColleges}</span>}
                             </div>
                         </div>
-                        <button style={{width: "80%", borderRadius: "5px", margin: "0 auto"}} onClick={() => onConnectClick(userData.userId)}> 
+                        <button className='btnConnect' style={{width: "80%", borderRadius: "5px", margin: "0 auto"}} onClick={() => onConnectClick(userData.userId)}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>

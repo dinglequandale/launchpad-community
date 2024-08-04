@@ -1,5 +1,4 @@
 import "./usercard.css";
-import { VscAccount } from "react-icons/vsc";
 import ConnectionBanner from "../Connectionbanner/ConnectionBanner";
 import { useState } from "react";
 import { FaLink } from "react-icons/fa6";
@@ -27,10 +26,10 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
 
     // TODO: change to userData
 
-    const basicInfoContent ={userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.fieldsOfExpertise[0]}`
+    const basicInfoContent ={userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`
     : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
     : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
-    userFirstDesc: `${userType !== "Professional" ? "Interests" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "shorter") : displayFieldsOfInterest(userData.fieldsOfExpertise, "shorter")}`,
+    userFirstDesc: `${userType !== "Professional" ? "Interests" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "shorter") : displayFieldsOfInterest(userData.areasOfInterest, "shorter")}`,
     userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition? (lowerAndCapitalize(userData.industryPosition)) : "None") : userType === "Alumni" ? displayColleges([userData.collegeAttending], "shorter") : displayColleges([...userData.collegeInterestsOrDecision], "shorter")}`,
 }
 
@@ -43,8 +42,9 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
             </button>
             <div className='basicInfo'>
                 <div>
-                    {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
-                {width: "60px", height: "60px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <VscAccount size = {60} className='cardPfp'/>}
+                    {userData.userPfpPreview ? <img className="pfpImage" src={userData.userPfpPreview} alt="" style={
+                {width: "60px", height: "60px"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
+                    {width: "60px", height: "60px"}}/>}
                 </div>
                 <div className='cardNameDescription'>
                     <span className='cardName'>{displayShortenedName(userData.userName)}</span>
