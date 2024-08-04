@@ -4,7 +4,7 @@ import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
 import { searchDocuments } from "../../services/searchServices";
 
-export default function SearchBar({filters, pageName, handleFilterChange}) {
+export default function SearchBar({filters, pageName, handleFilterChange, handleSearch}) {
     const searchType = () => {
         switch(pageName){
             case "Network":
@@ -15,17 +15,12 @@ export default function SearchBar({filters, pageName, handleFilterChange}) {
     }
     const [queryText, setQueryText] = useState('');
 
-    const handleSearch = async (e) => {
-      e.preventDefault();
-      await searchDocuments(pageName.toLowerCase(), queryText);
-    };
-
     return (
       <div className="searchContainer">
         <h2 style={{paddingLeft: "3%"}}>{pageName}</h2>
         <div style={{dislay: "flex"}} className="search">
             <CiSearch size={28} style={{color:"grey"}}/>
-            <form onSubmit={handleSearch} style={{ display: "flex", flex: 1 }}>
+            <form onSubmit={(e) => handleSearch(e, queryText)} style={{ display: "flex", flex: 1 }}>
               <input 
                 type="text" 
                 name="fname" 

@@ -27,6 +27,7 @@ const searchDocuments = async (collectionName, searchText) => {
       ];
   
       console.log([...new Set(matches)]);
+      return [...new Set(matches)];
     } catch (error) {
       console.error('Error searching Firestore: ', error);
     }
