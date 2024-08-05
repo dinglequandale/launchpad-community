@@ -14,6 +14,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { getFilteredData } from "../../services/filteringServices";
+import { searchDocuments } from "../../services/searchServices";
 
 
 const NetworkContext = createContext();
@@ -58,18 +59,18 @@ export default function UserNetwork() {
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`]
   };
 
-useEffect(() => {
-    fetchOpportunities();
-}, [filters]);
+  useEffect(() => {
+      fetchOpportunities();
+  }, [filters]);
 
-const fetchOpportunities = async () => {
-    const filteredData = await getFilteredData('users', filters, currentUser.uid);
-    setAllUserData(filteredData);
-};
+  const fetchOpportunities = async () => {
+      const filteredData = await getFilteredData('users', filters, currentUser.uid);
+      setAllUserData(filteredData);
+  };
 
-const handleFilterChange = (filterKey, value) => {
-  setFilters(prev => ({...prev, [filterKey]: value}));
-};
+  const handleFilterChange = (filterKey, value) => {
+    setFilters(prev => ({...prev, [filterKey]: value}));
+  };
 
   const getUserClassData = (userData) => {
     const highSchoolers = userData.filter((user) => user.userType === "High Schooler");
@@ -118,13 +119,22 @@ const handleFilterChange = (filterKey, value) => {
   //   return () => unsubscribe();
   // }, []);
 
-    useEffect(() => {
-      if (profileModalVisibility) {
-        document.body.classList.add('modal-open');
-      } else {
-        document.body.classList.remove('modal-open');
-      }
-    }, [profileModalVisibility]);
+  useEffect(() => {
+    if (profileModalVisibility) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+  }, [profileModalVisibility]);
+
+  const handleSearch = async (e, queryText) => {
+    e.preventDefault();
+    // setIsSearching(false);
+    if (queryText) {
+      const searchResults = await searchDocuments('users', queryText);
+      setAllUserData(searchResults);
+    }
+  };
     
   return (
     <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick}}>
@@ -134,7 +144,7 @@ const handleFilterChange = (filterKey, value) => {
             <TopBar/>
             <SideNav/>
             <div className='networkContainer' id="networkContainer" style={{paddingTop: "3%", paddingLeft: "10%"}}>
-              <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange}/>
+              <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/>
               <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh"}}>
                 {getUserClassData(allUserData).highSchoolers.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>

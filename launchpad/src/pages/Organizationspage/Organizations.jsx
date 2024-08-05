@@ -10,6 +10,7 @@ import NoResults, { EmptyField } from "../../components/NoResultsnotifier/NoResu
 import Loading from "../../components/LoadingAnimation/Loading";
 import { getFilteredData } from "../../services/filteringServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
+import { searchDocuments } from "../../services/searchServices";
 
 const filterContent = {
     organizationType: ["Any Category","Community Service", "Clubs", "Workplace Opportunities", "Nonprofits"],
@@ -22,6 +23,8 @@ export default function Organizations(){
 
     const [organizationsData, setOrganizationsData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const [isFiltering, setIsFiltering] = useState(false);
 
     const [filters, setFilters] = useState({
         category: 'Any Category',
@@ -33,15 +36,27 @@ export default function Organizations(){
     }, [filters]);
 
     const fetchOpportunities = async () => {
+        if(!isSearching){
         const filteredData = await getFilteredData('opportunities', filters, currentUser.uid);
         setOrganizationsData(filteredData);
+        }
     };
 
-  const handleFilterChange = (filterKey, value) => {
-    setFilters(prev => ({...prev, [filterKey]: value}));
-  };
+    const handleFilterChange = (filterKey, value) => {
+        setIsFiltering(true);
+        setFilters(prev => ({...prev, [filterKey]: value}));
+    };
 
     const pageName = "Opportunities";
+
+    const handleSearch = async (e, queryText) => {
+        e.preventDefault();
+        // setIsSearching(false);
+        if (queryText) {
+            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText);
+            setOrganizationsData(searchResults);
+        }
+    };
 
 
     // TODO: make these styles more dynamic
@@ -61,14 +76,14 @@ export default function Organizations(){
             </div>
             <div style={{paddingLeft:"10%"}}>
                 <div className='organizationsContainer'>
-                    <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange}/> 
+                    <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/> 
                     
                     <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px", paddingBottom: "40px"}}>
                         {loading ?
                             <div>
                                 <Loading style={loadingStyles}/>
                             </div>
-                            : organizationsData.length > 0 ?
+                            : (organizationsData && organizationsData.length > 0) ?
                             organizationsData.map((organization, index)=>(
                                 <OrganizationProfile key={index} organizationData={organization} location={"organizations_page"}/>))
                             :
