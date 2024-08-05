@@ -36,23 +36,26 @@
     padding: 0px 25px;
     box-shadow:1px 2px 5px rgba(0, 0, 0, 0.1);
   }
-
-  .navbar.scrolled {
-    background: rgba(50, 129, 255, 0.103);
-    backdrop-filter: blur(10px);
-  }
   
   .nav-links {
     display: flex;
-    gap: 35px;
+    gap: 10px;
     list-style-type: none;
   }
   
   .nav-links li {
-    margin-left: 40px;
+    padding: 10px 10px;
+    align-items: center;
+  }
+
+  .nav-links li:hover{
+    background-color: rgba(124, 134, 137, 0.1);
+    border-radius: 10px;
   }
   
   .nav-links a {
+    padding: 30px;
+    z-index: 2;
     color: white;
     font-size: large;
     text-decoration: none;
@@ -184,6 +187,7 @@
 
   .who-are-we {
     padding: 10px 0;
+    margin-bottom: 50px;
     background-color: rgba(69, 128, 162, 0.05);
   }
   
@@ -229,7 +233,7 @@
   .highlight::after {
     content: '';
     position: absolute;
-    bottom: -2px;
+    bottom: 2px;
     left: 0;
     width: 100%;
     height: 2px;
@@ -241,20 +245,29 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 30px;
-    margin: 40px 0;
+    margin: 20px 0;
   }
   
   .network-item {
+    background-color: var(--neutral);
+    opacity: .7;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.199);
+    border-radius: 50px;
+    padding: 10px 0px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    font-size: 1.1rem;
-    color: var(--secondary);
+    font-size: 1.48rem;
+    color: #415ca2;
+  }
+
+  .network-item:hover{
+    box-shadow: 0 6px 12px rgba(1, 0, 0, 0.3);
   }
   
   .network-item i {
-    font-size: 2rem;
-    margin-right: 15px;
-    color: var(--accent);
+    font-size: 2.5rem;
+    /* color: var(--secondary); */
   }
   
   .goal {
@@ -305,10 +318,9 @@
   }
 
   .mission-statement {
-    padding: 60px 0;
     background-color: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-    margin: 40px 0;
+    padding-bottom: 55px;
   }
   
   .mission-title {
@@ -319,8 +331,16 @@
     text-align: center;
     margin-bottom: 30px;
     text-transform: uppercase;
+    letter-spacing: 3px;  
+  }
+  .next-steps-title{
+    font-size: 2.9rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    margin-bottom: 30px;
     letter-spacing: 3px;
-    
   }
   
   .mission-text {

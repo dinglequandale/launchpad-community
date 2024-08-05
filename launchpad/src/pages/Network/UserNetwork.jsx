@@ -96,28 +96,6 @@ const handleFilterChange = (filterKey, value) => {
     setProfileModalVisibility(true);
   }
 
-  // useEffect(() => {
-  //   const usersRef = collection(db, "users");
-  //   setLoading(true);
-  
-  //   const unsubscribe = onSnapshot(usersRef, 
-  //     (snapshot) => {
-  //       const userData = snapshot.docs.map(doc => ({
-  //         id: doc.id,
-  //         ...doc.data()
-  //       }));
-  //       setAllUserData(userData);
-  //       setLoading(false);
-  //     },
-  //     (error) => {
-  //       console.log("Error fetching opportunities:", error);
-  //       setLoading(false);
-  //     }
-  //   );
-  
-  //   return () => unsubscribe();
-  // }, []);
-
     useEffect(() => {
       if (profileModalVisibility) {
         document.body.classList.add('modal-open');

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import "./landingpage.css"
 import { useAuth } from "../../contexts/auth/AuthContext";
+import { PiBuilding, PiGraduationCap, PiStudent, PiSuitcase } from "react-icons/pi";
 
 export default function LandingPage() {
   const { userLoggedIn } = useAuth();
@@ -21,13 +22,13 @@ export default function LandingPage() {
         <nav className="navbar">
           <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "20%"}} />
           <ul className="nav-links">
-            <li><a href="#about">About</a></li>
+            <li className="nav-element"><a href="#about">About</a></li>
             <li><a href="#features">Features</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
         </nav>
         <div style={{paddingTop: "30px"}}>
-          <h1 className="landing-title"><span style={{color: "var(--neutral)", textDecoration: "underline"}}>Empowering</span> Student Excellence</h1>
+          <h1 className="landing-title"><span style={{color: "var(--neutral)", textDecoration: "underline"}}>Empowerin</span><span style={{color: "var(--neutral)"}}>g</span> Student Excellence</h1>
         </div>
         <p className="subheader"><span style={{fontWeight: "bolder",color: "var(--neutral)",textDecoration: "underline"}}>Launching</span> Houston’s youth into <span style={{fontWeight: "bolder",color: "var(--neutral)", textDecoration: "underline"}}>collegiate</span> and <span style={{fontWeight: "bolder",color: "var(--neutral)", textDecoration: "underline"}}>professional</span> success</p>
         <button className="cta-button btnUnfilled" onClick={handleJoin}>Get Started</button>
@@ -68,23 +69,23 @@ export default function LandingPage() {
             <h2 className="section-title">Who are we?</h2>
             <div className="content-wrapper">
               <p className="description">
-                Launchpad is a <span className="highlight">local social network</span> designed to empower Houston's youth by creating meaningful connections.
+                <span style={{fontWeight: "bolder"}}>Launchpad</span> is a <span className="highlight">local social network</span> designed to empower Houston's youth by creating meaningful connections among:
               </p>
               <div className="network-grid">
                 <div className="network-item">
-                  <i className="icon-student"></i>
+                  <i className="icon-student"><PiStudent/></i>
                   <span>Motivated highschoolers</span>
                 </div>
                 <div className="network-item">
-                  <i className="icon-graduate"></i>
+                  <i className="icon-graduate"><PiGraduationCap/></i>
                   <span>Qualified undergraduates</span>
                 </div>
                 <div className="network-item">
-                  <i className="icon-professional"></i>
+                  <i className="icon-professional"><PiSuitcase/></i>
                   <span>Experienced professionals</span>
                 </div>
                 <div className="network-item">
-                  <i className="icon-organization"></i>
+                  <i className="icon-organization"><PiBuilding/></i>
                   <span>Community organizations</span>
                 </div>
               </div>
@@ -104,7 +105,7 @@ export default function LandingPage() {
         </section>
 
         <section className="cta-section">
-        <span style={{fontSize: "50px", fontWeight: "500"}}>Ready to take the next step?</span>
+        <span className="next-steps-title">Ready to take the next step?</span>
           <button className="cta-button btnUnfilled" onClick={handleJoin}>Sign Up Now</button>
         </section>
         <div style={{display: "flex", justifyContent: "center", paddingBottom: "10px"}}>
