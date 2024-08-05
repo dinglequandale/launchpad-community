@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import "./landingpage.css"
 import { useAuth } from "../../contexts/auth/AuthContext";
@@ -6,6 +6,7 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 export default function LandingPage() {
   const { userLoggedIn } = useAuth();
   const navigate = useNavigate();
+
 
   const handleJoin = () => {
     if(!userLoggedIn){navigate("/Login");}
@@ -48,7 +49,7 @@ export default function LandingPage() {
             <span className="pillarTitle">Discover Meaningful Opportunities</span>
             <div className="pillarText" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
             <span>
-            <span className="txtEmphasis">Find</span> volunteer and leadership positions at community organizations, in line with your interests. Discover workplace opportunities while learning from undergrads and professionals who have done what you want to do!
+            <span className="txtEmphasis">Find</span> volunteer and leadership positions in town, in line with your interests. Discover workplace opportunities while learning from undergrads and professionals who have done what you want to do!
             </span>
             </div>
           </div>
@@ -62,18 +63,48 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-
+        <section className="who-are-we">
+          <div className="container">
+            <h2 className="section-title">Who are we?</h2>
+            <div className="content-wrapper">
+              <p className="description">
+                Launchpad is a <span className="highlight">local social network</span> designed to empower Houston's youth by creating meaningful connections.
+              </p>
+              <div className="network-grid">
+                <div className="network-item">
+                  <i className="icon-student"></i>
+                  <span>Motivated highschoolers</span>
+                </div>
+                <div className="network-item">
+                  <i className="icon-graduate"></i>
+                  <span>Qualified undergraduates</span>
+                </div>
+                <div className="network-item">
+                  <i className="icon-professional"></i>
+                  <span>Experienced professionals</span>
+                </div>
+                <div className="network-item">
+                  <i className="icon-organization"></i>
+                  <span>Community organizations</span>
+                </div>
+              </div>
+              <p className="description goal">
+                Our goal is to provide Houston's youth with <span className="highlight">accessible learning, leadership, and workplace opportunities</span>.
+              </p>
+            </div>
+          </div>
+        </section>
         <section className="mission-statement">
-          <span style={{fontSize: "50px", fontWeight: "250"}}>Our Mission</span>
+          <h2 className="mission-title">Our Mission</h2>
           <div className="mission-container">
-            <p>
-            <span style={{fontSize: "25px", fontWeight: "bolder"}}>We act as a launchpad</span> for high school students' potential and passion, propelling them into college and beyond by fostering a vibrant network of mentors, professionals, alumni, and other resources, empowering them to strengthen their portfolio of <br />work experience and extracurriculars.
+            <p className="mission-text">
+              <span className="mission-highlight">We act as a launchpad</span> for high school students' potential and passion, propelling them into college and beyond by fostering a vibrant network of mentors, professionals, alumni, and other resources, empowering them to strengthen their portfolio of work experience and extracurriculars.
             </p>
           </div>
         </section>
 
         <section className="cta-section">
-        <span style={{fontSize: "30px", fontWeight: "250"}}>Ready to take the next step?</span>
+        <span style={{fontSize: "50px", fontWeight: "500"}}>Ready to take the next step?</span>
           <button className="cta-button btnUnfilled" onClick={handleJoin}>Sign Up Now</button>
         </section>
         <div style={{display: "flex", justifyContent: "center", paddingBottom: "10px"}}>
