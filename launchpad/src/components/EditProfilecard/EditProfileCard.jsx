@@ -19,7 +19,7 @@ import { handleDeleteOpportunity, loadOpportunities } from '../../services/oppor
 import Loading from '../LoadingAnimation/Loading';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
-import { displayColleges, displayFieldsOfInterest, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
+import { displayColleges, displayFieldsOfInterest, getBasicUserDescription, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -240,11 +240,9 @@ function BasicInfoCard({descType}){
     const [basicInfoContent, setBasicInfoContent] = useState(null);
 
     useEffect(()=>{
-        setBasicInfoContent({userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`
-        : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
-        : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
+        setBasicInfoContent({userPreface: getBasicUserDescription(userData),
         userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
-        userSecondDesc: `${descType}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
+        userSecondDesc: `${descType}: ${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
         acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
     })
     },[userData])

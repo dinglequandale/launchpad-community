@@ -71,6 +71,10 @@
     text-decoration: none;
   }
 
+  .nav-links a:hover{
+    color: white;
+  }
+
   .pillarText{
     display: flex;
     justify-content: center;

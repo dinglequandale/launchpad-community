@@ -1,6 +1,7 @@
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase/firebaseConfig';
 import { collection, doc, setDoc } from 'firebase/firestore';
+import { getBasicUserDescription } from './userProfileServices';
 
 export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess) => {
     try {
@@ -102,7 +103,8 @@ const uploadFileToStorage = async (file, fileName, folderName) => {
   };
 
 export const packageBasicUserInfoToLS = (userData) => {
-    const userShortDescription = userData.userType === "High Schooler" ? `Class of ${userData.graduationYear}, ${userData.sectionAttending}` : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}` : `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`;
+
+    const userShortDescription = getBasicUserDescription(userData);
 
     // Check whether user is upperclassman or lowerclassman
     const currYear = new Date().getFullYear();

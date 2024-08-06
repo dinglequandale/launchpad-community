@@ -21,7 +21,7 @@ export default function LandingPage() {
       <header className="landing-header">
         <nav className="navbar">
           <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "20%"}} />
-          <div style={{display: "flex"}}>
+          <div style={{display: "flex", gap: "20px", marginRight: "10px"}}>
             <ul className="nav-links">
               <li className="nav-element"><a href="#about">About</a></li>
               <li><a href="#features">Features</a></li>
@@ -47,7 +47,7 @@ export default function LandingPage() {
             <span className="pillarTitle">Make Invaluable Connections</span>
             <div className="pillarText" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
             <span>
-            <span className="txtEmphasis">Connect</span> with industry professionals, undergraduates at your dream school, and like-minded peers— all committed to helping you. With just one click, you gain access to a world of opportunities.
+            <span className="highlight">Connect</span> with industry professionals, undergraduates at your dream school, and like-minded peers— all committed to helping you. With just one click, you gain access to a world of opportunities.
             </span>
             </div>
           </div>
@@ -56,7 +56,7 @@ export default function LandingPage() {
             <span className="pillarTitle">Discover Meaningful Opportunities</span>
             <div className="pillarText" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
             <span>
-            <span className="txtEmphasis">Find</span> volunteer and leadership positions in town, in line with your interests. Discover workplace opportunities while learning from undergrads and professionals who have done what you want to do!
+            <span className="highlight">Find</span> volunteer and leadership positions in town, in line with your interests. Discover workplace opportunities while learning from undergrads and professionals who have done what you want to do!
             </span>
             </div>
           </div>
@@ -65,7 +65,7 @@ export default function LandingPage() {
             <span className="pillarTitle">Explore Careers & Colleges</span>
             <div className="pillarText">
             <span>
-            <span className="txtEmphasis">Complete</span> reputed surveys to find the careers that best suit you. Connect with undergrads and professionals in your fields of interest to gain insight on college and work life. Explore shadow, intern, and job opportunities.
+            <span className="highlight">Complete</span> reputed surveys to find the careers that best suit you. Connect with undergrads and professionals in your fields of interest to gain insight on college and work life. Explore shadow, intern, and job opportunities.
             </span>
             </div>
           </div>
@@ -96,7 +96,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <p className="description goal">
-                Our goal is to provide Houston's youth with <span className="highlight">accessible learning, leadership, and workplace opportunities</span>.
+                Our aim is to provide Houston's youth with <span className="highlight">accessible learning, leadership, and workplace opportunities</span>.
               </p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function LandingPage() {
           <h2 className="mission-title">Our Mission</h2>
           <div className="mission-container">
             <p className="mission-text">
-              <span className="mission-highlight">We act as a launchpad</span> for high school students' potential and passion, propelling them into college and beyond by fostering a vibrant network of mentors, professionals, alumni, and other resources, empowering them to strengthen their portfolio of work experience and extracurriculars.
+              <span className="highlight">We act as a launchpad</span> for high school students' potential and passion, propelling them into college and beyond. By fostering a vibrant network of mentors, professionals, alumni, and other resourse, we empower our youth to strengthen their portfolio of work experience and extracurriculars.
             </p>
           </div>
         </section>

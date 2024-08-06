@@ -142,7 +142,7 @@ export default function UserNetwork() {
                 </>}
                 {getUserClassData(allUserData).alums.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
-                  <h3>Alumni</h3>
+                  <h3>College Students</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
                 <UserCarousel userNetworkData={getUserClassData(allUserData).alums}/>

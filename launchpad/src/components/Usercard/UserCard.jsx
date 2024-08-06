@@ -2,7 +2,7 @@ import "./usercard.css";
 import ConnectionBanner from "../Connectionbanner/ConnectionBanner";
 import { useState } from "react";
 import { FaLink } from "react-icons/fa6";
-import { displayColleges, displayFieldsOfInterest, displayShortenedName, lowerAndCapitalize } from "../../services/userProfileServices";
+import { displayColleges, displayFieldsOfInterest, displayShortenedName, getBasicUserDescription, lowerAndCapitalize } from "../../services/userProfileServices";
 
 export default function UserCard({userData, onProfileClick, onConnectClick}) {
     // todo: actual banner
@@ -26,11 +26,9 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
 
     // TODO: change to userData
 
-    const basicInfoContent ={userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`
-    : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
-    : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
+    const basicInfoContent ={userPreface:getBasicUserDescription(userData),
     userFirstDesc: `${userType !== "Professional" ? "Interests" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "shorter") : displayFieldsOfInterest(userData.areasOfInterest, "shorter")}`,
-    userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition? (lowerAndCapitalize(userData.industryPosition)) : "None") : userType === "Alumni" ? displayColleges([userData.collegeAttending], "shorter") : displayColleges([...userData.collegeInterestsOrDecision], "shorter")}`,
+    userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition ? (userData.industryPosition) : "None") : userType === "Alumni" ? displayColleges([userData.collegeAttending], "shorter") : displayColleges([...userData.collegeInterestsOrDecision], "shorter")}`,
 }
 
     return(
