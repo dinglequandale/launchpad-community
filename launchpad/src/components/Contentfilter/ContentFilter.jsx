@@ -15,6 +15,7 @@ const filterDisplayToIdPairs = {
     "Clubs": "Club",
     "Nonprofits":"Nonprofit",
     "My Dream Colleges":"collegeInterestsOrDecision",
+    "My High School":"schoolAttending"
 
 }
 

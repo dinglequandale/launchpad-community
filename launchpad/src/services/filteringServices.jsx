@@ -5,32 +5,39 @@ import { careerInterests } from '../pages/Onboarding/Options';
 export async function getFilteredData(collectionName, filters, currentUserId) {
     let q = collection(db, collectionName);
 
-    const {userInterests, userColleges} = await getUserData("areasOfInterest", currentUserId);
+    const {userInterests, userColleges, userHS } = await getUserData("areasOfInterest", currentUserId);
 
     const filterOperations = await Promise.all(Object.entries(filters).map(async ([key, value]) => {
         if (value && (Array.isArray(value) || !value.startsWith('Any'))) {
             if (key === "areasOfInterestOrExpertise") {
-            // const dataType = value;
-            //   const userInterests = await getUserData(dataType, currentUserId);
-            const userInterestsExtended = getExtendedInterests(userInterests);
-            
-            if (collectionName === "opportunities") {
-                return { key: "organizationTags", operation: "array-contains-any", value: userInterestsExtended };
-            } else {
-                return { key: "areasOfInterest", operation: "array-contains-any", value: userInterestsExtended };
+              // const dataType = value;
+              //   const userInterests = await getUserData(dataType, currentUserId);
+              const userInterestsExtended = getExtendedInterests(userInterests);
+              
+              if (collectionName === "opportunities") {
+                  return { key: "organizationTags", operation: "array-contains-any", value: userInterestsExtended };
+              } else {
+                  return { key: "areasOfInterest", operation: "array-contains-any", value: userInterestsExtended };
+              }
             }
-        }
-        else if(key === "collegeInterestsOrDecision"){
-            return {
-                key: "collegeInterestsOrDecision",
-                operation: "array-contains-any",
-                value: userColleges,
-            };
-        } else if (Array.isArray(value)) {
-            return { key, operation: 'in', value };
-        } else {
-            return { key, operation: '==', value };
-        }
+            else if(key === "schoolAttending"){
+              return{
+                key,
+                operation: "==",
+                value: userHS
+              }
+            }
+            else if(key === "collegeInterestsOrDecision"){
+                return {
+                    key: "collegeInterestsOrDecision",
+                    operation: "array-contains-any",
+                    value: userColleges,
+                };
+            } else if (Array.isArray(value)) {
+                return { key, operation: 'in', value };
+            } else {
+                return { key, operation: '==', value };
+            }
     }
     return null;
     }));
@@ -40,10 +47,9 @@ export async function getFilteredData(collectionName, filters, currentUserId) {
             q = query(q, where(filter.key, filter.operation, filter.value));
         }
       });
-    
-
   
     // IMPORTANT TODO: PAGINATION / MAX LOAD
+
     const querySnapshot = await getDocs(q);
     const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
@@ -64,7 +70,7 @@ export async function getFilteredData(collectionName, filters, currentUserId) {
 const getUserData = async (dataType, currentUserId) => {
     const userSnap = await getDoc(doc(db, "users", currentUserId));
     if(userSnap.exists()){
-        return {userInterests: userSnap.data()[dataType], userColleges :userSnap.data()["collegeInterestsOrDecision"]};
+        return {userInterests: userSnap.data()[dataType], userColleges :userSnap.data()["collegeInterestsOrDecision"], userHS: userSnap.data()["schoolAttending"]};
     }else{
         console.log("User not found!");
         return null

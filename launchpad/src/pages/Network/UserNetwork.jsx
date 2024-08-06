@@ -31,6 +31,7 @@ export default function UserNetwork() {
   const [connectTargetUserId, setConnectTargetUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const [allUserData, setAllUserData] = useState([]);
+
   const [profileTargetData, setProfileTargetData] = useState(null);
   const [connectTargerUserName, setConnectTargetUserName] = useState("");
   
@@ -50,13 +51,15 @@ export default function UserNetwork() {
   const [filters, setFilters] = useState({
     userType: 'Any User',
     collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
-    areasOfInterestOrExpertise: `My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`
+    areasOfInterestOrExpertise: `My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`,
+    schoolAttending: 'Any High School',
   });
 
   const filterContent = {
     userType: ["Any User", "High Schoolers", "College Students", "Professionals"],
     collegeInterestsOrDecision: userType === "High Schooler" ? ["Any College", "My Dream Colleges"] : null,
-    areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`]
+    areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+    schoolAttending: ["Any High School", "My High School"]
   };
 
   useEffect(() => {
