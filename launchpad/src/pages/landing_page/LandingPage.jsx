@@ -21,11 +21,17 @@ export default function LandingPage() {
       <header className="landing-header">
         <nav className="navbar">
           <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "20%"}} />
-          <ul className="nav-links">
-            <li className="nav-element"><a href="#about">About</a></li>
-            <li><a href="#features">Features</a></li>
-            <li><a href="#contact">Contact</a></li>
-          </ul>
+          <div style={{display: "flex"}}>
+            <ul className="nav-links">
+              <li className="nav-element"><a href="#about">About</a></li>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div style={{display: "flex", gap: "10px", justifyContent: "center", alignItems: "center"}}>
+              <button className="authButtons btnUnfilled" onClick={()=>navigate("/Signup")}>Signup</button>
+              <button className="authButtons" onClick={()=>navigate("/Login")}>Login</button>
+            </div>
+          </div>
         </nav>
         <div style={{paddingTop: "30px"}}>
           <h1 className="landing-title"><span style={{color: "var(--neutral)", textDecoration: "underline"}}>Empowerin</span><span style={{color: "var(--neutral)"}}>g</span> Student Excellence</h1>
