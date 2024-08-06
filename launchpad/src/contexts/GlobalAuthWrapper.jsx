@@ -24,9 +24,11 @@ function GlobalAuthWrapper() {
             navigate("/Onboarding");
             return;
           }
-          setUserData({...doc.data()});
+
+          // setUserData({...doc.data()});
         });
-        await connectToStream(currentUser,userData);
+        
+        await connectToStream(currentUser);
       }
       setIsInitializing(false);
     }

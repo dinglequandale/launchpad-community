@@ -152,6 +152,21 @@ export const displayColleges = (colleges, length = "longer") => {
     return currentList.slice(0, -1).join(", ") + ", " + currentList.slice(-1);
 };
 
+const getUserHS = (schoolName) => {
+    const hsAbbreviations = {
+        "Awty International School":"Awty"
+    }
+
+    if(hsAbbreviations[schoolName]) return hsAbbreviations[schoolName];
+    const baseSchoolName = schoolName.replace(/(School|High School)$/i, "").trim();
+    return baseSchoolName + " H.S."
+}
+
+
+export const getBasicUserDescription = (userData) => {
+    return userData.userType === "High Schooler" ? `Class of ${userData.graduationYear}, ${getUserHS(userData.schoolAttending)}` : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear} from ${getUserHS(userData.schoolAttending)}` : `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`;
+}
+
 export const editUserData = async (userData, currentUser) => {
     try{
       const userRef = doc(db, "users", currentUser.uid);

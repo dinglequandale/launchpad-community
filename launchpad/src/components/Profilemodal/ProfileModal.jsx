@@ -7,7 +7,7 @@ import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
-import { displayColleges, displayFieldsOfInterest, displayShortenedName, lowerAndCapitalize } from '../../services/userProfileServices';
+import { displayColleges, displayFieldsOfInterest, displayShortenedName, getBasicUserDescription, lowerAndCapitalize } from '../../services/userProfileServices';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick}) {
 
@@ -48,11 +48,9 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         }
     }
 
-    const basicInfoContent = {userPreface: userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`
-    : userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${userData.sectionAttending}`
-    : `Class of ${userData.graduationYear}, ${userData.sectionAttending}`,
+    const basicInfoContent = {userPreface: getBasicUserDescription(userData),
     userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
-    userSecondDesc: `${descType()}: ${userType === "Professional" ? lowerAndCapitalize(userData.industryPosition) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
+    userSecondDesc: `${descType()}: ${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
     acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
 };
 

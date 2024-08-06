@@ -33,12 +33,14 @@ export const getStreamToken = async () => {
 
     // console.log(isConnected, chatClient.userID)
 
-    const connectToStream = useCallback(async (user, userData) => {
+    const connectToStream = useCallback(async (user) => {
       console.log('Attempting to connect to Stream');
       console.log('Current chatClient.userID:', chatClient.userID);
       console.log('Current user:', user.uid);
 
-      const {userName, userPfpPreview} = userData ?? {userName:null, userPfpPreview:null};
+      // console.log(userData.userName);
+
+      const {userName, userPfpPreview} = JSON.parse(localStorage.getItem("basicUserInfo"));
 
       if(chatClient.userID){
         setIsConnected(true);
@@ -52,7 +54,7 @@ export const getStreamToken = async () => {
             {
               id: user.uid,
               name: userName,
-              image: userPfpPreview ?? "/assets/awty-logo.jpg"
+              image: userPfpPreview ?? null
             },
             token
           );
