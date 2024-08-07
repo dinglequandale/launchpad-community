@@ -17,8 +17,6 @@ export default function OrganizationProfile({organizationData, location, handleS
     const [isExpanded, setIsExpanded] = useState(false);
     const [isLessText, setIsLessText] = useState(false);
 
-    // const [showPfpCard, setShowPfpCard] = useState(false);
-
     const { currentUser } = useAuth();
 
     const descRef = useRef();
