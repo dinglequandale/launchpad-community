@@ -42,7 +42,7 @@ export default function NoResults ( {searchTerm} ) {
             transition={{ delay: 0.5, duration: 0.4 }}
             className="message"
           >
-            We couldn't find any matches for "{searchTerm}".
+            We couldn't find any matches for that!
           </motion.p>
           <motion.ul
             initial={{ opacity: 0, y: 10 }}
@@ -52,7 +52,7 @@ export default function NoResults ( {searchTerm} ) {
           >
             <li>Check for typos or spelling errors</li>
             <li>Try using more general keywords</li>
-            <li>Explore the filter options!</li>
+            <li>Explore other filter options!</li>
           </motion.ul>
         </motion.div>
       );

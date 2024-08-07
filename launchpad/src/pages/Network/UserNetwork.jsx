@@ -10,11 +10,11 @@ import SearchBar from "../../components/Searchbar/SearchBar";
 import { GrNext, GrPrevious } from "react-icons/gr";
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { getFilteredData } from "../../services/filteringServices";
 import { searchDocuments } from "../../services/searchServices";
+import NoResults from "../../components/NoResultsnotifier/NoResults";
+import Loading from "../../components/LoadingAnimation/Loading";
 
 
 const NetworkContext = createContext();
@@ -31,6 +31,7 @@ export default function UserNetwork() {
   const [connectTargetUserId, setConnectTargetUserId] = useState("");
   const [loading, setLoading] = useState(false);
   const [allUserData, setAllUserData] = useState([]);
+  const [userSearchText, setUserSearchText] = useState("");
 
   const [profileTargetData, setProfileTargetData] = useState(null);
   const [connectTargerUserName, setConnectTargetUserName] = useState("");
@@ -67,8 +68,10 @@ export default function UserNetwork() {
   }, [filters]);
 
   const fetchOpportunities = async () => {
-      const filteredData = await getFilteredData('users', filters, currentUser.uid);
-      setAllUserData(filteredData);
+    setLoading(true);
+    const filteredData = await getFilteredData('users', filters, currentUser.uid);
+    setAllUserData(filteredData);
+    setLoading(false);
   };
 
   const handleFilterChange = (filterKey, value) => {
@@ -108,15 +111,6 @@ export default function UserNetwork() {
       }
     }, [profileModalVisibility]);
 
-
-  useEffect(() => {
-    if (profileModalVisibility) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
-    }
-  }, [profileModalVisibility]);
-
   const handleSearch = async (e, queryText) => {
     e.preventDefault();
     // setIsSearching(false);
@@ -130,12 +124,14 @@ export default function UserNetwork() {
     <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick}}>
       <>
         {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={connectTargerUserName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
+        {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={profileTargetData}/>}
         <div>
             <TopBar/>
             <SideNav/>
             <div className='networkContainer' id="networkContainer" style={{paddingTop: "3%", paddingLeft: "10%"}}>
               <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/>
-              <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh"}}>
+              <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh", position: "relative"}}>
+                {allUserData && allUserData.length > 0 ? <>
                 {getUserClassData(allUserData).highSchoolers.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>High Schoolers</h3>
@@ -157,7 +153,8 @@ export default function UserNetwork() {
                 </div>
                 <UserCarousel userNetworkData={getUserClassData(allUserData).professionals}/>
                 </>}
-                {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={profileTargetData}/>}
+                </> : loading ? <div style={{position: "absolute", left: "50%",top: "50%", transform: "translate(-50%,-50%)", width: "300px"}}> <Loading/> </div> : 
+                <div style={{position: "absolute", left: "50%",top: "45%", transform: "translate(-50%,-40%)", width: "400px", height: "500px"}}><NoResults/></div>}
               </div>
             </div>
         </div>
