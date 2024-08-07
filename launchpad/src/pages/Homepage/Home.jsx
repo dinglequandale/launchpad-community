@@ -5,6 +5,7 @@ import ReactPlayer from "react-player";
 import ProfileStrength from "../../components/Profilestrength/ProfileStrength";
 import { FaArrowCircleDown } from "react-icons/fa";
 import { useEffect, useState } from "react";
+import InviteContactsModal from "../../components/InviteContactsmodal/InviteContactsModal";
 
 export default function Home(){
 
@@ -101,16 +102,21 @@ export default function Home(){
 }
 
 function InviteContacts({userName, userType}){
+    const [inviteContactsModalVisibility,setInviteContactsModalVisibility] = useState(false);
+
     return(
+        <>
+        {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} />}
         <div style={
             {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "#bae7ec",
          height: "fitContent", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)", border: "solid 1.4px var(--secondary)"}
          }>
             <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>{userType === "Professional" ? "Greetings" : "Hey"}, {userName}!</span> <br /> Know any <span style={{textDecoration: "underline", color: "var(--secondary)"}}>college students </span>or <span style={{textDecoration: "underline", color: "var(--secondary)"}}>working professionals</span> not on the app? Invite them below!</span>
             <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
-                <button className="btnUnfilled" style={{borderRadius: "10px", fontWeight: "550", fontSize: "20px", padding: "10px", width: "200px"}}>Invite Contacts</button>
+                <button className="btnUnfilled" onClick={()=>setInviteContactsModalVisibility(true)} style={{borderRadius: "10px", fontWeight: "550", fontSize: "20px", padding: "10px", width: "200px"}}>Invite Contacts</button>
             </div>
         </div>
+        </>
     )
 }
 

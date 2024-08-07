@@ -7,7 +7,7 @@ import { storage } from '../../firebase/firebaseConfig';
 import toast from 'react-hot-toast';
 
 // TODO: actually implement clickedUser logic
-export default function ConnectModal({visibility, chat, onClose, userId, currentUserPfpPreview, targetUserPfpPreview, userName}){
+export default function ConnectModal({visibility, chat, onClose, userId, userName}){
 
   const [introMessage, setIntroMessage] = useState("");
   const [sendWithResume, setSendWithResume] = useState(false);
@@ -93,7 +93,6 @@ export default function ConnectModal({visibility, chat, onClose, userId, current
         onRequestClose={onClose}
         style={customStyles}
         contentLabel="Connect Modal"
-        shouldCloseOnOverlayClick={false} 
       >
         <header>
           <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Connect with {userName} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Gain valuable internships and mentorship</span></h2>
