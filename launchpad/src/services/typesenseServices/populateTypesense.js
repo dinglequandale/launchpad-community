@@ -56,6 +56,26 @@ const readFirestoreData = async (collectionName) => {
         }
       ],
     },
+    {
+      name: "opportunities",
+      fields: [
+        {
+          name: "organizationName",
+          type: "string",
+          facet: false,
+        },
+        {
+          name: "organizationType",
+          type: "string",
+          facet: false,
+        },
+        {
+          name: "organizationMission",
+          type: "string",
+          facet: false,
+        }
+      ],
+    },
   ]
 
 
@@ -75,7 +95,7 @@ const readFirestoreData = async (collectionName) => {
   }
 
   // Loop over the collection names to read data from Firestore and import it to Typesense
-  const collectionNames = ["colleges", "users"];
+  const collectionNames = ["colleges", "users", "opportunities"];
 
   for (const collectionName of collectionNames) {
     try {

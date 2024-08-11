@@ -27,8 +27,7 @@ const searchDocuments = async (collectionName, searchText) => {
 
       const matches = searchResults.hits.map(hit => hit.document);
 
-      console.log([...new Set(matches)]);
-      return [...new Set(matches)]; // Remove duplicates
+      return matches;
     } else {
       const searchParameters = {
         q: searchText,
