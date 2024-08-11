@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
+import { highSchools, careerInterests, graduationYears, getColleges, CollegeSearch } from './../Options';
 import { requiredQuestionsAnswered, saveCollegeStudent } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
@@ -185,17 +185,23 @@ const CollegeInfo = ({ selectedOptions, handleChange, pageNum, colleges, onSearc
   return (
     <div className='onboardingQuestions'>
       {collegeStudentQuestionsConfig.filter(question => question.page === 2)
-                .map((question) => (
-        <OnboardingDropdown
-          key={question.id}
-          question={question.text}
-          options={question.id === 'collegeAttending' ? colleges : question.options}
-          selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-          onChange={(label) => handleChange(question.id, label)}
-          type={question.type}
-          onSearchQueryChange={question.id === 'collegeAttending' ? onSearchQueryChange : null}
-        />
-      ))}
+        .map((question) => (
+          question.id === 'collegeAttending' ? (
+            <CollegeSearch
+              key={question.id}
+              question={question.text}
+            />
+          ) : (
+            <OnboardingDropdown
+              key={question.id} // Add key for unique identification
+              question={question.text}
+              options={question.options}
+              selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+              onChange={(label) => handleChange(question.id, label)}
+              type={question.type}
+            />
+          )
+        ))}
     </div>
   );
 };

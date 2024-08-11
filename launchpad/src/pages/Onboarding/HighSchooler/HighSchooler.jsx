@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
+import { highSchools, careerInterests, graduationYears, getColleges, CollegeSearch } from './../Options';
 import { requiredQuestionsAnswered, saveHighSchooler } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
@@ -205,13 +205,8 @@ const HSCollegeInfo = ({ selectedOptions, handleChange, colleges, onSearchQueryC
         type={questions[0].type}
       />
 
-      <OnboardingDropdown
+      <CollegeSearch
           question={questions[1].text(collegeChosen)}
-          options={colleges}
-          selectedOption={selectedOptions['collegeInterestsOrDecision'] || []}
-          onChange={(label) => handleChange('collegeInterestsOrDecision', label)}
-          type={questions[1].type(collegeChosen)}
-          onSearchQueryChange={onSearchQueryChange}
         />
     </div>
   );

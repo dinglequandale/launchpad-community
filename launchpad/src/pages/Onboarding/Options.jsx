@@ -1,6 +1,8 @@
 import { db } from '../../firebase/firebaseConfig';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
+import Select from 'react-select';
+import Typesense from 'typesense';
 
 const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
@@ -142,5 +144,65 @@ const getColleges = (searchQuery = null) => {
   return colleges;
 };
 
+const CollegeSearch = ({ question }) => {
+  const [options, setOptions] = useState([]);
+  const [inputValue, setInputValue] = useState('');
 
-export { highSchools, careerInterests, graduationYears, getColleges };
+  const client = new Typesense.Client({
+    nodes: [
+      {
+        host: 'localhost', // For Typesense Cloud use xxx.a1.typesense.net
+        port: 8108, // For Typesense Cloud use 443
+        protocol: 'http', // For Typesense Cloud use https
+      },
+    ],
+    apiKey: 'xyz', // Replace with your actual Typesense API key
+    connectionTimeoutSeconds: 2,
+  });
+
+  const handleInputChange = async (value) => {
+    setInputValue(value); // Update the input value state
+    if (value.length < 1) {
+      setOptions([]); // Clear options if input is less than 2 characters
+      return;
+    }
+
+    const searchParameters = {
+      q: value,
+      query_by: 'label',
+    };
+
+    try {
+      const searchResults = await client
+        .collections('colleges')
+        .documents()
+        .search(searchParameters);
+
+      const formattedOptions = searchResults.hits.map((hit) => ({
+        value: hit.document.id,
+        label: hit.document.label,
+      }));
+
+      setOptions(formattedOptions);
+    } catch (error) {
+      console.error('Error searching Typesense:', error);
+    }
+  };
+
+  return (
+    <div>
+      <label>{question}</label>
+      <Select
+        options={options}
+        inputValue={inputValue}
+        onInputChange={handleInputChange}
+        placeholder="Search for a college..."
+        isClearable
+        noOptionsMessage={() => 'Type to search'}
+      />
+    </div>
+  );
+};
+
+
+export { highSchools, careerInterests, graduationYears, getColleges, CollegeSearch };
