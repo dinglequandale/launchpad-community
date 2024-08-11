@@ -34,41 +34,60 @@ const readFirestoreData = async (collectionName) => {
 
   const typesense = new Typesense.Client(TYPESENSE_CONFIG);
 
-  const schema = {
-    name: "colleges",
-    fields: [
-      {
-        name: "label",
-        type: "string",
-        facet: false,
-      }
-    ],
-    default_sorting_field: "label",
-  };
+  const schemas = [
+    {
+      name: "colleges",
+      fields: [
+        {
+          name: "label",
+          type: "string",
+          facet: false,
+        }
+      ],
+      default_sorting_field: "label",
+    },
+    {
+      name: "users",
+      fields: [
+        {
+          name: "userName",
+          type: "string",
+          facet: false,
+        }
+      ],
+    },
+  ]
 
-  // Check if collection already exists and handle it
-  try {
-    await typesense.collections().create(schema);
-    console.log('Collection created');
-  } catch (error) {
-    if (error.message.includes('already exists')) {
-      console.log('Collection already exists');
-    } else {
-      console.error('Error creating collection: ', error);
-      return;
+
+  // Loop over schemas to create collections
+  for (const schema of schemas) {
+    try {
+      await typesense.collections().create(schema);
+      console.log(`Collection ${schema.name} created`);
+    } catch (error) {
+      if (error.message.includes('already exists')) {
+        console.log(`Collection ${schema.name} already exists`);
+      } else {
+        console.error(`Error creating collection ${schema.name}:`, error);
+        return;
+      }
     }
   }
 
-  const collegeData = await readFirestoreData("colleges");
+  // Loop over the collection names to read data from Firestore and import it to Typesense
+  const collectionNames = ["colleges", "users"];
 
-  try {
-    const returnData = await typesense
-      .collections("colleges")
-      .documents()
-      .import(collegeData, { action: 'upsert' }); // Use upsert to update existing records
+  for (const collectionName of collectionNames) {
+    try {
+      const collectionData = await readFirestoreData(collectionName);
+      const returnData = await typesense
+        .collections(collectionName)
+        .documents()
+        .import(collectionData, { action: 'upsert' });
 
-    console.log("Return data: ", returnData);
-  } catch (err) {
-    console.error('Error importing data: ', err);
+      console.log(`Data imported to ${collectionName} collection:`, returnData);
+    } catch (err) {
+      console.error(`Error importing data to ${collectionName} collection:`, err);
+    }
   }
 })();
