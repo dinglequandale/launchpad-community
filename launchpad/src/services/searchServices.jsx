@@ -1,41 +1,52 @@
-import { collection, query, where, getDocs, startAt, endAt, orderBy, and } from 'firebase/firestore';
-import { db } from '../firebase/firebaseConfig';
+import Typesense from 'typesense';
+
+const client = new Typesense.Client({
+  nodes: [
+    {
+      host: 'localhost', // Typesense server host
+      port: 8108, // Typesense server port
+      protocol: 'http', // 'http' or 'https'
+    },
+  ],
+  apiKey: 'xyz', // Replace with your actual Typesense API key
+  connectionTimeoutSeconds: 2,
+});
 
 const searchDocuments = async (collectionName, searchText) => {
   try {
-    const docsRef = collection(db, collectionName);
-    
     if (collectionName === 'opportunities') {
-      const q1 = query(docsRef, orderBy('organizationName'), startAt(searchText), endAt(searchText + '\uf8ff'));
-      const q2 = query(docsRef, orderBy('organizationType'), startAt(searchText), endAt(searchText + '\uf8ff'));
-      const q3 = query(docsRef, orderBy('organizationMission'), startAt(searchText), endAt(searchText + '\uf8ff'));
-  
-      const [snapshot1, snapshot2, snapshot3] = await Promise.all([
-        getDocs(q1),
-        getDocs(q2),
-        getDocs(q3),
-      ]);
-  
-      const matches = [
-        ...snapshot1.docs.map(doc => doc.data()),
-        ...snapshot2.docs.map(doc => doc.data()),
-        ...snapshot3.docs.map(doc => doc.data()),
-      ];
-  
+      const searchParameters = {
+        q: searchText,
+        query_by: 'organizationName,organizationType,organizationMission', // Search across multiple fields
+      };
+      
+      const searchResults = await client
+        .collections(collectionName)
+        .documents()
+        .search(searchParameters);
+
+      const matches = searchResults.hits.map(hit => hit.document);
+
       console.log([...new Set(matches)]);
-      return [...new Set(matches)];
-    } else {  
-      const q = query(docsRef, orderBy('userName'), startAt(searchText), endAt(searchText + '\uf8ff'));
-  
-      const snapshot = await getDocs(q);
-  
-      const matches = snapshot.docs.map(doc => doc.data());
-  
+      return [...new Set(matches)]; // Remove duplicates
+    } else {
+      const searchParameters = {
+        q: searchText,
+        query_by: 'userName', // Search by userName
+      };
+
+      const searchResults = await client
+        .collections(collectionName)
+        .documents()
+        .search(searchParameters);
+
+      const matches = searchResults.hits.map(hit => hit.document);
+
       console.log(matches);
       return matches;
     }
   } catch (error) {
-    console.error('Error searching Firestore: ', error);
+    console.error('Error searching Typesense: ', error);
   }
 };
 
