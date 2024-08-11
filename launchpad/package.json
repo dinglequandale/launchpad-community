@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start-typesense-server": "node src/services/typesenseServices/startTypesenseServer.js",
+    "populate": "node src/services/typesenseServices/populateTypesense.js"
   },
   "dependencies": {
     "firebase": "^10.12.3",
