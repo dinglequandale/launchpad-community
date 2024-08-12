@@ -8,11 +8,13 @@ const searchDocuments = async (collectionName, searchText) => {
       searchParameters = {
         q: searchText,
         query_by: 'organizationName,organizationType,organizationMission',
+        num_typos: 1, // Allow up to 1 typo
       };
     } else {
       searchParameters = {
         q: searchText,
         query_by: 'userName',
+        num_typos: 1, // Allow up to 1 typo
       };
     }
 

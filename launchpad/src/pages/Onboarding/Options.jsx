@@ -156,6 +156,7 @@ const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion 
     const searchParameters = {
       q: inputValue,
       query_by: 'label',
+      num_typos: 1, // Allow up to 1 typo
     };
 
     try {

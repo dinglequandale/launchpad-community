@@ -201,7 +201,7 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
         question={questions[1].text(collegeChosen)}
         selectedOption={selectedOptions['collegeInterestsOrDecision']}
         onChange={(label) => handleChange('collegeInterestsOrDecision', label)}
-        type={questions[1].type}
+        type={questions[1].type(collegeChosen)}
       />
     </div>
   );
