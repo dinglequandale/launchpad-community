@@ -1,49 +1,30 @@
-import Typesense from 'typesense';
-
-const client = new Typesense.Client({
-  nodes: [
-    {
-      host: 'localhost', // Typesense server host
-      port: 8108, // Typesense server port
-      protocol: 'http', // 'http' or 'https'
-    },
-  ],
-  apiKey: 'xyz', // Replace with your actual Typesense API key
-  connectionTimeoutSeconds: 2,
-});
+import client from '../typesense/typesenseClient'
 
 const searchDocuments = async (collectionName, searchText) => {
   try {
+    let searchParameters;
+
     if (collectionName === 'opportunities') {
-      const searchParameters = {
+      searchParameters = {
         q: searchText,
-        query_by: 'organizationName,organizationType,organizationMission', // Search across multiple fields
+        query_by: 'organizationName,organizationType,organizationMission',
       };
-      
-      const searchResults = await client
-        .collections(collectionName)
-        .documents()
-        .search(searchParameters);
-
-      const matches = searchResults.hits.map(hit => hit.document);
-
-      return matches;
     } else {
-      const searchParameters = {
+      searchParameters = {
         q: searchText,
-        query_by: 'userName', // Search by userName
+        query_by: 'userName',
       };
-
-      const searchResults = await client
-        .collections(collectionName)
-        .documents()
-        .search(searchParameters);
-
-      const matches = searchResults.hits.map(hit => hit.document);
-
-      console.log(matches);
-      return matches;
     }
+
+    const searchResults = await client
+    .collections(collectionName)
+    .documents()
+    .search(searchParameters);
+
+    const matches = searchResults.hits.map(hit => hit.document);
+
+    console.log(matches);
+    return matches;
   } catch (error) {
     console.error('Error searching Typesense: ', error);
   }

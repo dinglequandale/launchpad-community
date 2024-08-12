@@ -2,7 +2,7 @@ import { db } from '../../firebase/firebaseConfig';
 import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
 import Select from 'react-select';
-import Typesense from 'typesense';
+import client from '../../typesense/typesenseClient'
 
 const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
@@ -147,18 +147,6 @@ const getColleges = (searchQuery = null) => {
 const CollegeSearch = ({ question }) => {
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState('');
-
-  const client = new Typesense.Client({
-    nodes: [
-      {
-        host: 'localhost', // For Typesense Cloud use xxx.a1.typesense.net
-        port: 8108, // For Typesense Cloud use 443
-        protocol: 'http', // For Typesense Cloud use https
-      },
-    ],
-    apiKey: 'xyz', // Replace with your actual Typesense API key
-    connectionTimeoutSeconds: 2,
-  });
 
   const handleInputChange = async (value) => {
     setInputValue(value); // Update the input value state
