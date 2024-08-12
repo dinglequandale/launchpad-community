@@ -1,4 +1,4 @@
-import client from '../typesense/typesenseClient'
+import { client } from '../typesense/typesenseClient'
 
 const searchDocuments = async (collectionName, searchText) => {
   try {

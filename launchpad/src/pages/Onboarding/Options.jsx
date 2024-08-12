@@ -2,7 +2,7 @@ import { db } from '../../firebase/firebaseConfig';
 import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
 import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
-import client from '../../typesense/typesenseClient'
+import { client } from '../../typesense/typesenseClient'
 
 const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
