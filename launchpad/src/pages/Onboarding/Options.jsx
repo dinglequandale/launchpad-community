@@ -1,6 +1,8 @@
 import { db } from '../../firebase/firebaseConfig';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
+import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
+import { client } from '../../typesense/typesenseClient'
 
 const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
@@ -142,5 +144,50 @@ const getColleges = (searchQuery = null) => {
   return colleges;
 };
 
+const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion = true }) => {
+  const [options, setOptions] = useState([]);
 
-export { highSchools, careerInterests, graduationYears, getColleges };
+  const handleInputChange = async (inputValue) => {
+    if (inputValue.length < 1) {
+      setOptions([]); // Clear options if input is empty
+      return;
+    }
+
+    const searchParameters = {
+      q: inputValue,
+      query_by: 'label',
+      num_typos: 1, // Allow up to 1 typo
+    };
+
+    try {
+      const searchResults = await client
+        .collections('colleges')
+        .documents()
+        .search(searchParameters);
+
+      const formattedOptions = searchResults.hits.map((hit) => ({
+        value: hit.document.id,
+        label: hit.document.label,
+      }));
+
+      setOptions(formattedOptions);
+    } catch (error) {
+      console.error('Error searching Typesense:', error);
+    }
+  };
+
+  return (
+    <OnboardingDropdown
+      question={question}
+      options={options}
+      selectedOption={selectedOption}
+      onChange={onChange}
+      type={type} // Assuming single-select for college search
+      onSearchQueryChange={handleInputChange} // Pass the input change handler
+      showQuestion={showQuestion}
+    />
+  );
+};
+
+
+export { highSchools, careerInterests, graduationYears, getColleges, CollegeSearch };

@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import { highSchools, careerInterests, graduationYears, getColleges } from './../Options';
+import { highSchools, careerInterests, graduationYears, CollegeSearch } from './../Options';
 import { requiredQuestionsAnswered, saveHighSchooler } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
@@ -82,10 +82,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
   const navigate = useNavigate();
 
   const {currentUser} = useAuth();
-  // Fetch college list from Firebase
-  const [searchQuery, setSearchQuery] = useState('');
-  const colleges = getColleges(searchQuery);
-  const cachedColleges = useMemo(() => colleges, [colleges]);
+
   const [highSchoolerData, setHighSchoolerData] = useState({
     userAboutMe: '',
     userName: '',
@@ -145,10 +142,6 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
     }));
   };
 
-  const handleSearchQueryChange = (query) => {
-    setSearchQuery(query);
-  };
-
   const renderPage = () => {
     switch (currentPage) {
       case 1:
@@ -156,8 +149,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
       case 2:
         return <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange}/>;
       case 3:
-        return <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} colleges={cachedColleges}
-        onSearchQueryChange={handleSearchQueryChange} />;
+        return <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} />;
       default:
         return null;
     }
@@ -190,7 +182,7 @@ const SchoolInfo = ({ selectedOptions, handleChange }) => {
   );
 };
 
-const HSCollegeInfo = ({ selectedOptions, handleChange, colleges, onSearchQueryChange }) => {
+const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
   const questions = highSchoolQuestionsConfig.filter(question => question.page === 3);
   
   const collegeChosen = selectedOptions['collegeDecision'] === "Yes";
@@ -205,14 +197,12 @@ const HSCollegeInfo = ({ selectedOptions, handleChange, colleges, onSearchQueryC
         type={questions[0].type}
       />
 
-      <OnboardingDropdown
-          question={questions[1].text(collegeChosen)}
-          options={colleges}
-          selectedOption={selectedOptions['collegeInterestsOrDecision'] || []}
-          onChange={(label) => handleChange('collegeInterestsOrDecision', label)}
-          type={questions[1].type(collegeChosen)}
-          onSearchQueryChange={onSearchQueryChange}
-        />
+    <CollegeSearch
+        question={questions[1].text(collegeChosen)}
+        selectedOption={selectedOptions['collegeInterestsOrDecision']}
+        onChange={(label) => handleChange('collegeInterestsOrDecision', label)}
+        type={questions[1].type(collegeChosen)}
+      />
     </div>
   );
 };

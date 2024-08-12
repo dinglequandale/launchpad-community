@@ -1,6 +1,7 @@
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db, storage } from "../firebase/firebaseConfig";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { updateTypesense } from '../typesense/typesenseClient';
 
 export const lowerAndCapitalize = (title) => {
     const lowerTitle = title.toLowerCase();
@@ -172,8 +173,9 @@ export const editUserData = async (userData, currentUser) => {
       const userRef = doc(db, "users", currentUser.uid);
   
       await updateDoc(userRef, userData);
+      await updateTypesense('users', currentUser.uid, userData);
     }catch(error){console.log(error)};
-  }
+}
 
 export const loadUserData = async (currentUser, setLoading, setUserData) => {
     let unsubscribe;
