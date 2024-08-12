@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import { highSchools, careerInterests, graduationYears, getColleges, CollegeSearch } from './../Options';
+import { highSchools, careerInterests, graduationYears, CollegeSearch } from './../Options';
 import { requiredQuestionsAnswered, saveCollegeStudent } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
@@ -87,9 +87,6 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
 
   const navigate = useNavigate();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const colleges = getColleges(searchQuery);
-  const cachedColleges = useMemo(() => colleges, [colleges]);
   const {currentUser} = useAuth();
 
   const [collegeStudentData, setCollegeStudentData] = useState({
@@ -152,10 +149,6 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
     }
   },[collegeStudentData])
 
-  const handleSearchQueryChange = (query) => {
-    setSearchQuery(query);
-  };
-
   const renderPage = () => {
     switch (currentPage) {
       case 1:
@@ -163,10 +156,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
       case 2:
         return <CollegeInfo 
         selectedOptions={collegeStudentData}
-        handleChange={handleChange}
-        pageNum={currentPage}
-        colleges={cachedColleges}
-        onSearchQueryChange={handleSearchQueryChange} />;
+        handleChange={handleChange} />;
       case 3:
         return <ConnectionLevel selectedOptions={collegeStudentData} setSelectedOptions={setCollegeStudentData} />;
       default:
@@ -181,7 +171,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
   );
 };
 
-const CollegeInfo = ({ selectedOptions, handleChange, pageNum, colleges, onSearchQueryChange }) => {
+const CollegeInfo = ({ selectedOptions, handleChange }) => {
   return (
     <div className='onboardingQuestions'>
       {collegeStudentQuestionsConfig.filter(question => question.page === 2)
@@ -190,6 +180,9 @@ const CollegeInfo = ({ selectedOptions, handleChange, pageNum, colleges, onSearc
             <CollegeSearch
               key={question.id}
               question={question.text}
+              selectedOption={selectedOptions['collegeAttending']}
+              onChange={(label) => handleChange('collegeAttending', label)}
+              type={questions.type}
             />
           ) : (
             <OnboardingDropdown

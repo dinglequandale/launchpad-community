@@ -1,7 +1,7 @@
 import { db } from '../../firebase/firebaseConfig';
 import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
-import Select from 'react-select';
+import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
 import client from '../../typesense/typesenseClient'
 
 const highSchools = [
@@ -144,19 +144,17 @@ const getColleges = (searchQuery = null) => {
   return colleges;
 };
 
-const CollegeSearch = ({ question }) => {
+const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion = true }) => {
   const [options, setOptions] = useState([]);
-  const [inputValue, setInputValue] = useState('');
 
-  const handleInputChange = async (value) => {
-    setInputValue(value); // Update the input value state
-    if (value.length < 1) {
-      setOptions([]); // Clear options if input is less than 2 characters
+  const handleInputChange = async (inputValue) => {
+    if (inputValue.length < 1) {
+      setOptions([]); // Clear options if input is empty
       return;
     }
 
     const searchParameters = {
-      q: value,
+      q: inputValue,
       query_by: 'label',
     };
 
@@ -178,17 +176,15 @@ const CollegeSearch = ({ question }) => {
   };
 
   return (
-    <div>
-      <label>{question}</label>
-      <Select
-        options={options}
-        inputValue={inputValue}
-        onInputChange={handleInputChange}
-        placeholder="Search for a college..."
-        isClearable
-        noOptionsMessage={() => 'Type to search'}
-      />
-    </div>
+    <OnboardingDropdown
+      question={question}
+      options={options}
+      selectedOption={selectedOption}
+      onChange={onChange}
+      type={type} // Assuming single-select for college search
+      onSearchQueryChange={handleInputChange} // Pass the input change handler
+      showQuestion={showQuestion}
+    />
   );
 };
 
