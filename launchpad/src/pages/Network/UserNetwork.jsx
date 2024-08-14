@@ -161,7 +161,7 @@ export default function UserNetwork() {
     // setIsSearching(false);
     if (queryText) {
       const searchResults = await searchDocuments('users', queryText);
-      setAllUserData(searchResults);
+      setAllVisibleUserData(searchResults);
     }
   };
     
