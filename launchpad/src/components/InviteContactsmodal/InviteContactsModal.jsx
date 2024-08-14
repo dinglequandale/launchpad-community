@@ -1,5 +1,6 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { GrAdd } from "react-icons/gr";
 import Modal from "react-modal";
 
@@ -9,7 +10,6 @@ export default function InviteContactsModal({visibility, onClose}){
     const [targetUserData,setTargetUserData] = useState([{id: 0, userName: "", email: ""}])
     console.log(targetUserData);
     const {userName} = JSON.parse(localStorage.getItem("basicUserInfo"));
-
     const customStyles = {
         content: {
           top: '50%',
@@ -28,9 +28,24 @@ export default function InviteContactsModal({visibility, onClose}){
       };
 
       const onInviteSend = async () => {
-        const sendInvitations = httpsCallable(getFunctions(),"sendInviteEmail");
-        const success = await sendInvitations({recipientData: targetUserData, senderName: userName});
-      }
+        const loadingToast = toast.loading('Sending your invitations...');
+      
+        try {
+          const sendInvitations = httpsCallable(getFunctions(), "sendInviteEmail");
+          const result = await sendInvitations({ recipientData: targetUserData, senderName: userName });
+    
+          toast.success('Invitations sent successfully!', { id: loadingToast });
+      
+          onClose();
+      
+        } catch (error) {
+          toast.error(`Failed to send invitations!`, { id: loadingToast });
+      
+          // You can handle the error case here (e.g., log the error, show more details to the user)
+          console.error('Error sending invitations:', error);
+        }
+      };
+      
 
       const handleInputChange = (key, value, index) => {
         // const prevUserData = targetUserData;
@@ -50,6 +65,7 @@ export default function InviteContactsModal({visibility, onClose}){
     
       return (
         <div>
+           <Toaster position="bottom-right" reverseOrder={false} />
           <Modal
             isOpen={visibility}
             onRequestClose={onClose}

@@ -1,44 +1,45 @@
-import { collection, query, where, getDocs, getDoc, doc, or } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, limit, startAfter, orderBy } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig'; // Adjust this import based on your Firebase setup
 import { careerInterests } from '../pages/Onboarding/Options';
 
-export async function getFilteredData(collectionName, filters, currentUserId) {
+export async function getFilteredData(collectionName, filters, currentUserId, category = null, lastDoc = null, maxLimit = 9) {
     let q = collection(db, collectionName);
 
     const {userInterests, userColleges, userHS } = await getUserData("areasOfInterest", currentUserId);
 
     const filterOperations = await Promise.all(Object.entries(filters).map(async ([key, value]) => {
-        if (value && (Array.isArray(value) || !value.startsWith('Any'))) {
-            if (key === "areasOfInterestOrExpertise") {
-              // const dataType = value;
-              //   const userInterests = await getUserData(dataType, currentUserId);
-              const userInterestsExtended = getExtendedInterests(userInterests);
-              
-              if (collectionName === "opportunities") {
-                  return { key: "organizationTags", operation: "array-contains-any", value: userInterestsExtended };
-              } else {
-                  return { key: "areasOfInterest", operation: "array-contains-any", value: userInterestsExtended };
-              }
-            }
-            else if(key === "schoolAttending"){
-              return{
-                key,
-                operation: "==",
-                value: userHS
-              }
-            }
-            else if(key === "collegeInterestsOrDecision"){
-                return {
-                    key: "collegeInterestsOrDecision",
-                    operation: "array-contains-any",
-                    value: userColleges,
-                };
-            } else if (Array.isArray(value)) {
-                return { key, operation: 'in', value };
-            } else {
-                return { key, operation: '==', value };
-            }
+    if (value && (Array.isArray(value) || !value.startsWith('Any'))) {
+        if (key === "areasOfInterestOrExpertise") {
+          // const dataType = value;
+          //   const userInterests = await getUserData(dataType, currentUserId);
+          const userInterestsExtended = getExtendedInterests(userInterests);
+          
+          if (collectionName === "opportunities") {
+              return { key: "organizationTags", operation: "array-contains-any", value: userInterestsExtended };
+          } else {
+              return { key: "areasOfInterest", operation: "array-contains-any", value: userInterestsExtended };
+          }
+        }
+        else if(key === "schoolAttending"){
+          return{
+            key,
+            operation: "==",
+            value: userHS
+          }
+        }
+        else if(key === "collegeInterestsOrDecision"){
+            return {
+                key: "collegeInterestsOrDecision",
+                operation: "array-contains-any",
+                value: userColleges,
+            };
+        } else if (Array.isArray(value)) {
+            return { key, operation: 'in', value };
+        } else {
+            return { key, operation: '==', value };
+        }
     }
+
     return null;
     }));
   
@@ -49,6 +50,31 @@ export async function getFilteredData(collectionName, filters, currentUserId) {
       });
   
     // IMPORTANT TODO: PAGINATION / MAX LOAD
+    
+    if(category){
+      // Add category filter
+      q = query(q, where('userType', '==', category));
+
+      // Add ordering to ensure consistent pagination
+      q = query(q, orderBy('userName'));
+
+      // Apply pagination
+      if (lastDoc) {
+          q = query(q, startAfter(lastDoc));
+      }
+      q = query(q, limit(maxLimit));
+    }
+    else{
+
+      // Add ordering to ensure consistent pagination
+      q = query(q, orderBy('createdAt'));
+
+      if (lastDoc) {
+          q = query(q, startAfter(lastDoc));
+      }
+      q = query(q, limit(10));
+    }
+    
 
     const querySnapshot = await getDocs(q);
     const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -62,8 +88,10 @@ export async function getFilteredData(collectionName, filters, currentUserId) {
       return bMatches - aMatches; // descending order
     });
     }catch{}
+
+    const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
   
-    return results;
+    return {results, lastVisible};
   
   }  
 

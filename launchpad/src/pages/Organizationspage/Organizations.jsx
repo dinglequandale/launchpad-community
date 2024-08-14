@@ -4,8 +4,6 @@ import SearchBar from "../../components/Searchbar/SearchBar";
 import SideNav from "../../components/Sidenav/SideNav";
 import TopBar from "../../components/Topbar/TopBar";
 import OrganizationProfile from "../../components/Organizationprofile/OrganizationProfile";
-import { db } from "../../firebase/firebaseConfig";
-import { collection, onSnapshot } from "firebase/firestore";
 import NoResults, { EmptyField } from "../../components/NoResultsnotifier/NoResults";
 import Loading from "../../components/LoadingAnimation/Loading";
 import { getFilteredData } from "../../services/filteringServices";
@@ -56,8 +54,9 @@ export default function Organizations(){
     const fetchOpportunities = async () => {
         if(!isSearching){
         setLoading(true);
-        const filteredData = await getFilteredData('opportunities', filters, currentUser.uid);
-        setOrganizationsData(filteredData);
+        const {results, lastVisible} = await getFilteredData('opportunities', filters, currentUser.uid);
+        console.log(results)
+        setOrganizationsData(results);
         setLoading(false);
         }
     };
@@ -111,7 +110,7 @@ export default function Organizations(){
             {showPfpCard && <ProfileModal visibility={showPfpCard} onClose={()=>setShowPfpCard(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={targetUserData}/>}
             <TopBar/>
             <SideNav/>
-            <div className='organizationsContainer' style={{paddingTop: "3%", paddingLeft: "10%"}}>
+            <div className='organizationsContainer' style={{paddingTop: "4%", paddingLeft: "10%"}}>
                 <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/> 
                 
                 <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px", paddingBottom: "40px", position: "relative"}}>
@@ -129,7 +128,6 @@ export default function Organizations(){
                         }
                 </div>
             </div>
-                
         </>
         
     )

@@ -28,7 +28,10 @@ export default function LogoutButton() {
     return(
         <>
             {userLoggedIn &&
-                <FiLogOut onClick={(e)=>handleLogout(e)} className="logoutButton"/>}
+                <div className='logoutGroup' style={{display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}} onClick={(e) => handleLogout(e)}>
+                    <FiLogOut size={19} className="logoutButton"/>
+                    <span className='txtLogout' style={{fontSize: "16px"}}>Logout</span>
+                </div>}
         </>
     );
   }

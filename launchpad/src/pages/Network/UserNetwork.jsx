@@ -29,9 +29,16 @@ export default function UserNetwork() {
   const [profileModalVisibility, setProfileModalVisibility] = useState(false);
   const [connectModalVisibility, setConnectModalVisibility] = useState(false);
   const [connectTargetUserId, setConnectTargetUserId] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [allUserData, setAllUserData] = useState([]);
+
+  const [highSchoolers, setHighSchoolers] = useState([]);
+  const [collegeStudents, setCollegeStudents] = useState([]);
+  const [professionals, setProfessionals] = useState([]);
+  const [lastDocs, setLastDocs] = useState({ highSchool: null, college: null, professional: null });
+  const [loading, setLoading] = useState({ highSchool: false, college: false, professional: false });
+  const [overallLoading, setOverallLoading] = useState(false);
+
   const [userSearchText, setUserSearchText] = useState("");
+  const [allVisibleUserData, setAllVisibleUserData] = useState(null);
 
   const [profileTargetData, setProfileTargetData] = useState(null);
   const [connectTargerUserName, setConnectTargetUserName] = useState("");
@@ -63,31 +70,69 @@ export default function UserNetwork() {
     schoolAttending: ["Any High School", "My High School"]
   };
 
-  useEffect(() => {
-      fetchOpportunities();
-  }, [filters]);
+  useEffect(()=>{
+    setOverallLoading(true);
+    fetchAllUserTypes();
+  },[filters])
 
-  const fetchOpportunities = async () => {
-    setLoading(true);
-    const filteredData = await getFilteredData('users', filters, currentUser.uid);
-    setAllUserData(filteredData);
-    setLoading(false);
-  };
+  useEffect(() => {
+    setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals])
+    console.log("All data:", allVisibleUserData)
+  },[collegeStudents, highSchoolers, professionals]);
+
+  const fetchAllUserTypes = async () => {
+        await Promise.all([
+            fetchUserType('High Schooler'),
+            fetchUserType('Alumni'),
+            fetchUserType('Professional')
+        ]);
+    };
+
+    const fetchUserType = async (category, isLoadMore = false) => {
+        setLoading(prev => ({ ...prev, [category]: true }));
+        try {
+            const { results, lastVisible } = await getFilteredData(
+                'users', 
+                filters, 
+                currentUser.uid, 
+                category,
+                isLoadMore ? lastDocs[category] : null
+            );
+
+            setLastDocs(prev => ({ ...prev, [category]: lastVisible }));
+
+            switch(category) {
+                case 'High Schooler':
+                    setHighSchoolers(prev => isLoadMore ? [...prev, ...results] : results);
+                    break;
+                case 'Alumni':
+                    setCollegeStudents(prev => isLoadMore ? [...prev, ...results] : results);
+                    break;
+                case 'Professional':
+                    setProfessionals(prev => isLoadMore ? [...prev, ...results] : results);
+                    break;
+            }
+        } catch (error) {
+            console.error(`Error fetching ${category} data:`, error);
+        } finally {
+            setLoading(prev => ({ ...prev, [category]: false }));
+            setOverallLoading(false);
+        }
+    };
+
+    const loadMore = (category) => {
+        if (!loading[category] && lastDocs[category]) {
+            fetchUserType(category, true);
+        }
+    };
 
   const handleFilterChange = (filterKey, value) => {
     setFilters(prev => ({...prev, [filterKey]: value}));
   };
 
-  const getUserClassData = (userData) => {
-    const highSchoolers = userData.filter((user) => user.userType === "High Schooler");
-    const alums = userData.filter((user) => user.userType === "Alumni");
-    const professionals = userData.filter((user) => user.userType === "Professional");
-    return {highSchoolers, alums, professionals}
-  }
-
   const handleConnectClick = (userId) => {
     setConnectTargetUserId(userId);
-    setConnectTargetUserName(allUserData.filter((user)=>(user.userId === userId))[0].userName);
+    setConnectTargetUserName(allVisibleUserData.filter((user)=>(user.userId === userId))[0].userName);
     setProfileModalVisibility(false);
     setConnectModalVisibility(true);
   }
@@ -96,8 +141,8 @@ export default function UserNetwork() {
     const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2);
     
     setProfileModalTop(modalTop);
-    if(allUserData){
-      setProfileTargetData(allUserData.filter((user) => (user.userId === userId))[0]);
+    if(allVisibleUserData){
+      setProfileTargetData(allVisibleUserData.filter((user) => (user.userId === userId))[0]);
     }
 
     setProfileModalVisibility(true);
@@ -128,32 +173,44 @@ export default function UserNetwork() {
         <div>
             <TopBar/>
             <SideNav/>
-            <div className='networkContainer' id="networkContainer" style={{paddingTop: "3%", paddingLeft: "10%"}}>
+            <div className='networkContainer' id="networkContainer" style={{paddingTop: "4%", paddingLeft: "10%"}}>
               <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/>
               <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh", position: "relative"}}>
-                {allUserData && allUserData.length > 0 ? <>
-                {getUserClassData(allUserData).highSchoolers.length > 0 && <>
+                {allVisibleUserData && allVisibleUserData.length > 0 ? <>
+                {highSchoolers.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>High Schoolers</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
-                <UserCarousel userNetworkData={getUserClassData(allUserData).highSchoolers}/>
+                <UserCarousel 
+                  userNetworkData={highSchoolers} 
+                  onEndReached={() => loadMore('High Schooler')} 
+                  loading={loading.highSchool}
+                />
                 </>}
-                {getUserClassData(allUserData).alums.length > 0 && <>
+                {collegeStudents.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>College Students</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
-                <UserCarousel userNetworkData={getUserClassData(allUserData).alums}/>
+                <UserCarousel 
+                  userNetworkData={collegeStudents}
+                  onEndReached={() => loadMore('Alumni')}
+                  loading={loading.college}
+                />
                 </>}
-                {getUserClassData(allUserData).professionals.length > 0 && <>
+                {professionals.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>Professionals</h3>
                   <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
                 </div>
-                <UserCarousel userNetworkData={getUserClassData(allUserData).professionals}/>
+                <UserCarousel 
+                  userNetworkData={professionals}
+                  onEndReached={() => loadMore('Professional')} 
+                  loading={loading.professional}
+                />
                 </>}
-                </> : loading ? <div style={{position: "absolute", left: "50%",top: "50%", transform: "translate(-50%,-50%)", width: "300px"}}> <Loading/> </div> : 
+                </> : overallLoading ? <div style={{position: "absolute", left: "50%",top: "50%", transform: "translate(-50%,-50%)", width: "300px"}}> <Loading/> </div> : 
                 <div style={{position: "absolute", left: "50%",top: "45%", transform: "translate(-50%,-40%)", width: "400px", height: "500px"}}><NoResults/></div>}
               </div>
             </div>
@@ -163,12 +220,13 @@ export default function UserNetwork() {
   );
 }
 
-function UserCarousel({userNetworkData}){
+function UserCarousel({userNetworkData, loading, onEndReached}){
   const { handleOnProfileClick,handleConnectClick } = useContext(NetworkContext);
   const itemsPerPage = 3;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState('');
   const carouselRef = useRef(null);
+
 
   useEffect(() => {
     if (carouselRef.current) {
@@ -176,9 +234,11 @@ function UserCarousel({userNetworkData}){
       const offset = currentIndex * (itemWidth);
       carouselRef.current.style.transform = `translateX(-${offset}px)`;
     }
+
+    if(currentIndex % 9 === 6) {
+      onEndReached();
+    }
   }, [currentIndex, itemsPerPage]);
-
-
 
   const nextSlide = () => {
     setSlideDirection('slide-left');
@@ -197,7 +257,7 @@ function UserCarousel({userNetworkData}){
   return (
     <div className="carousel" style={{width: `${userNetworkData.length === 1 ? "340.66px" : userNetworkData.length === 2 ? "681.33px" : "1022px"}`, margin: "0 auto"}}>
       <div className="carousel-container">
-        <div
+        {!loading ? <div
           className={`carousel-content ${slideDirection}`}
           style={{justifyContent: `${userNetworkData.length <= 3 ? "center" : ""}`, gap: `${userNetworkData.length < 3 ? "10px" : ""}`}}
           onAnimationEnd={() => setSlideDirection('')}
@@ -209,6 +269,8 @@ function UserCarousel({userNetworkData}){
             </div>
           ))}
         </div>
+        : <Loading/>
+        }
       </div>
       
       <button 

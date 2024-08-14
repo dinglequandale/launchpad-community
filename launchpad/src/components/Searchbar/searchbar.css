@@ -15,8 +15,8 @@
 .searchContainer{
     display: flex;
     flex-direction: column;
-    background-color: var(--neutral);
-    border-bottom: solid var(--secondary);
+    background-color: #e8f7f9;
+    /* border-bottom: solid var(--secondary) 2px; */
     padding-left: 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09);
 }
