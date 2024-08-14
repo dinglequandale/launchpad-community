@@ -63,6 +63,7 @@ const collegeStudentQuestionsConfig = [
     id: "sectionAttending",
     text: "Were you part of the French or International Section?",
     type: "select",
+    optional: true,
     options: ["French", "International"].map(option => ({ value: option, label: option })),
     page: 2,
   },
@@ -156,7 +157,8 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
       case 2:
         return <CollegeInfo 
         selectedOptions={collegeStudentData}
-        handleChange={handleChange} />;
+        handleChange={handleChange} 
+        collegeStudentData={collegeStudentData}/>;
       case 3:
         return <ConnectionLevel selectedOptions={collegeStudentData} setSelectedOptions={setCollegeStudentData} />;
       default:
@@ -171,9 +173,9 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
   );
 };
 
-const CollegeInfo = ({ selectedOptions, handleChange }) => {
+const CollegeInfo = ({ selectedOptions, handleChange, collegeStudentData }) => {
   return (
-    <div className='onboardingQuestions'>
+    <div className='onboardingQuestions' style={{width: "500px"}}>
       {collegeStudentQuestionsConfig.filter(question => question.page === 2)
         .map((question) => (
           question.id === 'collegeAttending' ? (
@@ -182,9 +184,10 @@ const CollegeInfo = ({ selectedOptions, handleChange }) => {
               question={question.text}
               selectedOption={selectedOptions['collegeAttending']}
               onChange={(label) => handleChange('collegeAttending', label)}
-              type={questions.type}
+              type={question.type}
             />
-          ) : (
+          ) : question.id === 'sectionAttending' ? (
+            (collegeStudentData.schoolAttending === "Awty International School") && <>
             <OnboardingDropdown
               key={question.id} // Add key for unique identification
               question={question.text}
@@ -193,7 +196,16 @@ const CollegeInfo = ({ selectedOptions, handleChange }) => {
               onChange={(label) => handleChange(question.id, label)}
               type={question.type}
             />
+            </>
           )
+          : <OnboardingDropdown
+          key={question.id} // Add key for unique identification
+          question={question.text}
+          options={question.options}
+          selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+          onChange={(label) => handleChange(question.id, label)}
+          type={question.type}
+        />
         ))}
     </div>
   );

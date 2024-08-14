@@ -111,17 +111,6 @@ export default function Organizations(){
                 setlastDoc(lastVisible);
             }
 
-            setlastDoc(lastVisible);if (results.length > 0) {
-                setOpportunities(prev => {
-                    // Remove duplicates
-                    const newOpportunities = results.filter(
-                        newOpp => !prev.some(existingOpp => existingOpp.id === newOpp.id)
-                    );
-                    return [...prev, ...newOpportunities];
-                });
-                setLastDoc(lastVisible);
-            }
-
             setHasMore(results.length === 5 && lastVisible !== null);
         } catch (error) {
             console.error("Error fetching more opportunities:", error);
@@ -133,7 +122,7 @@ export default function Organizations(){
 
 
     const handleShowProfile = (userData) => {
-        const scrollY = window.scrollY || document.documentElement.scrollTop;set
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
         const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2);
 
         setTargetUserData(userData);

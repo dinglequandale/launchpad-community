@@ -32,8 +32,9 @@ const professionalQuestionsConfig = [
   },
   {
     id: "userResume",
-    text: "Please attach your resume:",
+    text: "Upload your resume for student insight:",
     type: "file",
+    optional: true,
     page: 1
   },
   // Page 2

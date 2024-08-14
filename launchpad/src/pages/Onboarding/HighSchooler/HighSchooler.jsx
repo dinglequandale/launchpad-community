@@ -56,6 +56,7 @@ const highSchoolQuestionsConfig = [
     id: "sectionAttending",
     text: "Are you part of the French or International Section?",
     type: "select",
+    optional: true,
     options: ["French", "International"].map(option => ({ value: option, label: option })),
     page: 2,
   },
@@ -147,7 +148,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
       case 1:
         return <BasicUserInfo questionsForPage={highSchoolQuestionsConfig.filter((question)=>(question.page === 1))} setSelectedOptions={setHighSchoolerData} selectedOptions={highSchoolerData} handleChange={handleChange}/>;
       case 2:
-        return <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange}/>;
+        return <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange} highSchoolerData={highSchoolerData}/>;
       case 3:
         return <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} />;
       default:
@@ -162,14 +163,24 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
   );
 };
   
-const SchoolInfo = ({ selectedOptions, handleChange }) => {
+const SchoolInfo = ({ selectedOptions, handleChange, highSchoolerData }) => {
 
   const questionsForPage = highSchoolQuestionsConfig.filter(question => question.page === 2);
 
   return (
-    <div className='onboardingQuestions'>
+    <div className='onboardingQuestions' style={{width: "500px"}}>
       {questionsForPage.map((question) => (
+        (question.id === "sectionAttending") ?
+        highSchoolerData.schoolAttending === "Awty International School" &&
         <OnboardingDropdown
+          key={question.id}
+          question={question.text}
+          options={question.options}
+          selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+          onChange={(label) => handleChange(question.id, label)}
+          type={question.type}
+        />
+        : <OnboardingDropdown
           key={question.id}
           question={question.text}
           options={question.options}

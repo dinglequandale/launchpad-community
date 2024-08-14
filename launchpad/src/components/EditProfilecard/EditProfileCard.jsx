@@ -66,11 +66,11 @@ export default function EditProfileCard() {
     console.log(userData)
 
     const opportunitiesOptions = {highSchool: 
-    <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
+    <span style={{color: "#006876", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
     alum:
-    <span style={{color: "var(--secondary)", textAlign: "center", }}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead an <span style={{fontWeight: "bolder"}}>out-of-school student initative</span>, such as a nonprofit?</span>,
+    <span style={{color: "#006876", textAlign: "center", }}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead an <span style={{fontWeight: "bolder"}}>out-of-school student initative</span>, such as a nonprofit?</span>,
     professional:
-    <span style={{color: "var(--secondary)", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</span>
+    <span style={{color: "#006876", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</span>
 };
     const descType = () => {
         switch(userData.userType){
@@ -101,10 +101,12 @@ export default function EditProfileCard() {
                     <OpportunityPopup opportunitiesOptions={opportunitiesOptions}/>
                 </div>
                 <AboutMeDisplay/>
-                <div className={`userResume ${userData.userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px"}}>
-                    <div style={{display: "flex", justifyContent: "space-between"}} id="Resume">
+                <div className={`userResume ${userData.userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px", marginTop: "10px"}}>
+                    <div style={{display: "flex", justifyContent: "space-between", position: "relative"}} id="Resume">
                         <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px"}}>{userData.userName.split(" ")[0]}'s Resume ...</span>
-                        <PublicPrivateDropdown/>
+                        <div style={{position: "absolute", right: "0", top: "17px"}}>
+                            <PublicPrivateDropdown/>
+                        </div>
                     </div>
                     <ResumeUpload/>
                 </div>
@@ -142,7 +144,6 @@ function PublicPrivateDropdown({userResumePublicity}){
     const [selectedPublicity, setSelectedPublicity] = useState("Public");
     const [dropdownVisibility, setDropdownVisibility] = useState(false);
     const options = [["Public",<TbWorld size={23}/>], ["Private", <IoLockClosedOutline size={20}/>]];
-    
 
     const handleClick = () => {
         setDropdownVisibility(!dropdownVisibility);
@@ -353,7 +354,7 @@ function OpportunityPopup({opportunitiesOptions}){
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
                 {userData.userType === "High Schooler" ? opportunitiesOptions.highSchool : userData.userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
                 <hr style={{width:"50%", borderColor: "var(--accent)"}}/>
-                <div className="addOne" onClick={()=>setOpportunityModalVisibility(true)}>
+                <div className="addOne" style={{color: "#006876"}} onClick={()=>setOpportunityModalVisibility(true)}>
                     <IoAdd size={25} />
                     <span style={{textDecoration: "underline"}}>Add one!</span>
                 </div>

@@ -24,13 +24,14 @@
 }
 
 .addOne{
-    color: var(--secondary);
+    color: #006876;
+    font-size: larger;
     display: flex; 
     align-items: center;
     justify-content: center;
     gap:4px;
     cursor:pointer;
-    padding-top: 10px;
+    padding-top: 8px;
     position: relative;
 }
 .addOne:hover{
