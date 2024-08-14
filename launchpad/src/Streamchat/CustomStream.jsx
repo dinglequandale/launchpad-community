@@ -178,15 +178,15 @@ export const CustomChat = ({client, filters, sort, channels, activeChannel}) => 
           )}
         </ChannelListContainer>
         {<ChannelContainer>
-              <Channel channel={activeChannel}>
-              <Window>
-                <ChannelHeaderContainer>
-                  <ChannelHeader />
-                </ChannelHeaderContainer>
-                <MessageList />
-                <MessageInput />
-              </Window>
-              </Channel>
+          <Channel channel={activeChannel}>
+          <Window>
+            <ChannelHeaderContainer>
+              <ChannelHeader />
+            </ChannelHeaderContainer>
+            <MessageList />
+            <MessageInput />
+          </Window>
+          </Channel>
         </ChannelContainer>
       //    : 
       //   <EmptyState

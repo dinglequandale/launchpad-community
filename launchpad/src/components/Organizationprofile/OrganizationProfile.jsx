@@ -11,11 +11,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { displayFieldsOfInterest, displayShortenedName } from "../../services/userProfileServices";
 
-export default function OrganizationProfile({organizationData, location}){
+export default function OrganizationProfile({organizationData, location, handleShowProfile}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
-
-    const [showPfpCard, setShowPfpCard] = useState(false);
-
     const [isDisabled, setIsDisabled] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [isLessText, setIsLessText] = useState(false);
@@ -23,8 +20,6 @@ export default function OrganizationProfile({organizationData, location}){
     const { currentUser } = useAuth();
 
     const descRef = useRef();
-
-    const [organizationCreatorName, setOrganizationCreatorName] = useState("");
     const [userData, setUserData] = useState(null);
 
     const organizationProfileData = {
@@ -55,15 +50,15 @@ export default function OrganizationProfile({organizationData, location}){
         getUserData(organizationProfileData.organizationCreatedBy);
     },[])
 
-    useEffect(() => {
-        document.addEventListener("keydown", onKeyPress, true)
-      }, [])
+    // useEffect(() => {
+    //     document.addEventListener("keydown", onKeyPress, true)
+    //   }, [])
     
-      const onKeyPress = (e) => {
-        if(e.key === "Escape"){
-          setShowPfpCard(false);
-        }
-      }
+    //   const onKeyPress = (e) => {
+    //     if(e.key === "Escape"){
+    //       setShowPfpCard(false);
+    //     }
+    //   }
 
     useEffect(()=>{
         if(descRef.current.clientHeight <= 16*8){
@@ -83,7 +78,10 @@ export default function OrganizationProfile({organizationData, location}){
     },[])
     const handleOnHostClick = (e) => {
         e.preventDefault();
-        setShowPfpCard(true)
+        if(handleShowProfile){
+            handleShowProfile(userData);
+            return;
+        }
     }
 
     const handleConnect = (e) => {
@@ -101,10 +99,8 @@ export default function OrganizationProfile({organizationData, location}){
         setIsExpanded(!isExpanded);
     }
 
-    console.log("Current organization tags:", organizationProfileData.organizationRelevanceTags)
     return(
         <>
-            {showPfpCard && <ProfileModal userData={userData} onClose={() => setShowPfpCard(false)}/>}
             <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : (location === "user_profile" || location === "user_profile_public") ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
                 {organizationProfileData.organizationRelevanceTags && <RelevanceBanner organizationType={organizationProfileData.organizationType} relevanceType={organizationProfileData.organizationRelevanceTags}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>

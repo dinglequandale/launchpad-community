@@ -3,8 +3,8 @@
     display: flex;
     width: 60%; 
     padding: 10px;
-    background: rgb(255,255,255);
-    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(209,228,230,1) 100%);
+    background: rgba(218, 245, 255, 0.479);
+    /* background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(209,228,230,1) 100%); */
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     margin: 0 auto;
@@ -32,7 +32,7 @@
 }
 
   .organizationInfo.expanded {
-    padding-bottom: px;
+    padding-bottom: 2px;
     display: block;
     line-height: 1.1;
     max-height: none;
@@ -49,7 +49,7 @@
     width: 100%;
     bottom: 0;
     pointer-events: none;
-    background: linear-gradient(to bottom, transparent, rgba(209,228,230,1));
+    background: rgba(218, 245, 255, 0.479);
 }
 
 .btnOrganizationLearnMore{

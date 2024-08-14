@@ -8,7 +8,7 @@ export default function EditProfilePage(){
         <>
             <TopBar/>
             <SideNav/>
-            <div className='editProfilePageContainer' style={{paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px", alignItems: "center"}}>
+            <div className='editProfilePageContainer' style={{paddingTop: "6%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px", alignItems: "center"}}>
                 <EditProfileCard/>
             </div>
         </>
