@@ -1,7 +1,8 @@
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase/firebaseConfig';
-import { collection, doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { getBasicUserDescription } from './userProfileServices';
+import { updateTypesense } from '../typesense/typesenseClient';
 
 export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess) => {
     try {
@@ -18,6 +19,7 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        await updateTypesense('users', currentUser.uid, dataToSave);
         // console.log("High Schooler info saved -- written with ID: ", docRef.id);
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
@@ -43,6 +45,7 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        await updateTypesense('users', currentUser.uid, dataToSave);
         // console.log("College Student info saved -- written with ID: ", docRef.id);
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
@@ -68,6 +71,7 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        await updateTypesense('users', currentUser.uid, dataToSave);
         // console.log("Professional info saved -- written with ID: ", docRef.id);
 
         pushInitialProfileCompletion(dataToSave);
