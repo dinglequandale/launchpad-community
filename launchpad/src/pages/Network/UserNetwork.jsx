@@ -162,6 +162,9 @@ export default function UserNetwork() {
     if (queryText) {
       const searchResults = await searchDocuments('users', queryText);
       setAllVisibleUserData(searchResults);
+      setHighSchoolers(searchResults.filter((result) => result.userType === "High Schooler"));
+      setCollegeStudents(searchResults.filter((result) => result.userType === "Alumni"));
+      setProfessionals(searchResults.filter((result) => result.userType === "Professional"));
     }
   };
     
