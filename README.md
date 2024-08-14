@@ -1,8 +1,11 @@
 # launchpad-platform
 A platform that revolutionizes high schoolers' access to valuable connections and on-site job experience
 
-# How to Run
-Make sure you have `docker` installed. First, `cd` into `launchpad/`. This will be the working directory from now on. Install npm packages:
+# How to run
+Make sure you have `docker` installed. 
+
+# Run locally
+First, `cd` into `launchpad/`. This will be the working directory from now on. Install npm packages:
 
 `npm install`
 
@@ -20,3 +23,10 @@ This starts the typesense and stores all the compressed/serialized data in `type
 Finally:
 
 `npm run dev`
+
+# Run with docker
+```
+docker build  -t launchpad .
+docker run -p 3000:3000 -p 8108:8108 launchpad 
+```
+After building image, deploy container to Google Cloud run.
