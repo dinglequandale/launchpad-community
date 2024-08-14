@@ -51,7 +51,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
   
     // IMPORTANT TODO: PAGINATION / MAX LOAD
     
-    if(category){
+    if(category && collectionName === "users"){
       // Add category filter
       q = query(q, where('userType', '==', category));
 
@@ -72,7 +72,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
       if (lastDoc) {
           q = query(q, startAfter(lastDoc));
       }
-      q = query(q, limit(10));
+      q = query(q, limit(maxLimit));
     }
     
 

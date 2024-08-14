@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./organizations.css"
 import SearchBar from "../../components/Searchbar/SearchBar";
 import SideNav from "../../components/Sidenav/SideNav";
@@ -31,6 +31,9 @@ export default function Organizations(){
     const [connectTargetUserId,setConnectTargetUserId] = useState("");
     const [connectTargerUserName, setConnectTargetUserName] = useState("");
 
+    const [lastDoc, setlastDoc] = useState(null);
+    const [hasMore, setHasMore] = useState(true);
+
     const [connectModalVisibility, setConnectModalVisibility] = useState(false);
 
     const { chatClient } = useOutletContext();
@@ -46,23 +49,81 @@ export default function Organizations(){
         setShowPfpCard(false);
         setConnectModalVisibility(true);
       }
-
+    
+      
+    const observer = useRef();
+    const lastOpportunityElementRef = useCallback(node => {
+        if (loading) return;
+        if (observer.current) observer.current.disconnect();
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                fetchMoreOpportunities();
+            }
+        });
+        if (node) observer.current.observe(node);
+    }, [loading, hasMore]);
+  
+    
     useEffect(() => {
-        fetchOpportunities();
+        setOrganizationsData([]);
+        setlastDoc(null);
+        setHasMore(true);
+        fetchOpportunities(true);
+        console.log("Initial opportunities: ", organizationsData)
     }, [filters]);
 
-    const fetchOpportunities = async () => {
+    const fetchOpportunities = async (isInitial = false) => {
         if(!isSearching){
         setLoading(true);
-        const {results, lastVisible} = await getFilteredData('opportunities', filters, currentUser.uid);
-        console.log(results)
+        const {results, lastVisible} = await getFilteredData('opportunities', filters, currentUser.uid, null, isInitial ? null : lastDoc,
+            5 // adjust this number as needed
+);
+        setlastDoc(lastVisible);
+        setHasMore(results.length === 5 && lastVisible !== null);
+
         setOrganizationsData(results);
         setLoading(false);
         }
     };
 
+    const fetchMoreOpportunities = async () => {
+        if (loading || !hasMore) return;
+        
+        // setLoading(true);
+        try {
+            const { results, lastVisible } = await getFilteredData(
+                'opportunities', 
+                filters, 
+                currentUser.uid, 
+                null,
+                lastDoc,
+                5 // Amount to fetch each time
+            );
+
+            if (results.length > 0) {
+                setOrganizationsData(prev => {
+                    // Remove duplicates
+                    const newOpportunities = results.filter(
+                        newOpp => !prev.some(existingOpp => existingOpp.id === newOpp.id)
+                    );
+                    return [...prev, ...newOpportunities];
+                });
+                setlastDoc(lastVisible);
+            }
+
+            setlastDoc(lastVisible);
+            setHasMore(results.length === 5 && lastVisible !== null);
+        } catch (error) {
+            console.error("Error fetching more opportunities:", error);
+        } finally {
+            // setLoading(false);
+            console.log("fetching more opportunities ...", organizationsData)
+        }
+    };
+
+
     const handleShowProfile = (userData) => {
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        const scrollY = window.scrollY || document.documentElement.scrollTop;set
         const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2);
 
         setTargetUserData(userData);
@@ -120,7 +181,10 @@ export default function Organizations(){
                         </div>
                         : (organizationsData && organizationsData.length > 0) ?
                         organizationsData.map((organization, index)=>(
-                            <OrganizationProfile key={index} organizationData={organization} handleShowProfile={handleShowProfile} location={"organizations_page"}/>))
+                            <div ref={index === organizationsData.length - 1 ? lastOpportunityElementRef : null} key={index}>
+                                <OrganizationProfile organizationData={organization} handleShowProfile={handleShowProfile} location={"organizations_page"}/>
+                            </div>
+                            ))
                         :
                         <div style={{margin: "0 auto", transform: "translateY(18%)"}}>
                             <EmptyField/>
