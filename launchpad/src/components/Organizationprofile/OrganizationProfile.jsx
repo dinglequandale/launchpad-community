@@ -11,7 +11,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { displayFieldsOfInterest, displayShortenedName } from "../../services/userProfileServices";
 
-export default function OrganizationProfile({organizationData, location, handleShowProfile}){
+export default function OrganizationProfile({organizationData, location, handleShowProfile, handleReferalClick}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
     const [isDisabled, setIsDisabled] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -32,6 +32,10 @@ export default function OrganizationProfile({organizationData, location, handleS
         organizationLogoPreview: organizationData.organizationLogoPreview ?? "/assets/awty-logo.jpg",
         organizationCreatedBy: organizationData.createdBy,
         organizationHostName: organizationData.createdByUserName,
+        organizationLearnMoreMethod: organizationData.learnMore.split(": ")[0],
+        organizationApplyMethod: organizationData.apply.split(": ")[0],
+        organizationApply: organizationData.apply.split(": ")[1] ?? null,
+        organizationLearnMore: organizationData.learnMore.split(": ")[1] ?? null,
     }
 
     const getUserData = async (userId) => {
@@ -86,12 +90,12 @@ export default function OrganizationProfile({organizationData, location, handleS
 
     const handleConnect = (e) => {
         e.preventDefault();
-        // TODO: input connect logic here
+        handleReferalClick("apply", organizationProfileData, userData);
     }
 
     const handleLearnMore = (e) => {
         e.preventDefault();
-        // input learn more logic here
+        handleReferalClick("learnMore", organizationProfileData, userData);
     }
 
     const handleReadMoreClick = (e) => {

@@ -43,7 +43,14 @@ export default function Organizations(){
         subjectMatter: 'Any Subject Matter'
     });
 
-    const handleConnectClick = () => {
+    const handleConnectClick = (userData = null) => {
+        if(userData){
+            setConnectTargetUserId(userData.userId);
+            setConnectTargetUserName(userData.userName);
+            setShowPfpCard(false);
+            setConnectModalVisibility(true);
+            return;
+        }
         setConnectTargetUserId(targetUserData.userId);
         setConnectTargetUserName(targetUserData.userName);
         setShowPfpCard(false);
@@ -120,6 +127,42 @@ export default function Organizations(){
         }
     };
 
+    const handleEmailClick = (email) => {
+        console.log(`Email clicked: ${email}`)
+    }
+
+    const handleReferalClick = async (referalType, organizationData, userData) => {
+        setTargetUserData(userData);
+ 
+        const referalValue = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}`];
+        const methodType = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}Method`];
+        
+        switch(methodType){
+            case "Messages":
+                handleConnectClick(userData);
+                return;
+            case "Email":
+                handleEmailClick(referalValue);
+                return;
+            case "Website":
+                window.open(referalValue, '_blank', 'noopener,noreferrer');
+                return;
+        }
+    }
+    
+    // const handleOnJoin = (organizationData, userData) => {
+    //     setTargetUserData(userData);
+    //     switch(organizationData.apply){
+    //         case "Messages":
+    //             handleConnectClick();
+    //         case "Email":
+    //             handleEmailClick();
+    //         default:
+    //             window.open(organizationData.apply, '_blank', 'noopener,noreferrer');
+
+    //     }
+    // }
+
 
     const handleShowProfile = (userData) => {
         const scrollY = window.scrollY || document.documentElement.scrollTop;
@@ -181,7 +224,7 @@ export default function Organizations(){
                         : (organizationsData && organizationsData.length > 0) ?
                         organizationsData.map((organization, index)=>(
                             <div ref={index === organizationsData.length - 1 ? lastOpportunityElementRef : null} key={index}>
-                                <OrganizationProfile organizationData={organization} handleShowProfile={handleShowProfile} location={"organizations_page"}/>
+                                <OrganizationProfile handleReferalClick={handleReferalClick} organizationData={organization} handleShowProfile={handleShowProfile} location={"organizations_page"}/>
                             </div>
                             ))
                         :
