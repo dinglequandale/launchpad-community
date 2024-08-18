@@ -152,7 +152,7 @@ export default function OrganizationProfile({organizationData, location, handleS
 
 function RelevanceBanner({relevanceType, organizationType}){
     return(
-        <div style={{display: organizationType === "Community Service" ? "none" : "", borderRadius: "20px", position: "absolute", top: "-18px", left: "10px", width: "fitContent", padding: "4px 8px", background: "rgb(47,162,52)",
+        <div style={{display: organizationType === "Community Service" ? "none" : "", borderRadius: "20px", position: "absolute", top: "-16px", left: "10px", width: "fitContent", padding: "2px 8px", background: "rgb(47,162,52)",
             background: "linear-gradient(90deg, rgba(47,162,52,1) 48%, rgba(18,123,22,1) 100%)", zIndex: "1"}}>
             <span style={{color: "white", fontWeight: "600"}}>{["Shadowing", "Job", "Internship"].includes(organizationType) ? "Target fields:" : "Tags:"} {relevanceType} </span>
         </div>

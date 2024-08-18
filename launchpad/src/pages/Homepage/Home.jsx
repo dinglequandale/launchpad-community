@@ -108,8 +108,8 @@ function InviteContacts({userName, userType}){
         <>
         {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} />}
         <div style={
-            {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "#bae7ec",
-         height: "fitContent", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)", border: "solid 1.4px var(--secondary)"}
+            {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "rgba(33, 255, 169, .2)",
+         height: "fitContent", borderRadius: "4px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)", border: "solid 1.4px rgba(33, 255, 169, .6)"}
          }>
             <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>{userType === "Professional" ? "Greetings" : "Hey"}, {userName}!</span> <br /> Know any <span style={{textDecoration: "underline", color: "var(--secondary)"}}>college students </span>or <span style={{textDecoration: "underline", color: "var(--secondary)"}}>working professionals</span> not on the app? Invite them below!</span>
             <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
@@ -142,14 +142,14 @@ function TutorialDisplay({tutorialVideoLink, tutorialPresentationLink, title, hi
                     height='100%'
                     controls={true}/>
             </div>
-            <span style={{display: "flex", justifyContent: "center", paddingTop: "5px"}}> To access presentation, click &nbsp;<a href={tutorialPresentationLink} style={{textDecoration: "underline"}}>here. </a> </span>
+            <span style={{display: "flex", justifyContent: "center", paddingTop: "5px"}}> To access presentation, click&nbsp;<a href={tutorialPresentationLink} style={{textDecoration: "underline"}}>here. </a> </span>
         </div>
     )
 }
 
 function ImportanceBanner(){
     return(
-        <div style={{borderRadius: "20px", position: "absolute", top: "-15px", left: "10px", width: "fitContent", padding: "4px 8px", background: "rgb(47,162,52)",
+        <div style={{borderRadius: "20px", position: "absolute", top: "-15px", left: "10px", width: "fitContent", padding: "2px 8px", background: "rgb(47,162,52)",
             background: "linear-gradient(90deg, rgba(47,162,52,1) 48%, rgba(18,123,22,1) 100%)", zIndex: "1"}}>
             <span style={{color: "white", fontWeight: "600"}}>Highly Recommended!</span>
         </div>

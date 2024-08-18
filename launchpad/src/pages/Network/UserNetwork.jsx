@@ -26,6 +26,9 @@ export default function UserNetwork() {
   const { chatClient, isConnected } = useOutletContext();
 
   const pageName = "Network";
+
+
+
   const [profileModalVisibility, setProfileModalVisibility] = useState(false);
   const [connectModalVisibility, setConnectModalVisibility] = useState(false);
   const [connectTargetUserId, setConnectTargetUserId] = useState("");
@@ -33,11 +36,12 @@ export default function UserNetwork() {
   const [highSchoolers, setHighSchoolers] = useState([]);
   const [collegeStudents, setCollegeStudents] = useState([]);
   const [professionals, setProfessionals] = useState([]);
+
+  const loadLimit = 6;
   const [lastDocs, setLastDocs] = useState({ highSchool: null, college: null, professional: null });
   const [loading, setLoading] = useState({ highSchool: false, college: false, professional: false });
   const [overallLoading, setOverallLoading] = useState(false);
 
-  const [userSearchText, setUserSearchText] = useState("");
   const [allVisibleUserData, setAllVisibleUserData] = useState(null);
 
   const [profileTargetData, setProfileTargetData] = useState(null);
@@ -62,6 +66,7 @@ export default function UserNetwork() {
     areasOfInterestOrExpertise: `My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`,
     schoolAttending: 'Any High School',
   });
+  const [filterChanged, setFilterChanged] = useState(false);
 
   const filterContent = {
     userType: ["Any User", "High Schoolers", "College Students", "Professionals"],
@@ -73,7 +78,7 @@ export default function UserNetwork() {
   useEffect(()=>{
     setOverallLoading(true);
     fetchAllUserTypes();
-  },[filters])
+  },[filters]);
 
   useEffect(() => {
     setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals])
@@ -96,7 +101,8 @@ export default function UserNetwork() {
                 filters, 
                 currentUser.uid, 
                 category,
-                isLoadMore ? lastDocs[category] : null
+                isLoadMore ? lastDocs[category] : null,
+                loadLimit,
             );
 
             setLastDocs(prev => ({ ...prev, [category]: lastVisible }));
@@ -117,16 +123,19 @@ export default function UserNetwork() {
         } finally {
             setLoading(prev => ({ ...prev, [category]: false }));
             setOverallLoading(false);
+            setFilterChanged(false);
         }
     };
 
     const loadMore = (category) => {
         if (!loading[category] && lastDocs[category]) {
-            fetchUserType(category, true);
+          console.log("fetching more...");
+          fetchUserType(category, true);
         }
     };
 
   const handleFilterChange = (filterKey, value) => {
+    setFilterChanged(true);
     setFilters(prev => ({...prev, [filterKey]: value}));
   };
 
@@ -169,7 +178,7 @@ export default function UserNetwork() {
   };
     
   return (
-    <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick}}>
+    <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick, loadLimit, filterChanged}}>
       <>
         {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={connectTargerUserName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
         {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={profileTargetData}/>}
@@ -224,12 +233,19 @@ export default function UserNetwork() {
 }
 
 function UserCarousel({userNetworkData, loading, onEndReached}){
-  const { handleOnProfileClick,handleConnectClick } = useContext(NetworkContext);
+  const { handleOnProfileClick,handleConnectClick,loadLimit, filterChanged } = useContext(NetworkContext);
   const itemsPerPage = 3;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState('');
   const carouselRef = useRef(null);
 
+  useEffect(()=>{
+    console.log(filterChanged)
+    if(filterChanged){
+      console.log("setting current index to zero...")
+      setCurrentIndex(0);
+    }
+  },[filterChanged])
 
   useEffect(() => {
     if (carouselRef.current) {
@@ -237,8 +253,8 @@ function UserCarousel({userNetworkData, loading, onEndReached}){
       const offset = currentIndex * (itemWidth);
       carouselRef.current.style.transform = `translateX(-${offset}px)`;
     }
-
-    if(currentIndex % 9 === 6) {
+    console.log(currentIndex)
+    if((currentIndex % loadLimit) === (loadLimit - 3)) {
       onEndReached();
     }
   }, [currentIndex, itemsPerPage]);
