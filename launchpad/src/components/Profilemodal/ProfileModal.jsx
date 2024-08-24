@@ -13,10 +13,11 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
 
     const userType = userData.userType;
     const userName = userData.userName;
-    const resumePublicity = "Public";
     const [opportunityData, setOpportunityData] = useState(null);
     // const [loading, setLoading] = useState(false);
     const [opportunityLoading, setOpportunityLoading] = useState(false);
+    
+    const isProfessional = JSON.parse(localStorage.getItem("basicUserInfo")).userType === "Professional";
 
     useEffect(()=>{
 
@@ -123,10 +124,10 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 <span>{userData.userAboutMe}</span>
                             </div>
                         </div>}
-                        {(userData.userResumePreview && resumePublicity === "Public") && <div name="userResume" style={{marginTop: "20px"}}>
+                        {(userData.userResumePreview && (userData.userResumePreview.split(" ")[0]) !== "private" || isProfessional) && <div name="userResume" style={{marginTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s Resume</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
-                            <iframe src={userData.userResumePreview} frameborder="0" style={{width: "100%", height: "500px"}}></iframe></div>}
+                            <iframe src={userData.userResumePreview.split(" ")[userData.userResumePreview.split(" ").length - 1]} frameborder="0" style={{width: "100%", height: "500px"}}></iframe></div>}
                         {userData.networkingLevel && userData.networkingLevel.length > 0 && <div>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1", paddingTop: "20px"}}>{userName.split(" ")[0]}'s Commitment</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
