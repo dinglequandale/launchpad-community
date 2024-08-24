@@ -284,7 +284,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
     const availabilityOptionsConfig = [
       { 
           id: "casualConnection",
-          text: "Occasional messages and casual networking regarding your career field",
+          text: "Answer occasional messages and questions regarding your career field",
           value: "Casual Connection",
       },
       { 
@@ -294,8 +294,8 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
       },
       { 
           id: "informationalInterview",
-          text: "Interview with the student to discuss your career path and field",
-          value: "Informational Interview",
+          text: "Discuss your career path with high schoolers or undergrads over a 15-minute interview",
+          value: "Short Interview",
       },
       { 
           id: "workplaceOpportunities",
@@ -347,7 +347,7 @@ const FinalTouches = ({ selectedOptions, handleChange }) => {
   return (
     <div className='onboardingQuestions'>
       <div style={{position: "relative"}}>
-      <label className='onboardingQuestion' style={{textAlign: "center"}}>Optionally, writing a little blurb about yourself would help prime students on what it is you do.</label>
+      <label className='onboardingQuestion' style={{textAlign: "center"}}>Optionally, feel free to write a little blurb about yourself to help students and other professionals understand what you do.</label>
       <div style={{position: "absolute", width: "100%", bottom: "-13px", transform: "translateX(44%)"}}>
             <OptionalLabel />
       </div>
@@ -355,7 +355,7 @@ const FinalTouches = ({ selectedOptions, handleChange }) => {
       <div style={{margin: "0 auto", marginTop: "10px"}}>
         <textarea 
         style={{width: "460px", height: "160px"}} 
-        placeholder='Introduce yourself to prospective students!' 
+        placeholder='Introduce yourself to prospective students and other professionals' 
         onChange={(e) => handleChange("userAboutMe",e.target.value)} 
         value={selectedOptions["userAboutMe"]}></textarea>
       </div>

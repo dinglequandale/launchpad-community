@@ -1,7 +1,8 @@
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db, storage } from "../firebase/firebaseConfig";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { updateTypesense } from '../typesense/typesenseClient';
+import { pushInitialProfileCompletion } from "./onboardingServices";
 
 export const lowerAndCapitalize = (title) => {
     const lowerTitle = title.toLowerCase();
@@ -170,10 +171,12 @@ export const getBasicUserDescription = (userData) => {
 
 export const editUserData = async (userData, currentUser) => {
     try{
-      const userRef = doc(db, "users", currentUser.uid);
-  
-      await updateDoc(userRef, userData);
-      await updateTypesense('users', currentUser.uid, userData);
+        const userRef = doc(db, "users", currentUser.uid);
+    
+        await updateDoc(userRef, userData);
+        pushInitialProfileCompletion(userData);
+
+        await updateTypesense('users', currentUser.uid, userData);
     }catch(error){console.log(error)};
 }
 
@@ -203,23 +206,68 @@ export const loadUserData = async (currentUser, setLoading, setUserData) => {
     };
 }
 
-const loadUserResumePreview = async (userData, userResumePreview, currentUser) => {
-    const newData = {...userData, userResumePreview};
+const loadUserPfpPreview = async (userData, userPfpPreview, currentUser, privacy) => {
+    const newData = {...userData, userPfpPreview: `${privacy === "private" ? "private " : ""}` + userPfpPreview};
     await editUserData(newData, currentUser);
 }
 
-export const handleUserResumeUpdate = async (userData, resumeFile, currentUser) => {
+const loadUserResumePreview = async (userData, userResumePreview, currentUser) => {
+    const newData = {...userData, userResumePreview: userResumePreview};
+    await editUserData(newData, currentUser);
+}
+
+export const handleUserResumeUpdate = async (userData, resumeFile, currentUser, privacy = "") => {
     const resumeRef = ref(storage, `resumes/resume_${currentUser.uid}.pdf`);
 
     try {
         const snapshot = await uploadBytes(resumeRef, resumeFile);
         const downloadURL = await getDownloadURL(snapshot.ref);
 
-        await loadUserResumePreview(userData, downloadURL, currentUser);
+        await loadUserResumePreview(userData, downloadURL, currentUser, privacy);
 
         return downloadURL;
     } catch (error) {
       console.error(`Error uploading ${folderName}:`, error);
       return null;
     }
+}
+
+export const handleUserProfileUpdate = async (userData, pfpFile, currentUser) => {
+    const pfpRef = ref(storage, `profile_pictures/pfp_${currentUser.uid}`);
+
+    try {
+        const snapshot = await uploadBytes(pfpRef, pfpFile);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        await loadUserPfpPreview(userData, downloadURL, currentUser);
+        updateLocalPfpPreview(downloadURL);
+        return downloadURL;
+    } catch (error) {
+      console.error(`Error uploading ${folderName}:`, error);
+      return null;
+    }
+}
+
+export const deletePfp = async (userData, currentUser) => {
+    const pfpRef = ref(storage, `profile_pictures/pfp_${currentUser.uid}`);
+
+    // Delete the file
+    deleteObject(pfpRef).then(() => {
+    }).catch((error) => {
+        console.log("Error!")
+    });
+    try{
+        await loadUserPfpPreview(userData, "", currentUser);
+        updateLocalPfpPreview(null);
+    }
+    catch{
+        console.log("Error!");
+    }
+}
+
+const updateLocalPfpPreview = (newPfp) => {
+    const oldBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+    const newBasicInfo = {...oldBasicInfo, userPfpPreview: newPfp};
+    
+    localStorage.setItem("basicUserInfo", JSON.stringify(newBasicInfo));
 }

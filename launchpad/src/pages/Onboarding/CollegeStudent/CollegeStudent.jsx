@@ -159,8 +159,8 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
         selectedOptions={collegeStudentData}
         handleChange={handleChange} 
         collegeStudentData={collegeStudentData}/>;
-      case 3:
-        return <ConnectionLevel selectedOptions={collegeStudentData} setSelectedOptions={setCollegeStudentData} />;
+      // case 3:
+      //   return <ConnectionLevel selectedOptions={collegeStudentData} setSelectedOptions={setCollegeStudentData} />;
       default:
         return null;
     }

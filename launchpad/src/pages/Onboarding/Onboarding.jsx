@@ -22,7 +22,7 @@ export default function Onboarding() {
             case "High Schooler":
                 return 3;
             case "College Student":
-                return 3;
+                return 2;
             case "Professional":
                 return 5;
             default:
@@ -108,6 +108,7 @@ function UserType({setSelectedOption, selectedOption}) {
     
     return(
         <div style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+            <span style={{fontSize: "30px", fontWeight: "bolder", marginBottom: "5px", color: "var(--secondary)"}}>Create your Account</span>
             <span style={{marginBottom: "15px", fontSize: "large", color: "secondary"}}>Which best describes you?</span>
             <div className="userType-options-container">
             {userTypes.map((type) => (

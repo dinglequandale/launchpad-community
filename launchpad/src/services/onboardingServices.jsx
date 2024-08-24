@@ -19,10 +19,12 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
-        await updateTypesense('users', currentUser.uid, dataToSave);
+        
         // console.log("High Schooler info saved -- written with ID: ", docRef.id);
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
+
+        await updateTypesense('users', currentUser.uid, dataToSave);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -45,10 +47,11 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
-        await updateTypesense('users', currentUser.uid, dataToSave);
         // console.log("College Student info saved -- written with ID: ", docRef.id);
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
+
+        await updateTypesense('users', currentUser.uid, dataToSave);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -71,11 +74,12 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         };
 
         const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
-        await updateTypesense('users', currentUser.uid, dataToSave);
         // console.log("Professional info saved -- written with ID: ", docRef.id);
 
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
+
+        await updateTypesense('users', currentUser.uid, dataToSave);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -94,7 +98,7 @@ const uploadFileToStorage = async (file, fileName, folderName) => {
     if (!file) return null;
   
     const fileExtension = file.name.split('.').pop();
-    const storageRef = ref(storage, `${folderName}/${fileName}.${fileExtension}`);
+    const storageRef = ref(storage, `${folderName}/${fileName}`);
   
     try {
       const snapshot = await uploadBytes(storageRef, file);
@@ -133,7 +137,7 @@ export const packageBasicUserInfoToLS = (userData) => {
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));
 }
 
-const pushInitialProfileCompletion = (userData) => {
+export const pushInitialProfileCompletion = (userData) => {
     const emptyQuestions = Object.values(userData).filter((answer)=>(answer === "" || answer === null || (Array.isArray(answer) && answer.length===0)));
     const exactPercentage = ((Object.keys(userData).length - emptyQuestions.length)/Object.keys(userData).length)*100;
     const roundedPercentage = Math.ceil(exactPercentage / 10) * 10;

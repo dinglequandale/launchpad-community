@@ -4,12 +4,131 @@ import SideNav from "../../components/Sidenav/SideNav";
 import ReactPlayer from "react-player";
 import ProfileStrength from "../../components/Profilestrength/ProfileStrength";
 import { FaArrowCircleDown } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { createRef, useEffect, useRef, useState } from "react";
 import InviteContactsModal from "../../components/InviteContactsmodal/InviteContactsModal";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function Home(){
 
     const [userBasicInfo, setUserBasicInfo] = useState(null);
+
+    
+    const resourceData = {
+        "How To Network": [
+          {
+            title: "The Basics of (Digital) Networking for Highschoolers",
+            link: "https://docs.google.com/document/d/1G57KLYBhdCnElJDgJ_zYKv1Eg-3_MYZ8ULVhyW0B3j0/edit",
+            description: "Launchpad gives you access to undergraduates and industry professionals who are experienced in your fields of interest - but it's up to YOU to make the most of these connections. Read this guide to learn how to approach busy professionals and take full advantage of their expertise. By following these networking strategies, you will open doors to the learning and working opportunities of your lifetime.",
+            recommendedBanner: "yes (highly recommended)",
+            userType: "High Schoolers"
+          }
+        ],
+        "Find Your Ideal Career": [
+          {
+            title: "Career Explorer Free Career Survey",
+            link: "https://www.careerexplorer.com/assessments/",
+            description: "Find your dream career based on your personality, strengths, and experiences! The Career Explorer Career Survey is widely regarded as the #1 career survey in the world for any students seeking to learn more about careers they'd be a great fit for. It is perfect for students who want to learn more about jobs within a certain area of interest (i.e business) or just understand careers better in general. Though long, it is very highly recommended to complete this survey in order to find careers that are a great fit for you (career explorer generates 30 career options based on responses).",
+            recommendedBanner: "yes",
+            time: "20 minutes",
+            userType: "High Schoolers and Undergads"
+          },
+          {
+            title: "VIA Free Character Strength Survey",
+            link: "https://www.viacharacter.org/surveys/takesurvey",
+            description: "Find your top 3 strengths with the VIA survey! The VIA free personality test is highly recommended by experts for anyone seeking to learn more about their character. It's an excellent, thorough tool for gaining self-awareness, helping highschool students craft compelling college essays, and considering which colleges might be the best fit. For students and professionals alike, it provides valuable insights into which career environments might make you happiest.",
+            recommendedBanner: "yes",
+            time: "10 minutes",
+            userType: "High Schoolers and Undergads"
+          },
+          {
+            title: "Myers Briggs Free Personality Test",
+            link: "https://www.16personalities.com/free-personality-test",
+            description: "Possibly the most famous and respected personality test, a test that has helped millions understand themselves better and thus find their dream career. The Myers Briggs personality test places you into one of the 16 personality types and then gives you a multiple page report with recommendations about career paths, what workplace is best for you, famous people with your personality type, etc… Overall, it is a very useful tool to determine what career matches your personality.",
+            recommendedBanner: "no",
+            time: "10 minutes",
+            userType: "High Schoolers and Undergads"
+          },
+          {
+            title: "Indigo Research Career Pathway Guide",
+            link: "https://www.indigoresearch.org/blog/how-to-choose-profession",
+            description: "Not sure how to start your career path as a highschooler? You're not alone! The Indigo Research Blog offers an insightful guide that gives you, as a highschooler, actionable steps to start your real-world career experience. This blog provides practical tips on how to identify your strengths, explore your interests, and seek mentorship and internships. Make sure to take action on the lessons by reaching out to undergrads and professionals on Launchpad after!",
+            recommendedBanner: "yes",
+            userType: "High Schoolers"
+          },
+          {
+            title: "Education Planner Checklist and Resources",
+            link: "http://www.educationplanner.org/students/career-planning/checklists",
+            description: "Learn about the 6 core tasks you should have done by highschool. Make sure you are on task to achieve them! Education Planner has links to other useful guides, it is a great starting point to understand what to do during your highschool years. Take action on what you learn with Launchpad! Find volunteer opportunities and reach out to undergrads & professionals to check off your highschool list.",
+            recommendedBanner: "no",
+            userType: "High Schoolers"
+          },
+          {
+            title: "My Next Move Career Outlook",
+            link: "https://www.mynextmove.org/?fbclid=IwAR2OGpd-YNBFlZu_ZUOW8RQY1kFf1Exanso_MPFmT2vF6aRaluimDiMwde4",
+            description: "Discover your ideal career path with My Next Move! Think of it as an interactive version of regular career outlook resources like Occupational Outlook Handbook. My Next Move is a top-rated resource designed to help students identify careers that align with their interests, strengths, and goals - you'll understand the average salary, job growth, and other key metrics about your dream careers. Whether you're passionate about a specific field, like finance or healthcare, or just want to explore your options, My Next Move offers a personalized experience that guides you toward the careers that are the best fit for you.",
+            recommendedBanner: "no",
+            userType: "High Schoolers and Undergads"
+          },
+          {
+            title: "Occupational Outlook Handbook",
+            link: "https://www.bls.gov/ooh/home.htm",
+            description: "The Occupational Outlook Handbook is an excellent tool for exploring different careers. It provides insights into what a typical day looks like in a given profession, the required education, and average salaries in the U.S. Additionally, the Similar Careers tab helps you discover related fields, broadening your understanding of career possibilities. The more you explore, the better informed you'll be about your options.",
+            recommendedBanner: "no",
+            userType: "High Schoolers"
+          }
+        ],
+        "Find Your Dream University": [
+          {
+            title: "College Board College Search and Quiz",
+            link: "https://bigfuture.collegeboard.org/college-search/filters",
+            description: "The college board provides a great university search tool. Click 'match me' to take their quick quiz and find your best-fit universities, based on your interests. You can also search and learn more about universities you already have in mind.",
+            recommendedBanner: "no",
+            userType: "High Schoolers"
+          },
+          {
+            title: "Cialfo College Search",
+            link: "",
+            description: "If your school provides you with Cialfo, take full advantage of it. Cialfo provides an excellent college search tool that allows you to search for colleges based on your interests and learn everything about them.",
+            recommendedBanner: "no",
+            userType: "High Schoolers",
+          }
+        ],
+        "Resume-Building": [
+          {
+            title: "Yale Resume-Phrasing Guide",
+            link: "https://ocs.yale.edu/resources/writing-impactful-resume-bullets/",
+            description: "According to Yale University Admissions, the key to writing a resume is not quantity, but quality. Only write about your experiences that truly made an impact and/or showcase your interests. Filler awards and positions only hinder you. A good student resume is one page long. Here's how to write a student resume that impresses both college admissions and internship and job employers.",
+            recommendedBanner: "yes",
+            userType: "High Schoolers and Undergrads"
+          }
+        ],
+        "SAT/ACT Hacks": [
+          {
+            title: "College Board Bluebook Practice Tests",
+            link: "https://bluebook.app.collegeboard.org/",
+            description: "Download bluebook to take 6 college board verified digital SAT practice Tests. This is the nearest thing to the actual SAT exam, and is the most useful tool to gauge where you are and how you are improving",
+            recommendedBanner: "no",
+            userType: "High Schoolers"
+          },
+          {
+            title: "SAT Panda FREE Practice Test and Study Guides",
+            link: "https://www.satpanda.com/sat/",
+            description: "SAT Panda is widely regarded as the #1 free resource for SAT Prep. It gives you access to 20 free practice tests and thousands of free practice questions in specific subjects you need to work on. Stand-alone, SAT Panda is a great SAT prep tool alone, but it works best as a complementary resource to tutors or other study programs.",
+            recommendedBanner: "no",
+            userType: "High Schoolers"
+          },
+          {
+            title: "ACT Test Free Practice Tests & Questions",
+            link: "https://www.act.org/content/act/en/products-and-services/the-act/test-preparation/free-act-test-prep.html",
+            description: "This is the nearest thing to the actual ACT exam, and is a useful tool to gauge where you are and how you are improving. You can take tests specific to your weaker sections, as well as answer hundreds of free practice questions. Remember, like for the SAT, It is recommended to find some sort of a tutor or self-study ACT prep plan to prepare for this important test.",
+            recommendedBanner: "no",
+            userType: "High Schoolers"
+          }
+        ],
+      };
+      
 
     useEffect(()=>{
         const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
@@ -18,27 +137,19 @@ export default function Home(){
 
     console.log(userBasicInfo)
 
-    const resourceSections = ["How-To Network", "Discover Your Career", "SAT/ACT Study Tips", "Launchpad Help"];
-    const tutorialData = [
-        {
-            tutorialName: "Overview: Why Network?",
-            tutorialVideoLink: "https://www.youtube.com/watch?v=uhnxWBqVvbY",
-            tutorialPresentationLink: "https://docs.google.com/document/d/1hckUNRFHGQvIKBQiz2FqFK2bFQrPpor5GzZPtfJ6Mc8/edit#heading=h.xk8nbj32eu9r",
-            highlyRecommended: false
-        },
-        {
-            tutorialName: "How to Network",
-            tutorialVideoLink: "https://www.youtube.com/watch?v=IIoVUIwsJRM",
-            tutorialPresentationLink: "https://docs.google.com/document/d/1hckUNRFHGQvIKBQiz2FqFK2bFQrPpor5GzZPtfJ6Mc8/edit#heading=h.xk8nbj32eu9r",
-            highlyRecommended: true
-        },
-        {
-            tutorialName: "Finding and Applying to Internships",
-            tutorialVideoLink: "https://www.youtube.com/watch?v=xFrqZjIDE44",
-            tutorialPresentationLink: "https://docs.google.com/document/d/1hckUNRFHGQvIKBQiz2FqFK2bFQrPpor5GzZPtfJ6Mc8/edit#heading=h.xk8nbj32eu9r",
-            highlyRecommended: false
-        }
-    ]
+    const refSections = useRef({});
+
+    const resourceSections = { "How To Network": "howToNetwork", "Find Your Ideal Career": "discoverYourCareer", "Find Your Dream University":"findDreamUniversity", "Resume-Building": "buildResume", "SAT/ACT Hacks":"satTips"}
+    
+    // const howToNetwork = useRef();
+    // const discoverYourCareer = useRef();
+    // const findDreamUniversity = useRef();
+    // const buildResume = useRef();
+    // const satTips = useRef();
+    const handleSectionRef = (sectionTitle, ref) => {
+      refSections.current[sectionTitle] = ref;
+      console.log("Section_Title:", refSections)
+    };
 
     return(
         <>
@@ -79,12 +190,33 @@ export default function Home(){
                     <div style={
                         {display:"flex", alignItems: "center", justifyContent: "center", gap: "40px",
                         borderBottomStyle: "solid", borderColor: "#C0C0C0", paddingBottom: "20px"}}>
-                        {resourceSections.map((resourceType, index)=>(
-                            <ResourceItem resourceType={resourceType} key={index}/>
+                        {Object.keys(resourceSections).map((sectionName, index)=>(
+                            <ResourceItem 
+                            resourceType={sectionName}
+                            resourceRef={refSections.current[sectionName]}
+                            key={index}
+                            />
                         ))}
                     </div>
-                    <h3>How-To Network <span style={{fontWeight: "400", fontSize: "smaller"}}>(overview with frameworks and scripts)</span></h3>
-                    <span style={{display: "flex", justifyContent: "center", fontSize: "25px", fontWeight: "200"}}>Articles, Presentations, and Videos</span>
+                    <div>
+                        {Object.entries(resourceData).map(([sectionTitle, resources]) => (
+                        <ResourceSection 
+                        sectionRef={resourceSections[sectionTitle]}
+                        key={sectionTitle}
+                        title={sectionTitle}
+                        resources={resources}
+                        onSectionRef={handleSectionRef}/>
+                        ))}
+                    </div>
+                    <hr/>
+            
+                    <div style={{marginTop: "25px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+                        <h2 style={{fontSize: "30px"}}>Launchpad Support</h2>
+                        <div style={{width: "800px", background: "white", boxShadow: "var(--shadowColor)", padding: "19px", borderRadius: "5px", textAlign: "center", fontSize: "larger"}}>
+                            <span>If you experience any techincal bugs, errors, or issues of any sort, please contact <span className="highlight">launchpadhelpline@gmail.com</span>. Additionally, if you have any questions about networking or certain opportunities, feel free to contact us there as well!</span>
+                        </div>
+                    </div>
+                    {/* 
                     <div style={{display: "flex", gap: "30px", justifyContent: "center", paddingTop: "20px"}}>
                         {tutorialData.map((tutorial, index)=>(
                             <TutorialDisplay 
@@ -94,7 +226,7 @@ export default function Home(){
                                 title={tutorial.tutorialName}
                                 highlyRecommended={tutorial.highlyRecommended}/>
                         ))}
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </>
@@ -103,49 +235,145 @@ export default function Home(){
 
 function InviteContacts({userName, userType}){
     const [inviteContactsModalVisibility,setInviteContactsModalVisibility] = useState(false);
-
+    
     return(
         <>
         {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} />}
         <div style={
-            {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "rgba(33, 255, 169, .2)",
-         height: "fitContent", borderRadius: "4px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)", border: "solid 1.4px rgba(33, 255, 169, .6)"}
+            {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "rgba(14, 195, 111, .3)",
+         height: "fitContent", borderRadius: "4px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
          }>
-            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>{userType === "Professional" ? "Greetings" : "Hey"}, {userName}!</span> <br /> Know any <span style={{textDecoration: "underline", color: "var(--secondary)"}}>college students </span>or <span style={{textDecoration: "underline", color: "var(--secondary)"}}>working professionals</span> not on the app? Invite them below!</span>
+            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>{userType === "Professional" ? "Greetings" : "Hey"}, {userName}!</span> <br /> Know any <span style={{textDecoration: "underline", color: "var(--secondary)"}}>high school</span> or <span style={{textDecoration: "underline", color: "var(--secondary)"}}>college students</span> who would benefit from being on the app? Know other  <span style={{textDecoration: "underline", color: "var(--secondary)"}}>professionals</span> willing to share their expertise? <span style={{fontWeight: "650"}}>Invite friends and family below!</span></span>
             <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
-                <button className="btnUnfilled" onClick={()=>setInviteContactsModalVisibility(true)} style={{borderRadius: "10px", fontWeight: "550", fontSize: "20px", padding: "10px", width: "200px"}}>Invite Contacts</button>
+                <button onClick={()=>setInviteContactsModalVisibility(true)} style={{borderRadius: "10px", fontWeight: "550", fontSize: "20px", padding: "10px", width: "200px"}}>Invite Contacts</button>
             </div>
         </div>
         </>
     )
 }
 
-function ResourceItem({resourceType}){
-    return(
-        <button className="resourceItem">
-            <span style={{padding: "5px", fontSize: "larger"}}>{resourceType}</span>
-            <FaArrowCircleDown color="grey" size={20}/>
-        </button>
-    )
+function ResourceItem({resourceType, resourceRef}){
+
+  const handleResourceClick = () => {
+    resourceRef.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start', // Scroll to the top of the section
+      });
+  }
+  return(
+      <button className="resourceItem" onClick={handleResourceClick}>
+          <span style={{padding: "3.5px", fontSize: "larger"}}>{resourceType}</span>
+          <FaArrowCircleDown color="grey" size={20}/>
+      </button>
+  )
 }
 
-function TutorialDisplay({tutorialVideoLink, tutorialPresentationLink, title, highlyRecommended}){
-    return(
-        <div style={{position: "relative", padding: "10px", width: "30%",
-            backgroundColor: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)", borderRadius: "5px"}}>
-            {highlyRecommended && <ImportanceBanner/>}
-            <span style={{display: "flex", justifyContent: "center", fontWeight: "bolder"}}>{title}</span>
-            <div style={{paddingTop: "10px", height: "200px"}}>
-                <ReactPlayer
-                    url={tutorialVideoLink}
-                    width='100%'
-                    height='100%'
-                    controls={true}/>
-            </div>
-            <span style={{display: "flex", justifyContent: "center", paddingTop: "5px"}}> To access presentation, click&nbsp;<a href={tutorialPresentationLink} style={{textDecoration: "underline"}}>here. </a> </span>
-        </div>
-    )
-}
+// function TutorialDisplay({tutorialVideoLink, tutorialPresentationLink, title, highlyRecommended}){
+//     return(
+//         <div style={{position: "relative", padding: "10px", width: "30%",
+//             backgroundColor: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)", borderRadius: "5px"}}>
+//             {highlyRecommended && <ImportanceBanner/>}
+//             <span style={{display: "flex", justifyContent: "center", fontWeight: "bolder"}}>{title}</span>
+//             <div style={{paddingTop: "10px", height: "200px"}}>
+//                 <ReactPlayer
+//                     url={tutorialVideoLink}
+//                     width='100%'
+//                     height='100%'
+//                     controls={true}/>
+//             </div>
+//             <span style={{display: "flex", justifyContent: "center", paddingTop: "5px"}}> To access presentation, click&nbsp;<a href={tutorialPresentationLink} style={{textDecoration: "underline"}}>here. </a> </span>
+//         </div>
+//     )
+// }
+
+function ResourceCard({ title, link, description, recommendedBanner, time, userType }) {
+    return (
+      <div style={{
+        position: "relative",
+        padding: "20px",
+        width: "320px",
+        backgroundColor: "white",
+        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)",
+        borderRadius: "5px",
+        margin: "10px",
+        height: "320px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between"
+      }}>
+        {recommendedBanner === "yes (highly recommended)" && (
+            <ImportanceBanner/>
+        )}
+        <h3 style={{ margin: "0" }}>{title}</h3>
+        <p style={{ flex: 1, overflow: "auto" }}>{description}</p>
+        {time && <span>Time: {time}</span>}
+        <p>For: {userType}</p>
+        <a href={link} target="_blank" rel="noopener noreferrer" style={{
+          display: "block",
+          textAlign: "center",
+          background: "#007bff",
+          color: "white",
+          padding: "10px",
+          borderRadius: "5px",
+          textDecoration: "none"
+        }}>
+          Access Resource
+        </a>
+      </div>
+    );
+  }  
+
+function ResourceSection({ title, resources, onSectionRef }) {
+  
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    onSectionRef(title, sectionRef.current);
+  }, [title, onSectionRef]);
+
+  const settings = {
+    dots: true,
+    // infinite: true,
+    // speed: 1000,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      }
+    ]
+    };
+  
+    return (
+      <div style={{ margin: "20px 0", position: "relative" }}>
+        <div ref={sectionRef} style={{position: "absolute", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", width: "5px", top: "-80px", display: "hidden"}}></div>
+        <span style={{display: "flex", justifyContent: "center", fontSize: "25px", fontWeight: "200"}}>{title}</span>
+        {(resources.length > 3) ? <Slider {...settings}>
+          {resources.map((resource, index) => (
+            <ResourceCard key={index} {...resource} />
+          ))}
+        </Slider> :
+        <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+          {resources.map((resource, index) => (
+            <ResourceCard key={index} {...resource} />
+          ))}
+        </div>}
+      </div>
+    );
+  }
+  
+  
 
 function ImportanceBanner(){
     return(

@@ -13,7 +13,7 @@ const highSchoolQuestionsConfig = [
     id: "userName",
     text: "What's your full name?",
     type: "text",
-    placeholder: "E.g. Quandale Dingle",
+    placeholder: "E.g. Peffrey Jage",
     page: 1
   },
   {
