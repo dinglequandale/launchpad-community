@@ -39,7 +39,7 @@ export default function ProfileStrength({userData}){
                 <button style={{position: "absolute", bottom: "30px", padding: "10px", color: "white",
                  fontSize: "20px", width: "60%", fontWeight: "bolder", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}}
                 onClick={()=>{navigate("/MyProfile", { state: '/' })}}>
-                    Complete Profile
+                    {profileProgress === 1 ? "View Profile" : "Complete your profile"}
                 </button>
             </div>
         </>

@@ -19,7 +19,8 @@ import { handleDeleteOpportunity, loadOpportunities } from '../../services/oppor
 import Loading from '../LoadingAnimation/Loading';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
-import { displayColleges, displayFieldsOfInterest, getBasicUserDescription, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
+import { deletePfp, displayColleges, displayFieldsOfInterest, editUserData, getBasicUserDescription, handleUserProfileUpdate, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
+import { BiEdit, BiTrash } from 'react-icons/bi';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -103,7 +104,7 @@ export default function EditProfileCard() {
                 <AboutMeDisplay/>
                 <div className={`userResume ${userData.userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px", marginTop: "10px"}}>
                     <div style={{display: "flex", justifyContent: "space-between", position: "relative"}} id="Resume">
-                        <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px"}}>{userData.userName.split(" ")[0]}'s Resume ...</span>
+                        <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Resume ...</span>
                         <div style={{position: "absolute", right: "0", top: "17px"}}>
                             <PublicPrivateDropdown/>
                         </div>
@@ -139,52 +140,72 @@ function EditInformation({questionName, onEdit, isAnswered}){
     )
 }
 
-function PublicPrivateDropdown({userResumePublicity}){
+function PublicPrivateDropdown() {
     const dropdownRef = useRef();
-    const [selectedPublicity, setSelectedPublicity] = useState("Public");
+
+    const { userData,currentUser } = useContext(ProfileContext);
+
+    const [selectedPublicity, setSelectedPublicity] = useState( (userData.userResumePreview && userData.userResumePreview.split(" ").length > 1) ? "Professionals Only" : "Public");
     const [dropdownVisibility, setDropdownVisibility] = useState(false);
-    const options = [["Public",<TbWorld size={23}/>], ["Private", <IoLockClosedOutline size={20}/>]];
-
-    const handleClick = () => {
-        setDropdownVisibility(!dropdownVisibility);
+    
+    const options = [
+      { value: "Public", icon: <TbWorld size={23} /> },
+      { value: "Professionals Only", icon: <IoLockClosedOutline size={20} /> }
+    ];
+  
+    const toggleDropdown = () => setDropdownVisibility(!dropdownVisibility);
+    
+    const handleOnPubPrivDropdownSelect = async (privSelected) => {
+        setSelectedPublicity(privSelected);
+        setDropdownVisibility(false);
+        const newUserData = {...userData, userResumePreview: `${privSelected === "Professionals Only" ? "private " : ""}` + userData.userResumePreview.split(" ")[userData.userResumePreview.split(" ").length - 1]};
+        try{
+            await editUserData(newUserData, currentUser);
+        }catch{console.log("Dropdown Component Error!")}
     }
-    useEffect(()=>{
-        let onClickHandler = (e) => {
-            try{
-            if(!dropdownRef.current.contains(e.target)){
-                setDropdownVisibility(false);
-            }
-        }catch{}
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+          setDropdownVisibility(false);
         }
-
-        document.addEventListener("mousedown", onClickHandler)
-    },[])
-    return(
-        <div className="dropdownContainer" ref={dropdownRef}>
-            <div style={{display: "flex", alignItems: "center", cursor: "pointer", justifyContent: "space-between", gap:"5px"}} className="filterTop" onClick={handleClick}>
-                {selectedPublicity === "Public" ? <TbWorld size={23}/> : <IoLockClosedOutline size={20}/>}
-                <span style={{fontWeight: "550"}}>{selectedPublicity}</span>
-            </div>
-            <div className={dropdownVisibility ? "dropdown open" : "dropdown "}>
-                {options.map(([option,icon],index)=>(<div className='dropdownOption' style={{display: "flex", alignItems: "center", justifyContent: "space-between", gap: "5px", padding: "5px", cursor: "pointer"}} key={index} onClick={()=>{
-                            setSelectedPublicity(option);
-                            setDropdownVisibility(false);
-                            }}>
-                     <PrivacyComponent icon={icon} privacy={option}/>
-             </div>))}
-            </div>
+      };
+  
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+  
+    return (
+      <div className="dropdown-container" ref={dropdownRef}>
+        <div className="dropdown-header" onClick={toggleDropdown}>
+          {options.find(option => option.value === selectedPublicity).icon}
+          <span>{selectedPublicity}</span>
         </div>
-    )
-}
-
-function PrivacyComponent({icon, privacy}){
-    return(
-        <div style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "4px"}}> 
-            {icon} 
-            <span>{privacy}</span>
-        </div>
-    )
-}
+        {dropdownVisibility && (
+          <div className="dropdown-menu">
+            {options.map((option) => (
+              <PrivacyOption
+                key={option.value}
+                option={option}
+                isSelected={selectedPublicity === option.value}
+                onSelect={() => handleOnPubPrivDropdownSelect(option.value)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+  
+  function PrivacyOption({ option, isSelected, onSelect }) {
+    return (
+      <div className={`dropdown-option ${isSelected ? 'selected' : ''}`} onClick={onSelect}>
+        {option.icon}
+        <span>{option.value}</span>
+      </div>
+    );
+  }
+  
 
 function ResumeUpload(){
     const inputRef = useRef();
@@ -195,7 +216,11 @@ function ResumeUpload(){
         inputRef.current.click();
     }
 
-    const [pdfUrl, setPdfUrl] = useState(userData.userResumePreview);
+    const currentResumePfpUrl = userData.userResumePreview ? userData.userResumePreview.split(" ")[userData.userResumePreview.split(" ").length - 1] : null;
+    console.log("currentresume:", userData.userResumePreview)
+    const currentPrivacy = (userData.userResumePreview && userData.userResumePreview.split(" ")[0] === "private") ? "private" : "";
+
+    const [pdfUrl, setPdfUrl] = useState(currentResumePfpUrl);
     useEffect(() => {
         return () => {
           if (pdfUrl) {
@@ -207,7 +232,7 @@ function ResumeUpload(){
 
     async function onFileChange(event) {
         const file = event.target.files[0];
-        const userResumePreview = await handleUserResumeUpdate(userData, file, currentUser);
+        const userResumePreview = await handleUserResumeUpdate(userData, file, currentUser, currentPrivacy);
         setPdfUrl(userResumePreview);
         // setPdfUrl(URL.createObjectURL(file));
   }
@@ -234,11 +259,58 @@ function BasicInfoCard({descType}){
     // const [basicInfoData, setBasicInfoData] = useState({});
     const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(null);
 
-    const { userData } = useContext(ProfileContext);
+    const { userData,currentUser } = useContext(ProfileContext);
 
     const userType = userData.userType;
     
     const [basicInfoContent, setBasicInfoContent] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [pfpEditVisibility, setPfpEditVisibility] = useState(false);
+
+    const [pfpUrl, setPfpUrl] = useState(userData.userPfpPreview);
+    console.log("pfpUrl", userData.userPfpPreview)
+
+    const pfpInputRef = useRef(null);
+    const resumeInputRef = useRef(null);
+
+    const handleFileChange = async (event, fileType) => {
+        setIsUploading(true);
+        const file = event.target.files[0];
+        if (file) {
+          if (fileType === 'pfp' && !file.type.startsWith('image/')) {
+            // setPfpError('Please upload an image file.');
+            return;
+          }
+          if (fileType === 'resume' && file.type !== 'application/pdf') {
+            // setResumeError('Please upload a PDF file.');
+            return;
+          }
+    
+        //   setSelectedOptions(prevData => ({
+        //     ...prevData,
+        //     [fileType === 'pfp' ? 'userPfpPreview' : 'userResumePreview']: URL.createObjectURL(file),
+        //     [fileType === 'pfp' ? 'userPfp' : 'userResume']: file
+        //   }));
+        
+        const newUserPfp = await handleUserProfileUpdate(userData, file, currentUser);
+        setPfpUrl(newUserPfp);
+        setIsUploading(false);
+    
+          // if (fileType === 'pfp') setPfpError(null);
+          // else setResumeError(null);
+        }
+      }
+    
+    const triggerFileInput = (inputRef) => {
+    inputRef.current.click();
+    }
+    
+    const removeFile = async (fileType) => {
+        setPfpUrl(null);
+        // Create a reference to the file to delete
+        await deletePfp(userData, currentUser);
+
+    }
 
     useEffect(()=>{
         setBasicInfoContent({userPreface: getBasicUserDescription(userData),
@@ -253,10 +325,47 @@ function BasicInfoCard({descType}){
         {basicInfoModalVisibility && <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userData={userData} userType={userType}/>}
         {basicInfoContent && <>
         <div className='basicInfo'>
-            <div>
+            {/* <div>
                 {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
                 {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
                     {width: "80px", height: "80px"}}/>}
+            </div> */}
+            <div className="file-upload-container" 
+                onMouseEnter={() => setPfpEditVisibility(true)}
+                onMouseLeave={() => setPfpEditVisibility(false)}
+                style={{display: "flex", alignItems: "center"}}>
+            <div className="file-upload-preview" style={{display: "flex", justifyContent: "center", width: "100%"}}>
+                {pfpUrl ? (
+                <div className="preview-container">
+                    { isUploading ? <div className='btnCircle' style={{width: "60px", height: "60px", border: "2.5px solid var(--neutral)", boxShadow: "var(--shadowColor)"}}><div><Loading/></div></div> 
+                    :
+                     <img src={pfpUrl} alt="Profile Preview" className="file-preview" style={{width: "70px", height: "70px", borderRadius: "50%"}} />}
+                    <div className="preview-actions" style={{top: "-15px", visibility: (!pfpEditVisibility || isUploading) ? "hidden" : ""}}>
+                    <button onClick={() => triggerFileInput(pfpInputRef)} className="action-button">
+                        <BiEdit size={20} />
+                    </button>
+                    <button onClick={() => removeFile('pfp')} className="action-button">
+                        <BiTrash size={20} />
+                    </button>
+                    </div>
+                </div>
+                ) : (
+                    <button 
+                    className="btnCircle btnFileUpload"
+                    style={{width: "70px", height: "70px"}}
+                    onClick={() => triggerFileInput(pfpInputRef)}
+                    >
+                    {isUploading ? <Loading/> : <IoAdd size={50}/>}
+                    </button>
+                    )}
+            </div>
+            <input 
+            type="file"
+            ref={pfpInputRef}
+            onChange={(e) => handleFileChange(e, 'pfp')}
+            accept="image/*"
+            style={{display: 'none'}}
+            />
             </div>
             <div className='cardNameDescription'>
                 <span className='cardName'>{userData.userName}</span>
@@ -349,7 +458,7 @@ function OpportunityPopup({opportunitiesOptions}){
                 <Loading/>
             </div>
             :
-            <div className="initiativeOrOpportunity" style={{backgroundColor: "var(--neutral)", borderRadius: "20px",
+            <div className="initiativeOrOpportunity" style={{backgroundColor: "#7ed5d770", borderRadius: "20px",
                 boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
                 {userData.userType === "High Schooler" ? opportunitiesOptions.highSchool : userData.userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
@@ -423,7 +532,7 @@ function ConnectionAvailability(){
 
     return(
         <>
-            {availabilityModalVisibility && <AvailabilityModal visibility={availabilityModalVisibility} onClose={()=>setAvailabilityModalVisibility(false)} userType={userData.userType}/>}
+            {availabilityModalVisibility && <AvailabilityModal visibility={availabilityModalVisibility} availabilityData={availabilityData} onClose={()=>setAvailabilityModalVisibility(false)} userData={userData}/>}
             <div>
                 {!availabilityData && <span style={{fontWeight: "250", fontSize: "15px"}}>How are you open to assisting prospective students?</span>}
                 {!availabilityData && <div className='addOne' onClick={()=>setAvailabilityModalVisibility(true)}>

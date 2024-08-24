@@ -11,7 +11,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { displayFieldsOfInterest, displayShortenedName } from "../../services/userProfileServices";
 
-export default function OrganizationProfile({organizationData, location, handleShowProfile}){
+export default function OrganizationProfile({organizationData, location, handleShowProfile, handleReferalClick}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
     const [isDisabled, setIsDisabled] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -32,6 +32,10 @@ export default function OrganizationProfile({organizationData, location, handleS
         organizationLogoPreview: organizationData.organizationLogoPreview ?? "/assets/awty-logo.jpg",
         organizationCreatedBy: organizationData.createdBy,
         organizationHostName: organizationData.createdByUserName,
+        organizationLearnMoreMethod: organizationData.learnMore.split(": ")[0],
+        organizationApplyMethod: organizationData.apply.split(": ")[0],
+        organizationApply: organizationData.apply.split(": ")[1] ?? null,
+        organizationLearnMore: organizationData.learnMore.split(": ")[1] ?? null,
     }
 
     const getUserData = async (userId) => {
@@ -86,12 +90,12 @@ export default function OrganizationProfile({organizationData, location, handleS
 
     const handleConnect = (e) => {
         e.preventDefault();
-        // TODO: input connect logic here
+        handleReferalClick("apply", organizationProfileData, userData);
     }
 
     const handleLearnMore = (e) => {
         e.preventDefault();
-        // input learn more logic here
+        handleReferalClick("learnMore", organizationProfileData, userData);
     }
 
     const handleReadMoreClick = (e) => {
@@ -152,7 +156,7 @@ export default function OrganizationProfile({organizationData, location, handleS
 
 function RelevanceBanner({relevanceType, organizationType}){
     return(
-        <div style={{display: organizationType === "Community Service" ? "none" : "", borderRadius: "20px", position: "absolute", top: "-18px", left: "10px", width: "fitContent", padding: "4px 8px", background: "rgb(47,162,52)",
+        <div style={{display: organizationType === "Community Service" ? "none" : "", borderRadius: "20px", position: "absolute", top: "-16px", left: "10px", width: "fitContent", padding: "2px 8px", background: "rgb(47,162,52)",
             background: "linear-gradient(90deg, rgba(47,162,52,1) 48%, rgba(18,123,22,1) 100%)", zIndex: "1"}}>
             <span style={{color: "white", fontWeight: "600"}}>{["Shadowing", "Job", "Internship"].includes(organizationType) ? "Target fields:" : "Tags:"} {relevanceType} </span>
         </div>

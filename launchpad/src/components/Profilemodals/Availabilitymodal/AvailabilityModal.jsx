@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import MakeChanges from "../../Makechanges/MakeChanges";
+import { editUserData } from "../../../services/userProfileServices";
+import { useAuth } from "../../../contexts/auth/AuthContext";
 
-export default function AvailabilityModal({visibility, onClose, userType}){
+export default function AvailabilityModal({visibility, onClose, userData, availabilityData}){
 
-    const [selectedOptions, setSelectedOptions] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState(availabilityData);
     const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
 
-    useEffect(()=>{
-        const storedAvailabilityData = localStorage.getItem("userAvailabilityData");
-        if(storedAvailabilityData !== null){
-            setSelectedOptions(JSON.parse(storedAvailabilityData));
-        }
-    }, [])
+    const {currentUser} = useAuth();
 
-    const saveAvailabilityData = () => {
-        console.log(selectedOptions)
-        localStorage.setItem("userAvailabilityData", JSON.stringify(selectedOptions));
+    const userType = userData.userType;
+
+    const saveAvailabilityData = async () => {
+        
+        const newUserData = {...userData, networkingLevel: selectedOptions};
+        await editUserData(newUserData, currentUser);
+        console.log(selectedOptions);
         onClose();
     }
 
@@ -45,7 +46,7 @@ export default function AvailabilityModal({visibility, onClose, userType}){
         { 
             id: "informationalInterview",
             text: "30-minute informational interview to discuss your career path and field",
-            value: "Informational Interview",
+            value: "Short Interview",
             includers: ["Alumni", "Professional"]
         },
         {
@@ -60,12 +61,6 @@ export default function AvailabilityModal({visibility, onClose, userType}){
             value: "Long-Term Mentorship",
             includers: ["High Schooler"]
         },
-        {
-            id: "resumeReview",
-            text: "Review student resumes and provide feedback",
-            value: "Resume Review",
-            includers: ["Alumni", "Professional"] 
-        },
         { 
             id: "mockInterview",
             text: "Conduct a mock interview to help students prepare for job applications", 
@@ -74,8 +69,8 @@ export default function AvailabilityModal({visibility, onClose, userType}){
         },
         { 
             id: "workplaceOpportunities",
-            text: "Offering job shadowing, internships, job, or volunteer opportunities to college or high school students at your organization",
-            value: "Workplace Opportunities",
+            text: "Offer job shadowing, internships, job, or volunteer opportunities to college or high school students at your organization/company",
+            value: "Workplace",
             includers: ["Professional"]
         },
       ];

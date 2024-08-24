@@ -1,6 +1,6 @@
 .mainBody{
-    background: var(--accent);
-    background: linear-gradient(360deg, var(--neutral) 0%, rgba(52,197,227,0) 100%);
+    background: var(--primary);
+    /* background: linear-gradient(360deg, var(--neutral) 0%, rgba(52,197,227,0) 100%); */
 }
 
 body.modal-open {

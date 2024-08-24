@@ -22,11 +22,11 @@ export default function LandingPage() {
         <nav className="navbar">
           <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "20%"}} />
           <div style={{display: "flex", gap: "20px", marginRight: "10px"}}>
-            <ul className="nav-links">
+            {/* <ul className="nav-links">
               <li className="nav-element"><a href="#about">About</a></li>
               <li><a href="#features">Features</a></li>
               <li><a href="#contact">Contact</a></li>
-            </ul>
+            </ul> */}
             <div style={{display: "flex", gap: "10px", justifyContent: "center", alignItems: "center"}}>
               <button className="authButtons btnUnfilled" onClick={()=>navigate("/Signup")}>Signup</button>
               <button className="authButtons" onClick={()=>navigate("/Login")}>Login</button>
@@ -75,7 +75,7 @@ export default function LandingPage() {
             <h2 className="section-title">Who are we?</h2>
             <div className="content-wrapper">
               <p className="description">
-                <span style={{fontWeight: "bolder"}}>Launchpad</span> is a <span className="highlight">local social network</span> designed to empower Houston's youth by creating meaningful connections among:
+                <span style={{fontWeight: "bolder"}}>Launchpad</span> is a <span className="highlight">free local social network</span> designed to empower Houston's youth by creating meaningful connections among:
               </p>
               <div className="network-grid">
                 <div className="network-item">
@@ -105,7 +105,7 @@ export default function LandingPage() {
           <h2 className="mission-title">Our Mission</h2>
           <div className="mission-container">
             <p className="mission-text">
-              <span className="highlight">We act as a launchpad</span> for high school students' potential and passion, propelling them into college and beyond. By fostering a vibrant network of mentors, professionals, alumni, and other resourse, we empower our youth to strengthen their portfolio of work experience and extracurriculars.
+              <span className="highlight">We act as a launchpad</span> for high school students' potential and passion, propelling them into college and beyond. By fostering a vibrant network of mentors, professionals, alumni, and high quality resources, we empower our youth to strengthen their portfolio of work experience and extracurriculars.
             </p>
           </div>
         </section>

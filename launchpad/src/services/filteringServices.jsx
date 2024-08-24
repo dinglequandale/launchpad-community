@@ -2,7 +2,7 @@ import { collection, query, where, getDocs, getDoc, doc, limit, startAfter, orde
 import { db } from '../firebase/firebaseConfig'; // Adjust this import based on your Firebase setup
 import { careerInterests } from '../pages/Onboarding/Options';
 
-export async function getFilteredData(collectionName, filters, currentUserId, category = null, lastDoc = null, maxLimit = 9) {
+export async function getFilteredData(collectionName, filters, currentUserId, category = null, lastDoc = null, maxLimit = 6) {
     let q = collection(db, collectionName);
 
     const {userInterests, userColleges, userHS } = await getUserData("areasOfInterest", currentUserId);
