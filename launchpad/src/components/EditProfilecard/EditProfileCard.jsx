@@ -21,6 +21,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import { deletePfp, displayColleges, displayFieldsOfInterest, editUserData, getBasicUserDescription, handleUserProfileUpdate, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
 import { BiEdit, BiTrash } from 'react-icons/bi';
+import SkillModal from '../SkillsModal/SkillModal';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -30,15 +31,17 @@ const ProfileContext = createContext({
 export default function EditProfileCard() {
     const navigate = useNavigate();
     const location = useLocation();
-    // temporary data
-    // const [userBasicInfo, setUserBasicInfo] = useState(null);
-    // const userType = "Professional";
 
     const [userData, setUserData] = useState(null);
 
     const { currentUser } = useAuth();
     const [loading, setLoading] = useState(false);
     
+    const [opportunitiesData, setOpportunitiesData] = useState([]);
+    const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
+    const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
+    const [newOpportunityModalVisibility, setNewOpportunityModalVisibility] = useState(false);
+
     useEffect(() => {
         let unsubscribe;
         setLoading(true);
@@ -64,6 +67,12 @@ export default function EditProfileCard() {
         };
     }, [currentUser]);
 
+    useEffect(() => {
+        setOpportunitiesLoading(true);
+        const unsubscribe = loadOpportunities(currentUser, setOpportunitiesLoading, setOpportunitiesData);
+        return () => unsubscribe();
+      }, [currentUser]);
+
     console.log(userData)
 
     const opportunitiesOptions = {highSchool: 
@@ -87,6 +96,21 @@ export default function EditProfileCard() {
     }
     return(
         <>
+        <div name="opportunityModal" style={{position: "relative"}}>
+            {userData && userData.userType === "Professional" ? <OpportunityModal 
+                onClose={()=>setNewOpportunityModalVisibility(false)}
+                visibility={newOpportunityModalVisibility} 
+                opportunityData={null} 
+                isEditing={false} 
+                opportunityId={""}/>
+            
+            : <InitiativeModal 
+                onClose={()=>setOpportunityModalVisibility(false)} 
+                visibility={newOpportunityModalVisibility}
+                opportunityData={null} 
+                isEditing={false} 
+                opportunityId={""}/>}
+        </div>
             <ProfileContext.Provider value={{currentUser, userData}}>
             <div className='editprofileCard'>
                 {(!loading && userData) ? <>
@@ -99,9 +123,32 @@ export default function EditProfileCard() {
                     <BasicInfoCard descType={descType()}/>
                 </div>
                 <div style={{paddingTop: "20px"}}>
-                    <OpportunityPopup opportunitiesOptions={opportunitiesOptions}/>
+                    {(!opportunitiesLoading && opportunitiesData.length > 0) ? opportunitiesData.map((opportunityData, index)=>(
+                        <OpportunityPopup 
+                            opportunityData={opportunityData} 
+                            key={index}
+                            opportunitiesOptions={opportunitiesOptions} 
+                            opportunityModalVisibility={opportunityModalVisibility} 
+                            setOpportunityModalVisibility={setOpportunityModalVisibility}
+                        />
+                        )) 
+                        :
+                    (opportunitiesLoading) ? 
+                    <Loading/> :
+                    <OpportunityPopup opportunityData={null}  opportunitiesOptions={opportunitiesOptions} opportunityModalVisibility={opportunityModalVisibility} 
+                    setOpportunityModalVisibility={setOpportunityModalVisibility}/>}
+                </div>
+                <div>
+                {!opportunitiesLoading && opportunitiesData.length > 0 && <div className="addOne" onClick={()=>setNewOpportunityModalVisibility(true)}>
+                    <IoAdd size={25} />
+                    <span style={{textDecoration: "underline"}}>Add another opportunity!</span>
+                </div>}
                 </div>
                 <AboutMeDisplay/>
+                {(userData && userData.userType !== "Professional") && <div name="skills" style={{marginTop: "20px"}}>
+                    <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Skills ...</span>
+                    <SkillBase/>
+                </div>}
                 <div className={`userResume ${userData.userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px", marginTop: "10px"}}>
                     <div style={{display: "flex", justifyContent: "space-between", position: "relative"}} id="Resume">
                         <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Resume ...</span>
@@ -197,14 +244,61 @@ function PublicPrivateDropdown() {
     );
   }
   
-  function PrivacyOption({ option, isSelected, onSelect }) {
+function PrivacyOption({ option, isSelected, onSelect }) {
     return (
-      <div className={`dropdown-option ${isSelected ? 'selected' : ''}`} onClick={onSelect}>
+        <div className={`dropdown-option ${isSelected ? 'selected' : ''}`} onClick={onSelect}>
         {option.icon}
         <span>{option.value}</span>
-      </div>
+        </div>
     );
-  }
+}
+
+
+function SkillBase() {
+    const [skillModalVisibility, setSkillModalVisibility] = useState(false);
+
+    const { userData } = useContext(ProfileContext);
+
+    const userSkills = [{skillCategory: "Leadership", skillDescription: "I became a leader of blah blah blah..."},{skillCategory: "Community", skillDescription: "I became a leader of blah blah blah..."},{skillCategory: "Leadership", skillDescription: "I became a leader of blah blah blah..."}]
+    
+
+    return(
+        <>
+            {skillModalVisibility && <SkillModal visibility={skillModalVisibility} userSkills={userData.userSkills} onClose={() => setSkillModalVisibility(false)}/>}
+            {(userSkills.length > 0) ? 
+            (
+                <div className="skills-container" style={{position: "relative"}}>
+                  {Object.entries(
+                    userSkills.reduce((acc, skill) => {
+                      if (!acc[skill.skillCategory]) {
+                        acc[skill.skillCategory] = [];
+                      }
+                      acc[skill.skillCategory].push(skill.skillDescription);
+                      return acc;
+                    }, {})
+                  ).map(([category, skills]) => (
+                    <div key={category} className="skill-category">
+                      <span>{category}</span>
+                      <ul>
+                        {skills.map((skill, index) => (
+                          <li key={index}>{skill}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                    <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
+                        <EditInformation isAnswered={true} questionName={"Skills"} onEdit={()=>inputRef.current.click()}/>
+                    </div>
+                </div>
+            )
+            : <div className="addOne" onClick={()=>setNewOpportunityModalVisibility(true)}>
+                <IoAdd size={25} />
+                <span style={{textDecoration: "underline"}}>Add your skills!</span>
+            </div>}
+        </>
+    )
+}
+    
   
 
 function ResumeUpload(){
@@ -244,7 +338,7 @@ function ResumeUpload(){
             {pdfUrl ? 
             <>
             <iframe src={pdfUrl} frameborder="0" style={{width: "100%", height: "500px"}}></iframe>
-            <div className='addOne' style={{position: "absolute", right: "0"}}>
+            <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
                 <EditInformation isAnswered={true} questionName={"Resume"} onEdit={()=>inputRef.current.click()}/>
             </div>
             </>
@@ -387,72 +481,73 @@ function BasicInfoCard({descType}){
     )
 }
 
-function OpportunityPopup({opportunitiesOptions}){
+function OpportunityPopup({opportunitiesOptions, opportunityData, opportunityModalVisibility, setOpportunityModalVisibility}){
 
     const { currentUser, userData } = useContext(ProfileContext);
 
-    const [opportunityData, setOpportunityData] = useState(null);
+    const [currentOpportunityData, setCurrentOpportunityData] = useState(opportunityData);
 
-    const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
+    // const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
     const [deleteWarningVisibility, setDeleteWarningVisibility] = useState(false);
     const [opportunityId, setOpportunityId] = useState("");
     const [loading, setLoading] = useState(false);
     const [isEditing,setIsEditing] = useState(false);
     
 
-    useEffect(() => {
-        setLoading(true);
-        const unsubscribe = loadOpportunities(currentUser, setLoading, setOpportunityData);
-        return () => unsubscribe();
-      }, [currentUser]);
+    // useEffect(() => {
+    //     setLoading(true);
+    //     const unsubscribe = loadOpportunities(currentUser, setLoading, setOpportunityData);
+    //     return () => unsubscribe();
+    //   }, [currentUser]);
 
     
     useEffect(()=>{
-        if(opportunityData){
-            setOpportunityId(opportunityData.id);
+        if(currentOpportunityData){
+            setOpportunityId(currentOpportunityData.id);
         }
-    },[opportunityData]);
+    },[currentOpportunityData]);
 
     const deleteOpportunity = (opportunityId) => {
         handleDeleteOpportunity(opportunityId);
-        setOpportunityData(null);
+        setCurrentOpportunityData(null);
     }
 
-    console.log(opportunityData)
+    console.log(currentOpportunityData)
+    console.log(opportunityModalVisibility, "opportunity modal vis")
 
     return(
         <>
         <div name="deleteWarning">
             {deleteWarningVisibility && <DeleteWarningModal onCancel={()=>setDeleteWarningVisibility(false)} onVerify={() => deleteOpportunity(opportunityId)} visibility={deleteWarningVisibility}
-                objectOfDeletation={opportunityData.organizationType}/>}
+                objectOfDeletation={currentOpportunityData.organizationType}/>}
         </div>
         <div name="opportunityModal" style={{position: "relative"}}>
             {userData.userType === "Professional" ? <OpportunityModal 
                 onClose={()=>setOpportunityModalVisibility(false)}
                 visibility={opportunityModalVisibility} 
-                opportunityData={opportunityData} 
+                opportunityData={currentOpportunityData} 
                 isEditing={isEditing} 
                 opportunityId={opportunityId}/>
             
             : <InitiativeModal 
                 onClose={()=>setOpportunityModalVisibility(false)} 
                 visibility={opportunityModalVisibility}
-                opportunityData={opportunityData} 
+                opportunityData={currentOpportunityData} 
                 isEditing={isEditing} 
                 opportunityId={opportunityId}/>}
         </div>
-        <div style={{position: "relative"}}>
-            { (opportunityData && !loading) ? <>
+        <div style={{position: "relative", height: "230px"}}>
+            { (currentOpportunityData && !loading) ? <>
             <div style={{textAlign: "center", marginBottom: "12px"}}>
             <span
             style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)"}}>
-                {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
+                {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {currentOpportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
             </span>
             </div>
             <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "-13px", top: "28px", background: "red", zIndex: "2"}}>
                 <MdDeleteOutline size={30}/>
             </button>
-            <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
+            <OrganizationProfile location={"user_profile"} organizationData={currentOpportunityData}/>
             </> : loading ?
             <div>
                 <Loading/>
@@ -468,12 +563,12 @@ function OpportunityPopup({opportunitiesOptions}){
                     <span style={{textDecoration: "underline"}}>Add one!</span>
                 </div>
             </div>}
-        </div>
-        <div className='addOne' style={{transform: "translate(0,-120px)"}}>
-            <EditInformation isAnswered={opportunityData} questionName={"Opportunity"} onEdit={()=>{
-                setOpportunityModalVisibility(true);
-                setIsEditing(true);
-                }}/>
+            <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
+                <EditInformation isAnswered={currentOpportunityData} questionName={"Opportunity"} onEdit={()=>{
+                    setOpportunityModalVisibility(true);
+                    setIsEditing(true);
+                    }}/>
+            </div>
         </div>
         </>
     )

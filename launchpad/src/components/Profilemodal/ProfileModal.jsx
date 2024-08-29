@@ -18,7 +18,6 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     const [opportunityLoading, setOpportunityLoading] = useState(false);
     
     const isProfessional = JSON.parse(localStorage.getItem("basicUserInfo")).userType === "Professional";
-
     useEffect(()=>{
 
         const getOpportunityData = async () => {
