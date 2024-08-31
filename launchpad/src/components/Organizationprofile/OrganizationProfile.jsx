@@ -147,7 +147,7 @@ export default function OrganizationProfile({organizationData, location, handleS
                 </div>
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px", marginLeft: "6px"}}>
                     <button className="btnOrganizationLearnMore btnConnect" onClick={e => handleLearnMore(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> Learn More </button>
-                    <button className="btnOrganizationConnect btnUnfilled" onClick={e => handleConnect(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> {organizationProfileData.organizationType==="Volunteering" ? "Volunteer" : ["Club","Nonprofit"].includes(organizationProfileData.organizationType) ? "Join" : "Connect"} </button>
+                    {(organizationData.apply !== "NOAPPLY") && <button className="btnOrganizationConnect btnUnfilled" onClick={e => handleConnect(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> {organizationProfileData.organizationType==="Volunteering" ? "Volunteer" : ["Club","Nonprofit"].includes(organizationProfileData.organizationType) ? "Join" : "Connect"} </button>}
                 </div>
             </div>
         </>

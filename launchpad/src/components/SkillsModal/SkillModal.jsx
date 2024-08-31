@@ -5,9 +5,10 @@ import Modal from "react-modal";
 import { editUserData } from "../../services/userProfileServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
 
-export default function SkillModal({visibility, onClose}) {
+export default function SkillModal({visibility, onClose, userData}) {
 
-    const [skillData,setSkillData] = useState([{id: 0, skillCategory: "", skillDescription: ""}])
+    const initialUserSkills = userData.userSkills ?? [{id: 0, skillCategory: "", skillDescription: ""}];
+    const [skillData,setSkillData] = useState(initialUserSkills);
     const {currentUser} = useAuth();
     console.log(skillData);
     const customStyles = {
@@ -41,7 +42,7 @@ export default function SkillModal({visibility, onClose}) {
         const loadingToast = toast.loading('Making your changes...');
     
         try {
-            await editUserData({userSkills: skillData}, currentUser);
+            await editUserData({userSkills: skillData}, currentUser, userData);
     
             toast.success('Changes made successfully!', { id: loadingToast });
 
@@ -66,7 +67,7 @@ export default function SkillModal({visibility, onClose}) {
         contentLabel="Skills Modal"
         >
         <header>
-            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Introduce your Skillset <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress Professionals and Secure Internships</span></h2>
+            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Introduce your Skill Set <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress Professionals and Secure Internships</span></h2>
             <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{paddingTop: "10px", display: "flex", flexDirection: "column", gap: "7px"}}>

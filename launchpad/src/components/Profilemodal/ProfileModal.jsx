@@ -119,9 +119,34 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                         {userData.userAboutMe && <div name="userAboutMe" style={{paddingTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s About Me</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
-                            <div style={{background: "var(--neutral)", padding: "10px", borderRadius: "5px", boxShadow: "var(--shadowColor)", paddingTop: "15px"}}>
+                            <div style={{background: "var(--neutral)", borderRadius: "5px", display: "flex", alignItems: "center", padding: "10px"}}>
                                 <span>{userData.userAboutMe}</span>
                             </div>
+                        </div>}
+                        {(userData.userSkills && userData.userSkills.length > 0) && 
+                        <div>
+                            <span style={{marginTop: "20px", fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s Career-Ready Skills</span>
+                            <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
+                            <div className="skills-container" style={{position: "relative"}}>
+                                {Object.entries(
+                                    userData.userSkills.reduce((acc, skill) => {
+                                    if (!acc[skill.skillCategory]) {
+                                        acc[skill.skillCategory] = [];
+                                    }
+                                    acc[skill.skillCategory].push(skill.skillDescription);
+                                    return acc;
+                                    }, {})
+                                ).map(([category, skills]) => (
+                                    <div key={category} className="skill-category">
+                                    <span>{category}</span>
+                                    <ul>
+                                        {skills.map((skill, index) => (
+                                        <li key={index}>{skill}</li>
+                                        ))}
+                                    </ul>
+                                    </div>
+                                ))}
+                                </div>
                         </div>}
                         {(userData.userResumePreview && (userData.userResumePreview.split(" ")[0]) !== "private" || isProfessional) && <div name="userResume" style={{marginTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s Resume</span>
@@ -137,7 +162,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                     </div>
                                 ))}
                             </div>
-                    </div>}
+                        </div>}
                     </main>
                     </>
                 </div>

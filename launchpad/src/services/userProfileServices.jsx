@@ -169,12 +169,12 @@ export const getBasicUserDescription = (userData) => {
     return userData.userType === "High Schooler" ? `Class of ${userData.graduationYear}, ${getUserHS(userData.schoolAttending)}` : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear} from ${getUserHS(userData.schoolAttending)}` : `${userData.yearsOfExperience}+ Years of Experience in ${userData.areasOfInterest[0]}`;
 }
 
-export const editUserData = async (userData, currentUser) => {
+export const editUserData = async (newData, currentUser, origUserData) => {
     try{
         const userRef = doc(db, "users", currentUser.uid);
     
-        await updateDoc(userRef, userData);
-        pushInitialProfileCompletion(userData);
+        await updateDoc(userRef, newData);
+        pushInitialProfileCompletion({... origUserData, ...newData});
 
         await updateTypesense('users', currentUser.uid, userData);
     }catch(error){console.log(error)};
@@ -207,13 +207,13 @@ export const loadUserData = async (currentUser, setLoading, setUserData) => {
 }
 
 const loadUserPfpPreview = async (userData, userPfpPreview, currentUser, privacy) => {
-    const newData = {...userData, userPfpPreview: `${privacy === "private" ? "private " : ""}` + userPfpPreview};
-    await editUserData(newData, currentUser);
+    const newData = {userPfpPreview: `${privacy === "private" ? "private " : ""}` + userPfpPreview};
+    await editUserData(newData, currentUser, userData);
 }
 
 const loadUserResumePreview = async (userData, userResumePreview, currentUser) => {
-    const newData = {...userData, userResumePreview: userResumePreview};
-    await editUserData(newData, currentUser);
+    const newData = {userResumePreview: userResumePreview};
+    await editUserData(newData, currentUser, userData);
 }
 
 export const handleUserResumeUpdate = async (userData, resumeFile, currentUser, privacy = "") => {

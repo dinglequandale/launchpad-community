@@ -33,6 +33,7 @@
     cursor:pointer;
     padding-top: 8px;
     position: relative;
+    transition: color 0.3s ease;
 }
 .addOne:hover{
     color: var(--highlight);
@@ -190,4 +191,17 @@
     position: absolute;
     left: 0;
     color: #007bff;
+  }
+
+  .editInfoIcon {
+    background: #DFECEF;
+    border-radius: 50%;
+    padding: 5px;
+    /* transition: background-color 0.5s ease; */
+    transition: box-shadow 0.3s ease;
+  }
+
+  .editInfoIcon:hover{
+    /* background-color: rgb(179,205,255); */
+    box-shadow: 0 4px 8px 0 rgba(179,205,255, 0.5), 0 6px 20px 0 rgba(179,205,255, 0.4);
   }

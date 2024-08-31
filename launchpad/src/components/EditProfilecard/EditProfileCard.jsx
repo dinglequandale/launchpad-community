@@ -178,8 +178,8 @@ function EditInformation({questionName, onEdit, isAnswered}){
         {isAnswered && <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", position: "absolute", width: "150px", right: "-180px"}}
             onClick={onEdit}>
             
-            <MdEdit size={30} style={{background: "#DFECEF", borderRadius: "50%", padding: "5px"}}/>
-            <span style={{textDecoration: "underline", color: "var(--secondary)"}}>
+            <MdEdit size={30} className='editInfoIcon'/>
+            <span style={{textDecoration: "underline"}}>
                 Edit {questionName}
             </span>
         </div>}
@@ -205,9 +205,9 @@ function PublicPrivateDropdown() {
     const handleOnPubPrivDropdownSelect = async (privSelected) => {
         setSelectedPublicity(privSelected);
         setDropdownVisibility(false);
-        const newUserData = {...userData, userResumePreview: `${privSelected === "Professionals Only" ? "private " : ""}` + userData.userResumePreview.split(" ")[userData.userResumePreview.split(" ").length - 1]};
         try{
-            await editUserData(newUserData, currentUser);
+            const newUserResume = {userResumePreview: `${privSelected === "Professionals Only" ? "private " : ""}` + userData.userResumePreview.split(" ")[userData.userResumePreview.split(" ").length - 1]};
+            await editUserData(newUserResume, currentUser, userData);
         }catch{console.log("Dropdown Component Error!")}
     }
 
@@ -259,13 +259,14 @@ function SkillBase() {
 
     const { userData } = useContext(ProfileContext);
 
-    const userSkills = [{skillCategory: "Leadership", skillDescription: "I became a leader of blah blah blah..."},{skillCategory: "Community", skillDescription: "I became a leader of blah blah blah..."},{skillCategory: "Leadership", skillDescription: "I became a leader of blah blah blah..."}]
+    const userSkills = userData.userSkills;
+    // [{skillCategory: "Leadership", skillDescription: "I became a leader of blah blah blah..."},{skillCategory: "Community", skillDescription: "I became a leader of blah blah blah..."},{skillCategory: "Leadership", skillDescription: "I became a leader of blah blah blah..."}];
     
 
     return(
         <>
-            {skillModalVisibility && <SkillModal visibility={skillModalVisibility} userSkills={userData.userSkills} onClose={() => setSkillModalVisibility(false)}/>}
-            {(userSkills.length > 0) ? 
+            {skillModalVisibility && <SkillModal visibility={skillModalVisibility} userData={userData} onClose={() => setSkillModalVisibility(false)}/>}
+            {(userSkills && (userSkills.length > 0)) ? 
             (
                 <div className="skills-container" style={{position: "relative"}}>
                   {Object.entries(
@@ -287,7 +288,7 @@ function SkillBase() {
                     </div>
                   ))}
                     <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
-                        <EditInformation isAnswered={true} questionName={"Skills"} onEdit={()=>inputRef.current.click()}/>
+                        <EditInformation isAnswered={true} questionName={"Skills"} onEdit={()=>setSkillModalVisibility(true)}/>
                     </div>
                 </div>
             )
