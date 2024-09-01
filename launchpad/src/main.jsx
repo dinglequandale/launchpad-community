@@ -14,6 +14,8 @@ import Login from './pages/Authentication/Login.jsx';
 import LandingPage from './pages/landing_page/LandingPage.jsx';
 import InitializeStream from './Streamchat/streamChatConfig.jsx';
 import GlobalAuthWrapper from './contexts/GlobalAuthWrapper.jsx';
+import Professional_LandingPage from './pages/landing_page/Professional_LandPage.jsx';
+import Alumni_LandingPage from './pages/landing_page/Alumni_LandingPage.jsx';
 
 const router = createBrowserRouter([
   {
@@ -24,6 +26,21 @@ const router = createBrowserRouter([
   {
     path: '/Landing',
     element: <LandingPage/>,
+    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+  },
+  {
+    path: '/highschoolers',
+    element: <LandingPage/>,
+    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+  },
+  {
+    path: '/professionals',
+    element: <Professional_LandingPage/>,
+    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+  },
+  {
+    path: '/undergrads',
+    element: <Alumni_LandingPage/>,
     errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
   },
   {

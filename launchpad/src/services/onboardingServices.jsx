@@ -140,7 +140,7 @@ export const packageBasicUserInfoToLS = (userData) => {
 export const pushInitialProfileCompletion = (userData) => {
     const emptyQuestions = Object.values(userData).filter((answer)=>(answer === "" || answer === null || (Array.isArray(answer) && answer.length===0)));
     const exactPercentage = ((Object.keys(userData).length - emptyQuestions.length)/Object.keys(userData).length)*100;
-    const roundedPercentage = Math.ceil(exactPercentage / 10) * 10;
+    const roundedPercentage = Math.floor(exactPercentage / 10) * 10;
     console.log(roundedPercentage, emptyQuestions, exactPercentage);
     localStorage.setItem("userProfileProgress", `${roundedPercentage/100}`);
 }

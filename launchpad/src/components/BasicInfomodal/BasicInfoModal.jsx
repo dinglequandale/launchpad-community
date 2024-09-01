@@ -13,6 +13,8 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
 
   const {currentUser} = useAuth();
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSearchQueryChange = (query) => {
     setSearchQuery(query);
   };
@@ -125,6 +127,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     return (questionsForUser.filter((question)=>(question.required && (basicInfoContent[question.id] === "")))).length > 0;
   }
   const saveBasicInfo = async () => {
+    setIsSubmitting(true);
     if(!isEmpty()){
       const filteredBasicInfo = Object.entries(basicInfoContent).reduce((acc, [key, value]) => {
         console.log(`Desired questions for ${key}, ${value}:`, questionsForUser.filter((question)=>question.id === key))
@@ -136,14 +139,29 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
 
       console.log("Filtered:", filteredBasicInfo)
 
-      const newUserData = {...userData, ...filteredBasicInfo};
-      await editUserData(newUserData, currentUser);
+      
+      const loadingToast = toast.loading('Making your changes...');
+  
+      try {
+        await editUserData(filteredBasicInfo, currentUser, userData);
 
+        toast.success('Changes made successfully!', { id: loadingToast });
+
+        new Promise( res => setTimeout(res, 500) );
+
+        onClose();
+
+      } catch (error) {
+          toast.error(`Failed to make changes!`, { id: loadingToast });
+          console.error('Error changing skills:', error);
+          setIsSubmitting(false);
+      }
       onClose();
     }
     else{
       toast.error("Please fill out the required questions!")
     }
+    setIsSubmitting(false)
   }
 
   const customStyles = {
@@ -229,11 +247,11 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
           </form>
         </main>
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-          <button onClick={
+          <button disabled={isSubmitting} onClick={
             ()=>setMakeChangesVisibility(true)
             } style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Cancel</button>
-          <button onClick={saveBasicInfo} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+          <button disabled={isSubmitting} onClick={saveBasicInfo} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Save Changes</button>
         </footer>
       </Modal>

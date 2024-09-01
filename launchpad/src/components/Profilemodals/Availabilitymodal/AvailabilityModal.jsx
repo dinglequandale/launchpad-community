@@ -14,10 +14,7 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
     const userType = userData.userType;
 
     const saveAvailabilityData = async () => {
-        
-        const newUserData = {...userData, networkingLevel: selectedOptions};
-        await editUserData(newUserData, currentUser);
-        console.log(selectedOptions);
+        await editUserData({networkingLevel: selectedOptions}, currentUser, userData);
         onClose();
     }
 

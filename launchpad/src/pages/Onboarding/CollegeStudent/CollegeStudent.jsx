@@ -98,6 +98,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
     graduationYear: '',
     sectionAttending: '',
     areasOfInterest: [],
+    userSkills: [],
     networkingLevel: [],
     userResume: null,
     userResumePreview: "",

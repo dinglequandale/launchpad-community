@@ -33,6 +33,7 @@
     cursor:pointer;
     padding-top: 8px;
     position: relative;
+    transition: color 0.3s ease;
 }
 .addOne:hover{
     color: var(--highlight);
@@ -158,4 +159,49 @@
   
   .dropdown-option span {
     margin-left: 10px;
+  }
+
+  .skills-container {
+    margin: 20px 0;
+  }
+  
+  .skill-category {
+    margin-bottom: 15px;
+  }
+  
+  .skill-category span {
+    margin-bottom: 10px;
+    color: var(--secondary);
+    font-size: 1.2em;
+  }
+  
+  .skill-category ul {
+    list-style-type: none;
+    padding-left: 20px;
+  }
+  
+  .skill-category li {
+    position: relative;
+    padding-left: 15px;
+    margin-bottom: 5px;
+  }
+  
+  .skill-category li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #007bff;
+  }
+
+  .editInfoIcon {
+    background: #DFECEF;
+    border-radius: 50%;
+    padding: 5px;
+    /* transition: background-color 0.5s ease; */
+    transition: box-shadow 0.3s ease;
+  }
+
+  .editInfoIcon:hover{
+    /* background-color: rgb(179,205,255); */
+    box-shadow: 0 4px 8px 0 rgba(179,205,255, 0.5), 0 6px 20px 0 rgba(179,205,255, 0.4);
   }

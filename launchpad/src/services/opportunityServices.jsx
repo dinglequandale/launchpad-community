@@ -64,7 +64,7 @@ export const loadOpportunities = (user, setLoading, setOpportunities) => {
       return { ...opportunity, organizationLogoPreview: logoDisplay };
     }));
 
-    setOpportunities(opportunitiesWithLogos[0]);
+    setOpportunities(opportunitiesWithLogos);
     setLoading(false);
   }, (error) => {
     console.log("Error getting user opportunities: ", error);

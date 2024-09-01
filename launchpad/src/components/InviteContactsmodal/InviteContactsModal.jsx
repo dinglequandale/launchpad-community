@@ -8,7 +8,6 @@ export default function InviteContactsModal({visibility, onClose}){
 
     // const [targetUserData, setTargetUserData] = useState([{userName: "", email: ""}]);
     const [targetUserData,setTargetUserData] = useState([{id: 0, userName: "", email: ""}])
-    console.log(targetUserData);
     const {userName} = JSON.parse(localStorage.getItem("basicUserInfo"));
     const customStyles = {
         content: {

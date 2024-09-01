@@ -91,6 +91,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
     graduationYear: '',
     sectionAttending: '',
     areasOfInterest: [],
+    userSkills: [],
     collegeDecision: '',
     collegeInterestsOrDecision: [],
     userResume: null,

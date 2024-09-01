@@ -453,21 +453,20 @@ function FinalInfo(){
   const logoRef = useRef();
   
   const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
-
+  
   const [learnMoreType, setLearnMoreType] = useState("");
   const [applyType, setApplyType] = useState("");
   const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState(false);
   const [applyInputVisibility, setApplyInputVisibility] = useState(false);
 
   useEffect(()=>{
-    setApplyType(organizationData.apply.split(": ")[0]);
     setLearnMoreType(organizationData.learnMore.split(": ")[0]);
-  },[])
-
+    setApplyType(organizationData.apply.split(": ")[0]);
+  },[]);
   useEffect(()=>{
     setApplyInputVisibility(applyType !== "Messages");
     setLearnMoreInputVisibility(learnMoreType !== "Messages");
-  },[applyType,learnMoreType])
+  },[applyType,learnMoreType]);
 
 
   // revoke urls to clean up localStorage
@@ -494,14 +493,17 @@ function FinalInfo(){
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+
     setOrganizationData({
       ...organizationData,
-      [name]: `${name === "learnMore" ? learnMoreType : applyType}: ${value}`,
+      [name]: name === "learnMore" ? `${learnMoreType}: ${value}` : `${applyType}: ${value}`,
     });
-  };
+  }
 
   const handleOptionClick = (event, optionName, questionId) => {
     event.preventDefault();
+    // setOrganizationData({...organizationData, learnMore: ""});
+    // setOrganizationData({...organizationData, apply: ""});
     if(optionName !== "Messages" && questionId === "learnMore"){
       setLearnMoreType(optionName);
     }
@@ -532,15 +534,15 @@ function FinalInfo(){
             {questionsForPage
               .filter(question => question.type === "link")
               .map(question => (
-                <div key={question.id}> 
+                <div key={question.id} style={{position: "relative"}}>
                   <label htmlFor={question.id}>{question.text}</label>
                   <div style={{display: "flex", justifyContent: "center", gap: "25px", paddingTop: "10px"}}>
                   {learnMoreAndApplyOptions.map((option)=>(
                     <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: "100px"}}>
-                      <button key={option[0]} style={{padding: "10px"}} className={`btnCircle ${option[0] === (question.id === "learnMore" ? learnMoreType : applyType) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
+                      <button key={option[0]} style={{padding: "10px"}} className={`btnCircle ${(option[0] === (question.id === "learnMore" ? learnMoreType : applyType)) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
                         {option[1]}
                       </button>
-                      <span>{option[0]}</span>
+                      <span>{option[0] === "Messages" ? "Message Me" : option[0] === "Email" ? "Email Me" : "Website"}</span>
                     </div>)
                   )}
                   </div>
@@ -555,7 +557,7 @@ function FinalInfo(){
                     onChange={handleChange}
                     />
                   </div>}
-                  {applyInputVisibility && question.id === "apply" &&
+                  {(applyInputVisibility && question.id === "apply") &&
                   <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", color: "var(--secondary)"}}>
                     <span style={{fontWeight: "600"}} htmlFor={`${question.id} Input`}>Input your desired {applyType === "Email" ? "email" : "website link"}:</span>
                     <input

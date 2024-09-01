@@ -23,6 +23,36 @@
     background-size: 400% 400%;
     animation: gradientAnimation 15s ease infinite;
   }
+
+.landing-page-professional {
+  margin: 0 auto;
+  background: linear-gradient(
+    135deg,
+    #d7c569c9 10%,
+    #585ad8 25%,
+    #4f9cb4 50%,
+    #d7c569c9 70%,
+    #5b5dc7 75%,
+    #5775f0 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientAnimation 20s ease infinite;
+}
+
+.landing-page-alumni {
+  margin: 0 auto;
+  background: linear-gradient(
+    135deg,
+    #d36cffc9 24%,
+    #7858d8 25%,
+    #4f9cb4 50%,
+    #a769d7c9 60%,
+    #5759f0 75%,
+    #5775f0 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+}
   
   .landing-header {
     text-align: center;

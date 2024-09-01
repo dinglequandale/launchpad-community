@@ -377,10 +377,17 @@ function FinalInfo(){
   const [applyType, setApplyType] = useState("");
   const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState(false);
   const [applyInputVisibility, setApplyInputVisibility] = useState(false);
+  const [applyDisabled, setApplyDisabled] = useState(false);
 
   useEffect(()=>{
-    setApplyType(organizationData.apply.split(": ")[0]);
     setLearnMoreType(organizationData.learnMore.split(": ")[0]);
+
+    if(organizationData.apply === "NOAPPLY"){
+      setApplyDisabled(true);
+      return;
+    }
+
+    setApplyType(organizationData.apply.split(": ")[0]);
   },[]);
   useEffect(()=>{
     setApplyInputVisibility(applyType !== "Messages");
@@ -412,12 +419,33 @@ function FinalInfo(){
 
     setOrganizationData({
       ...organizationData,
-      [name]: value,
+      [name]: name === "learnMore" ? `${learnMoreType}: ${value}` : `${applyType}: ${value}`,
     });
+  }
+
+  const handleNoApplyClick = (e) => {
+    e.preventDefault();
+    if(!applyDisabled){
+
+      setOrganizationData({
+        ...organizationData,
+        apply: "NOAPPLY",
+      });
+    }
+    else{
+      setApplyType("Messages")
+      setOrganizationData({
+        ...organizationData,
+        apply: "Messages",
+      });
+    }
+    setApplyDisabled(!applyDisabled);
   }
 
   const handleOptionClick = (event, optionName, questionId) => {
     event.preventDefault();
+    // setOrganizationData({...organizationData, learnMore: ""});
+    // setOrganizationData({...organizationData, apply: ""});
     if(optionName !== "Messages" && questionId === "learnMore"){
       setLearnMoreType(optionName);
     }
@@ -447,7 +475,7 @@ function FinalInfo(){
             {questionsForPage
               .filter(question => question.type === "link")
               .map(question => (
-                <div key={question.id}> 
+                <div key={question.id} style={{position: "relative"}}>
                   <label htmlFor={question.id}>{question.text}</label>
                   <div style={{display: "flex", justifyContent: "center", gap: "25px", paddingTop: "10px"}}>
                   {learnMoreAndApplyOptions.map((option)=>(
@@ -455,7 +483,7 @@ function FinalInfo(){
                       <button key={option[0]} style={{padding: "10px"}} className={`btnCircle ${(option[0] === (question.id === "learnMore" ? learnMoreType : applyType)) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
                         {option[1]}
                       </button>
-                      <span>{option[0]}</span>
+                      <span>{option[0] === "Messages" ? "Message Me" : option[0] === "Email" ? "Email Me" : "Website"}</span>
                     </div>)
                   )}
                   </div>
@@ -470,7 +498,7 @@ function FinalInfo(){
                     onChange={handleChange}
                     />
                   </div>}
-                  {applyInputVisibility && question.id === "apply" &&
+                  {(applyInputVisibility && !applyDisabled && question.id === "apply") &&
                   <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", color: "var(--secondary)"}}>
                     <span style={{fontWeight: "600"}} htmlFor={`${question.id} Input`}>Input your desired {applyType === "Email" ? "email" : "website link"}:</span>
                     <input
@@ -480,6 +508,13 @@ function FinalInfo(){
                     onChange={handleChange}
                     value={organizationData[question.id].split(": ")[1]}/>
                   </div>}
+                  <div style={{zIndex: "10", height: "100px", top: "6px", opacity: ".6", backgroundColor: "white", display: (question.id === "apply" && applyDisabled) ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}>
+                  </div>
+                  {(question.id === "apply") && (
+                    <button className='btnText' onClick={handleNoApplyClick} style={{fontSize: "18px", opacity: ".75", marginTop: "10px", color: applyDisabled ? "var(--highlight)" : ""}}>
+                      I don't want students to apply.
+                    </button>
+                  )}
                 </div>
               ))}
           </div>
