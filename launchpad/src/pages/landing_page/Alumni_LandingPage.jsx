@@ -18,7 +18,7 @@ export default function Alumni_LandingPage() {
   return (
     <>
     {userLoggedIn && (<Navigate to="/Home" replace={true}/>)}
-    <div className="landing-page">
+    <div className="landing-page-alumni">
       <header className="landing-header">
         <nav className="navbar">
           <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "20%"}} />
