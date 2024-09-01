@@ -14,11 +14,11 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
   const [channelId, setChannelId] = useState("")
   const {currentUser} = useAuth();
 
-  const wordLimit = 50;
+  // const wordLimit = 50;
 
-  const getWordCount = (text) => {
-    return text.trim().split(/\s+/).length;
-  }
+  // const getWordCount = (text) => {
+  //   return text.trim().split(/\s+/).length;
+  // }
 
   const navigate = useNavigate();
 
@@ -100,8 +100,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
         </header>
         <main style={{paddingTop: "20px", display: "flex", flexDirection: "column", gap: "7px"}}>
             <textarea className='inputIntroMessage' placeholder='Introduce yourself!' onChange={e => handleIntroChange(e.target.value)} value={introMessage} style={{width: "600px", height: "200px"}}></textarea>
-            <span style={{fontSize: "smaller"}}>Word Count: {introMessage ? `${getWordCount(introMessage)}` : "0"}/{wordLimit}</span>
-            <div style={{margin: "0 auto"}}>
+            <div style={{margin: "0 auto", paddingTop: "15px"}}>
                 <input type="checkbox" checked={sendWithResume} onChange={()=>setSendWithResume(!sendWithResume)}/>
                 <span style={{fontSize: "larger", fontWeight: "300"}}>Attach resume in your message</span>
             </div>
