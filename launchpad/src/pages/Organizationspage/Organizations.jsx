@@ -12,6 +12,8 @@ import { searchDocuments } from "../../services/searchServices";
 import ProfileModal from "../../components/Profilemodal/ProfileModal"
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
+// import { collection, getDocs, limit, query } from "firebase/firestore";
+// import { db } from "../../firebase/firebaseConfig";
 
 const filterContent = {
     organizationType: ["Any Category","Community Service", "Clubs", "Workplace Opportunities", "Nonprofits"],
@@ -42,6 +44,11 @@ export default function Organizations(){
         category: 'Any Category',
         subjectMatter: 'Any Subject Matter'
     });
+
+    // useEffect(() => {
+    //     const orgData = getDocs(query(collection(db, "opportunities"), limit(10)));
+    //     console.log(orgData.docs);
+    // },[]);
 
     const handleConnectClick = (userData = null) => {
         if(userData){
@@ -76,7 +83,7 @@ export default function Organizations(){
         setlastDoc(null);
         setHasMore(true);
         fetchOpportunities(true);
-        console.log("Initial opportunities: ", organizationsData)
+        // console.log("Initial opportunities: ", organizationsData)
     }, [filters]);
 
     const fetchOpportunities = async (isInitial = false) => {
@@ -90,6 +97,7 @@ export default function Organizations(){
 
         setOrganizationsData(results);
         setLoading(false);
+        console.log(results)
         }
     };
 
@@ -209,7 +217,7 @@ export default function Organizations(){
 
     return(
         <>
-            {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={connectTargerUserName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
+            {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={targetUserData.userName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
             {showPfpCard && <ProfileModal visibility={showPfpCard} onClose={()=>setShowPfpCard(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={targetUserData}/>}
             <TopBar/>
             <SideNav/>

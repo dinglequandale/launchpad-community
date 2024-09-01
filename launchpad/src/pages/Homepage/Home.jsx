@@ -9,6 +9,9 @@ import InviteContactsModal from "../../components/InviteContactsmodal/InviteCont
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+// import jsonData from "../Onboarding/tempInitialOrgData.json";
+// import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+// import { db } from "../../firebase/firebaseConfig";
 
 export default function Home(){
 
@@ -150,6 +153,13 @@ export default function Home(){
       refSections.current[sectionTitle] = ref;
       console.log("Section_Title:", refSections)
     };
+
+    // useEffect(() => {
+    //   jsonData.map(async (org, index) => {
+    //     await setDoc(doc(db, "opportunities", org.organizationName), org);
+    //     print("Org ", index + 1, " uploaded")
+    //   })
+    // },[])
 
     return(
         <>
