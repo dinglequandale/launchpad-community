@@ -5,7 +5,7 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 import { PiBuilding, PiGraduationCap, PiStudent, PiSuitcase } from "react-icons/pi";
 import Landing_Nav from "./Landing_Nav/Landing_Nav";
 
-export default function LandingPage() {
+export default function Alumni_LandingPage() {
   const { userLoggedIn } = useAuth();
   const navigate = useNavigate();
 
@@ -46,10 +46,10 @@ export default function LandingPage() {
         <section className="feature-section">
           <div className="feature-card">
             {/* <i className="icon-connections"></i> */}
-            <span className="pillarTitle">Make Invaluable Connections</span>
+            <span className="pillarTitle">Explore Careers & Opportunities</span>
             <div className="pillarText" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
             <span>
-            <span className="highlight">Connect</span> with industry professionals, undergraduates at your dream school, and like-minded peers— all committed to helping you. With just one click, you gain access to a world of opportunities.
+            <span className="highlight">Connect</span> with professionals in your fields of interest to gain insights on work life and explore intern/job opportunities! Talk with other skilled undergrads. Complete reputed surveys to find the careers that best suit you.
             </span>
             </div>
           </div>
@@ -58,16 +58,16 @@ export default function LandingPage() {
             <span className="pillarTitle">Discover Meaningful Opportunities</span>
             <div className="pillarText" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
             <span>
-            <span className="highlight">Find</span> volunteer and leadership positions in town, in line with your interests. Discover workplace opportunities while learning from undergrads and professionals who have done what you want to do!
+            Many students seek to <span className="highlight">follow in your footsteps</span> and attend the same colleges. Share your experiences, offer advice, and <span className="highlight">help foster the next generation</span>!
             </span>
             </div>
           </div>
           <div className="feature-card">
             {/* <i className="icon-community"></i> */}
-            <span className="pillarTitle">Explore Careers & Colleges</span>
+            <span className="pillarTitle">Promote Your Initiatives</span>
             <div className="pillarText">
             <span>
-            <span className="highlight">Complete</span> reputed surveys to find the careers that best suit you. Connect with undergrads and professionals in your fields of interest to gain insight on college and work life. Explore shadow, intern, and job opportunities.
+            <span className="highlight">Have a growing business? </span> A budding project? Promote your initiative to professionals. Looking for help? Connect with talented undergraduates and highschoolers to accelerate your project!
             </span>
             </div>
           </div>
