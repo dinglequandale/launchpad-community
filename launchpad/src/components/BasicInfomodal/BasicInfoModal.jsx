@@ -144,7 +144,6 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   
       try {
         await editUserData(filteredBasicInfo, currentUser, userData);
-
         toast.success('Changes made successfully!', { id: loadingToast });
 
         new Promise( res => setTimeout(res, 500) );

@@ -4,7 +4,8 @@ import { sendConnectMessageWithoutResume, sendConnectMessageWithResume } from '.
 import { useAuth } from '../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { storage } from '../../firebase/firebaseConfig';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
+import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
 
 // TODO: actually implement clickedUser logic
 export default function ConnectModal({visibility, chat, onClose, userId, userName}){
@@ -13,6 +14,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
   const [sendWithResume, setSendWithResume] = useState(false);
   const [channelId, setChannelId] = useState("")
   const {currentUser} = useAuth();
+  const [canSend, setCanSubmit] = useState(introMessage.length > 0);
 
   // const wordLimit = 50;
 
@@ -23,33 +25,37 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
   const navigate = useNavigate();
 
   const onSendClick = async () => {
+    const loadingToast = toast.loading('Sending your message...');
+    setCanSubmit(false);
+    console.log("sending...")
+
     try {
-        await toast.promise(
-          verifySend(),
-          {
-            loading: 'Sending your message ...',
-            success: 'Messag sent successfully!',
-            error: (err) => `Failed to send your message: ${err.message}`,
-          }
-        );
-      } catch (error) {
-        console.error("Error saving opportunity: ", error);
-      }
-  }
+      await verifySend();
+      toast.success('Message sent!', { id: loadingToast });
+
+      new Promise( res => setTimeout(res, 500) );
+
+      navigate("/messages", {state: channelId});
+
+    } catch (error) {
+      toast.error("Error sending your message!");
+      console.error("Error sending your message!", error);
+      setCanSubmit(true);
+    }
+    }
 
   const verifySend = async () => {
+
     try{
         if(sendWithResume){
-            const resumeRef = ref(storage, `resumes/resume_${currentUser.uid}.pdf`);
-            //TODO: Check this
-            const resumeURL = await storage.getDownloadURL(resumeRef);
+          const resumeRef = ref(storage, `resumes/resume_${currentUser.uid}.pdf`);
+          //TODO: Check this
+          const resumeURL = await getDownloadURL(resumeRef);
 
-            // Get the file metadata
-            const metaData = await storage.getMetadata(resumeRef);
-
-            // TODO: user resume read logic
-            
-            await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, userId, setChannelId, chat);
+          // Get the file metadata
+          const metaData = await getMetadata(resumeRef);
+          
+          await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, userId, setChannelId, chat);
         }
         else{
             await sendConnectMessageWithoutResume(introMessage, currentUser.uid, userId, setChannelId, chat);
@@ -58,15 +64,14 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
         console.log(error);
         return;
     }
-    
-    navigate("/messages", {state: channelId});
+
   }
 
   const handleIntroChange = (text) => {
-    const currentWordCount = getWordCount(text);
-    if (currentWordCount <= wordLimit) {
-      setIntroMessage(text);
-    }  
+    if(text.length > 0){
+      setCanSubmit(true);
+    }
+    setIntroMessage(text);
 }
 
   const customStyles = {
@@ -88,6 +93,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
 
   return (
     <div>
+      <Toaster position={'bottom-right'} reverseOrder={false}/>
       <Modal
         isOpen={visibility}
         onRequestClose={onClose}
@@ -108,7 +114,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
           <button onClick={onClose} style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Cancel</button>
-          <button onClick={onSendClick} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+          <button onClick={onSendClick} disabled={!canSend} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Send it over!</button>
         </footer>
       </Modal>
