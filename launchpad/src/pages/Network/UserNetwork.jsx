@@ -147,7 +147,7 @@ export default function UserNetwork() {
   }
   const handleOnProfileClick = (userId) => {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
-    const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2);
+    const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2 + 80);
     
     setProfileModalTop(modalTop);
     if(allVisibleUserData){

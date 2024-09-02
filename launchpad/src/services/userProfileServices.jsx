@@ -176,7 +176,7 @@ export const editUserData = async (newData, currentUser, origUserData) => {
         await updateDoc(userRef, newData);
         pushInitialProfileCompletion({... origUserData, ...newData});
 
-        await updateTypesense('users', currentUser.uid, userData);
+        await updateTypesense('users', currentUser.uid, {... origUserData, ...newData});
     }catch(error){console.log(error)};
 }
 

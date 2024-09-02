@@ -112,7 +112,7 @@ export default function Organizations(){
                 currentUser.uid, 
                 null,
                 lastDoc,
-                5 // Amount to fetch each time
+                5 // amount to fetch each time
             );
 
             if (results.length > 0) {

@@ -49,16 +49,21 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
     try{
         if(sendWithResume){
           const resumeRef = ref(storage, `resumes/resume_${currentUser.uid}.pdf`);
+          if(!resumeRef){
+            await sendConnectMessageWithoutResume(introMessage, currentUser.uid, userId, setChannelId, chat);
+            return;
+          }
           //TODO: Check this
           const resumeURL = await getDownloadURL(resumeRef);
 
           // Get the file metadata
           const metaData = await getMetadata(resumeRef);
           
+          
           await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, userId, setChannelId, chat);
         }
         else{
-            await sendConnectMessageWithoutResume(introMessage, currentUser.uid, userId, setChannelId, chat);
+          await sendConnectMessageWithoutResume(introMessage, currentUser.uid, userId, setChannelId, chat);
         }
     }catch(error){
         console.log(error);
