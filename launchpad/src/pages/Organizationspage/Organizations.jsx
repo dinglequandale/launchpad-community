@@ -174,7 +174,7 @@ export default function Organizations(){
 
     const handleShowProfile = (userData) => {
         const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2);
+        const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2 + 80);
 
         setTargetUserData(userData);
 
@@ -218,7 +218,7 @@ export default function Organizations(){
     return(
         <>
             {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={targetUserData.userName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
-            {showPfpCard && <ProfileModal visibility={showPfpCard} onClose={()=>setShowPfpCard(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={targetUserData}/>}
+            {showPfpCard && <ProfileModal visibility={showPfpCard} onClose={()=>setShowPfpCard(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={targetUserData} handleReferalClick={handleReferalClick}/>}
             <TopBar/>
             <SideNav/>
             <div className='organizationsContainer' style={{paddingTop: "4%", paddingLeft: "10%"}}>
