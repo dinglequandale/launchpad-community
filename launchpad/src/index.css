@@ -83,15 +83,20 @@ input[type="checkbox"]::before {
   transform: translateY(-4px);
   margin-right: 7px;
   cursor: pointer;
-  box-shadow: var(--shadowColor);
+  transition: box-shadow .5s ease;
+  /* box-shadow: var(--shadowColor); */
 }
 
 input[type="checkbox"]:checked::before {
-  background-color: var(--highlight); /* Or your desired color */
+  background-color: #9598f5eb; /* Or your desired color */
   content: "\2713"; /* Unicode checkmark character */
   color: white;
   text-align: center;
   font-size: 16px; /* Adjust size as needed */
+}
+
+input[type="checkbox"]::before:hover{
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(46, 178, 255, 0.19);
 }
 
 
@@ -108,13 +113,18 @@ form select{
 textarea{
   color: var(--secondary);
   padding: 5px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
   border-radius: 10px;
   border-style: solid;
   border-color: var(--secondary);
   font-family: "Inter";
   border-width: 1.5px;
   font-size: 18px;
+  transition: box-shadow .5s ease;
+}
+
+textarea:hover{
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(46, 178, 255, 0.19);
 }
 
 hr {
