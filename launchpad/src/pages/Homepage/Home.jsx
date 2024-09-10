@@ -10,8 +10,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 // import jsonData from "../Onboarding/tempInitialOrgData.json";
-// import { addDoc, collection, doc, setDoc } from "firebase/firestore";
-// import { db } from "../../firebase/firebaseConfig";
+import { collection, doc, getDocs, query, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
 
 export default function Home(){
 
@@ -159,6 +159,25 @@ export default function Home(){
     //     await setDoc(doc(db, "opportunities", org.organizationName), org);
     //     print("Org ", index + 1, " uploaded")
     //   })
+    // },[])
+    
+    // useEffect(() => {
+    //   const writeData = async () => {
+    //     const q = query(collection(db, "opportunities"));
+
+    //     const querySnapshot = await getDocs(q);
+    //     querySnapshot.forEach(async (d) => {
+    //       if(d.id.includes(" ")){ // doc.data() is never undefined for query doc snapshots
+    //         console.log(d.id);
+    //         const docRef = doc(db, "opportunities", d.id);
+
+    //         new Promise( res => setTimeout(res, 10000) );
+    //         await updateDoc(docRef, {createdAt: new Date()});
+    //       }
+    //     });
+    //   }
+
+    //   writeData();
     // },[])
 
     return(

@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { GrAdd } from "react-icons/gr";
 import Modal from "react-modal";
 import { editUserData } from "../../services/userProfileServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
+import { BiPlus, BiTrash, BiX } from "react-icons/bi";
+import "./skillmodal.css";
+import { IoCloseOutline } from "react-icons/io5";
 
 export default function SkillModal({visibility, onClose, userData}) {
 
@@ -29,14 +32,19 @@ export default function SkillModal({visibility, onClose, userData}) {
         };
     
     const handleInputChange = (key, value, index) => {
-        setSkillData([...skillData.map((userData) => (userData.id === index ? {id: index, ... skillData[index], [key]: value} : userData))]);
+        setSkillData([...skillData.map((skill) => (skill.id === index ? {id: index, ... skillData[index], [key]: value} : skill))]);
         console.log(skillData);
     }
 
-    const handleAddTargetUser = () => {
+    const handleAddSkill = () => {
     setSkillData([...skillData, {id: skillData.length, skillCategory: "", skillDescription: ""}]);
     console.log(skillData)
-    }
+    };
+    
+    const handleRemoveSkill = (index) => {
+        const updatedSkills = skillData.filter((_, i) => i !== index);
+        setSkillData(updatedSkills);
+    };
 
     const handleSubmit = async () => {
         const loadingToast = toast.loading('Making your changes...');
@@ -57,40 +65,70 @@ export default function SkillModal({visibility, onClose, userData}) {
         }
     };
 
+    const modalRef = useRef();
+
+    useEffect(() => {
+      let onClickOutside = (e) => {
+          if(!modalRef.current.contains(e.target)){
+            onClose();
+          }
+      }
+      document.addEventListener("mousedown", onClickOutside)
+  })
+
     return (
-    <div>
+    <>
         <Toaster position="bottom-right" reverseOrder={false} />
-        <Modal
-        isOpen={visibility}
-        onRequestClose={onClose}
-        style={customStyles}
-        contentLabel="Skills Modal"
-        >
-        <header>
-            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Introduce your Skill Set <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress Professionals and Secure Internships</span></h2>
-            <hr style={{borderColor: "var(--secondary)"}}/>
-        </header>
-        <main style={{paddingTop: "10px", display: "flex", flexDirection: "column", gap: "7px"}}>
-            {skillData.map((user, index) => (
-                <form onSubmit={handleAddTargetUser}>
-                <h2 style={{color: "var(--secondary)", textAlign: "center"}}>Skill {index + 1}</h2>
-                <div style={{display: "flex", justifyContent: "space-around"}}>
-                <input type="text" style={{width: "35%"}} value={user.skillCategory} placeholder="Skill Category" onChange={(e) => handleInputChange("skillCategory", e.target.value, index)}/>
-                <input type="text" style={{width: "50%"}} value={user.skillDescription} placeholder="Brief Description" onChange={(e) => handleInputChange("skillDescription", e.target.value, index)}/>
+        <div className="modal-overlay">
+            <div className="modal-content" ref={modalRef}>
+            
+            <div className="close-skills"><IoCloseOutline size={30} /></div>
+            <header>
+                <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Introduce your Skill Set <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress Professionals and Secure Internships</span></h2>
+                <hr style={{borderColor: "var(--secondary)"}}/>
+            </header>
+            
+            <div className="skills-modal-container">
+            {skillData.map((skill, index) => (
+                <div key={index} className="skill-item">
+                <div className="skill-header">
+                    <h3>Skill {index + 1}</h3>
+                    {index > 0 && (
+                    <button className="btnText remove-button" onClick={() => handleRemoveSkill(index)}>
+                        <BiTrash size={22} />
+                    </button>
+                    )}
                 </div>
-                </form>
+                <input
+                    type="text"
+                    placeholder="Skill Category"
+                    value={skill.skillCategory}
+                    onChange={(e) => handleInputChange("skillCategory", e.target.value, index)}
+                />
+                <input
+                    type="text"
+                    placeholder="Brief Description"
+                    value={skill.skillDescription}
+                    onChange={(e) => handleInputChange("skillDescription", e.target.value, index)}
+                />
+                </div>
             ))}
-        </main>
-        <footer style={{paddingTop: "20px", position: "relative"}}>
-            <button className="btnText" onClick={handleAddTargetUser} style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", fontSize: "larger", margin: "0 auto", marginBottom: "20px"}}><GrAdd size={25}/> Add skill</button>
-            <div style={{display: "flex", justifyContent: "space-between",}}>
-                <button onClick={onClose} className="btnUnfilled" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger"}}>
-                    Cancel</button>
-                <button onClick={handleSubmit} type='submit' style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-                    Submit</button>
             </div>
-        </footer>
-        </Modal>
+            
+            <button className="btnUnfilled skill-add-button" onClick={handleAddSkill}>
+            <BiPlus size={20} /> Add Skill
+            </button>
+            <footer style={{paddingTop: "20px", position: "relative"}}>
+                {/* <button className="btnText" onClick={handleAddSkill} style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", fontSize: "larger", margin: "0 auto", marginBottom: "20px"}}><GrAdd size={25}/> Add skill</button> */}
+                <div style={{display: "flex", justifyContent: "space-between",}}>
+                    <button onClick={onClose} className="btnUnfilled" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger"}}>
+                        Cancel</button>
+                    <button onClick={handleSubmit} type='submit' style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+                        Submit</button>
+                </div>
+            </footer>
+        </div>
     </div>
+    </>
     )
 }

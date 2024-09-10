@@ -9,7 +9,7 @@ import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
 import { displayColleges, displayFieldsOfInterest, displayShortenedName, getBasicUserDescription, lowerAndCapitalize } from '../../services/userProfileServices';
 
-export default function ProfileCard({userData, visibility, onClose, top, onConnectClick}) {
+export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick}) {
 
     const userType = userData.userType;
     const userName = userData.userName;
@@ -115,7 +115,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                             <div style={{textAlign: "center", marginBottom: ".6rem"}}>
                             <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", paddingBottom: "3rem"}}>{userName.split(" ")[0]} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"}<span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
                             </div>
-                            <OrganizationProfile location={"user_profile_public"} organizationData={opportunityData}/> </div> : opportunityLoading ? <Loading/> : null}
+                            <OrganizationProfile location={"user_profile_public"} organizationData={opportunityData} handleReferalClick={handleReferalClick}/> </div> : opportunityLoading ? <Loading/> : null}
                         {userData.userAboutMe && <div name="userAboutMe" style={{paddingTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s About Me</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>

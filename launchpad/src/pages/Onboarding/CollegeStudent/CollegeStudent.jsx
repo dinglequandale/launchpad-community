@@ -6,6 +6,7 @@ import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInf
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { BiPlus, BiTrash } from 'react-icons/bi';
 
 const collegeStudentQuestionsConfig = [
   {
@@ -67,17 +68,25 @@ const collegeStudentQuestionsConfig = [
     options: ["French", "International"].map(option => ({ value: option, label: option })),
     page: 2,
   },
+  // {
+  //   id: "networkingLevel",
+  //   text: "Your knowledge and mentorship is a valuable reasource for students on this app.  \
+  //         Please roughly assess your level of commitment:",
+  //   type: "multi-select",
+  //   options: [
+  //       "Casual Connections",
+  //       "General Inquires",
+  //       "Short Interviews / Coffee Chats",
+  //       "Mentorship",
+  //   ].map(option => ({ value: option, label: option })),
+  //   page: 3,
+  //   optional: true,
+  // },
+
+  // Page 3
   {
-    id: "networkingLevel",
-    text: "Your knowledge and mentorship is a valuable reasource for students on this app.  \
-          Please roughly assess your level of commitment:",
-    type: "multi-select",
-    options: [
-        "Casual Connections",
-        "General Inquires",
-        "Short Interviews / Coffee Chats",
-        "Mentorship",
-    ].map(option => ({ value: option, label: option })),
+    id: "userSkills",
+    text: "List out skills that make you standout to professionals:",
     page: 3,
     optional: true,
   },
@@ -160,8 +169,8 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
         selectedOptions={collegeStudentData}
         handleChange={handleChange} 
         collegeStudentData={collegeStudentData}/>;
-      // case 3:
-      //   return <ConnectionLevel selectedOptions={collegeStudentData} setSelectedOptions={setCollegeStudentData} />;
+      case 3:
+        return <UserSkills selectedOptions={collegeStudentData} setSelectedOptions={setCollegeStudentData} />;
       default:
         return null;
     }
@@ -284,3 +293,81 @@ const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
     </div>
   );
 };
+
+
+const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
+
+  const OptionalLabel = () => (
+    <span className="optional-label" style={{fontSize: "15px"}}>(Optional)</span>
+  );
+
+
+
+  const [skillData,setSkillData] = useState(selectedOptions.userSkills.length > 0 ? selectedOptions.userSkills : [{id: 0, skillCategory: "", skillDescription: ""}]);
+
+
+  useEffect(() => {
+    setSelectedOptions({... selectedOptions, userSkills: skillData});
+  },[skillData])
+
+  const handleInputChange = (key, value, index) => {
+      // setSkillData([...skillData.map((skill) => (skill.id === index ? {id: index, ... skillData[index], [key]: value} : skill))]);
+      console.log(skillData);
+      // setSelectedOptions({... selectedOptions, userSkills: [...skillData.map((skill) => (skill.id === index ? {id: index, ... skillData[index], [key]: value} : skill))]});
+      setSkillData([...skillData.map((skill) => (skill.id === index ? {id: index, ... skillData[index], [key]: value} : skill))]);
+    }
+
+  const handleAddSkill = () => {
+    setSkillData([...skillData, {id: skillData.length, skillCategory: "", skillDescription: ""}]);
+  };
+  
+  const handleRemoveSkill = (index) => {
+      const updatedSkills = skillData.filter((_, i) => i !== index);
+      setSkillData(updatedSkills);
+  };
+
+  return (
+      <div className='onboardingQuestions'>
+        {/* <div style={{border: "solid 1.5px var(--secondary)", textAlign: "center", padding: "8px 0px", background: "var(--neutral)"}}>
+          <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and mentorship</span> <br /> is a valuable reasource for students on this app.</span></div> */}
+        <div style={{position: "relative"}}>
+        <label className='onboardingQuestion'>List some of your skills:</label>
+        <div style={{position: "absolute", bottom: "-13px"}}>
+            <OptionalLabel />
+            </div>
+        </div>
+            <div className="skills-modal-container" style={{maxHeight: "300px", width: "500px"}}>
+            {selectedOptions.userSkills.map((skill, index) => (
+                <div key={index} className="skill-item">
+                <div className="skill-header">
+                    <h3>Skill {index + 1}</h3>
+                    {index > 0 && (
+                    <button className="btnText remove-button" onClick={() => handleRemoveSkill(index)}>
+                        <BiTrash size={22} />
+                    </button>
+                    )}
+                </div>
+                <input
+                    type="text"
+                    placeholder="Skill Category"
+                    value={skill.skillCategory}
+                    onChange={(e) => handleInputChange("skillCategory", e.target.value, index)}
+                />
+                <input
+                    type="text"
+                    placeholder="Brief Description"
+                    value={skill.skillDescription}
+                    onChange={(e) => handleInputChange("skillDescription", e.target.value, index)}
+                />
+                </div>
+            ))}
+            </div>
+            
+            <button className="btnUnfilled skill-add-button" style={{marginTop: "2px"}} onClick={handleAddSkill}>
+            <BiPlus size={20} /> Add Skill
+            </button>
+        
+    </div>
+  );
+};
+

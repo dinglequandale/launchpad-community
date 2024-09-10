@@ -147,7 +147,7 @@ export default function UserNetwork() {
   }
   const handleOnProfileClick = (userId) => {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
-    const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2);
+    const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2 + 80);
     
     setProfileModalTop(modalTop);
     if(allVisibleUserData){
@@ -176,12 +176,35 @@ export default function UserNetwork() {
       setProfessionals(searchResults.filter((result) => result.userType === "Professional"));
     }
   };
+
+  const handleEmailClick = (email) => {
+    // TODO
+  }
+
+  const handleReferalClick = async (referalType, organizationData, userData) => {
+    setConnectTargetUserId(userData);
+
+    const referalValue = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}`];
+    const methodType = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}Method`];
+    
+    switch(methodType){
+        case "Messages":
+            handleConnectClick(userData);
+            return;
+        case "Email":
+            handleEmailClick(referalValue);
+            return;
+        case "Website":
+            window.open(referalValue, '_blank', 'noopener,noreferrer');
+            return;
+    }
+}
     
   return (
     <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick, loadLimit, filterChanged}}>
       <>
         {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={connectTargerUserName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
-        {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={profileTargetData}/>}
+        {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} handleReferalClick={handleReferalClick} userData={profileTargetData}/>}
         <div>
             <TopBar/>
             <SideNav/>

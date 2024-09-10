@@ -245,8 +245,8 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
           onRequestClose={onClose}
           style={customStyles}
           contentLabel="Initiative Modal"
-          shouldCloseOnOverlayClick={false}
-          shouldCloseOnEsc={false}
+          // shouldCloseOnOverlayClick={false}
+          // shouldCloseOnEsc={false}
         >
           
           <header>

@@ -105,7 +105,7 @@ export default function EditProfileCard() {
                 opportunityId={""}/>
             
             : <InitiativeModal 
-                onClose={()=>setOpportunityModalVisibility(false)} 
+                onClose={()=>setNewOpportunityModalVisibility(false)} 
                 visibility={newOpportunityModalVisibility}
                 opportunityData={null} 
                 isEditing={false} 
@@ -636,7 +636,7 @@ function ConnectionAvailability(){
                     <span style={{textDecoration: "underline"}}>Add Your Availability</span>
                 </div>}
                 {availabilityData && <div style={{position: "relative", paddingTop: "10px", alignItems: "center"}}>
-                    <div className='addOne' style={{position: "absolute", right: "0"}}>
+                    <div className='addOne' style={{position: "absolute", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto", right: "0"}}>
                         <EditInformation isAnswered={true} questionName={"Availability"} onEdit={()=>setAvailabilityModalVisibility(true)}/>
                     </div>
                     <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px"}}>
