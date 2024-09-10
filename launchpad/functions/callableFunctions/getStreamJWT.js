@@ -15,18 +15,11 @@ exports.createStreamToken = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   const uid = context.auth.uid;
-  console.log(uid);
+  // console.log('API Key:', process.env.STREAM_API_KEY);
+  // console.log('Secret:', process.env.STREAM_SECRET);
+  // console.log('User Authentication:', uid);
   try {
-    // const { users } = await serverClient.queryUsers({ id: uid });
     
-    // if (users.length === 0) {
-    //   await serverClient.upsertUser({ 
-    //     id: uid, 
-    //     name: 'Anonymous',
-    //     image: ""
-    //   });
-    // }
-
     console.log('Attempting to create Stream token');
     const streamToken = serverClient.createToken(uid);
     console.log('Stream token created successfully');

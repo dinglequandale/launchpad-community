@@ -67,7 +67,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     else{
 
       // Add ordering to ensure consistent pagination
-      // q = query(q, orderBy('createdAt'));
+      q = query(q, orderBy('createdAt'));
 
       if (lastDoc) {
           q = query(q, startAfter(lastDoc));

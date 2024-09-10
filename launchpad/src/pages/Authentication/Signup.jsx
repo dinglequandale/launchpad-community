@@ -51,9 +51,10 @@ export default function SignUp(){
             doSignInWithGoogle().catch(error => {
                 setUserIsSigningIn(false);
                 toast.error("Sorry! There was an issue signing you in. Try again!");
+            }).then(()=>{
+                navigate("/Onboarding");
             })
         }
-        navigate("/Onboarding");
     }
 
     return(

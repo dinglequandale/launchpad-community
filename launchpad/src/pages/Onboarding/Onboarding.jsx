@@ -16,13 +16,14 @@ export default function Onboarding() {
     const [selectedOption, setSelectedOption] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [canSubmit, setCanSubmit] = useState(false);
+    const [agreedToTerms, setAgreedToTerms] = useState(false);
 
     const getNumOfSections = () => {
         switch(selectedOption){
             case "High Schooler":
                 return 3;
             case "College Student":
-                return 2;
+                return 3;
             case "Professional":
                 return 5;
             default:
@@ -64,9 +65,13 @@ export default function Onboarding() {
             </header>
             <main style={{marginBottom: "2rem"}}>
             {!showComponent ? (
-                <>
+                <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                     <UserType setSelectedOption={setSelectedOption} selectedOption={selectedOption}/>
-                </>
+                    <div style={{display: "flex", marginTop: "15px"}}>
+                        <input type="checkbox" checked={agreedToTerms} onChange={()=>setAgreedToTerms(!agreedToTerms)}/>
+                        <span>I accept the <a href="/" style={{textDecoration: "underline"}}>Privacy Policy</a> and the <a href="" style={{textDecoration: "underline"}}>Terms and Conditions</a>.</span>
+                    </div>
+                </div>
             ) : (
                 <>
                     {selectedOption === "High Schooler" && <HighSchooler currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
@@ -75,12 +80,12 @@ export default function Onboarding() {
                 </>
             )}    
             </main>
-            <footer style={{paddingTop: "10px", display: "flex", justifyContent: "space-between", width: "100%"}}>
+            <footer style={{display: "flex", justifyContent: "space-between", width: "100%"}}>
                 <button style={{visibility: `${currentPage === 0 ? "hidden" : "visible"}`}} className="btnUnfilled continueButton" onClick={handlePrev}>
                     Previous
                 </button>
                 {(currentPage !== numOfSections || numOfSections === 0) ? 
-                <button className="continueButton" onClick={handleContinue} disabled={!selectedOption}>
+                <button className="continueButton" onClick={handleContinue} disabled={!selectedOption || !agreedToTerms}>
                 Continue
                 </button>
                 : 
