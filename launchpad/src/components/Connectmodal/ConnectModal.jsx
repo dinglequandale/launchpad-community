@@ -8,13 +8,15 @@ import toast, { Toaster } from 'react-hot-toast';
 import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
 
 // TODO: actually implement clickedUser logic
-export default function ConnectModal({visibility, chat, onClose, userId, userName}){
+export default function ConnectModal({visibility, chat, onClose, userId, userName, isOpportunity=false, opportunityType=null}){
 
   const [introMessage, setIntroMessage] = useState("");
   const [sendWithResume, setSendWithResume] = useState(false);
   const [channelId, setChannelId] = useState("")
   const {currentUser} = useAuth();
   const [canSend, setCanSubmit] = useState(introMessage.length > 0);
+
+  const userType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
 
   // const wordLimit = 50;
 
@@ -106,7 +108,9 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
         contentLabel="Connect Modal"
       >
         <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Connect with {userName} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Gain valuable internships and mentorship</span></h2>
+          {!isOpportunity ? <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Connect with {userName} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Gain valuable internships and mentorship</span></h2>
+          :
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Join {userName}'s {userType === "Professional" ? "Opportunity" : "Initiative"} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Send an Introductory Message</span></h2>}
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{paddingTop: "20px", display: "flex", flexDirection: "column", gap: "7px"}}>

@@ -15,6 +15,7 @@ import { getFilteredData } from "../../services/filteringServices";
 import { searchDocuments } from "../../services/searchServices";
 import NoResults from "../../components/NoResultsnotifier/NoResults";
 import Loading from "../../components/LoadingAnimation/Loading";
+import toast, { Toaster } from "react-hot-toast";
 
 
 const NetworkContext = createContext();
@@ -177,9 +178,17 @@ export default function UserNetwork() {
     }
   };
 
-  const handleEmailClick = (email) => {
-    // TODO
-  }
+  const handleEmailClick = async (email) => {
+    console.log(`Email clicked: ${email}`)
+    try {
+        await navigator.clipboard.writeText(email);
+        toast.success('Email copied to clipboard!');
+      } catch (err) {
+        console.error('Failed to copy email: ', err);
+        toast.error('Failed to copy email');
+      }
+  
+}
 
   const handleReferalClick = async (referalType, organizationData, userData) => {
     setConnectTargetUserId(userData);
@@ -203,6 +212,7 @@ export default function UserNetwork() {
   return (
     <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick, loadLimit, filterChanged}}>
       <>
+        <Toaster position={'bottom-right'} reverseOrder={false}/>
         {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={connectTargerUserName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
         {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} handleReferalClick={handleReferalClick} userData={profileTargetData}/>}
         <div>
