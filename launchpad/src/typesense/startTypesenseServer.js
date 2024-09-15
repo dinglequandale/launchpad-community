@@ -3,7 +3,7 @@ import { exec } from "child_process";
 const API_KEY = 'xyz';
 const PORT = 8108;
 
-const command = `docker run -d -p ${PORT}:8108 -v\`pwd\`/typesense-server-data/:/data \
+const command = `docker run -d -p ${PORT}:8108 -v typesense-server-data/:/data \
 typesense/typesense:26.0 --data-dir /data --api-key=${API_KEY} --listen-port ${PORT}  --enable-cors`;
 
 exec(command, (err, stdout, stderr) => {
