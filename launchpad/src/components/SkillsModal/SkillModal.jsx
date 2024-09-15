@@ -82,7 +82,7 @@ export default function SkillModal({visibility, onClose, userData}) {
         <div className="modal-overlay">
             <div className="modal-content" ref={modalRef}>
             
-            <div className="close-skills"><IoCloseOutline size={30} /></div>
+            <div className="close-skills" onClick={onClose}><IoCloseOutline size={30} /></div>
             <header>
                 <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Introduce your Skill Set <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress Professionals and Secure Internships</span></h2>
                 <hr style={{borderColor: "var(--secondary)"}}/>

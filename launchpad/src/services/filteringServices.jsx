@@ -29,8 +29,9 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
         }
         else if(key === "collegeInterestsOrDecision"){
             return {
-                key: "collegeInterestsOrDecision",
-                operation: "array-contains-any",
+              // TODO: Check this works...
+                key: "schoolAttending",
+                operation: "in",
                 value: userColleges,
             };
         } else if (Array.isArray(value)) {

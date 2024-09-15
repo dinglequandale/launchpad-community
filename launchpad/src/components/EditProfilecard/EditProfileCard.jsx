@@ -122,28 +122,35 @@ export default function EditProfileCard() {
                     </div>
                     <BasicInfoCard descType={descType()}/>
                 </div>
-                <div style={{paddingTop: "20px"}}>
-                    {(!opportunitiesLoading && opportunitiesData.length > 0) ? opportunitiesData.map((opportunityData, index)=>(
-                        <OpportunityPopup 
-                            opportunityData={opportunityData} 
-                            key={index}
-                            opportunitiesOptions={opportunitiesOptions} 
-                            opportunityModalVisibility={opportunityModalVisibility} 
-                            setOpportunityModalVisibility={setOpportunityModalVisibility}
-                        />
-                        )) 
+                <div>
+                    {(!opportunitiesLoading && opportunitiesData.length > 0) ? 
+                    
+                    (
+                        <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
+                            {opportunitiesData.map((opportunityData, index)=>(
+                                <OpportunityPopup 
+                                    opportunityData={opportunityData} 
+                                    key={index}
+                                    opportunitiesOptions={opportunitiesOptions} 
+                                    opportunityModalVisibility={opportunityModalVisibility} 
+                                    setOpportunityModalVisibility={setOpportunityModalVisibility}
+                                />
+                            ))}
+                        </div> )
                         :
                     (opportunitiesLoading) ? 
-                    <Loading/> :
-                    <OpportunityPopup opportunityData={null}  opportunitiesOptions={opportunitiesOptions} opportunityModalVisibility={opportunityModalVisibility} 
-                    setOpportunityModalVisibility={setOpportunityModalVisibility}/>}
+                    <div style={{marginTop: "40px"}}><Loading/></div>
+                     :
+                    <div style={{marginTop: "20px"}}>
+                        <OpportunityPopup opportunityData={null}  opportunitiesOptions={opportunitiesOptions} opportunityModalVisibility={opportunityModalVisibility} 
+                        setOpportunityModalVisibility={setOpportunityModalVisibility}/>
+                    </div>
+                    }
                 </div>
-                <div>
-                {!opportunitiesLoading && opportunitiesData.length > 0 && <div className="addOne" onClick={()=>setNewOpportunityModalVisibility(true)}>
+                {(!opportunitiesLoading && opportunitiesData.length > 0) && <div className="addOne" onClick={()=>setNewOpportunityModalVisibility(true)}>
                     <IoAdd size={25} />
                     <span style={{textDecoration: "underline"}}>Add another opportunity!</span>
                 </div>}
-                </div>
                 <AboutMeDisplay/>
                 {(userData && userData.userType !== "Professional") && <div name="skills" style={{marginTop: "20px"}}>
                     <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Skills ...</span>
@@ -537,7 +544,7 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, opportunityMod
                 isEditing={isEditing} 
                 opportunityId={opportunityId}/>}
         </div>
-        <div style={{position: "relative", height: "230px"}}>
+        <div style={{position: "relative"}}>
             { (currentOpportunityData && !loading) ? <>
             <div style={{textAlign: "center", marginBottom: "12px"}}>
             <span

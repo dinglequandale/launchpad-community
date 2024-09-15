@@ -12,6 +12,7 @@ import { searchDocuments } from "../../services/searchServices";
 import ProfileModal from "../../components/Profilemodal/ProfileModal"
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
+import toast, { Toaster } from "react-hot-toast";
 // import { collection, getDocs, limit, query } from "firebase/firestore";
 // import { db } from "../../firebase/firebaseConfig";
 
@@ -124,8 +125,16 @@ export default function Organizations(){
     }, [loading, hasMore]);
 
 
-    const handleEmailClick = (email) => {
+    const handleEmailClick = async (email) => {
         console.log(`Email clicked: ${email}`)
+        try {
+            await navigator.clipboard.writeText(email);
+            toast.success('Email copied to clipboard!');
+          } catch (err) {
+            console.error('Failed to copy email: ', err);
+            toast.error('Failed to copy email');
+          }
+      
     }
 
     const handleReferalClick = async (referalType, organizationData, userData) => {
@@ -206,7 +215,8 @@ export default function Organizations(){
 
     return(
         <>
-            {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={targetUserData.userName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
+            <Toaster position={'bottom-right'} reverseOrder={false}/>
+            {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={targetUserData.userName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId} isOpportunity={true}/>}
             {showPfpCard && <ProfileModal visibility={showPfpCard} onClose={()=>setShowPfpCard(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={targetUserData} handleReferalClick={handleReferalClick}/>}
             <TopBar/>
             <SideNav/>

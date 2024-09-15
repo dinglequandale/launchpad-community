@@ -179,10 +179,11 @@
   
   .feature-section {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     padding: 0 20px;
     margin: 80px 0;
     gap: 10px;
+    max-width: 1500px;
   }
   
   .feature-card {
