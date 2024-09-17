@@ -9,6 +9,14 @@ but you probably should also make an individual personalized CSS file for each p
     font-size: 24px;
     border-radius: 15px;
     width: 220px;
+    background-color: var(--secondary);
+}
+
+.prevButton {
+  padding: 10px 20px;
+  font-size: 24px;
+  border-radius: 15px;
+  width: 220px;
 }
 
 .onboardingQuestions{

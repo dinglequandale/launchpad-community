@@ -299,7 +299,7 @@ function SkillBase() {
                     </div>
                 </div>
             )
-            : <div className="addOne" onClick={()=>setNewOpportunityModalVisibility(true)}>
+            : <div className="addOne" onClick={()=>setSkillModalVisibility(true)}>
                 <IoAdd size={25} />
                 <span style={{textDecoration: "underline"}}>Add your skills!</span>
             </div>}

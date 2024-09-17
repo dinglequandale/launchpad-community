@@ -81,7 +81,7 @@ export default function Onboarding() {
             )}    
             </main>
             <footer style={{display: "flex", justifyContent: "space-between", width: "100%"}}>
-                <button style={{visibility: `${currentPage === 0 ? "hidden" : "visible"}`}} className="btnUnfilled continueButton" onClick={handlePrev}>
+                <button style={{visibility: `${currentPage === 0 ? "hidden" : "visible"}`}} className="btnUnfilled prevButton" onClick={handlePrev}>
                     Previous
                 </button>
                 {(currentPage !== numOfSections || numOfSections === 0) ? 
