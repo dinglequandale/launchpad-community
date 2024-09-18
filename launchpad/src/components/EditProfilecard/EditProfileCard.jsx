@@ -499,7 +499,9 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, opportunityMod
 
     // const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
     const [deleteWarningVisibility, setDeleteWarningVisibility] = useState(false);
-    const [opportunityId, setOpportunityId] = useState(currentOpportunityData.id);
+
+    // TODO: Diagnose...
+    const [opportunityId, setOpportunityId] = useState(currentOpportunityData ? currentOpportunityData.id : "");
     const [loading, setLoading] = useState(false);
     const [isEditing,setIsEditing] = useState(false);
     
