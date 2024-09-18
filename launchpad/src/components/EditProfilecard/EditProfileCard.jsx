@@ -70,10 +70,13 @@ export default function EditProfileCard() {
     useEffect(() => {
         setOpportunitiesLoading(true);
         const unsubscribe = loadOpportunities(currentUser, setOpportunitiesLoading, setOpportunitiesData);
+
         return () => unsubscribe();
       }, [currentUser]);
 
-    console.log(userData)
+    console.log(opportunitiesData);
+
+    // console.log(userData)
 
     const opportunitiesOptions = {highSchool: 
     <span style={{color: "#006876", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
@@ -299,7 +302,7 @@ function SkillBase() {
                     </div>
                 </div>
             )
-            : <div className="addOne" onClick={()=>setNewOpportunityModalVisibility(true)}>
+            : <div className="addOne" onClick={()=>setSkillModalVisibility(true)}>
                 <IoAdd size={25} />
                 <span style={{textDecoration: "underline"}}>Add your skills!</span>
             </div>}
@@ -319,7 +322,6 @@ function ResumeUpload(){
     }
 
     const currentResumePfpUrl = userData.userResumePreview ? userData.userResumePreview.split(" ")[userData.userResumePreview.split(" ").length - 1] : null;
-    console.log("currentresume:", userData.userResumePreview)
     const currentPrivacy = (userData.userResumePreview && userData.userResumePreview.split(" ")[0] === "private") ? "private" : "";
 
     const [pdfUrl, setPdfUrl] = useState(currentResumePfpUrl);
@@ -370,7 +372,7 @@ function BasicInfoCard({descType}){
     const [pfpEditVisibility, setPfpEditVisibility] = useState(false);
 
     const [pfpUrl, setPfpUrl] = useState(userData.userPfpPreview);
-    console.log("pfpUrl", userData.userPfpPreview)
+    // console.log("pfpUrl", userData.userPfpPreview)
 
     const pfpInputRef = useRef(null);
     const resumeInputRef = useRef(null);
@@ -497,30 +499,24 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, opportunityMod
 
     // const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
     const [deleteWarningVisibility, setDeleteWarningVisibility] = useState(false);
-    const [opportunityId, setOpportunityId] = useState("");
+    const [opportunityId, setOpportunityId] = useState(currentOpportunityData.id);
     const [loading, setLoading] = useState(false);
     const [isEditing,setIsEditing] = useState(false);
     
-
-    // useEffect(() => {
-    //     setLoading(true);
-    //     const unsubscribe = loadOpportunities(currentUser, setLoading, setOpportunityData);
-    //     return () => unsubscribe();
-    //   }, [currentUser]);
-
+    console.log("current opportunity", currentOpportunityData)
     
-    useEffect(()=>{
-        if(currentOpportunityData){
-            setOpportunityId(currentOpportunityData.id);
-        }
-    },[currentOpportunityData]);
+    // useEffect(()=>{
+    //     console.log("Current opportunity data:", currentOpportunityData)
+    //     if(currentOpportunityData){
+    //         setOpportunityId(currentOpportunityData.id);
+    //     }
+    // },[currentOpportunityData]);
 
     const deleteOpportunity = (opportunityId) => {
         handleDeleteOpportunity(opportunityId);
         setCurrentOpportunityData(null);
     }
 
-    console.log(currentOpportunityData)
     console.log(opportunityModalVisibility, "opportunity modal vis")
 
     return(

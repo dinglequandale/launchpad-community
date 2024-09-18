@@ -1,17 +1,38 @@
 import "./home.css";
 import TopBar from "../../components/Topbar/TopBar";
 import SideNav from "../../components/Sidenav/SideNav";
-import ReactPlayer from "react-player";
+import ReactPlayer from "react-player/youtube";
 import ProfileStrength from "../../components/Profilestrength/ProfileStrength";
 import { FaArrowCircleDown } from "react-icons/fa";
-import { createRef, useEffect, useRef, useState } from "react";
+import React, { createRef, useEffect, useRef, useState } from "react";
 import InviteContactsModal from "../../components/InviteContactsmodal/InviteContactsModal";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 // import jsonData from "../Onboarding/tempInitialOrgData.json";
-import { collection, doc, getDocs, query, updateDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
+// import { collection, doc, getDocs, query, updateDoc } from "firebase/firestore";
+// import { db } from "../../firebase/firebaseConfig";
+
+
+class ErrorBoundary extends React.Component {
+  state = { hasError: false };
+  
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+  
+  componentDidCatch(error, info) {
+    console.error("ReactPlayer error:", error, info);
+  }
+  
+  render() {
+    if (this.state.hasError) {
+      return <div>Error loading video player</div>;
+    }
+    return this.props.children;
+  }
+}
+
 
 export default function Home(){
 
@@ -200,11 +221,13 @@ export default function Home(){
                             Welcome to Launchpad! &nbsp; <span style={{fontSize: "smaller", fontWeight:"400"}}>(Watch Full Video)</span>
                         </span>
                         <div style={{paddingTop: "15px", height: "330px"}}>
+                        <ErrorBoundary>
                             <ReactPlayer
                                 url='https://www.youtube.com/watch?v=uhnxWBqVvbY'
                                 width='100%'
                                 height='100%'
                                 controls={true}/>
+                        </ErrorBoundary>
                         </div>
                     </div>
                     <div style={

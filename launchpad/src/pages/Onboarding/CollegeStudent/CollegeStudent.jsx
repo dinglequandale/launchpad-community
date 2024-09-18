@@ -155,6 +155,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
 
   useEffect(()=>{
     if(requiredQuestionsAnswered(collegeStudentQuestionsConfig,collegeStudentData)){
+      if(collegeStudentData.userSkills && collegeStudentData.userSkills[0].skillDescription === "" && collegeStudentData.userSkills[0].skillCategory === ""){setCollegeStudentData({...collegeStudentData, userSkills: []})};
       console.log("Can submit")
       setCanSubmit(true);
     }

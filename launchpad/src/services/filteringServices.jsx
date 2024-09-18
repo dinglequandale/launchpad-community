@@ -28,9 +28,10 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
           }
         }
         else if(key === "collegeInterestsOrDecision"){
+            console.log(userColleges, "collegeAttending")
             return {
               // TODO: Check this works...
-                key: "schoolAttending",
+                key: "collegeAttending",
                 operation: "in",
                 value: userColleges,
             };

@@ -43,8 +43,7 @@ const readFirestoreData = async (collectionName) => {
           type: "string",
           facet: false,
         }
-      ],
-      default_sorting_field: "label",
+      ]
     },
     {
       name: "users",

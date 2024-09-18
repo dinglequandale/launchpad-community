@@ -2,7 +2,7 @@ import { db, storage } from '../firebase/firebaseConfig';
 import { collection, addDoc, updateDoc, doc, query, where, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
-import { deleteFromTypesense } from '../typesense/typesenseClient';
+import { deleteFromTypesense, updateTypesense } from '../typesense/typesenseClient';
 
 export const saveOpportunity = async (opportunityData, organizationLogo, currentUser, isEditing, opportunityId) => {
   const opportunitiesCollectionRef = collection(db, "opportunities");

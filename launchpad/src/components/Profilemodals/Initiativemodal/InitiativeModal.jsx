@@ -46,12 +46,10 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
           error: (err) => `Failed to ${isEditing ? 'update' : 'create'} initiative: ${err.message}`,
         }
       );
-      onClose();
+      // await saveOpportunity(organizationData, organizationLogo, currentUser, isEditing, opportunityId);
     } catch (error) {
       console.error("Error saving initiative: ", error);
     }
-  
-    onClose();
     }
   
 
@@ -536,7 +534,7 @@ function FinalInfo(){
                         onChange={handleFileChange}
                         style={{display: "none"}}
                         ref={logoRef}
-                        accept=".jpg"
+                        accept=".jpg,.png"
                     />
                     {organizationData.organizationLogoPreview && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
                       <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Logo Preview:</span>
