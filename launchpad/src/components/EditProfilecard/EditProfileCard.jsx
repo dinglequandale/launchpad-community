@@ -40,7 +40,7 @@ export default function EditProfileCard() {
     const [opportunitiesData, setOpportunitiesData] = useState([]);
     const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
-    const [newOpportunityModalVisibility, setNewOpportunityModalVisibility] = useState(false);
+    // const [newOpportunityModalVisibility, setNewOpportunityModalVisibility] = useState(false);
 
     const [edittingOpportunity, setEdittingOpportunity] = useState(null);
 
@@ -78,6 +78,11 @@ export default function EditProfileCard() {
 
     console.log(opportunitiesData);
 
+    const deleteOpportunity = async (opportunityId) => {
+        setOpportunitiesData(opportunitiesData.filter((opportunity) => (opportunity.id !== opportunityId)));
+        await handleDeleteOpportunity(opportunityId);
+    }
+
     const opportunitiesOptions = {highSchool: 
     <span style={{color: "#006876", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
     alum:
@@ -101,18 +106,18 @@ export default function EditProfileCard() {
         <>
         <div name="opportunityModal" style={{position: "relative"}}>
             {userData && userData.userType === "Professional" ? <OpportunityModal 
-                onClose={()=>setNewOpportunityModalVisibility(false)}
-                visibility={newOpportunityModalVisibility} 
-                opportunityData={null} 
-                isEditing={false} 
-                opportunityId={""}/>
+                onClose={()=>setOpportunityModalVisibility(false)}
+                visibility={opportunityModalVisibility} 
+                opportunityData={edittingOpportunity} 
+                isEditing={edittingOpportunity !== null} 
+                opportunityId={edittingOpportunity ? edittingOpportunity.id : ""}/>
             
             : <InitiativeModal 
-                onClose={()=>setNewOpportunityModalVisibility(false)} 
-                visibility={newOpportunityModalVisibility}
-                opportunityData={null} 
-                isEditing={false} 
-                opportunityId={""}/>}
+                onClose={()=>setOpportunityModalVisibility(false)} 
+                visibility={opportunityModalVisibility}
+                opportunityData={edittingOpportunity} 
+                isEditing={edittingOpportunity !== null} 
+                opportunityId={edittingOpportunity ? edittingOpportunity.id : ""}/>}
         </div>
             <ProfileContext.Provider value={{currentUser, userData}}>
             <div className='editprofileCard'>
@@ -135,8 +140,10 @@ export default function EditProfileCard() {
                                     opportunityData={opportunityData} 
                                     key={index}
                                     opportunitiesOptions={opportunitiesOptions} 
-                                    opportunityModalVisibility={opportunityModalVisibility} 
+                                    // opportunityModalVisibility={opportunityModalVisibility} 
                                     setOpportunityModalVisibility={setOpportunityModalVisibility}
+                                    setEdittingOpportunity={setEdittingOpportunity}
+                                    deleteOpportunity={deleteOpportunity}
                                 />
                             ))}
                         </div> )
@@ -145,12 +152,15 @@ export default function EditProfileCard() {
                     <div style={{marginTop: "40px"}}><Loading/></div>
                      :
                     <div style={{marginTop: "20px"}}>
-                        <OpportunityPopup opportunityData={null}  opportunitiesOptions={opportunitiesOptions} opportunityModalVisibility={opportunityModalVisibility} 
+                        <OpportunityPopup opportunityData={null}  opportunitiesOptions={opportunitiesOptions} 
                         setOpportunityModalVisibility={setOpportunityModalVisibility}/>
                     </div>
                     }
                 </div>
-                {(!opportunitiesLoading && opportunitiesData.length > 0) && <div className="addOne" onClick={()=>setNewOpportunityModalVisibility(true)}>
+                {(!opportunitiesLoading && opportunitiesData.length > 0) && <div className="addOne" onClick={()=>{
+                    setEdittingOpportunity(null);
+                    setOpportunityModalVisibility(true);
+                }}>
                     <IoAdd size={25} />
                     <span style={{textDecoration: "underline"}}>Add another opportunity!</span>
                 </div>}
@@ -406,7 +416,7 @@ function BasicInfoCard({descType}){
       }
     
     const triggerFileInput = (inputRef) => {
-    inputRef.current.click();
+        inputRef.current.click();
     }
     
     const removeFile = async (fileType) => {
@@ -441,7 +451,7 @@ function BasicInfoCard({descType}){
             <div className="file-upload-preview" style={{display: "flex", justifyContent: "center", width: "100%"}}>
                 {pfpUrl ? (
                 <div className="preview-container">
-                    { isUploading ? <div className='btnCircle' style={{width: "60px", height: "60px", border: "2.5px solid var(--neutral)", boxShadow: "var(--shadowColor)"}}><div><Loading/></div></div> 
+                    { isUploading ? <div className='btnCircle btnFileUpload' style={{width: "70px", height: "70px"}}><div><Loading/></div></div> 
                     :
                      <img src={pfpUrl} alt="Profile Preview" className="file-preview" style={{width: "70px", height: "70px", borderRadius: "50%"}} />}
                     <div className="preview-actions" style={{top: "-15px", visibility: (!pfpEditVisibility || isUploading) ? "hidden" : ""}}>
@@ -491,21 +501,19 @@ function BasicInfoCard({descType}){
     )
 }
 
-function OpportunityPopup({opportunitiesOptions, opportunityData, opportunityModalVisibility, setOpportunityModalVisibility}){
+function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunityModalVisibility, deleteOpportunity}){
 
     const { currentUser, userData } = useContext(ProfileContext);
 
-    const [currentOpportunityData, setCurrentOpportunityData] = useState(opportunityData);
-
-    // const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
+    // const [currentOpportunityData, setCurrentOpportunityData] = useState(opportunityData);
     const [deleteWarningVisibility, setDeleteWarningVisibility] = useState(false);
 
     // TODO: Diagnose...
-    const [opportunityId, setOpportunityId] = useState(currentOpportunityData ? currentOpportunityData.id : "");
+    const opportunityId = opportunityData ? opportunityData.id : "";
     const [loading, setLoading] = useState(false);
     const [isEditing,setIsEditing] = useState(false);
     
-    console.log("current opportunity", currentOpportunityData)
+    // console.log("current opportunity", currentOpportunityData)
     
     // useEffect(()=>{
     //     console.log("Current opportunity data:", currentOpportunityData)
@@ -514,20 +522,13 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, opportunityMod
     //     }
     // },[currentOpportunityData]);
 
-    const deleteOpportunity = (opportunityId) => {
-        handleDeleteOpportunity(opportunityId);
-        setCurrentOpportunityData(null);
-    }
-
-    console.log(opportunityModalVisibility, "opportunity modal vis")
-
     return(
         <>
         <div name="deleteWarning">
             {deleteWarningVisibility && <DeleteWarningModal onCancel={()=>setDeleteWarningVisibility(false)} onVerify={() => deleteOpportunity(opportunityId)} visibility={deleteWarningVisibility}
-                objectOfDeletation={currentOpportunityData.organizationType}/>}
+                objectOfDeletation={opportunityData.organizationType}/>}
         </div>
-        <div name="opportunityModal" style={{position: "relative"}}>
+        {/* <div name="opportunityModal" style={{position: "relative"}}>
             {userData.userType === "Professional" ? <OpportunityModal 
                 onClose={()=>setOpportunityModalVisibility(false)}
                 visibility={opportunityModalVisibility} 
@@ -541,19 +542,19 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, opportunityMod
                 opportunityData={currentOpportunityData} 
                 isEditing={isEditing} 
                 opportunityId={opportunityId}/>}
-        </div>
+        </div> */}
         <div style={{position: "relative"}}>
-            { (currentOpportunityData && !loading) ? <>
+            { (opportunityData && !loading) ? <>
             <div style={{textAlign: "center", marginBottom: "12px"}}>
             <span
             style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)"}}>
-                {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {currentOpportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
+                {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
             </span>
             </div>
             <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "-13px", top: "28px", background: "red", zIndex: "2"}}>
                 <MdDeleteOutline size={30}/>
             </button>
-            <OrganizationProfile location={"user_profile"} organizationData={currentOpportunityData}/>
+            <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
             </> : loading ?
             <div>
                 <Loading/>
@@ -570,7 +571,8 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, opportunityMod
                 </div>
             </div>}
             <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
-                <EditInformation isAnswered={currentOpportunityData} questionName={"Opportunity"} onEdit={()=>{
+                <EditInformation isAnswered={opportunityData} questionName={"Opportunity"} onEdit={()=>{
+                    setEdittingOpportunity(opportunityData);
                     setOpportunityModalVisibility(true);
                     setIsEditing(true);
                     }}/>
