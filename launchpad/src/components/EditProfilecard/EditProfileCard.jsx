@@ -42,6 +42,8 @@ export default function EditProfileCard() {
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
     const [newOpportunityModalVisibility, setNewOpportunityModalVisibility] = useState(false);
 
+    const [edittingOpportunity, setEdittingOpportunity] = useState(null);
+
     useEffect(() => {
         let unsubscribe;
         setLoading(true);
@@ -75,8 +77,6 @@ export default function EditProfileCard() {
       }, [currentUser]);
 
     console.log(opportunitiesData);
-
-    // console.log(userData)
 
     const opportunitiesOptions = {highSchool: 
     <span style={{color: "#006876", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
