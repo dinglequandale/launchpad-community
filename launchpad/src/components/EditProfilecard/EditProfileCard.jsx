@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { IoAdd } from "react-icons/io5";
 import { IoLockClosedOutline } from "react-icons/io5";
 import { TbWorld } from "react-icons/tb";
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { MdDeleteOutline, MdEdit } from "react-icons/md";
 import AboutMeModal from '../Profilemodals/AboutMemodal/AboutMeModal';
@@ -76,7 +76,8 @@ export default function EditProfileCard() {
         return () => unsubscribe();
       }, [currentUser]);
 
-    console.log(opportunitiesData);
+    // console.log(opportunitiesData);
+    // console.log(edittingOpportunity);
 
     const deleteOpportunity = async (opportunityId) => {
         setOpportunitiesData(opportunitiesData.filter((opportunity) => (opportunity.id !== opportunityId)));
@@ -427,7 +428,7 @@ function BasicInfoCard({descType}){
     }
 
     useEffect(()=>{
-        setBasicInfoContent({userPreface: getBasicUserDescription(userData),
+        setBasicInfoContent({userPreface: getBasicUserDescription(userData, false),
         userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
         userSecondDesc: `${descType}: ${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
         acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
@@ -501,7 +502,7 @@ function BasicInfoCard({descType}){
     )
 }
 
-function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunityModalVisibility, deleteOpportunity}){
+function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunityModalVisibility, deleteOpportunity, setEdittingOpportunity}){
 
     const { currentUser, userData } = useContext(ProfileContext);
 
@@ -610,6 +611,9 @@ function AboutMeDisplay(){
                 </>}
                 <EditInformation questionName={"About Me"} onEdit={()=>setAboutMeModalVisibility(true)} isAnswered={aboutMe}/>
             </div><span>{aboutMe}</span>
+            {userData.linkedinLink && <div className="linkedInDisplay" style={{display: "flex", justifyContent: "center", padding: "10px"}}>
+                <span>LinkedIn Profile: <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link></span>
+            </div>}
         </div>
         </>
     )

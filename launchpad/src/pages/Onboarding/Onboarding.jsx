@@ -51,9 +51,9 @@ export default function Onboarding() {
     return (
         <div className='onboarding-container'>
             <div className='onboarding-body'>
-            <header style={{marginBottom: "2rem"}}>
+            <header style={{marginBottom: "1.5rem"}}>
                 <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
-                    display: "flex", justifyContent: "center", alignItems: "center", height: "100px",  marginBottom: "20px"}}>
+                    display: "flex", justifyContent: "center", alignItems: "center", height: "80px", padding: "10px 5px",  marginBottom: "17px"}}>
                     <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
                 </div>
                 {(currentPage !== 0) && <ProgressBar

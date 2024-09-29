@@ -37,6 +37,11 @@ const professionalQuestionsConfig = [
     optional: true,
     page: 1
   },
+  {
+    id: "linkedinLink",
+    optional: true,
+    page: 1
+  },
   // Page 2
   {
     id: "retiredStatus",
@@ -138,6 +143,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
     networkingLevel: [],
     userResume: null,
     userResumePreview: "",
+    linkedinLink: "",
     userType: "Professional",
     userPfpPreview: "",
     yearsOfExperience: "",
@@ -148,7 +154,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
 
   const handleSubmit = async () => {
     
-    const loadingToast = toast.loading('Saving your information...');
+    // const loadingToast = toast.loading('Saving your information...');
 
     try {
       await saveProfessional(
@@ -156,9 +162,9 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
         professionalData,
         () => {
           // Success callback
-          toast.success('Information saved successfully!', {
-            id: loadingToast,
-          });
+          // toast.success('Information saved successfully!', {
+          //   id: loadingToast,
+          // });
           navigate("/Home");
         }
       );
