@@ -47,7 +47,7 @@ const careerInterests = [
   // {"value": "business_operations", "label": "Business (Operations)", "group": "Business"},
   // {"value": "business_sales", "label": "Business (Sales)", "group": "Business"},
   // {"value": "business_admin", "label": "Business (Administration)", "group": "Business"},
-  {"value": "business", "label": "Business", "group": "Business"},
+  {"value": "business", "label": "Business Management", "group": "Business"},
   {"value": "engineering", "label": "Engineering", "group": "STEM"},
   {"value": "computer_science", "label": "Computer Science", "group": "STEM"},
   {"value": "medicine_general", "label": "Medicine", "group": "Medical"},

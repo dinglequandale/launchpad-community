@@ -38,6 +38,12 @@ const collegeStudentQuestionsConfig = [
     page: 1
   },
 
+  {
+    id: "linkedinLink",
+    optional: true,
+    page: 1
+  },
+
   // Page 2
   {
     id: "collegeAttending",
@@ -111,6 +117,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
     networkingLevel: [],
     userResume: null,
     userResumePreview: "",
+    linkedinLink: "",
     userType: "Alumni",
     userPfpPreview: "",
     userPfp: null,

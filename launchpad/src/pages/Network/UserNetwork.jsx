@@ -73,7 +73,7 @@ export default function UserNetwork() {
     userType: ["Any User", "High Schoolers", "College Students", "Professionals"],
     collegeInterestsOrDecision: userType === "High Schooler" ? ["Any College", "My Dream Colleges"] : null,
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
-    schoolAttending: ["Any High School", "My High School"]
+    // schoolAttending: ["Any High School", "My High School"]
   };
 
   useEffect(()=>{

@@ -38,11 +38,12 @@ export default function Alumni_LandingPage() {
         <div style={{paddingTop: "30px"}}>
           <h1 className="landing-title"><span style={{color: "var(--neutral)", textDecoration: "underline"}}>Empowerin</span><span style={{color: "var(--neutral)"}}>g</span> Student Excellence</h1>
         </div>
-        <p className="subheader"><span style={{fontWeight: "bolder",color: "var(--neutral)",textDecoration: "underline"}}>Launching</span> Houston’s youth into <span style={{fontWeight: "bolder",color: "var(--neutral)", textDecoration: "underline"}}>collegiate</span> and <span style={{fontWeight: "bolder",color: "var(--neutral)", textDecoration: "underline"}}>professional</span> success</p>
+        <p className="subheader"><span style={{fontWeight: "bolder",color: "var(--neutral)",textDecoration: "underline"}}>Launching</span> Awty’s youth into <span style={{fontWeight: "bolder",color: "var(--neutral)", textDecoration: "underline"}}>collegiate</span> and <span style={{fontWeight: "bolder",color: "var(--neutral)", textDecoration: "underline"}}>professional</span> success</p>
         <button className="cta-button btnUnfilled" onClick={handleJoin}>Get Started</button>
       </header>
 
       <main className="main-content">
+        <div className="feature-container">
         <section className="feature-section">
           <div className="feature-card">
             {/* <i className="icon-connections"></i> */}
@@ -58,7 +59,7 @@ export default function Alumni_LandingPage() {
             <span className="pillarTitle">Discover Meaningful Opportunities</span>
             <div className="pillarText" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
             <span>
-            Many students seek to <span className="highlight">follow in your footsteps</span> and attend the same colleges. Share your experiences, offer advice, and <span className="highlight">help foster the next generation</span>!
+            Many students seek to <span className="highlight">follow in your footsteps</span> and attend the same colleges. Share your experiences, offer advice, and <span className="highlight">help guild Awty's next generation</span>!
             </span>
             </div>
           </div>
@@ -67,17 +68,18 @@ export default function Alumni_LandingPage() {
             <span className="pillarTitle">Promote Your Initiatives</span>
             <div className="pillarText">
             <span>
-            <span className="highlight">Have a growing business? </span> A budding project? Promote your initiative to professionals. Looking for help? Connect with talented undergraduates and highschoolers to accelerate your project!
+            <span className="highlight">Have a growing business? </span> A budding project? Promote your initiative to professionals. Looking for help? Accelerate your project by connecting with talented undergraduates and high schoolers!
             </span>
             </div>
           </div>
         </section>
+        </div>
         <section className="who-are-we">
           <div className="container">
             <h2 className="section-title">Who are we?</h2>
             <div className="content-wrapper">
               <p className="description">
-                <span style={{fontWeight: "bolder"}}>Launchpad</span> is a <span className="highlight">free local social network</span> designed to empower Houston's youth by creating meaningful connections among:
+                <span style={{fontWeight: "bolder"}}>Launchpad</span> is a <span className="highlight">free local social network</span> designed to empower Awty's youth by creating meaningful connections among:
               </p>
               <div className="network-grid">
                 <div className="network-item">
@@ -98,7 +100,7 @@ export default function Alumni_LandingPage() {
                 </div>
               </div>
               <p className="description goal">
-                Our aim is to provide Houston's youth with <span className="highlight">accessible learning, leadership, and workplace opportunities</span>.
+                Our aim is to provide Awty's youth with <span className="highlight">accessible learning, leadership, and workplace opportunities</span>.
               </p>
             </div>
           </div>

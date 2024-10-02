@@ -4,10 +4,10 @@ import { IoCloseOutline } from "react-icons/io5";
 import { useState, useEffect, useRef } from 'react';
 import { FaLink } from 'react-icons/fa6';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
-import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
-import { displayColleges, displayFieldsOfInterest, displayShortenedName, getBasicUserDescription, lowerAndCapitalize } from '../../services/userProfileServices';
+import { displayColleges, displayFieldsOfInterest, getBasicUserDescription } from '../../services/userProfileServices';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick}) {
 
@@ -48,7 +48,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         }
     }
 
-    const basicInfoContent = {userPreface: getBasicUserDescription(userData),
+    const basicInfoContent = {userPreface: getBasicUserDescription(userData, false),
     userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
     userSecondDesc: `${descType()}: ${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
     acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
@@ -116,12 +116,15 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                             <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", paddingBottom: "3rem"}}>{userName.split(" ")[0]} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"}<span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
                             </div>
                             <OrganizationProfile location={"user_profile_public"} organizationData={opportunityData} handleReferalClick={handleReferalClick}/> </div> : opportunityLoading ? <Loading/> : null}
-                        {userData.userAboutMe && <div name="userAboutMe" style={{paddingTop: "20px"}}>
+                        {(userData.userAboutMe || userData.linkedinLink) && <div name="userAboutMe" style={{paddingTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s About Me</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
-                            <div style={{background: "var(--neutral)", borderRadius: "5px", display: "flex", alignItems: "center", padding: "10px"}}>
+                            {userData.userAboutMe && <div style={{background: "var(--neutral)", borderRadius: "5px", display: "flex", alignItems: "center", padding: "10px"}}>
                                 <span>{userData.userAboutMe}</span>
-                            </div>
+                            </div>}
+                            {userData.linkedinLink && <div className="linkedInDisplay" style={{display: "flex", justifyContent: "center", padding: "10px"}}>
+                                <span>LinkedIn Profile: <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link></span>
+                            </div>}
                         </div>}
                         {(userData.userSkills && userData.userSkills.length > 0) && 
                         <div>
@@ -148,7 +151,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 ))}
                                 </div>
                         </div>}
-                        {(userData.userResumePreview && (userData.userResumePreview.split(" ")[0]) !== "private" || isProfessional) && <div name="userResume" style={{marginTop: "20px"}}>
+                        {(userData.userResumePreview && ((userData.userResumePreview.split(" ")[0]) !== "private" || isProfessional)) && <div name="userResume" style={{marginTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s Resume</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             <iframe src={userData.userResumePreview.split(" ")[userData.userResumePreview.split(" ").length - 1]} frameborder="0" style={{width: "100%", height: "500px"}}></iframe></div>}

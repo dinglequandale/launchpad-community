@@ -10,6 +10,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
   const resumeInputRef = useRef(null);
   // const [pfpError, setPfpError] = useState(null);
   const [resumeError, setResumeError] = useState(null);
+  const [linkedInOptionSelected, setLinkedInOptionSelected] = useState(false);
 
   const handleFileChange = (event, fileType) => {
     const file = event.target.files[0];
@@ -29,8 +30,6 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
         [fileType === 'pfp' ? 'userPfp' : 'userResume']: file
       }));
 
-      // if (fileType === 'pfp') setPfpError(null);
-      // else setResumeError(null);
     }
   }
 
@@ -102,7 +101,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
           style={{display: 'none'}}
         />
       </div>
-        
+        <div style={{zIndex: "2"}}>
         <OnboardingDropdown
           key={questionsForPage[2].id}
           question={questionsForPage[2].text}
@@ -112,9 +111,10 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
           type={questionsForPage[2].type}
           onSearchQueryChange={questionsForPage[2].id === 'whatCollege' ? onSearchQueryChange : null}
         />
+        </div>
         
-        {questionsForPage[3] && (
-        <div className="file-upload-container">
+        {questionsForPage[3] && ( <>
+        <div className="file-upload-container" style={{position: "relative"}}>
           <label className="onboardingQuestion" style={{position: "relative"}}>
             {questionsForPage[3].text}
             {questionsForPage[3].optional && <div style={{position: "absolute", bottom: "-20px"}}>
@@ -150,8 +150,22 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
             accept=".pdf"
             style={{display: 'none'}}
           />
+        <div style={{zIndex: "1", height: "130px", top: "6px", opacity: ".9", backgroundColor: "var(--primary)", display: linkedInOptionSelected ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}><input
+              type="link"
+              onChange={(e) => handleChange("linkedinLink", e.target.value)}
+              placeholder="Paste your LinkedIn profile link here"
+              value={selectedOptions["linkedinLink"]}
+              // TODO: work this into everything
+              className="onboardingInput"
+              style={{width: "85%", boxShadow: "var(--shadowColor)", display: "flex", right: "0", left: "0", marginLeft: "auto", marginRight: "auto", marginTop: "40px"}}
+            /></div>
         </div>
-        )}
+        
+        {(selectedOptions.linkedinLink !== undefined) && <div style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
+          <button className="btnText" style={{fontSize: "17px", color: linkedInOptionSelected ? "var(--highlight)" : ""}} onClick={() => setLinkedInOptionSelected(!linkedInOptionSelected)}>Or click here link here to link your LinkedIn profile.</button>
+        </div>}
+        </>
+      )}
       </div>
     )
   }

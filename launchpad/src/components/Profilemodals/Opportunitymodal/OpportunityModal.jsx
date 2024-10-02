@@ -31,6 +31,7 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
   const [showLast, setShowLast] = useState(false);
 
   const { currentUser } = useAuth();
+  console.log("Opportunity data:", opportunityData);
 
   const [organizationData, setOrganizationData] = useState({
     organizationType: '',
@@ -68,16 +69,28 @@ const saveOpportunityData = async () => {
 
   onClose();
   }
-  
 
   useEffect(() => {
-    if (opportunityData) {
+    if (opportunityData !== null) {
         setOrganizationData({... opportunityData});
         return;
     }
 
     const {userName} = JSON.parse(localStorage.getItem("basicUserInfo"));
-    setOrganizationData({...organizationData, createdByUserName: userName});
+    setOrganizationData({
+      organizationType: '',
+      organizationHostCompany: '',
+      organizationTags: [],
+      applicantPosition: '',
+      applicantExpectations: '',
+      isPaid: 'Unpaid',
+      applicants: 'All Education',
+      workLocation: 'On-site',
+      timeFrame: 'One Week',
+      learnMore: 'Messages',
+      apply: 'Messages',
+      organizationLogoPreview: null,
+      createdByUserName: "", createdByUserName: userName});
 
     }, [visibility]);
 
@@ -96,6 +109,8 @@ const saveOpportunityData = async () => {
       zIndex: "3",
     }
   };
+
+  console.log("organizationData:", organizationData)
 
   const getApplicantType = () => {
     switch(organizationData.organizationType){
@@ -195,7 +210,7 @@ const saveOpportunityData = async () => {
       id: "timeFrame",
       text: "What is the opportunity timeframe?",
       type: "select",
-      options: ["One Week", "Two Weeks", "Three Weeks"],
+      options: ["One Week", "Two Weeks", "Three Weeks", "4+ Weeks", "6+ Weeks", "Indefinite"],
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
       required: true,
       page: 3, 

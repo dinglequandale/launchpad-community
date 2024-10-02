@@ -52,7 +52,7 @@ export default function Home(){
         "Find Your Ideal Career": [
           {
             title: "Career Explorer Free Career Survey",
-            link: "https://www.careerexplorer.com/assessments/",
+            link: "https://www.careerexplorer.com/career-test/",
             description: "Find your dream career based on your personality, strengths, and experiences! The Career Explorer Career Survey is widely regarded as the #1 career survey in the world for any students seeking to learn more about careers they'd be a great fit for. It is perfect for students who want to learn more about jobs within a certain area of interest (i.e business) or just understand careers better in general. Though long, it is very highly recommended to complete this survey in order to find careers that are a great fit for you (career explorer generates 30 career options based on responses).",
             recommendedBanner: "yes",
             time: "20 minutes",
@@ -113,7 +113,7 @@ export default function Home(){
           },
           {
             title: "Cialfo College Search",
-            link: "",
+            link: "https://www.cialfo.co/",
             description: "If your school provides you with Cialfo, take full advantage of it. Cialfo provides an excellent college search tool that allows you to search for colleges based on your interests and learn everything about them.",
             recommendedBanner: "no",
             userType: "High Schoolers",
@@ -295,7 +295,7 @@ function InviteContacts({userName, userType}){
             {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "rgba(14, 195, 111, .3)",
          height: "fitContent", borderRadius: "4px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
          }>
-            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>{userType === "Professional" ? "Greetings" : "Hey"}, {userName}!</span> <br /> Know any <span style={{textDecoration: "underline", color: "var(--secondary)"}}>high school</span> or <span style={{textDecoration: "underline", color: "var(--secondary)"}}>college students</span> who would benefit from being on the app? Know other  <span style={{textDecoration: "underline", color: "var(--secondary)"}}>professionals</span> willing to share their expertise? <span style={{fontWeight: "650"}}>Invite friends and family below!</span></span>
+            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>{userType === "Professional" ? "Greetings" : "Hey"}, {userName}!</span> <br /> <span style={{textDecoration: "underline", color: "var(--secondary)"}}>Awty high schoolers</span> or <span style={{textDecoration: "underline", color: "var(--secondary)"}}>Awty alumni</span> who would benefit from being on the app? Know other  <span style={{textDecoration: "underline", color: "var(--secondary)"}}>professionals</span> in the Awty community willing to share their expertise? <span style={{fontWeight: "650"}}>Invite friends and family below!</span></span>
             <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
                 <button onClick={()=>setInviteContactsModalVisibility(true)} style={{borderRadius: "10px", fontWeight: "550", fontSize: "20px", padding: "10px", width: "200px"}}>Invite Contacts</button>
             </div>
