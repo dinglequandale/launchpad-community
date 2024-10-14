@@ -25,7 +25,7 @@ const readFirestoreData = async (collectionName) => {
     nodes: [
       {
         host: '20.3.232.3',
-        port: 8108,
+        port: "8108",
         protocol: 'http',
       },
     ],
