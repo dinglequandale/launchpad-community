@@ -3,7 +3,7 @@ import Typesense from 'typesense';
 const client = new Typesense.Client({
     nodes: [
       {
-        host: 'localhost',
+        host: '20.3.232.3',
         port: 8108,
         protocol: 'http', 
       },
