@@ -148,7 +148,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
     userPfpPreview: "",
     yearsOfExperience: "",
     userName: "",
-    userAboutMe: "",
+    // userAboutMe: "",
     userPfp: null,
   });
 
@@ -206,8 +206,8 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
         return <WorkDetails selectedOptions={professionalData} handleChange={handleChange} />;
       case 4:
         return <ConnectionLevel selectedOptions={professionalData} setSelectedOptions={setProfessionalData} />;
-      case 5:
-        return <FinalTouches selectedOptions={professionalData} handleChange={handleChange}/>
+      // case 5:
+      //   return <FinalTouches selectedOptions={professionalData} handleChange={handleChange}/>
       default:
         return null;
     }

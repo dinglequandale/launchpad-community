@@ -5,7 +5,7 @@ const client = new Typesense.Client({
       {
         host: 'launchpad-typesense.westus2.cloudapp.azure.com',
         port: "8108",
-        protocol: 'http', 
+        protocol: 'https', 
       },
     ],
     apiKey: 'xyz', 
