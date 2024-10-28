@@ -15,8 +15,8 @@ const filterDisplayToIdPairs = {
     "Clubs": "Club",
     "Nonprofits":"Nonprofit",
     "My Dream Colleges":"collegeInterestsOrDecision",
-    "My High School":"schoolAttending"
-
+    "My High School":"schoolAttending",
+    "Businesses":"Business",
 }
 
 export default function ContentFilter({filterKey, filterContent, onFilterChange}){
