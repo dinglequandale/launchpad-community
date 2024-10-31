@@ -36,8 +36,8 @@ export default function ProfileStrength({userData}){
                 </div>
                 {/* {nullValues[0] !== 0 && <span style={{fontWeight: "bolder", color: "rgb(223, 93, 93)"}}> {nullValues[0]} mandatory field{nullValues[0] > 1 ? "s" : ""} missing! </span>}
                 {nullValues[1] !== 0 && <span style={{fontWeight: "bolder", color: "rgb(255, 178, 35)"}}> {nullValues[1]} optional field{nullValues[1] > 1 ? "s" : ""} missing! </span>} */}
-                <button style={{position: "absolute", bottom: "30px", padding: "10px", color: "white",
-                 fontSize: "20px", width: "60%", fontWeight: "bolder", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}}
+                <button
+                className="btnViewProfile"
                 onClick={()=>{navigate("/MyProfile", { state: '/' })}}>
                     {profileProgress === 1 ? "View Profile" : "Complete your profile"}
                 </button>

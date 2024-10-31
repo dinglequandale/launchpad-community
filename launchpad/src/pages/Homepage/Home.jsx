@@ -297,7 +297,7 @@ function InviteContacts({userName, userType}){
          }>
             <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>{userType === "Professional" ? "Greetings" : "Hey"}, {userName}!</span> <br /> <span style={{textDecoration: "underline", color: "var(--secondary)"}}>Awty high schoolers</span> or <span style={{textDecoration: "underline", color: "var(--secondary)"}}>Awty alumni</span> who would benefit from being on the app? Know other  <span style={{textDecoration: "underline", color: "var(--secondary)"}}>professionals</span> in the Awty community willing to share their expertise? <span style={{fontWeight: "650"}}>Invite friends and family below!</span></span>
             <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
-                <button onClick={()=>setInviteContactsModalVisibility(true)} style={{borderRadius: "10px", fontWeight: "550", fontSize: "20px", padding: "10px", width: "200px"}}>Invite Contacts</button>
+                <button onClick={()=>setInviteContactsModalVisibility(true)} className="btnInviteContacts" style={{}}>Invite Contacts</button>
             </div>
         </div>
         </>

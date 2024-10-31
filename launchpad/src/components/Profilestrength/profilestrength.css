@@ -13,3 +13,19 @@
 .progressBar.progressBar.purple{
     background: #646cff;
 }
+
+.btnViewProfile{
+    position: absolute;
+    bottom: 30px;
+    padding: 10px; 
+    color: white;
+    font-size: 20px;
+    width: 60%; 
+    font-weight: bolder;
+    background: var(--secondary);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2) 0 6px 20px 0 rgba(0, 0, 0, 0.09);
+}
+
+.btnViewProfile:hover{
+    background: var(--highlight);
+}
