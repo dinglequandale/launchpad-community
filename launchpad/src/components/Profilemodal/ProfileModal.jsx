@@ -8,6 +8,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
 import { displayColleges, displayFieldsOfInterest, getBasicUserDescription } from '../../services/userProfileServices';
+import { Link } from 'react-router-dom';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick}) {
 
