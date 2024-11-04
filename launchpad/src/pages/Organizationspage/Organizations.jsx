@@ -17,7 +17,7 @@ import toast, { Toaster } from "react-hot-toast";
 // import { db } from "../../firebase/firebaseConfig";
 
 const filterContent = {
-    organizationType: ["Any Category","Community Service", "Clubs", "Workplace Opportunities", "Nonprofits"],
+    organizationType: ["Any Category","Community Service", "Clubs", "Workplace Opportunities", "Nonprofits", "Businesses"],
     areasOfInterestOrExpertise: ["Any Subject Matter", "My Interests"]
 };
 

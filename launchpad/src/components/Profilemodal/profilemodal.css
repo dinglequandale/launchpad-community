@@ -1,12 +1,12 @@
 .profileModalContent{
     max-height: 80vh;
     width: 550px;
-    background: var(--neutral);
-    background: linear-gradient(180deg, var(--neutral) 0%, rgba(255,255,255,1) 60%);
+    background: var(--primary);
+    /* background: linear-gradient(180deg, var(--neutral) 0%, rgba(255,255,255,1) 60%); */
     color: black;
     display: flex;
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 5px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     flex-direction: column;
     position: fixed;

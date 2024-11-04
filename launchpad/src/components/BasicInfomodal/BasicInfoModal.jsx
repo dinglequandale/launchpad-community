@@ -4,7 +4,7 @@ import Modal from "react-modal"
 import MakeChanges from "../Makechanges/MakeChanges";
 import toast, { Toaster } from "react-hot-toast";
 import OptionalNotice from "../Optionalnotice/OptionalNotice";
-import { careerInterests, getColleges } from "../../pages/Onboarding/Options";
+import { careerInterests, CollegeSearch, getColleges } from "../../pages/Onboarding/Options";
 import OnboardingDropdown from "../OnboardingDropdown/OnboardingDropdown";
 import { editUserData } from "../../services/userProfileServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
@@ -228,7 +228,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
                   placeholder={question.placeholder}
                   onChange={handleOnChange}
                   style={{width: "42.8%"}}/> 
-                  :
+                  : question.id !== "collegeInterestsOrDecision" ?
                   <div style={{width: "45%"}}><OnboardingDropdown
                     showQuestion={false}
                     key={question.id}
@@ -240,6 +240,14 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
                     onSearchQueryChange={question.id.toLowerCase().includes("college") ? handleSearchQueryChange : null}
                   />
                   </div>
+                  :
+                  <CollegeSearch
+                  showQuestion={false}
+                  question={""}
+                  selectedOption={basicInfoContent['collegeInterestsOrDecision']}
+                  onChange={(label) => handleDropdownChange('collegeInterestsOrDecision', label)}
+                  type={"multi-select"}
+                />
                   }
                 </div>
             ))}

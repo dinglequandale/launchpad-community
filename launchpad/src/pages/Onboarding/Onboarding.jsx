@@ -25,7 +25,8 @@ export default function Onboarding() {
             case "College Student":
                 return 3;
             case "Professional":
-                return 5;
+                // return 5;
+                return 4;
             default:
                 return null;
         }

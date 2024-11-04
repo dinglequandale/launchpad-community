@@ -162,7 +162,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
         </div>
         
         {(selectedOptions.linkedinLink !== undefined) && <div style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
-          <button className="btnText" style={{fontSize: "17px", color: linkedInOptionSelected ? "var(--highlight)" : ""}} onClick={() => setLinkedInOptionSelected(!linkedInOptionSelected)}>Or click here link here to link your LinkedIn profile.</button>
+          <button className="btnText" style={{fontSize: "19px", color: linkedInOptionSelected ? "rgb(48, 160, 240)" : ""}} onClick={() => setLinkedInOptionSelected(!linkedInOptionSelected)}>Or click here link here to link your LinkedIn profile.</button>
         </div>}
         </>
       )}

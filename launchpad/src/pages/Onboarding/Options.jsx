@@ -145,7 +145,7 @@ const getColleges = (searchQuery = null) => {
   return colleges;
 };
 
-const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion = true }) => {
+const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion = true}) => {
   const [options, setOptions] = useState([]);
 
   const handleInputChange = async (inputValue) => {

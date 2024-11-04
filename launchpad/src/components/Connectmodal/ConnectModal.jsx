@@ -16,6 +16,8 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
   const {currentUser} = useAuth();
   const [canSend, setCanSubmit] = useState(introMessage.length > 0);
 
+  const [sendDirectMessage, setSendDirectMessage] = useState(false);
+
   const userType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
 
   // const wordLimit = 50;
@@ -108,23 +110,40 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
         contentLabel="Connect Modal"
       >
         <header>
-          {!isOpportunity ? <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Connect with {userName} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Gain valuable internships and mentorship</span></h2>
+          {!isOpportunity ? <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Contact {userName} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Receive valuable opportunities, mentorship, and referrals</span></h2>
           :
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Join {userName}'s {userType === "Professional" ? "Opportunity" : "Initiative"} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Send an Introductory Message</span></h2>}
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Join {userName}'s {userType === "Professional" ? "Opportunity" : "Initiative"} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Send an Introductory Message</span></h2>}
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
-        <main style={{paddingTop: "20px", display: "flex", flexDirection: "column", gap: "7px"}}>
-            <textarea className='inputIntroMessage' placeholder='Introduce yourself!' onChange={e => handleIntroChange(e.target.value)} value={introMessage} style={{width: "600px", height: "200px"}}></textarea>
+        <main style={{ display: "flex", flexDirection: "column", gap: "7px"}}>
+            <div style={{display: "flex", flexDirection: "column", gap: "5px", padding: "15px 5px"}}>
+              <span style={{fontSize: "18px"}}>
+                <span style={{fontWeight: "550", fontSize: "18px"}}>Email:</span>
+                &nbsp;tittelk@awty.org
+              </span>
+              {userId && <span style={{fontSize: "18px"}}>
+                <span style={{textDecoration: "", color: "black", fontWeight: "550"}}>Linkedin:</span>
+                &nbsp;<button className='btnText' style={{fontSize: "18px", textDecoration: "underline", color: "#555CFF"}}>https://www.linkedin.com/in/konrad-tittel-b03122273/</button>
+              </span>}
+            </div>
+            {sendDirectMessage && (<>
+            <textarea className='inputIntroMessage' placeholder='Introduce yourself!' onChange={e => handleIntroChange(e.target.value)} value={introMessage} style={{width: "600px", height: "180px"}}></textarea>
             <div style={{margin: "0 auto", paddingTop: "15px"}}>
                 <input type="checkbox" checked={sendWithResume} onChange={()=>setSendWithResume(!sendWithResume)}/>
                 <span style={{fontSize: "larger", fontWeight: "300"}}>Attach resume in your message</span>
             </div>
+            </>)}
+
         </main>
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
           <button onClick={onClose} className='btnUnfilled' style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Cancel</button>
-          <button onClick={onSendClick} disabled={!canSend} type='submit' style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-            Send</button>
+          {sendDirectMessage ? <button onClick={onSendClick} disabled={!canSend} type='submit' style={{background: !canSend && "grey", borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+            Send</button> :
+            <button onClick={() => setSendDirectMessage(!sendDirectMessage)} style={{borderRadius: "4px", width: "40%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+              Send Direct Message
+            </button>}
+          
         </footer>
       </Modal>
     </div>
