@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { storage } from '../../firebase/firebaseConfig';
 import toast, { Toaster } from 'react-hot-toast';
 import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
+import { CgClose } from 'react-icons/cg';
 
 // TODO: actually implement clickedUser logic
 export default function ConnectModal({visibility, chat, onClose, userId, userName, isOpportunity=false, opportunityType=null}){
@@ -109,6 +110,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
         style={customStyles}
         contentLabel="Connect Modal"
       >
+        <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
         <header>
           {!isOpportunity ? <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Contact {userName} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Receive valuable opportunities, mentorship, and referrals</span></h2>
           :
@@ -138,9 +140,9 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
           <button onClick={onClose} className='btnUnfilled' style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Cancel</button>
-          {sendDirectMessage ? <button onClick={onSendClick} disabled={!canSend} type='submit' style={{background: !canSend && "grey", borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+          {sendDirectMessage ? <button onClick={onSendClick} disabled={!canSend} type='submit' className='btnSaveChanges' style={{background: !canSend && "grey", borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Send</button> :
-            <button onClick={() => setSendDirectMessage(!sendDirectMessage)} style={{borderRadius: "4px", width: "40%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+            <button onClick={() => setSendDirectMessage(!sendDirectMessage)} className='btnSaveChanges' style={{borderRadius: "4px", width: "40%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Send Direct Message
             </button>}
           

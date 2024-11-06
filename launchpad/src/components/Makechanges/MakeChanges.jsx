@@ -29,14 +29,15 @@ export default function MakeChanges({visibility, onCancel, onVerify}){
                 <span style={{fontSize: "larger", fontWeight: "300"}}> <span style={{fontWeight: "500", color: "#4d73be"}}>Are you sure</span> you want to lose your changes?</span>
                 <div style={{display: "flex", justifyContent: "space-between", paddingTop: "15px"}}>
                     <button 
-                    style={{color: "white", width: "30%", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}} 
+                    className="btnUnfilled"
+                    style={{width: "30%", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}} 
                     onClick={onCancel}>
                     No</button>
                     
                     <button onClick={()=>{
                           onCancel();
                           onVerify();
-                          }} style={{color: "white", width: "30%", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+                          }} className="btnSaveChanges" style={{ width: "30%", borderRadius: "5px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
                         Yes</button>
                 </div>
             </Modal>
