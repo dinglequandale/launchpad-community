@@ -7,6 +7,7 @@ import { useAuth } from '../../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { BiPlus, BiTrash } from 'react-icons/bi';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const collegeStudentQuestionsConfig = [
   {
@@ -25,7 +26,7 @@ const collegeStudentQuestionsConfig = [
   },
   {
     id: "areasOfInterest",
-    text: "What are you're fields of study?",
+    text: "What are your fields of study?",
     type: "multi-select",
     options: careerInterests,
     page: 1,
@@ -105,6 +106,15 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
 
   const {currentUser} = useAuth();
 
+  const getEmail = httpsCallable(getFunctions(), 'getEmail');
+  const [loginEmail,setLoginEmail] = useState("");
+  const getUserEmail = async () => {
+    const result = await getEmail();
+    console.log("result:", result);
+    setLoginEmail(result.data.email);
+  }
+  getUserEmail();
+
   const [collegeStudentData, setCollegeStudentData] = useState({
     userAboutMe: '',
     userName: '',
@@ -118,6 +128,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}
     userResume: null,
     userResumePreview: "",
     linkedinLink: "",
+    email: loginEmail,
     userType: "Alumni",
     userPfpPreview: "",
     userPfp: null,
@@ -339,7 +350,7 @@ const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
         {/* <div style={{border: "solid 1.5px var(--secondary)", textAlign: "center", padding: "8px 0px", background: "var(--neutral)"}}>
           <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and mentorship</span> <br /> is a valuable reasource for students on this app.</span></div> */}
         <div style={{position: "relative"}}>
-        <label className='onboardingQuestion'>List some of your skills:</label>
+        <label className='onboardingQuestion'>Professionals in the Awty community may have workplace opportunities for you. List some of your skills to show them what you are about:</label>
         <div style={{position: "absolute", bottom: "-13px"}}>
             <OptionalLabel />
             </div>

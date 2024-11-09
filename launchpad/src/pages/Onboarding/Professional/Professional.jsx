@@ -31,16 +31,17 @@ const professionalQuestionsConfig = [
     options: careerInterests,
     page: 1
   },
-  {
-    id: "userResume",
-    text: "Upload your resume for student insight:",
-    type: "file",
-    optional: true,
-    page: 1
-  },
+  // {
+  //   id: "userResume",
+  //   text: "Upload your resume for student insight:",
+  //   type: "file",
+  //   optional: true,
+  //   page: 1
+  // },
   {
     id: "linkedinLink",
     optional: true,
+    text: "Please link your Linkedin profile to make it easy for students to learn more about you.",
     page: 1
   },
   // Page 2
@@ -140,20 +141,29 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
 
   const {currentUser} = useAuth();
 
+  const getEmail = httpsCallable(getFunctions(), 'getEmail');
+  const [loginEmail,setLoginEmail] = useState("");
+  const getUserEmail = async () => {
+    const result = await getEmail();
+    console.log("result:", result);
+    setLoginEmail(result.data.email);
+  }
+  getUserEmail();
+
   const [professionalData, setProfessionalData] = useState({
     retiredStatus: false,
     industryPosition: '',
     companyName: '',
     areasOfInterest: [],
     networkingLevel: [],
-    userResume: null,
-    userResumePreview: "",
+    // userResume: null,
+    // userResumePreview: "",
     linkedinLink: "",
     userType: "Professional",
     userPfpPreview: "",
     yearsOfExperience: "",
     userName: "",
-    email: "",
+    email: loginEmail,
     // userAboutMe: "",
     userPfp: null,
   });
@@ -213,7 +223,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
       case 4:
         return <ConnectionLevel selectedOptions={professionalData} setSelectedOptions={setProfessionalData} />;
       case 5:
-        return <EmailConfirmation selectedOptions={professionalData} handleChange={handleChange}/>
+        return <EmailConfirmation selectedOptions={professionalData} handleChange={handleChange} loginEmail={loginEmail}/>
       default:
         return null;
     }
@@ -319,7 +329,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
     return (
         <div className='onboardingQuestions'>
           <div style={{border: "solid 1.5px var(--secondary)", textAlign: "center", padding: "8px 0px", background: "var(--neutral)"}}>
-            <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and experiences</span> <br /> are invaluable resources for students on this app.</span></div>
+            <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and experiences</span> <br /> are invaluable resources to the Awty community.</span></div>
           <div style={{position: "relative"}}>
           <label className='onboardingQuestion'>Please roughly assess your commitment:</label>
           <div style={{position: "absolute", bottom: "-13px"}}>
@@ -375,20 +385,12 @@ const FinalTouches = ({ selectedOptions, handleChange }) => {
   );
 };
 
-const EmailConfirmation = ({ selectedOptions, handleChange }) => {
+const EmailConfirmation = ({ selectedOptions, handleChange, loginEmail }) => {
   const [btnSelected,setBtnSelected] = useState("");
-  const getEmail = httpsCallable(getFunctions(), 'getEmail');
-  const [loginEmail,setLoginEmail] = useState("");
-  const getUserEmail = async () => {
-    const result = await getEmail();
-    console.log("result:", result);
-    setLoginEmail(result.data.email);
-  }
-  getUserEmail();
   return (
     <div className='onboardingQuestions'>
       <div className='onboardingQuestion' style={{textAlign: "center"}}>
-        <label>Last thing! Please confirm whether students can contact you via the following email:</label>
+        <label>Last thing! Please confirm whether you are comfortable with students contacting you via the following email:</label>
         <br />
         <span style={{color: "black", fontSize: "23px"}}>{loginEmail}</span>
       </div>

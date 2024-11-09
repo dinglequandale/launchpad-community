@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { sendConnectMessageWithoutResume, sendConnectMessageWithResume } from '../../Streamchat/chatFunctions/sendConnectMessage';
 import { useAuth } from '../../contexts/auth/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { storage } from '../../firebase/firebaseConfig';
 import toast, { Toaster } from 'react-hot-toast';
 import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
 import { CgClose } from 'react-icons/cg';
 
 // TODO: actually implement clickedUser logic
-export default function ConnectModal({visibility, chat, onClose, userId, userName, isOpportunity=false, opportunityType=null}){
+export default function ConnectModal({visibility, chat, onClose, userId, userData, isOpportunity=false, opportunityType=null}){
 
   const [introMessage, setIntroMessage] = useState("");
   const [sendWithResume, setSendWithResume] = useState(false);
@@ -19,13 +19,8 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
 
   const [sendDirectMessage, setSendDirectMessage] = useState(false);
 
-  const userType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
-
-  // const wordLimit = 50;
-
-  // const getWordCount = (text) => {
-  //   return text.trim().split(/\s+/).length;
-  // }
+  // const userType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
+  const userType = userData.userType;
 
   const navigate = useNavigate();
 
@@ -112,20 +107,20 @@ export default function ConnectModal({visibility, chat, onClose, userId, userNam
       >
         <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
         <header>
-          {!isOpportunity ? <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Contact {userName} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Receive valuable opportunities, mentorship, and referrals</span></h2>
+          {!isOpportunity ? <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Contact {userData.userName} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Receive valuable opportunities, mentorship, and referrals</span></h2>
           :
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Join {userName}'s {userType === "Professional" ? "Opportunity" : "Initiative"} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Send an Introductory Message</span></h2>}
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Join {userData.userName}'s {userType === "Professional" ? "Opportunity" : "Initiative"} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Send an Introductory Message</span></h2>}
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{ display: "flex", flexDirection: "column", gap: "7px"}}>
             <div style={{display: "flex", flexDirection: "column", gap: "5px", padding: "15px 5px"}}>
               <span style={{fontSize: "18px"}}>
                 <span style={{fontWeight: "550", fontSize: "18px"}}>Email:</span>
-                &nbsp;tittelk@awty.org
+                &nbsp;{userData.email ? userData.email : "No email provided"}
               </span>
-              {userId && <span style={{fontSize: "18px"}}>
+              {userData.linkedinLink && <span style={{fontSize: "18px"}}>
                 <span style={{textDecoration: "", color: "black", fontWeight: "550"}}>Linkedin:</span>
-                &nbsp;<button className='btnText' style={{fontSize: "18px", textDecoration: "underline", color: "#555CFF"}}>https://www.linkedin.com/in/konrad-tittel-b03122273/</button>
+                &nbsp;<Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link>
               </span>}
             </div>
             {sendDirectMessage && (<>

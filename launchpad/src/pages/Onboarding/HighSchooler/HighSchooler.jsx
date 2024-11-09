@@ -6,6 +6,7 @@ import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInf
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -89,6 +90,14 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
 
   const {currentUser} = useAuth();
 
+  const getEmail = httpsCallable(getFunctions(), 'getEmail');
+  const [loginEmail,setLoginEmail] = useState("");
+  const getUserEmail = async () => {
+    const result = await getEmail();
+    setLoginEmail(result.data.email);
+  }
+  getUserEmail();
+
   const [highSchoolerData, setHighSchoolerData] = useState({
     userAboutMe: '',
     userName: '',
@@ -101,6 +110,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
     collegeInterestsOrDecision: [],
     userResume: null,
     userResumePreview: "",
+    email: loginEmail,
     userType: "High Schooler",
     userPfpPreview: "",
     userPfp: null,
