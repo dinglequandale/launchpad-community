@@ -1,10 +1,15 @@
 .inputAboutMe::placeholder {
-    display: block; /* Makes it behave like a block element */
-    top: 5px; /* Adjust the negative margin to match your padding */
-    position: absolute;
-  }
+  display: block;
+  top: 5px;
+  position: absolute;
+}
 
 .inputAboutMe {
-    width: 450px;
-    height: 200px;
-  }
+  width: 450px;
+  height: 200px;
+}
+
+.btnSaveChanges{
+  background-color: var(--secondary);
+  
+}

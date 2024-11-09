@@ -5,6 +5,7 @@ import MakeChanges from '../../Makechanges/MakeChanges';
 import { editUserData } from '../../../services/userProfileServices';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
+import { CgClose } from 'react-icons/cg';
 
 export default function AboutMeModal({userData, visibility, onClose}){
   const [aboutMeContent, setAboutMeContent] = useState(userData.userAboutMe ?? "");
@@ -78,6 +79,7 @@ export default function AboutMeModal({userData, visibility, onClose}){
         contentLabel="About Me Modal"
         shouldCloseOnOverlayClick={false} 
       >
+        <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
         <header>
           <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> My About Me <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>It's your time to shine!</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
@@ -87,9 +89,9 @@ export default function AboutMeModal({userData, visibility, onClose}){
         </main>
         <span style={{fontSize: "smaller"}}>Word Count: {aboutMeContent ? `${getWordCount(aboutMeContent)}` : "0"}/{wordLimit}</span>
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-          <button disabled={isSubmitting} onClick={()=>setMakeChangesVisibility(true)} style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+          <button disabled={isSubmitting} className='btnUnfilled' onClick={()=>setMakeChangesVisibility(true)} style={{borderRadius: "4px", width: "40%", padding: "8px", fontSize: "larger"}}>
             Cancel</button>
-          <button onClick={saveAboutMe} type='submit' disabled={isSubmitting} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+          <button onClick={saveAboutMe} type='submit' disabled={isSubmitting} className="btnSaveChanges" style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white"}}>
             Save Changes</button>
         </footer>
       </Modal>

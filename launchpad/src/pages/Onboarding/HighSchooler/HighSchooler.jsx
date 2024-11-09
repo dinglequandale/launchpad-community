@@ -6,6 +6,7 @@ import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInf
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -34,6 +35,11 @@ const highSchoolQuestionsConfig = [
     id: "userResume",
     text: "If you have a resume, feel free to attach it:",
     type: "file",
+    optional: true,
+    page: 1
+  },
+  {
+    id: "linkedinLink",
     optional: true,
     page: 1
   },
@@ -84,6 +90,14 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
 
   const {currentUser} = useAuth();
 
+  const getEmail = httpsCallable(getFunctions(), 'getEmail');
+  const [loginEmail,setLoginEmail] = useState("");
+  const getUserEmail = async () => {
+    const result = await getEmail();
+    setLoginEmail(result.data.email);
+  }
+  getUserEmail();
+
   const [highSchoolerData, setHighSchoolerData] = useState({
     userAboutMe: '',
     userName: '',
@@ -96,9 +110,11 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
     collegeInterestsOrDecision: [],
     userResume: null,
     userResumePreview: "",
+    email: loginEmail,
     userType: "High Schooler",
     userPfpPreview: "",
     userPfp: null,
+    linkedinLink:'',
   });
 
   const handleSubmit = async () => {
@@ -200,7 +216,7 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
   const collegeChosen = selectedOptions['collegeDecision'] === "Yes";
 
   return (
-    <div className='onboardingQuestions' style={{width: "460px"}}>
+    <div className='onboardingQuestions' style={{width: "500px"}}>
       <OnboardingDropdown
         question={questions[0].text}
         options={questions[0].options}

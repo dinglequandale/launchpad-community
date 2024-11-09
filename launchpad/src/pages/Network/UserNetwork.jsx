@@ -46,7 +46,7 @@ export default function UserNetwork() {
   const [allVisibleUserData, setAllVisibleUserData] = useState(null);
 
   const [profileTargetData, setProfileTargetData] = useState(null);
-  const [connectTargerUserName, setConnectTargetUserName] = useState("");
+  const [connectTargetUser, setConnectTargetUser] = useState("");
   
   const [profileModalTop, setProfileModalTop] = useState(0);
 
@@ -142,7 +142,7 @@ export default function UserNetwork() {
 
   const handleConnectClick = (userId) => {
     setConnectTargetUserId(userId);
-    setConnectTargetUserName(allVisibleUserData.filter((user)=>(user.userId === userId))[0].userName);
+    setConnectTargetUser(allVisibleUserData.filter((user)=>(user.userId === userId))[0]);
     setProfileModalVisibility(false);
     setConnectModalVisibility(true);
   }
@@ -213,7 +213,7 @@ export default function UserNetwork() {
     <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick, loadLimit, filterChanged}}>
       <>
         <Toaster position={'bottom-right'} reverseOrder={false}/>
-        {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={connectTargerUserName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
+        {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userData={connectTargetUser} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
         {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} handleReferalClick={handleReferalClick} userData={profileTargetData}/>}
         <div>
             <TopBar/>
