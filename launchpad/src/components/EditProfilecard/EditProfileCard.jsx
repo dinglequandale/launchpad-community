@@ -22,6 +22,7 @@ import { db } from '../../firebase/firebaseConfig';
 import { deletePfp, displayColleges, displayFieldsOfInterest, editUserData, getBasicUserDescription, handleUserProfileUpdate, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
 import { BiEdit, BiTrash } from 'react-icons/bi';
 import SkillModal from '../SkillsModal/SkillModal';
+import LinkedinModal from '../Profilemodals/LinkedInModal/LinkedinModal';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -170,6 +171,7 @@ export default function EditProfileCard() {
                     <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Skills ...</span>
                     <SkillBase/>
                 </div>}
+                <LinkedInLink/>
                 <div className={`userResume ${userData.userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px", marginTop: "10px"}}>
                     <div style={{display: "flex", justifyContent: "space-between", position: "relative"}} id="Resume">
                         <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Resume ...</span>
@@ -320,6 +322,32 @@ function SkillBase() {
         </>
     )
 }
+
+function LinkedInLink(){
+    const { userData, currentUser } = useContext(ProfileContext);
+
+    const [linkedInModalVisibility, setLinkedInModalVisibility] = useState(false);
+    return(
+        <>
+        {linkedInModalVisibility && <LinkedinModal userData ={userData} visibility ={linkedInModalVisibility} onClose={() => setLinkedInModalVisibility(false)}/>}
+        <div className='linkedInSection' style={{position: "relative", marginTop: "10px"}}>
+            {userData.linkedinLink ? <div className="linkedInDisplay" style={{display: "flex", justifyContent: "left", padding: "10px"}}>
+                <span>LinkedIn Profile: <br /><Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link></span>
+            </div> :
+            <div className='linkedInUpload'>
+                <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>
+                    Linkedin Profile ...
+                </span>
+                <br />
+                <span style={{fontWeight: "250", fontSize: "15px"}}>Have a Linkedin profile you'd like to share? <a style={{cursor: "pointer", textDecoration: "underline"}} onClick={() => setLinkedInModalVisibility(true)}>Upload it here!</a></span>
+            </div>}
+            <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
+                <EditInformation isAnswered={userData.linkedinLink} questionName={"LinkedIn"} onEdit={()=>setLinkedInModalVisibility(true)}/>
+            </div>
+        </div>
+        </>
+    )
+}
     
   
 
@@ -327,6 +355,8 @@ function ResumeUpload(){
     const inputRef = useRef();
 
     const { userData, currentUser } = useContext(ProfileContext);
+
+    const [linkedInModalVisibility, setLinkedInModalVisibility] = useState(false);
 
     const handleUploadClick = () => {
         inputRef.current.click();
@@ -611,9 +641,6 @@ function AboutMeDisplay(){
                 </>}
                 <EditInformation questionName={"About Me"} onEdit={()=>setAboutMeModalVisibility(true)} isAnswered={aboutMe}/>
             </div><span>{aboutMe}</span>
-            {userData.linkedinLink && <div className="linkedInDisplay" style={{display: "flex", justifyContent: "center", padding: "10px"}}>
-                <span>LinkedIn Profile: <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link></span>
-            </div>}
         </div>
         </>
     )

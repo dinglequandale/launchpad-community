@@ -109,6 +109,10 @@ const professionalQuestionsConfig = [
     options: null,
     page: 3,
   },
+  {
+    id: "email",
+    page: 4,
+  },
   // Page 4
   // TODO: add descriptions to the options
   {
@@ -148,6 +152,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
     userPfpPreview: "",
     yearsOfExperience: "",
     userName: "",
+    email: "",
     // userAboutMe: "",
     userPfp: null,
   });
@@ -206,8 +211,8 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit}) 
         return <WorkDetails selectedOptions={professionalData} handleChange={handleChange} />;
       case 4:
         return <ConnectionLevel selectedOptions={professionalData} setSelectedOptions={setProfessionalData} />;
-      // case 5:
-      //   return <FinalTouches selectedOptions={professionalData} handleChange={handleChange}/>
+      case 5:
+        return <EmailConfirmation selectedOptions={professionalData} handleChange={handleChange}/>
       default:
         return null;
     }
@@ -300,7 +305,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
       },
       { 
           id: "informationalInterview",
-          text: "Discuss your career path with high schoolers or undergrads over a 15-minute interview",
+          text: "Discuss your career path with high schoolers or undergrads over a short interview",
           value: "Short Interview",
       },
       { 
@@ -313,7 +318,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
     return (
         <div className='onboardingQuestions'>
           <div style={{border: "solid 1.5px var(--secondary)", textAlign: "center", padding: "8px 0px", background: "var(--neutral)"}}>
-            <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and mentorship</span> <br /> is a valuable reasource for students on this app.</span></div>
+            <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and experiences</span> <br /> are invaluable resources for students on this app.</span></div>
           <div style={{position: "relative"}}>
           <label className='onboardingQuestion'>Please roughly assess your commitment:</label>
           <div style={{position: "absolute", bottom: "-13px"}}>
@@ -365,6 +370,32 @@ const FinalTouches = ({ selectedOptions, handleChange }) => {
         onChange={(e) => handleChange("userAboutMe",e.target.value)} 
         value={selectedOptions["userAboutMe"]}></textarea>
       </div>
+    </div>
+  );
+};
+
+const EmailConfirmation = ({ selectedOptions, handleChange }) => {
+  const [btnSelected,setBtnSelected] = useState("");
+  const email = "tittelk@awty.org";
+  return (
+    <div className='onboardingQuestions'>
+      <div className='onboardingQuestion' style={{textAlign: "center"}}>
+        <label>Last thing! Please confirm whether students can contact you via the following email:</label>
+        <br />
+        <span style={{color: "black", fontSize: "23px"}}>{email}</span>
+      </div>
+      <div style={{display: "flex", justifyContent: "space-around"}}>
+        <button className={btnSelected === "y" ? "" : 'btnUnfilled'} onClick={()=>{
+          setBtnSelected("y");
+          handleChange("email", email);
+        }} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>Yes, I confirm.</button>
+        <button className={btnSelected === "n" ? "" : 'btnUnfilled'} onClick={()=>setBtnSelected("n")} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>No, I prefer another email.</button>
+      </div>
+      {btnSelected === "n" && 
+      <>
+        <label className='onboardingQuestion' style={{textAlign: "center"}}>Please input a more suitable email:</label>
+        <input className="onboardingInput" type="email" value={selectedOptions["email"]} onChange={(e) => handleChange("email", e.target.value)}/>
+      </>}
     </div>
   );
 };

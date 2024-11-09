@@ -37,6 +37,11 @@ const highSchoolQuestionsConfig = [
     optional: true,
     page: 1
   },
+  {
+    id: "linkedinLink",
+    optional: true,
+    page: 1
+  },
   // Page 2
   {
     id: "schoolAttending",
@@ -99,6 +104,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
     userType: "High Schooler",
     userPfpPreview: "",
     userPfp: null,
+    linkedinLink:'',
   });
 
   const handleSubmit = async () => {
@@ -200,7 +206,7 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
   const collegeChosen = selectedOptions['collegeDecision'] === "Yes";
 
   return (
-    <div className='onboardingQuestions' style={{width: "460px"}}>
+    <div className='onboardingQuestions' style={{width: "500px"}}>
       <OnboardingDropdown
         question={questions[0].text}
         options={questions[0].options}

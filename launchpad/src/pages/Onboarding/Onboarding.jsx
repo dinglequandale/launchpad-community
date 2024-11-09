@@ -26,7 +26,7 @@ export default function Onboarding() {
                 return 3;
             case "Professional":
                 // return 5;
-                return 4;
+                return 5;
             default:
                 return null;
         }

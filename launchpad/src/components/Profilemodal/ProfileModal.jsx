@@ -162,7 +162,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                             <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px", paddingTop: "10px"}}>
                                 {userData.networkingLevel.map((availability)=>(
                                     <div key={availability} style={{background: "var(--neutral)", padding: "6px 11px", borderRadius: "5px"}}>
-                                        <a href='/' style={{lineHeight: "1.5", fontSize: "22px", textDecoration: "underline"}}>{availability}</a>
+                                        <span style={{lineHeight: "1.5", fontSize: "22px", color: "var(--secondary)"}}>{availability}</span>
                                     </div>
                                 ))}
                             </div>

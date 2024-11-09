@@ -91,6 +91,7 @@ const careerInterests = [
   {"value": "philosophy", "label": "Philosophy", "group": "Arts & Humanities"},
   {"value": "gender_studies", "label": "Gender Studies", "group": "Social Sciences"},
   {"value": "hospitality_management", "label": "Hospitality Management", "group": "Business"},
+  {"value:": "entertainment", "label": "Entertainment", "group": "Business"},
   {"value": "geology", "label": "Geology", "group": "Life Sciences"},
   {"value": "life_science", "label": "Life, Animal, & Earth Science", "group": "Life Sciences"},
   {"value": "building_trades", "label": "Hands-On Building Trades (Carpentry, Welding, Plumbing, and Construction)", "group": "Hands-On Trades"},
