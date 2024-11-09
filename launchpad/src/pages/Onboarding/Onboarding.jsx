@@ -8,6 +8,7 @@ import { BsBackpack } from 'react-icons/bs';
 import { BiBriefcase } from 'react-icons/bi';
 import { LuGraduationCap } from 'react-icons/lu';
 import ProgressBar from '../../components/Progressbar/ProgressBar';
+import Loading from '../../components/LoadingAnimation/Loading';
 
 export default function Onboarding() {
     const [showComponent, setShowComponent] = useState(false);
@@ -26,7 +27,7 @@ export default function Onboarding() {
                 return 3;
             case "Professional":
                 // return 5;
-                return 4;
+                return 5;
             default:
                 return null;
         }
@@ -93,10 +94,11 @@ export default function Onboarding() {
                 <button onClick={()=>{if(canSubmit){
                     setIsSubmitting(true);
                 }}} className='continueButton' style={!canSubmit ? disabledSubmitStyles : {}}>
-                    Submit
+                    {!isSubmitting ? "Submit" : <Loading/>}
                 </button>}
             </footer>
             </div>
+            {isSubmitting && <div name="screenBlocker" style={{background:"rgba(0,0,0,0.5)", width: "100%", height: "100%"}}></div>}
         </div>
     );
 };

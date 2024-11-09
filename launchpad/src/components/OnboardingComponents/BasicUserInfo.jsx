@@ -114,7 +114,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
         </div>
         
         {questionsForPage[3] && ( <>
-        <div className="file-upload-container" style={{position: "relative"}}>
+          {selectedOptions.userType !== "Professional" ? <div className="file-upload-container" style={{position: "relative"}}>
           <label className="onboardingQuestion" style={{position: "relative"}}>
             {questionsForPage[3].text}
             {questionsForPage[3].optional && <div style={{position: "absolute", bottom: "-20px"}}>
@@ -157,11 +157,23 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
               value={selectedOptions["linkedinLink"]}
               // TODO: work this into everything
               className="onboardingInput"
-              style={{width: "85%", boxShadow: "var(--shadowColor)", display: "flex", right: "0", left: "0", marginLeft: "auto", marginRight: "auto", marginTop: "40px"}}
+              style={{width: "465px", boxShadow: "var(--shadowColor)", display: "flex", right: "0", left: "0", marginLeft: "auto", marginRight: "auto", marginTop: "40px"}}
             /></div>
-        </div>
+        </div> : 
+        <>
+          <span className="onboardingQuestion">{questionsForPage[3].text}</span>
+          <input
+            type="link"
+            onChange={(e) => handleChange("linkedinLink", e.target.value)}
+            placeholder="Paste your LinkedIn profile link here"
+            value={selectedOptions["linkedinLink"]}
+            // TODO: work this into everything
+            className="onboardingInput"
+            style={{width: "465px", display: "flex", right: "0", left: "0", marginLeft: "auto", marginRight: "auto"}}
+          />
+        </>}
         
-        {(selectedOptions.linkedinLink !== undefined) && <div style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
+        {(selectedOptions.linkedinLink !== undefined && selectedOptions.userType !== "Professional") && <div style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
           <button className="btnText" style={{fontSize: "19px", color: linkedInOptionSelected ? "rgb(48, 160, 240)" : ""}} onClick={() => setLinkedInOptionSelected(!linkedInOptionSelected)}>Or click here link here to link your LinkedIn profile.</button>
         </div>}
         </>

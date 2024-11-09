@@ -61,15 +61,16 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
 export const saveProfessional = async (currentUser, professionalData, onSuccess) => {
 
     try {
-        const { userPfp, userResume, ...otherData } = professionalData;
+        // const { userPfp, userResume, ...otherData } = professionalData;
+        const { userPfp, ...otherData } = professionalData;
 
         const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
-        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
+        // const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
 
         const dataToSave = {
         ...otherData,
         userPfpPreview: pfpURL,
-        userResumePreview: resumeURL,
+        // userResumePreview: resumeURL,
         userId: currentUser.uid
         };
 

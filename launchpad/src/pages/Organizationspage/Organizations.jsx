@@ -216,7 +216,7 @@ export default function Organizations(){
     return(
         <>
             <Toaster position={'bottom-right'} reverseOrder={false}/>
-            {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userName={targetUserData.userName} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId} isOpportunity={true}/>}
+            {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userData={targetUserData} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId} isOpportunity={true}/>}
             {showPfpCard && <ProfileModal visibility={showPfpCard} onClose={()=>setShowPfpCard(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={targetUserData} handleReferalClick={handleReferalClick}/>}
             <TopBar/>
             <SideNav/>
