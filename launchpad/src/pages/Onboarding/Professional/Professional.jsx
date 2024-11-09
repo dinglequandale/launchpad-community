@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
+import { getFunctions, httpsCallable } from "firebase/functions";
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import { careerInterests } from './../Options';
 import { requiredQuestionsAnswered, saveProfessional } from '../../../services/onboardingServices';
@@ -376,18 +377,25 @@ const FinalTouches = ({ selectedOptions, handleChange }) => {
 
 const EmailConfirmation = ({ selectedOptions, handleChange }) => {
   const [btnSelected,setBtnSelected] = useState("");
-  const email = "tittelk@awty.org";
+  const getEmail = httpsCallable(getFunctions(), 'getEmail');
+  const [loginEmail,setLoginEmail] = useState("");
+  const getUserEmail = async () => {
+    const result = await getEmail();
+    console.log("result:", result);
+    setLoginEmail(result.data.email);
+  }
+  getUserEmail();
   return (
     <div className='onboardingQuestions'>
       <div className='onboardingQuestion' style={{textAlign: "center"}}>
         <label>Last thing! Please confirm whether students can contact you via the following email:</label>
         <br />
-        <span style={{color: "black", fontSize: "23px"}}>{email}</span>
+        <span style={{color: "black", fontSize: "23px"}}>{loginEmail}</span>
       </div>
       <div style={{display: "flex", justifyContent: "space-around"}}>
         <button className={btnSelected === "y" ? "" : 'btnUnfilled'} onClick={()=>{
           setBtnSelected("y");
-          handleChange("email", email);
+          handleChange("email", loginEmail);
         }} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>Yes, I confirm.</button>
         <button className={btnSelected === "n" ? "" : 'btnUnfilled'} onClick={()=>setBtnSelected("n")} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>No, I prefer another email.</button>
       </div>
