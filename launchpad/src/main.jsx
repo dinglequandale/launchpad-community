@@ -21,42 +21,42 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App/>,
-    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
     path: '/Landing',
     element: <LandingPage/>,
-    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
     path: '/highschoolers',
     element: <LandingPage/>,
-    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
     path: '/professionals',
     element: <Professional_LandingPage/>,
-    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
     path: '/undergrads',
     element: <Alumni_LandingPage/>,
-    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
     path: '/Signup',
     element: <SignUp/>,
-    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
     path: '/Login',
     element: <Login/>,
-    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
     path: '/Onboarding',
     element: <Onboarding/>,
-    errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
     element: <GlobalAuthWrapper/>,
@@ -64,27 +64,27 @@ const router = createBrowserRouter([
     {
       path: '/Home',
       element: <Home/>,
-      errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>,
+      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>,
     },
     {
       path: '/UserNetwork',
       element: <UserNetwork/>,
-      errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
     },
     {
       path: '/messages',
       element: <InitializeStream/>,
-      errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
     },
     {
       path: '/Organizations',
       element: <Organizations/>,
-      errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
     },
     {
       path: '/MyProfile',
       element: <EditProfilePage/>,
-      errorElement: <div>Sorry pookie! We got an error on our hands ... Try reload!</div>
+      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
     },
 ]
 }

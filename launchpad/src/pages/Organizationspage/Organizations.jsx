@@ -33,7 +33,6 @@ export default function Organizations(){
     const [profileModalTop, setProfileModalTop] = useState(0);
     const [targetUserData, setTargetUserData] = useState(null);
     const [connectTargetUserId,setConnectTargetUserId] = useState("");
-    const [connectTargerUserName, setConnectTargetUserName] = useState("");
 
     const [lastDoc, setlastDoc] = useState(null);
     const [hasMore, setHasMore] = useState(true);
@@ -56,13 +55,12 @@ export default function Organizations(){
     const handleConnectClick = (userData = null) => {
         if(userData){
             setConnectTargetUserId(userData.userId);
-            setConnectTargetUserName(userData.userName);
+            setTargetUserData(userData);
             setShowPfpCard(false);
             setConnectModalVisibility(true);
             return;
         }
         setConnectTargetUserId(targetUserData.userId);
-        setConnectTargetUserName(targetUserData.userName);
         setShowPfpCard(false);
         setConnectModalVisibility(true);
       }

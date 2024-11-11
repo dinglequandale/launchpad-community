@@ -41,16 +41,16 @@ export default function OrganizationProfile({organizationData, location, handleS
     const getUserData = async (userId) => {
         const userSnap = await getDoc(doc(db, "users", userId));
         if (userSnap.exists()) {
-            setUserData(userSnap.data());
+            setUserData({id: userSnap.id, ...userSnap.data()});
             } else {
                 console.log("No such document!");
             }
     }
 
     useEffect(()=>{
-        if(location !== "organizations_page"){
-            return;
-        }
+        // if(location !== "organizations_page"){
+        //     return;
+        // }
         getUserData(organizationProfileData.organizationCreatedBy);
     },[])
 
@@ -90,11 +90,13 @@ export default function OrganizationProfile({organizationData, location, handleS
 
     const handleConnect = (e) => {
         e.preventDefault();
+        // console.log("Connect data:", userData)
         handleReferalClick("apply", organizationProfileData, userData);
     }
 
     const handleLearnMore = (e) => {
         e.preventDefault();
+        // console.log("Connect data:", userData)
         handleReferalClick("learnMore", organizationProfileData, userData);
     }
 
