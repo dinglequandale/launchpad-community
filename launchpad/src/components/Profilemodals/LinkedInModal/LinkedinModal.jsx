@@ -94,7 +94,7 @@ export default function LinkedinModal({userData, visibility, onClose}){
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
           <button disabled={isSubmitting} className='btnUnfilled' onClick={()=>setMakeChangesVisibility(true)} style={{borderRadius: "4px", width: "40%", padding: "8px", fontSize: "larger"}}>
             Cancel</button>
-          <button onClick={saveLinkedIn} type='submit' disabled={isSubmitting || newLinkedinLink===""} className="btnSaveChanges" style={{background: (newLinkedinLink === "") ? "gray": "", borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", cursor: (newLinkedinLink === "") ? "not-allowed" : ""}}>
+          <button onClick={saveLinkedIn} type='submit' disabled={isSubmitting || newLinkedinLink===""} className="btnSaveChanges" style={{background: (isSubmitting || newLinkedinLink === "") ? "gray": "", borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", cursor: (newLinkedinLink === "") ? "not-allowed" : ""}}>
             Save Changes</button>
         </footer>
       </Modal>

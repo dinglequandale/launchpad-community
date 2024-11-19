@@ -94,7 +94,7 @@ export default function EmailModal({userData, visibility, onClose}){
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
           <button disabled={isSubmitting} className='btnUnfilled' onClick={()=>setMakeChangesVisibility(true)} style={{borderRadius: "4px", width: "40%", padding: "8px", fontSize: "larger"}}>
             Cancel</button>
-          <button onClick={saveLinkedIn} type='submit' disabled={isSubmitting || newEmail===""} className="btnSaveChanges" style={{background: (newEmail === "") ? "gray": "", borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", cursor: (newEmail === "") ? "not-allowed" : ""}}>
+          <button onClick={saveLinkedIn} type='submit' disabled={isSubmitting || newEmail===""} className="btnSaveChanges" style={{background: (newEmail === "" || isSubmitting) ? "gray": "", borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", cursor: (newEmail === "") ? "not-allowed" : ""}}>
             Save Changes</button>
         </footer>
       </Modal>

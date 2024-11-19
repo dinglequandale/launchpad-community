@@ -248,7 +248,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
         >
           
           <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Initiative <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Make your voice heard.</span></h2>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Initiative <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Make your voice heard. Garner support from Awty alumni and parents.</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
           <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast}/>
           </header>
@@ -478,7 +478,7 @@ function FinalInfo(){
                   <div style={{display: "flex", justifyContent: "center", gap: "25px", paddingTop: "10px"}}>
                   {learnMoreAndApplyOptions.map((option)=>(
                     <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: "100px"}}>
-                      <button key={option[0]} style={{padding: "10px"}} className={`btnCircle ${(option[0] === (question.id === "learnMore" ? learnMoreType : applyType)) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
+                      <button key={option[0]} style={{padding: "10px"}}  className={`btnSaveChanges btnCircle ${(option[0] === (question.id === "learnMore" ? learnMoreType : applyType)) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
                         {option[1]}
                       </button>
                       <span>{option[0] === "Messages" ? "Message Me" : option[0] === "Email" ? "Email Me" : "Website"}</span>
@@ -524,7 +524,7 @@ function FinalInfo(){
                 <div key={question.id} className="questionItem">
                   <label htmlFor={question.id}>{question.text}</label>
                   <div style={{display: "flex", position: "relative", alignItems: "center", justifyContent: "center", width: "40%", paddingTop: "15px"}}>
-                    <button style={{borderRadius: "50%", boxShadow: "var(--shadowColor)", padding: "15px"}} onClick={(e)=>{
+                    <button className='btnSaveChanges' style={{borderRadius: "50%", boxShadow: "var(--shadowColor)", padding: "15px"}} onClick={(e)=>{
                       logoRef.current.click();
                       e.preventDefault();}}><GrAdd size={30}/></button>
                     <input
