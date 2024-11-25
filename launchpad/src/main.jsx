@@ -16,6 +16,8 @@ import InitializeStream from './Streamchat/streamChatConfig.jsx';
 import GlobalAuthWrapper from './contexts/GlobalAuthWrapper.jsx';
 import Professional_LandingPage from './pages/landing_page/Professional_LandPage.jsx';
 import Alumni_LandingPage from './pages/landing_page/Alumni_LandingPage.jsx';
+import PrivacyPolicy from './pages/Policies/PrivacyPolicy.jsx';
+import Terms from './pages/Policies/Terms.jsx';
 
 const router = createBrowserRouter([
   {
@@ -56,6 +58,16 @@ const router = createBrowserRouter([
   {
     path: '/Onboarding',
     element: <Onboarding/>,
+    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPolicy/>,
+    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+  },
+  {
+    path: '/terms',
+    element: <Terms/>,
     errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {

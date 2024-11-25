@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Navigate, useNavigate } from "react-router-dom"
+import { Navigate, useLocation, useNavigate } from "react-router-dom"
 import "./landingpage.css"
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { PiBuilding, PiGraduationCap, PiStudent, PiSuitcase } from "react-icons/pi";
@@ -8,6 +8,7 @@ import Landing_Nav from "./Landing_Nav/Landing_Nav";
 export default function LandingPage() {
   const { userLoggedIn } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
 
   const handleJoin = () => {
@@ -144,8 +145,12 @@ export default function LandingPage() {
           <div className="footer-column">
             <h3>Legal</h3>
             <ul>
-              <li><a href="#terms">Terms of Service</a></li>
-              <li><a href="#privacy">Privacy Policy</a></li>
+            <li><a onClick={() => {
+                navigate("/terms", {state: location.pathname});
+              }}>Terms of Service</a></li>
+              <li><a onClick={() => {
+                navigate("/privacy", {state: location.pathname});
+              }}>Privacy Policy</a></li>
             </ul>
           </div>
           <div className="footer-column">
