@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react"
-import { Navigate, useNavigate } from "react-router-dom"
+import { Navigate, useLocation, useNavigate } from "react-router-dom"
 import "./landingpage.css"
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { PiBuilding, PiGraduationCap, PiStudent, PiSuitcase } from "react-icons/pi";
 import Landing_Nav from "./Landing_Nav/Landing_Nav";
+import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 
 export default function LandingPage() {
   const { userLoggedIn } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
 
   const handleJoin = () => {
@@ -124,38 +126,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="landing-footer">
-        <div className="footer-content">
-          <div className="footer-column">
-            <h3>Company</h3>
-            <ul>
-              <li><a href="#about">About Us</a></li>
-              <li><a href="#careers">Careers</a></li>
-              <li><a href="#press">Press</a></li>
-            </ul>
-          </div>
-          <div className="footer-column">
-            <h3>Resources</h3>
-            <ul>
-              <li><a href="#blog">Blog</a></li>
-              <li><a href="#faq">FAQ</a></li>
-              <li><a href="#support">Support</a></li>
-            </ul>
-          </div>
-          <div className="footer-column">
-            <h3>Legal</h3>
-            <ul>
-              <li><a href="#terms">Terms of Service</a></li>
-              <li><a href="#privacy">Privacy Policy</a></li>
-            </ul>
-          </div>
-          <div className="footer-column">
-            <h3>Connect</h3>
-            <div className="social-icons">
-              {/* Add social media icons here */}
-            </div>
-          </div>
-        </div>
-        <p className="copyright">&copy; 2024 Launchpad. All rights reserved.</p>
+        <LegalityFooter pathName={location.pathname}/>
       </footer>
     </div>
     </>

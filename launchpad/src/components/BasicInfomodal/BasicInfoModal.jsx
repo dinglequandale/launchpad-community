@@ -256,9 +256,9 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
           <button disabled={isSubmitting} onClick={
             ()=>setMakeChangesVisibility(true)
-            } style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+            } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Cancel</button>
-          <button disabled={isSubmitting} onClick={saveBasicInfo} type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+          <button disabled={isSubmitting} onClick={saveBasicInfo} className="btnSaveChanges" type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
             Save Changes</button>
         </footer>
       </Modal>

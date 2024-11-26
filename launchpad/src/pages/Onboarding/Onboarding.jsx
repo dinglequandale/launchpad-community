@@ -9,6 +9,7 @@ import { BiBriefcase } from 'react-icons/bi';
 import { LuGraduationCap } from 'react-icons/lu';
 import ProgressBar from '../../components/Progressbar/ProgressBar';
 import Loading from '../../components/LoadingAnimation/Loading';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function Onboarding() {
     const [showComponent, setShowComponent] = useState(false);
@@ -18,6 +19,9 @@ export default function Onboarding() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [canSubmit, setCanSubmit] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const getNumOfSections = () => {
         switch(selectedOption){
@@ -71,7 +75,11 @@ export default function Onboarding() {
                     <UserType setSelectedOption={setSelectedOption} selectedOption={selectedOption}/>
                     <div style={{display: "flex", marginTop: "15px"}}>
                         <input type="checkbox" checked={agreedToTerms} onChange={()=>setAgreedToTerms(!agreedToTerms)}/>
-                        <span>I accept the <a href="/" style={{textDecoration: "underline"}}>Privacy Policy</a> and the <a href="" style={{textDecoration: "underline"}}>Terms and Conditions</a>.</span>
+                        <span>I accept the <a onClick={() => {
+                            navigate("/privacy", {state: location.pathname});
+                        }} style={{textDecoration: "underline"}}>Privacy Policy</a> and the <a onClick={() => {
+                            navigate("/terms", {state: location.pathname});
+                        }} style={{textDecoration: "underline"}}>Terms and Conditions</a>.</span>
                     </div>
                 </div>
             ) : (

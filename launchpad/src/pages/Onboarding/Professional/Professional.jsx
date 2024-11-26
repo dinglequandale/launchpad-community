@@ -395,11 +395,11 @@ const EmailConfirmation = ({ selectedOptions, handleChange, loginEmail }) => {
         <span style={{color: "black", fontSize: "23px"}}>{loginEmail}</span>
       </div>
       <div style={{display: "flex", justifyContent: "space-around"}}>
-        <button className={btnSelected === "y" ? "" : 'btnUnfilled'} onClick={()=>{
+        <button className={btnSelected === "y" ? "btnSaveChanges" : 'btnUnfilled'} onClick={()=>{
           setBtnSelected("y");
           handleChange("email", loginEmail);
         }} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>Yes, I confirm.</button>
-        <button className={btnSelected === "n" ? "" : 'btnUnfilled'} onClick={()=>setBtnSelected("n")} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>No, I prefer another email.</button>
+        <button className={btnSelected === "n" ? "btnSaveChanges" : 'btnUnfilled'} onClick={()=>setBtnSelected("n")} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>No, I prefer another email.</button>
       </div>
       {btnSelected === "n" && 
       <>

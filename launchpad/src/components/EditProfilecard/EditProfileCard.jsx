@@ -20,9 +20,10 @@ import Loading from '../LoadingAnimation/Loading';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import { deletePfp, displayColleges, displayFieldsOfInterest, editUserData, getBasicUserDescription, handleUserProfileUpdate, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
-import { BiEdit, BiTrash } from 'react-icons/bi';
+import { BiEdit, BiPlus, BiTrash } from 'react-icons/bi';
 import SkillModal from '../SkillsModal/SkillModal';
 import LinkedinModal from '../Profilemodals/LinkedInModal/LinkedinModal';
+import EmailModal from '../Profilemodals/EmailModal/EmailModal';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -132,6 +133,9 @@ export default function EditProfileCard() {
                     </div>
                     <BasicInfoCard descType={descType()}/>
                 </div>
+                <div style={{marginBottom: "15px"}}><ContactInformation/></div>
+                <hr style={{width:"100%"}}/>
+                
                 <div>
                     {(!opportunitiesLoading && opportunitiesData.length > 0) ? 
                     
@@ -168,13 +172,12 @@ export default function EditProfileCard() {
                 </div>}
                 <AboutMeDisplay/>
                 {(userData && userData.userType !== "Professional") && <div name="skills" style={{marginTop: "20px"}}>
-                    <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Skills ...</span>
+                    <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Skills </span>
                     <SkillBase/>
                 </div>}
-                <LinkedInLink/>
                 <div className={`userResume ${userData.userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px", marginTop: "10px"}}>
                     <div style={{display: "flex", justifyContent: "space-between", position: "relative"}} id="Resume">
-                        <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Resume ...</span>
+                        <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Resume </span>
                         <div style={{position: "absolute", right: "0", top: "17px"}}>
                             <PublicPrivateDropdown/>
                         </div>
@@ -183,7 +186,7 @@ export default function EditProfileCard() {
                 </div>
                 {(userData.userType === "Professional" || userData.userType === "Alumni") && <hr style={{width: "100%"}}/>}
                 {(userData.userType === "Professional") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
-                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userData.userName.split(" ")[0]}</span> is <span style={{fontWeight: "450"}}>open to</span> ... </h>
+                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userData.userName.split(" ")[0]}</span> is <span style={{fontWeight: "450"}}>open to</span>  </h>
                     <ConnectionAvailability/>
                 </div>}
                 </>
@@ -283,7 +286,6 @@ function SkillBase() {
     const { userData } = useContext(ProfileContext);
 
     const userSkills = userData.userSkills;
-    // [{skillCategory: "Leadership", skillDescription: "I became a leader of blah blah blah..."},{skillCategory: "Community", skillDescription: "I became a leader of blah blah blah..."},{skillCategory: "Leadership", skillDescription: "I became a leader of blah blah blah..."}];
     
 
     return(
@@ -323,26 +325,49 @@ function SkillBase() {
     )
 }
 
-function LinkedInLink(){
+function ContactInformation(){
     const { userData, currentUser } = useContext(ProfileContext);
 
     const [linkedInModalVisibility, setLinkedInModalVisibility] = useState(false);
+    const [emailModalVisibility, setEmailModalVisibility] = useState(false);
+
     return(
         <>
+        <div style={{marginTop: "10px"}}>
+        <span style={{fontSize: "20px", fontWeight: "bolder"}}>Contact Information</span>
+        </div>
         {linkedInModalVisibility && <LinkedinModal userData ={userData} visibility ={linkedInModalVisibility} onClose={() => setLinkedInModalVisibility(false)}/>}
-        <div className='linkedInSection' style={{position: "relative", marginTop: "10px"}}>
-            {userData.linkedinLink ? <div className="linkedInDisplay" style={{display: "flex", justifyContent: "left", padding: "10px"}}>
-                <span>LinkedIn Profile: <br /><Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link></span>
-            </div> :
-            <div className='linkedInUpload'>
-                <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>
-                    Linkedin Profile ...
-                </span>
-                <br />
-                <span style={{fontWeight: "250", fontSize: "15px"}}>Have a Linkedin profile you'd like to share? <a style={{cursor: "pointer", textDecoration: "underline"}} onClick={() => setLinkedInModalVisibility(true)}>Upload it here!</a></span>
+        {emailModalVisibility && <EmailModal userData={userData} visibility={emailModalVisibility} onClose={() => setEmailModalVisibility(false)}/>}
+        <div>
+            <div className='emailSection' style={{marginTop: "10px", position: "relative"}}>
+            <span style={{fontWeight: "550"}}>Email: {!userData.email && <span style={{color: "red", fontWeight: "lighter"}}>No Email provided</span>}
+            {userData.email && <span style={{color: "var(--secondary)"}}>{userData.email}</span>}
+            </span>
+            {!userData.email &&
+            <div className='emailUpload'>
+                <div className="addOne" onClick={()=>setEmailModalVisibility(true)}>
+                <IoAdd size={25} />
+                <span style={{textDecoration: "underline"}}>Add your Email</span>
+            </div>
             </div>}
-            <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
-                <EditInformation isAnswered={userData.linkedinLink} questionName={"LinkedIn"} onEdit={()=>setLinkedInModalVisibility(true)}/>
+            <div className='addOne' style={{position: "absolute", right: "0", top: "-60px", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
+                <EditInformation isAnswered={userData.email} questionName={"Email"} onEdit={()=>setEmailModalVisibility(true)}/>
+            </div>
+            </div>
+            <div className='linkedInSection' style={{position: "relative", marginTop: "10px"}}>
+                <span style={{fontWeight: "550"}}>Linkedin Profile: {!userData.linkedinLink && <span style={{color: "red", fontWeight: "lighter"}}>No Linkedin provided</span>}
+                {userData.linkedinLink && <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link>}
+                </span>
+                {!userData.linkedinLink &&
+                <div className='linkedInUpload'>
+                    <div className="addOne" onClick={()=>setLinkedInModalVisibility(true)}>
+                    <IoAdd size={25} />
+                    <span style={{textDecoration: "underline"}}>Add your LinkedIn</span>
+                </div>
+                </div>}
+                <div className='addOne' style={{position: "absolute", right: "0", top: "20px", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
+                    <EditInformation isAnswered={userData.linkedinLink} questionName={"LinkedIn"} onEdit={()=>setLinkedInModalVisibility(true)}/>
+                </div>
             </div>
         </div>
         </>
@@ -630,7 +655,7 @@ function AboutMeDisplay(){
         <>
         <AboutMeModal visibility={aboutMeModalVisibility} onClose={onModalClose} userData={userData}/>
         <div className="aboutMe" style={{paddingTop: "20px"}}>
-            <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me ...</span> <br />
+            <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me</span> <br />
 
             {!aboutMe && <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>}
             <div className="addOne" id="About Me" onClick={()=>{setAboutMeModalVisibility(true)}}>

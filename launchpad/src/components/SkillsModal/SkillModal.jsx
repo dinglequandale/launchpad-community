@@ -123,7 +123,7 @@ export default function SkillModal({visibility, onClose, userData}) {
                 <div style={{display: "flex", justifyContent: "space-between",}}>
                     <button onClick={onClose} className="btnUnfilled" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger"}}>
                         Cancel</button>
-                    <button onClick={handleSubmit} type='submit' style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+                    <button onClick={handleSubmit} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
                         Submit</button>
                 </div>
             </footer>

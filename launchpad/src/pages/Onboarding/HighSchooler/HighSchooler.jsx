@@ -33,7 +33,7 @@ const highSchoolQuestionsConfig = [
   },
   {
     id: "userResume",
-    text: "If you have a resume, feel free to attach it:",
+    text: "Attach your resume to show Awty professionals and alumni what you're about:",
     type: "file",
     optional: true,
     page: 1

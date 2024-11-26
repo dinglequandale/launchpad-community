@@ -139,6 +139,7 @@ a {
   font-weight: 500;
   color: var(--secondary);
   text-decoration: inherit;
+  cursor: pointer;
 }
 a:hover {
   color: var(--highlight);

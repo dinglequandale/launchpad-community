@@ -191,14 +191,13 @@ export default function UserNetwork() {
 }
 
   const handleReferalClick = async (referalType, organizationData, userData) => {
-    setConnectTargetUserId(userData);
-
     const referalValue = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}`];
     const methodType = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}Method`];
+    console.log("DATA:", userData);
     
     switch(methodType){
         case "Messages":
-            handleConnectClick(userData);
+            handleConnectClick(userData.id);
             return;
         case "Email":
             handleEmailClick(referalValue);
