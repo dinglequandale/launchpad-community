@@ -100,7 +100,7 @@ const collegeStudentQuestionsConfig = [
 ];
 
 
-export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit}) {
+export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit, schoolId}) {
 
   const navigate = useNavigate();
 

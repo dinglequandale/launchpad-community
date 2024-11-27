@@ -18,6 +18,7 @@ import Professional_LandingPage from './pages/landing_page/Professional_LandPage
 import Alumni_LandingPage from './pages/landing_page/Alumni_LandingPage.jsx';
 import PrivacyPolicy from './pages/Policies/PrivacyPolicy.jsx';
 import Terms from './pages/Policies/Terms.jsx';
+import PrivateKeyPage from './pages/Onboarding/Private Key Page/PrivateKeyPage.jsx';
 
 const router = createBrowserRouter([
   {
@@ -71,6 +72,11 @@ const router = createBrowserRouter([
     errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
+    path: '/school-signup',
+    element: <PrivateKeyPage/>,
+    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+  },
+  {
     element: <GlobalAuthWrapper/>,
     children: [
     {
@@ -98,6 +104,7 @@ const router = createBrowserRouter([
       element: <EditProfilePage/>,
       errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
     },
+    
 ]
 }
 ]);

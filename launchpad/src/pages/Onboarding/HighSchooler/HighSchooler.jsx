@@ -84,7 +84,7 @@ const highSchoolQuestionsConfig = [
   },
 ];
 
-export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) {
+export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, schoolId}) {
 
   const navigate = useNavigate();
 

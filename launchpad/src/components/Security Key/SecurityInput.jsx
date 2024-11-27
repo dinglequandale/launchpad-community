@@ -78,6 +78,7 @@ export default function SecurityCodeInput({onSubmit}) {
                 />
             ))}
             </div>
+            <span className="onboardingQuestion" style={{color: "black"}}>Please enter the security code sent by your school.</span>
             <button 
             type="submit" 
             disabled={isSubmitting || code.join('').length < 8}
