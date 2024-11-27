@@ -10,6 +10,7 @@ import { LuGraduationCap } from 'react-icons/lu';
 import ProgressBar from '../../components/Progressbar/ProgressBar';
 import Loading from '../../components/LoadingAnimation/Loading';
 import { useLocation, useNavigate } from 'react-router-dom';
+import PrivateKeyPage from './Private Key Page/PrivateKeyPage';
 
 export default function Onboarding() {
     const [showComponent, setShowComponent] = useState(false);
@@ -82,6 +83,7 @@ export default function Onboarding() {
                         }} style={{textDecoration: "underline"}}>Terms and Conditions</a>.</span>
                     </div>
                 </div>
+                // <PrivateKeyPage/>
             ) : (
                 <>
                     {selectedOption === "High Schooler" && <HighSchooler currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
@@ -102,7 +104,7 @@ export default function Onboarding() {
                 <button onClick={()=>{if(canSubmit){
                     setIsSubmitting(true);
                 }}} className='continueButton' style={!canSubmit ? disabledSubmitStyles : {}}>
-                    {!isSubmitting ? "Submit" : <Loading/>}
+                    {!isSubmitting ? "Submit" : <Loading style={{maxWidth: "4px"}}/>}
                 </button>}
             </footer>
             </div>
