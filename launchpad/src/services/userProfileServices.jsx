@@ -171,7 +171,7 @@ export const getBasicUserDescription = (userData, shortened=true) => {
 
 export const editUserData = async (newData, currentUser, origUserData) => {
     try{
-        const userRef = doc(db, "users", currentUser.uid);
+        const userRef = doc(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', "users", currentUser.uid);
     
         await updateDoc(userRef, newData);
         pushInitialProfileCompletion({... origUserData, ...newData});
@@ -185,7 +185,7 @@ export const loadUserData = async (currentUser, setLoading, setUserData) => {
     setLoading(true);
 
     if (currentUser) {
-        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userDocRef = doc(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', 'users', currentUser.uid);
         unsubscribe = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
                 setUserData(doc.data());

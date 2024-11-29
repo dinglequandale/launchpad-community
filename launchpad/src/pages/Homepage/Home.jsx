@@ -9,6 +9,8 @@ import InviteContactsModal from "../../components/InviteContactsmodal/InviteCont
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useAuth } from "../../contexts/auth/AuthContext";
+import { auth } from "../../firebase/firebaseConfig";
 // import jsonData from "../Onboarding/tempInitialOrgData.json";
 // import { collection, doc, getDocs, query, updateDoc } from "firebase/firestore";
 // import { db } from "../../firebase/firebaseConfig";
@@ -33,10 +35,24 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-
 export default function Home(){
 
+    const currentUser = auth.currentUser;
+
     const [userBasicInfo, setUserBasicInfo] = useState(null);
+
+    const getUserTokenInfo = async () => {
+      // await currentUser.getIdToken(true);
+
+      const idTokenResult = await currentUser.getIdTokenResult();
+    
+      // Access the school_id claim
+      const schoolId = idTokenResult.claims.school_id;
+
+      console.log("schoolId!!!!! ", schoolId);
+    }
+
+    getUserTokenInfo();
 
     
     const resourceData = {
@@ -159,20 +175,12 @@ export default function Home(){
         setUserBasicInfo(JSON.parse(storedUserBasicInfo));
     },[]);
 
-    console.log(userBasicInfo)
-
     const refSections = useRef({});
 
     const resourceSections = { "How To Network": "howToNetwork", "Find Your Ideal Career": "discoverYourCareer", "Find Your Dream University":"findDreamUniversity", "Resume-Building": "buildResume", "SAT/ACT Hacks":"satTips"}
     
-    // const howToNetwork = useRef();
-    // const discoverYourCareer = useRef();
-    // const findDreamUniversity = useRef();
-    // const buildResume = useRef();
-    // const satTips = useRef();
     const handleSectionRef = (sectionTitle, ref) => {
       refSections.current[sectionTitle] = ref;
-      console.log("Section_Title:", refSections)
     };
 
     // useEffect(() => {
@@ -268,17 +276,6 @@ export default function Home(){
                             <span>If you experience any techincal bugs, errors, or issues of any sort, please contact <span className="highlight">launchpadhelpline@gmail.com</span>. Additionally, if you have any questions about networking or certain opportunities, feel free to contact us there as well!</span>
                         </div>
                     </div>
-                    {/* 
-                    <div style={{display: "flex", gap: "30px", justifyContent: "center", paddingTop: "20px"}}>
-                        {tutorialData.map((tutorial, index)=>(
-                            <TutorialDisplay 
-                                key={index}
-                                tutorialVideoLink={tutorial.tutorialVideoLink} 
-                                tutorialPresentationLink={tutorial.tutorialPresentationLink}
-                                title={tutorial.tutorialName}
-                                highlyRecommended={tutorial.highlyRecommended}/>
-                        ))}
-                    </div> */}
                 </div>
             </div>
         </>
@@ -319,24 +316,6 @@ function ResourceItem({resourceType, resourceRef}){
       </button>
   )
 }
-
-// function TutorialDisplay({tutorialVideoLink, tutorialPresentationLink, title, highlyRecommended}){
-//     return(
-//         <div style={{position: "relative", padding: "10px", width: "30%",
-//             backgroundColor: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)", borderRadius: "5px"}}>
-//             {highlyRecommended && <ImportanceBanner/>}
-//             <span style={{display: "flex", justifyContent: "center", fontWeight: "bolder"}}>{title}</span>
-//             <div style={{paddingTop: "10px", height: "200px"}}>
-//                 <ReactPlayer
-//                     url={tutorialVideoLink}
-//                     width='100%'
-//                     height='100%'
-//                     controls={true}/>
-//             </div>
-//             <span style={{display: "flex", justifyContent: "center", paddingTop: "5px"}}> To access presentation, click&nbsp;<a href={tutorialPresentationLink} style={{textDecoration: "underline"}}>here. </a> </span>
-//         </div>
-//     )
-// }
 
 function ResourceCard({ title, link, description, recommendedBanner, time, userType }) {
     return (

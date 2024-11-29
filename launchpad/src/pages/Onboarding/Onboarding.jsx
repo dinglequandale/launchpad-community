@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
 import CollegeStudent from './CollegeStudent/CollegeStudent';
 import HighSchooler from './HighSchooler/HighSchooler';
 import "./onboarding.css"
@@ -19,9 +18,12 @@ export default function Onboarding() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [canSubmit, setCanSubmit] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
+    
 
     const location = useLocation();
-    const navigate = useNavigate();
+    const tempSchoolInfo = location.state ?? JSON.parse(localStorage.getItem("tempSchoolInfo"));
+    const {schoolId, schoolDisplayName} = tempSchoolInfo;
+    console.log("SCHOOLID: ", schoolId, schoolDisplayName);
 
     const getNumOfSections = () => {
         switch(selectedOption){
@@ -30,7 +32,6 @@ export default function Onboarding() {
             case "College Student":
                 return 3;
             case "Professional":
-                // return 5;
                 return 5;
             default:
                 return null;
@@ -41,7 +42,6 @@ export default function Onboarding() {
         if(!showComponent){
             setShowComponent(true);
             setNumOfSections(getNumOfSections());
-            console.log(numOfSections);
         }
         setCurrentPage(currentPage+1); 
     };
@@ -72,21 +72,13 @@ export default function Onboarding() {
             <main style={{marginBottom: "2rem"}}>
             {!showComponent ? (
                 <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-                    <UserType setSelectedOption={setSelectedOption} selectedOption={selectedOption}/>
-                    <div style={{display: "flex", marginTop: "15px"}}>
-                        <input type="checkbox" checked={agreedToTerms} onChange={()=>setAgreedToTerms(!agreedToTerms)}/>
-                        <span>I accept the <a onClick={() => {
-                            navigate("/privacy", {state: location.pathname});
-                        }} style={{textDecoration: "underline"}}>Privacy Policy</a> and the <a onClick={() => {
-                            navigate("/terms", {state: location.pathname});
-                        }} style={{textDecoration: "underline"}}>Terms and Conditions</a>.</span>
-                    </div>
+                    <UserType setSelectedOption={setSelectedOption} selectedOption={selectedOption} agreedToTerms={agreedToTerms} setAgreedToTerms={setAgreedToTerms} location={location}/>
                 </div>
             ) : (
                 <>
-                    {selectedOption === "High Schooler" && <HighSchooler currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                    {selectedOption === "College Student" && <CollegeStudent currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                    {selectedOption === "Professional" && <Professional currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "High Schooler" && <HighSchooler schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "College Student" && <CollegeStudent schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "Professional" && <Professional schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
                 </>
             )}    
             </main>
@@ -102,7 +94,7 @@ export default function Onboarding() {
                 <button onClick={()=>{if(canSubmit){
                     setIsSubmitting(true);
                 }}} className='continueButton' style={!canSubmit ? disabledSubmitStyles : {}}>
-                    {!isSubmitting ? "Submit" : <Loading/>}
+                    {!isSubmitting ? "Submit" : <Loading style={{maxWidth: "4px"}}/>}
                 </button>}
             </footer>
             </div>
@@ -111,7 +103,10 @@ export default function Onboarding() {
     );
 };
 
-function UserType({setSelectedOption, selectedOption}) {
+function UserType({setSelectedOption, selectedOption, setAgreedToTerms, agreedToTerms, location}) {
+
+    const navigate = useNavigate();
+
     const userTypes = [
         { id: 'highschool', label: 'High Schooler', icon: <BsBackpack size={25}/> },
         { id: 'college', label: 'College Student', icon: <LuGraduationCap size={30}/> },
@@ -137,6 +132,14 @@ function UserType({setSelectedOption, selectedOption}) {
                 <span className="userType-label">{type.label}</span>
             </button>
             ))}
+            </div>
+            <div style={{display: "flex", marginTop: "15px"}}>
+                <input type="checkbox" checked={agreedToTerms} onChange={()=>setAgreedToTerms(!agreedToTerms)}/>
+                <span>I accept the <a onClick={() => {
+                    navigate("/privacy", {state: location.pathname});
+                }} style={{textDecoration: "underline"}}>Privacy Policy</a> and the <a onClick={() => {
+                    navigate("/terms", {state: location.pathname});
+                }} style={{textDecoration: "underline"}}>Terms and Conditions</a>.</span>
             </div>
         </div>
     )    

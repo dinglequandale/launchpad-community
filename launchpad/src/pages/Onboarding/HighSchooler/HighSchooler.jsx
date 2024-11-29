@@ -52,6 +52,10 @@ const highSchoolQuestionsConfig = [
     page: 2,
   },
   {
+    id: "email",
+    optional: true
+  },
+  {
     id: "graduationYear",
     text: "What year do you graduate?",
     type: "select",
@@ -84,7 +88,7 @@ const highSchoolQuestionsConfig = [
   },
 ];
 
-export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) {
+export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, schoolInfo}) {
 
   const navigate = useNavigate();
 
@@ -92,16 +96,12 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
 
   const getEmail = httpsCallable(getFunctions(), 'getEmail');
   const [loginEmail,setLoginEmail] = useState("");
-  const getUserEmail = async () => {
-    const result = await getEmail();
-    setLoginEmail(result.data.email);
-  }
-  getUserEmail();
 
   const [highSchoolerData, setHighSchoolerData] = useState({
     userAboutMe: '',
     userName: '',
-    schoolAttending: '',
+    schoolAttending: schoolInfo.schoolDisplayName,
+    schoolId: schoolInfo.schoolId,
     graduationYear: '',
     sectionAttending: '',
     areasOfInterest: [],
@@ -110,7 +110,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
     collegeInterestsOrDecision: [],
     userResume: null,
     userResumePreview: "",
-    email: loginEmail,
+    email: "",
     userType: "High Schooler",
     userPfpPreview: "",
     userPfp: null,
@@ -159,6 +159,14 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit}) 
       [id]: label,
     }));
   };
+
+  useEffect(() => {
+    const getUserEmail = async () => {
+      const result = await getEmail();
+      handleChange("email",result.data.email);
+    }
+    getUserEmail();
+  },[]);
 
   const renderPage = () => {
     switch (currentPage) {

@@ -3,7 +3,7 @@ import { db } from '../firebase/firebaseConfig'; // Adjust this import based on 
 import { careerInterests } from '../pages/Onboarding/Options';
 
 export async function getFilteredData(collectionName, filters, currentUserId, category = null, lastDoc = null, maxLimit = 6) {
-    let q = collection(db, collectionName);
+    let q = collection(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', collectionName);
 
     const {userInterests, userColleges, userHS } = await getUserData("areasOfInterest", currentUserId);
 
@@ -98,7 +98,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
   }  
 
 const getUserData = async (dataType, currentUserId) => {
-    const userSnap = await getDoc(doc(db, "users", currentUserId));
+    const userSnap = await getDoc(doc(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', "users", currentUserId));
     if(userSnap.exists()){
         return {userInterests: userSnap.data()[dataType], userColleges :userSnap.data()["collegeInterestsOrDecision"], userHS: userSnap.data()["schoolAttending"]};
     }else{

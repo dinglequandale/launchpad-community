@@ -33,9 +33,8 @@ export default function SignUp(){
                     }
                 );
                 
-                // Redirect to homepage after successful account creation
-                // navigate('/Home');
-                navigate("/Onboarding");
+                // navigate("/Onboarding");
+                navigate("/school-signup");
             } catch (error) {
                 console.error("Error creating account:", error);
             } finally {

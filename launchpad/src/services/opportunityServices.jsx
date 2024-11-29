@@ -5,7 +5,8 @@ import toast from 'react-hot-toast';
 import { deleteFromTypesense, updateTypesense } from '../typesense/typesenseClient';
 
 export const saveOpportunity = async (opportunityData, organizationLogo, currentUser, isEditing, opportunityId) => {
-  const opportunitiesCollectionRef = collection(db, "opportunities");
+  const basicUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+  const opportunitiesCollectionRef = collection(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities");
   let opportunityRef;
 
   try {
@@ -23,7 +24,7 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
         createdAt: new Date(),
       });
     } else {
-      opportunityRef = doc(db, "opportunities", opportunityId);
+      opportunityRef = doc(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities", opportunityId);
       await updateDoc(opportunityRef, opportunityData);
       await updateTypesense('opportunities', opportunityId, opportunityData);
     }
@@ -48,7 +49,7 @@ const uploadImage = async (file, opportunityId) => {
 };
 
 export const loadOpportunities = (user, setLoading, setOpportunities) => {
-  const opportunitiesRef = collection(db, "opportunities");
+  const opportunitiesRef = collection(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', "opportunities");
   const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", user.uid));
   
   return onSnapshot(qUserOpportunity, async (querySnapshot) => {
@@ -86,7 +87,7 @@ const loadOpportunityLogo = async (opportunityId) => {
 };
 
 export const handleDeleteOpportunity = async (opportunityId) => {
-    const opportunityDoc = doc(db, "opportunities", opportunityId);
+    const opportunityDoc = doc(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities", opportunityId);
     try {
         await deleteDoc(opportunityDoc);
         await deleteFromTypesense('opportunities', opportunityId);

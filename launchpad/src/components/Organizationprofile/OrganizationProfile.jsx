@@ -39,7 +39,7 @@ export default function OrganizationProfile({organizationData, location, handleS
     }
 
     const getUserData = async (userId) => {
-        const userSnap = await getDoc(doc(db, "users", userId));
+        const userSnap = await getDoc(doc(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', "users", userId));
         if (userSnap.exists()) {
             setUserData({id: userSnap.id, ...userSnap.data()});
             } else {
