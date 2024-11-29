@@ -52,6 +52,10 @@ const highSchoolQuestionsConfig = [
     page: 2,
   },
   {
+    id: "email",
+    optional: true
+  },
+  {
     id: "graduationYear",
     text: "What year do you graduate?",
     type: "select",
@@ -91,13 +95,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
   const {currentUser} = useAuth();
 
   const getEmail = httpsCallable(getFunctions(), 'getEmail');
-  // const [loginEmail,setLoginEmail] = useState("");
-  const getUserEmail = async () => {
-    const result = await getEmail();
-    console.log("user email:", result.data.email);
-    return result.data.email;
-  }
-  // getUserEmail();
+  const [loginEmail,setLoginEmail] = useState("");
 
   const [highSchoolerData, setHighSchoolerData] = useState({
     userAboutMe: '',
@@ -112,7 +110,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
     collegeInterestsOrDecision: [],
     userResume: null,
     userResumePreview: "",
-    email: getUserEmail(),
+    email: "",
     userType: "High Schooler",
     userPfpPreview: "",
     userPfp: null,
@@ -161,6 +159,14 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
       [id]: label,
     }));
   };
+
+  useEffect(() => {
+    const getUserEmail = async () => {
+      const result = await getEmail();
+      handleChange("email",result.data.email);
+    }
+    getUserEmail();
+  },[]);
 
   const renderPage = () => {
     switch (currentPage) {

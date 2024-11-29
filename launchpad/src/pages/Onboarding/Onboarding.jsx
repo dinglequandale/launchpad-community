@@ -25,8 +25,6 @@ export default function Onboarding() {
     const {schoolId, schoolDisplayName} = tempSchoolInfo;
     console.log("SCHOOLID: ", schoolId, schoolDisplayName);
 
-    const navigate = useNavigate();
-
     const getNumOfSections = () => {
         switch(selectedOption){
             case "High Schooler":
@@ -106,6 +104,9 @@ export default function Onboarding() {
 };
 
 function UserType({setSelectedOption, selectedOption, setAgreedToTerms, agreedToTerms, location}) {
+
+    const navigate = useNavigate();
+
     const userTypes = [
         { id: 'highschool', label: 'High Schooler', icon: <BsBackpack size={25}/> },
         { id: 'college', label: 'College Student', icon: <LuGraduationCap size={30}/> },

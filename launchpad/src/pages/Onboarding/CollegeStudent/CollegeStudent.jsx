@@ -75,20 +75,6 @@ const collegeStudentQuestionsConfig = [
     options: ["French", "International"].map(option => ({ value: option, label: option })),
     page: 2,
   },
-  // {
-  //   id: "networkingLevel",
-  //   text: "Your knowledge and mentorship is a valuable reasource for students on this app.  \
-  //         Please roughly assess your level of commitment:",
-  //   type: "multi-select",
-  //   options: [
-  //       "Casual Connections",
-  //       "General Inquires",
-  //       "Short Interviews / Coffee Chats",
-  //       "Mentorship",
-  //   ].map(option => ({ value: option, label: option })),
-  //   page: 3,
-  //   optional: true,
-  // },
 
   // Page 3
   {
@@ -107,13 +93,6 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
   const {currentUser} = useAuth();
 
   const getEmail = httpsCallable(getFunctions(), 'getEmail');
-  const [loginEmail,setLoginEmail] = useState("");
-  const getUserEmail = async () => {
-    const result = await getEmail();
-    console.log("result:", result);
-    setLoginEmail(result.data.email);
-  }
-  getUserEmail();
 
   const [collegeStudentData, setCollegeStudentData] = useState({
     userAboutMe: '',
@@ -129,7 +108,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
     userResume: null,
     userResumePreview: "",
     linkedinLink: "",
-    email: loginEmail,
+    email: "",
     userType: "Alumni",
     userPfpPreview: "",
     userPfp: null,
@@ -178,7 +157,15 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
       console.log("Can submit")
       setCanSubmit(true);
     }
-  },[collegeStudentData])
+  },[collegeStudentData]);
+
+  useEffect(() => {
+    const getUserEmail = async () => {
+      const result = await getEmail();
+      handleChange("email",result.data.email);
+    }
+    getUserEmail();
+  },[]);
 
   const renderPage = () => {
     switch (currentPage) {
