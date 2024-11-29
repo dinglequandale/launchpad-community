@@ -21,7 +21,7 @@ function GlobalAuthWrapper() {
       if (currentUser && !isConnected) {
         unsubscribe = onSnapshot(userRef, (doc) => {
           if (!doc.exists()) {
-            navigate("/Onboarding");
+            navigate("/school-signup");
             return;
           }
 
