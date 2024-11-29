@@ -16,7 +16,7 @@ function GlobalAuthWrapper() {
   useEffect(() => {
     let unsubscribe;
     if(!currentUser){navigate("/Login")}
-    const userRef = doc(db, 'users', currentUser.uid);
+    const userRef = doc(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', 'users', currentUser.uid);
     async function initializeApp() {
       if (currentUser && !isConnected) {
         unsubscribe = onSnapshot(userRef, (doc) => {

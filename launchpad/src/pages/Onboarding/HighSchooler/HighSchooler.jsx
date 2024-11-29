@@ -84,24 +84,26 @@ const highSchoolQuestionsConfig = [
   },
 ];
 
-export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, schoolId}) {
+export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, schoolInfo}) {
 
   const navigate = useNavigate();
 
   const {currentUser} = useAuth();
 
   const getEmail = httpsCallable(getFunctions(), 'getEmail');
-  const [loginEmail,setLoginEmail] = useState("");
+  // const [loginEmail,setLoginEmail] = useState("");
   const getUserEmail = async () => {
     const result = await getEmail();
-    setLoginEmail(result.data.email);
+    console.log("user email:", result.data.email);
+    return result.data.email;
   }
-  getUserEmail();
+  // getUserEmail();
 
   const [highSchoolerData, setHighSchoolerData] = useState({
     userAboutMe: '',
     userName: '',
-    schoolAttending: '',
+    schoolAttending: schoolInfo.schoolDisplayName,
+    schoolId: schoolInfo.schoolId,
     graduationYear: '',
     sectionAttending: '',
     areasOfInterest: [],
@@ -110,7 +112,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
     collegeInterestsOrDecision: [],
     userResume: null,
     userResumePreview: "",
-    email: loginEmail,
+    email: getUserEmail(),
     userType: "High Schooler",
     userPfpPreview: "",
     userPfp: null,

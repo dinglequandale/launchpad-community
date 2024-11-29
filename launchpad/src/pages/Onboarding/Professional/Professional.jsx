@@ -135,7 +135,7 @@ const professionalQuestionsConfig = [
   },
 ];
 
-export default function Professional({currentPage, isSubmitting, setCanSubmit, schoolId}) {
+export default function Professional({currentPage, isSubmitting, setCanSubmit, schoolInfo}) {
 
   const navigate = useNavigate();
 
@@ -166,6 +166,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
     email: loginEmail,
     // userAboutMe: "",
     userPfp: null,
+    schoolId: schoolInfo.schoolId
   });
 
   const handleSubmit = async () => {

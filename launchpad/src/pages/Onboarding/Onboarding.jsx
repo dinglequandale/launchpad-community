@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
 import CollegeStudent from './CollegeStudent/CollegeStudent';
 import HighSchooler from './HighSchooler/HighSchooler';
 import "./onboarding.css"
@@ -10,7 +9,6 @@ import { LuGraduationCap } from 'react-icons/lu';
 import ProgressBar from '../../components/Progressbar/ProgressBar';
 import Loading from '../../components/LoadingAnimation/Loading';
 import { useLocation, useNavigate } from 'react-router-dom';
-import PrivateKeyPage from './Private Key Page/PrivateKeyPage';
 
 export default function Onboarding() {
     const [showComponent, setShowComponent] = useState(false);
@@ -23,8 +21,9 @@ export default function Onboarding() {
     
 
     const location = useLocation();
-    const schoolId = location.state;
-    console.log("SCHOOLID: ", schoolId);
+    const tempSchoolInfo = location.state ?? JSON.parse(localStorage.getItem("tempSchoolInfo"));
+    const {schoolId, schoolDisplayName} = tempSchoolInfo;
+    console.log("SCHOOLID: ", schoolId, schoolDisplayName);
 
     const navigate = useNavigate();
 
@@ -35,7 +34,6 @@ export default function Onboarding() {
             case "College Student":
                 return 3;
             case "Professional":
-                // return 5;
                 return 5;
             default:
                 return null;
@@ -78,12 +76,11 @@ export default function Onboarding() {
                 <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                     <UserType setSelectedOption={setSelectedOption} selectedOption={selectedOption} agreedToTerms={agreedToTerms} setAgreedToTerms={setAgreedToTerms} location={location}/>
                 </div>
-                // <PrivateKeyPage/>
             ) : (
                 <>
-                    {selectedOption === "High Schooler" && <HighSchooler schoolId={schoolId} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                    {selectedOption === "College Student" && <CollegeStudent schoolId={schoolId} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                    {selectedOption === "Professional" && <Professional schoolId={schoolId} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "High Schooler" && <HighSchooler schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "College Student" && <CollegeStudent schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    {selectedOption === "Professional" && <Professional schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
                 </>
             )}    
             </main>

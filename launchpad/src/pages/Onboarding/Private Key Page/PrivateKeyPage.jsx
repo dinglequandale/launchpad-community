@@ -1,14 +1,17 @@
 import toast, { Toaster } from "react-hot-toast";
 import SecurityCodeInput from "../../../components/Security Key/SecurityInput";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../../../firebase/firebaseConfig";
+import { auth, db } from "../../../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 export default function PrivateKeyPage() {
 
-    let schoolId;
+    let schoolId, schoolDisplayName;
 
     const navigate = useNavigate();
+
+    const user = auth.currentUser;
 
     const onSubmit = async (key) => {
         const loadingToast = toast.loading('Verifying your code...');
@@ -23,13 +26,23 @@ export default function PrivateKeyPage() {
                 return;
             }
             schoolId = querySnapshot.docs[0].id;
-            console.log("school:", schoolId);
+            schoolDisplayName = querySnapshot.docs[0].data().display_name;
+            console.log("school:", schoolId, schoolDisplayName);
             toast.success('We found your school!', { id: loadingToast });
             
+            const functions = getFunctions();
+            const createSchoolClaim = httpsCallable(functions, 'createSchoolClaim');
+            
+            const result = await createSchoolClaim({ schoolId });
+
+            await user.getIdToken(true);
+
             new Promise( res => setTimeout(res, 700) );
 
-            // TODO: logic for going to the next part of onboarding
-            navigate("/Onboarding", {state: `${schoolId}`});
+            
+
+            navigate("/Onboarding", {state: {schoolId, schoolDisplayName}});
+            localStorage.setItem("tempSchoolInfo", JSON.stringify({schoolId, schoolDisplayName}));
 
         } catch (error) {
 

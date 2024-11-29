@@ -18,12 +18,15 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         userId: currentUser.uid
         };
 
-        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        // here, highSchoolerData.schoolId is basically always going to equal 'awty' for now
+        const docRef = await setDoc(doc(db, 'tenants', highSchoolerData.schoolId, 'users', currentUser.uid), dataToSave);
         
         // console.log("High Schooler info saved -- written with ID: ", docRef.id);
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
+
+        // JOSE TODO
         await updateTypesense('users', currentUser.uid, dataToSave);
         onSuccess();
     } catch (e) {
@@ -46,7 +49,7 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         userId: currentUser.uid
         };
 
-        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        const docRef = await setDoc(doc(db, 'tenants', collegeStudentData.schoolId, 'users', currentUser.uid), dataToSave);
         // console.log("College Student info saved -- written with ID: ", docRef.id);
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
@@ -74,7 +77,7 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         userId: currentUser.uid
         };
 
-        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+        const docRef = await setDoc(doc(db, 'tenants', professionalData.schoolId, 'users', currentUser.uid), dataToSave);
         // console.log("Professional info saved -- written with ID: ", docRef.id);
 
         pushInitialProfileCompletion(dataToSave);
@@ -132,7 +135,8 @@ export const packageBasicUserInfoToLS = (userData) => {
         userType: userData.userType,
         userPfpPreview: userData.userPfpPreview,
         userShortDescription: userShortDescription,
-        userHighSchoolType: (userData.userType === "High Schooler") ? userHighSchoolType(userData.graduationYear) : null
+        userHighSchoolType: (userData.userType === "High Schooler") ? userHighSchoolType(userData.graduationYear) : null,
+        userSchoolId: userData.schoolId
     };
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));

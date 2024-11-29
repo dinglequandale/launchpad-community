@@ -100,7 +100,7 @@ const collegeStudentQuestionsConfig = [
 ];
 
 
-export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit, schoolId}) {
+export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit, schoolInfo}) {
 
   const navigate = useNavigate();
 
@@ -119,7 +119,8 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
     userAboutMe: '',
     userName: '',
     collegeAttending: '',
-    schoolAttending: '',
+    schoolAttending: schoolInfo.schoolDisplayName,
+    schoolId: schoolInfo.schoolId,
     graduationYear: '',
     sectionAttending: '',
     areasOfInterest: [],

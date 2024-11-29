@@ -17,13 +17,14 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     const [opportunityData, setOpportunityData] = useState(null);
     // const [loading, setLoading] = useState(false);
     const [opportunityLoading, setOpportunityLoading] = useState(false);
-    
-    const isProfessional = JSON.parse(localStorage.getItem("basicUserInfo")).userType === "Professional";
+
+    const basicUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+    const isProfessional = basicUserInfo.userType === "Professional";
     useEffect(()=>{
 
         const getOpportunityData = async () => {
             setOpportunityLoading(true);
-            const opportunitiesRef = collection(db, "opportunities");
+            const opportunitiesRef = collection(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities");
             const userOpportunityQuery = query(opportunitiesRef, where("createdBy", "==", userData.userId));
 
             const opportunitySnapshot = await getDocs(userOpportunityQuery)
