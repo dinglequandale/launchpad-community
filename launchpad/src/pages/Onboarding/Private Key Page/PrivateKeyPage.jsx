@@ -2,7 +2,7 @@ import toast, { Toaster } from "react-hot-toast";
 import SecurityCodeInput from "../../../components/Security Key/SecurityInput";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebaseConfig";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 export default function PrivateKeyPage() {
@@ -58,6 +58,7 @@ export default function PrivateKeyPage() {
         <span className="onboardingQuestion" style={{color: "black"}}>Please enter the security code sent by your school.</span>
         <SecurityCodeInput onSubmit={onSubmit}/>
     </div> */}
+    {localStorage.getItem("tempSchoolInfo") && <Navigate to="/Onboarding"/>}
     <div className="onboarding-container">
         <div className="onboarding-body">
             <div style={{textAlign: "center", paddingBottom: "8px"}}></div>

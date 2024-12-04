@@ -57,11 +57,6 @@ const router = createBrowserRouter([
     errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
-    path: '/Onboarding',
-    element: <Onboarding/>,
-    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
-  },
-  {
     path: '/privacy',
     element: <PrivacyPolicy/>,
     errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
@@ -74,6 +69,11 @@ const router = createBrowserRouter([
   {
     path: '/school-signup',
     element: <PrivateKeyPage/>,
+    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+  },
+  {
+    path: '/Onboarding',
+    element: <Onboarding/>,
     errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {

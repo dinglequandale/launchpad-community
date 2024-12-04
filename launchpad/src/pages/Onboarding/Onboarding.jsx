@@ -8,7 +8,7 @@ import { BiBriefcase } from 'react-icons/bi';
 import { LuGraduationCap } from 'react-icons/lu';
 import ProgressBar from '../../components/Progressbar/ProgressBar';
 import Loading from '../../components/LoadingAnimation/Loading';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 export default function Onboarding() {
     const [showComponent, setShowComponent] = useState(false);
@@ -18,12 +18,18 @@ export default function Onboarding() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [canSubmit, setCanSubmit] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
-    
+    let schoolId, schoolDisplayName;
+
+    // localStorage.clear();
 
     const location = useLocation();
     const tempSchoolInfo = location.state ?? JSON.parse(localStorage.getItem("tempSchoolInfo"));
-    const {schoolId, schoolDisplayName} = tempSchoolInfo;
-    console.log("SCHOOLID: ", schoolId, schoolDisplayName);
+
+    try{
+        schoolId = tempSchoolInfo.schoolId;
+        schoolDisplayName = tempSchoolInfo.schoolDisplayName;
+    }catch{}
+    console.log("SCHOOLIDwewe: ", schoolId, schoolDisplayName);
 
     const getNumOfSections = () => {
         switch(selectedOption){
@@ -56,6 +62,7 @@ export default function Onboarding() {
     const disabledSubmitStyles = {cursor: "not-allowed", background: "gray"};
     return (
         <div className='onboarding-container'>
+            {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
             <div className='onboarding-body'>
             <header style={{marginBottom: "1.5rem"}}>
                 <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
