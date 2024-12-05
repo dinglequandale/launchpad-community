@@ -30,43 +30,49 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
     const availabilityOptionsConfig = [
         { 
             id: "casualConnection",
-            text: "Occasional messages and casual networking regarding your career field",
+            text: "Answer occasional questions from students regarding your career fields",
             value: "Casual Connection",
             includers: ["High Schooler", "Alumni", "Professional"]
         },
         { 
             id: "generalInquiries",
-            text: "Entertain student inquiries about any opportunities you know of in your field",
+            text: "Entertain student inquiries about opportunities you know of within your career field",
             value: "General Inquiries",
             includers: ["Alumni", "Professional"]
         },
         { 
             id: "informationalInterview",
-            text: "30-minute informational interview to discuss your career path and field",
+            text: "Occasionally hold short discussions about your career experiences with students or school clubs",
             value: "Short Interview",
             includers: ["Alumni", "Professional"]
         },
+        // {
+        //     id: "generalAdvice",
+        //     text: "Occasional short interviews to suggest extracurriculars that worked for you",
+        //     value: "General Advice",
+        //     includers: ["High Schooler"]
+        // },
+        // {
+        //     id: "longTermMentorship",
+        //     text: "Take them under your wing! Consistently be on top of any questions and offer strong advice.",
+        //     value: "Long-Term Mentorship",
+        //     includers: ["High Schooler"]
+        // },
         {
-            id: "generalAdvice",
-            text: "Occasional short interviews to suggest extracurriculars that worked for you",
-            value: "General Advice",
-            includers: ["High Schooler"]
-        },
-        {
-            id: "longTermMentorship",
-            text: "Take them under your wing! Consistently be on top of any questions and offer strong advice.",
-            value: "Long-Term Mentorship",
-            includers: ["High Schooler"]
+            id: "projectSupport",
+            text: "Support certain student businesses, nonprofits, or fundraisers you identify with",
+            value: "Project Support",
+            includers: ["Professional"]
         },
         { 
             id: "mockInterview",
-            text: "Conduct a mock interview to help students prepare for job applications", 
+            text: "Conduct mock interviews to help Awty alumni entering similar career fields", 
             value: "Mock Interview", 
             includers: ["Professional"] 
         },
         { 
             id: "workplaceOpportunities",
-            text: "Offer job shadowing, internships, job, or volunteer opportunities to college or high school students at your organization/company",
+            text: "Offer shadow, internship, job, or volunteer opportunities for Awty students or alumni at your company",
             value: "Workplace",
             includers: ["Professional"]
         },

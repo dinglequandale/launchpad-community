@@ -123,10 +123,10 @@ export const packageBasicUserInfoToLS = (userData) => {
     
     const userHighSchoolType = (graduationYear) => {
         if(currYear + 2 >= graduationYear){
-            return "Upperclassman"
+            return "Upperclassman";
         }
         else{
-            return "Lowerclassman"
+            return "Lowerclassman";
         }
     }
 
@@ -140,6 +140,7 @@ export const packageBasicUserInfoToLS = (userData) => {
     };
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));
+    localStorage.removeItem("tempSchoolInfo");
 }
 
 export const pushInitialProfileCompletion = (userData) => {
