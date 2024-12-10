@@ -22,7 +22,7 @@ export const displayShortenedName = (userName) => {
         return firstLast[0] + " " + firstLast[1][0] + ".";}
     catch{
     }
-    return "Deleted User";
+    return userName;
 }
 
 export const displayFieldsOfInterest = (fieldsOfInterest, length = "longer") => {

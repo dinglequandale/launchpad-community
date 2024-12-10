@@ -7,7 +7,7 @@ import ProgressBar from '../../Progressbar/ProgressBar';
 import { GrAdd } from 'react-icons/gr';
 import { LuMessagesSquare } from 'react-icons/lu';
 import { MdEmail } from 'react-icons/md';
-import { CgWebsite } from 'react-icons/cg';
+import { CgClose, CgWebsite } from 'react-icons/cg';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { saveOpportunity } from '../../../services/opportunityServices';
@@ -248,6 +248,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
         >
           
           <header>
+          <button className='btnClose' onClick={()=>setMakeChangesVisibility(true)} style={{background:"none"}}><CgClose size={25}/></button>
           <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Initiative <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Make your voice heard. Garner support from Awty alumni and parents.</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
           <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast}/>
@@ -258,10 +259,10 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
           </form>
           </main>
           <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-            <button onClick={
+            {/* <button onClick={
               ()=>setMakeChangesVisibility(true)
               } className='btnUnfilled' style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Cancel</button>
+              Cancel</button> */}
             {currentInitiativePage === 4 && <button onClick={saveInitiativeData} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Save Changes</button>}
           </footer>
