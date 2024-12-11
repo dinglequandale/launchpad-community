@@ -31,16 +31,17 @@ const collegeStudentQuestionsConfig = [
     options: careerInterests,
     page: 1,
   },
-  {
-    id: "userResume",
-    text: "Feel free to attach a resume:",
-    type: "file",
-    optional: true,
-    page: 1
-  },
+  // {
+  //   id: "userResume",
+  //   text: "Feel free to attach a resume:",
+  //   type: "file",
+  //   optional: true,
+  //   page: 1
+  // },
 
   {
     id: "linkedinLink",
+    text: "Link your Linkedin to make it easy for others to learn about you.",
     optional: true,
     page: 1
   },

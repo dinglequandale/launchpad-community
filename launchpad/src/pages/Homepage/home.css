@@ -18,7 +18,8 @@
 }
 
 .btnInviteContacts{
-    background: var(--secondary);
+    /* background: var(--secondary); */
+    background: #007bff;
     border-radius: 10px;
     font-weight: 550;
     font-size: 20px;

@@ -64,13 +64,13 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
         </div>
         
         <div className="file-upload-container" style={{display: "flex", alignItems: "center"}}>
-        <label className="onboardingQuestion" style={{width: "100%", position: 'relative'}}>
+        {/* <label className="onboardingQuestion" style={{width: "100%", position: 'relative'}}>
           {questionsForPage[1].text}
           <div style={{position: "absolute", bottom: "-20px"}}>
             <OptionalLabel />
             </div>
-        </label>
-        <div className="file-upload-preview" style={{display: "flex", justifyContent: "center", width: "100%"}}>
+        </label> */}
+        {/* <div className="file-upload-preview" style={{display: "flex", justifyContent: "center", width: "100%"}}>
           {selectedOptions.userPfpPreview ? (
             <div className="preview-container">
               <img src={selectedOptions.userPfpPreview} alt="Profile Preview" className="file-preview" style={{width: "70px", height: "70px", borderRadius: "50%"}} />
@@ -92,7 +92,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
               <IoAdd size={50}/>
             </button>
           )}
-        </div>
+        </div> */}
         <input 
           type="file"
           ref={pfpInputRef}
@@ -114,7 +114,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
         </div>
         
         {questionsForPage[3] && ( <>
-          {selectedOptions.userType !== "Professional" ? <div className="file-upload-container" style={{position: "relative"}}>
+          {selectedOptions.userType === "High Schooler" ? <div className="file-upload-container" style={{position: "relative", marginTop: "15px"}}>
           <label className="onboardingQuestion" style={{position: "relative"}}>
             {questionsForPage[3].text}
             {questionsForPage[3].optional && <div style={{position: "absolute", bottom: "-20px"}}>
@@ -173,8 +173,8 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
           />
         </>}
         
-        {(selectedOptions.linkedinLink !== undefined && selectedOptions.userType !== "Professional") && <div style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
-          <button className="btnText" style={{fontSize: "19px", color: linkedInOptionSelected ? "rgb(48, 160, 240)" : ""}} onClick={() => setLinkedInOptionSelected(!linkedInOptionSelected)}>Or click here link here to link your LinkedIn profile.</button>
+        {(selectedOptions.linkedinLink !== undefined && selectedOptions.userType === "High Schooler") && <div style={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
+          <button className="btnText" style={{fontSize: "19px", color: linkedInOptionSelected ? "rgb(48, 160, 240)" : ""}} onClick={() => setLinkedInOptionSelected(!linkedInOptionSelected)}>Or click here to link your LinkedIn profile.</button>
         </div>}
         </>
       )}

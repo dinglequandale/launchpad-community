@@ -17,6 +17,7 @@ const filterDisplayToIdPairs = {
     "My Dream Colleges":"collegeInterestsOrDecision",
     "My High School":"schoolAttending",
     "Businesses":"Business",
+    "Leadership":"Youth Leadership"
 }
 
 export default function ContentFilter({filterKey, filterContent, onFilterChange}){

@@ -100,9 +100,7 @@ export default function Login(){
     
                 await updateBasicUserData(user);
     
-                // Optionally, navigate to home page or desired route
                 navigate('/Home');
-    
             } catch (error) {
                 console.error("Error signing in with Google:", error);
                 toast.error("Sorry! There was an issue signing you in. Try again!");

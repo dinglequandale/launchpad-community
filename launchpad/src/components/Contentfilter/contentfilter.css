@@ -18,7 +18,7 @@
 }
   
   .dropdown.open {
-    max-height: 300px; /* Adjust to desired maximum height */
+    max-height: 315px; /* Adjust to desired maximum height */
   }
 
 .filterTop:hover{

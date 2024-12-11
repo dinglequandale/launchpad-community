@@ -13,12 +13,13 @@ import SignUp from './pages/Authentication/Signup.jsx';
 import Login from './pages/Authentication/Login.jsx';
 import LandingPage from './pages/landing_page/LandingPage.jsx';
 import InitializeStream from './Streamchat/streamChatConfig.jsx';
-import GlobalAuthWrapper from './contexts/GlobalAuthWrapper.jsx';
+// import GlobalAuthWrapper from './contexts/GlobalAuthWrapper.jsx';
 import Professional_LandingPage from './pages/landing_page/Professional_LandPage.jsx';
 import Alumni_LandingPage from './pages/landing_page/Alumni_LandingPage.jsx';
 import PrivacyPolicy from './pages/Policies/PrivacyPolicy.jsx';
 import Terms from './pages/Policies/Terms.jsx';
 import PrivateKeyPage from './pages/Onboarding/Private Key Page/PrivateKeyPage.jsx';
+import GlobalAuthWrapper from './contexts/GlobalAuthWrapper.jsx';
 
 const router = createBrowserRouter([
   {
@@ -57,11 +58,6 @@ const router = createBrowserRouter([
     errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {
-    path: '/Onboarding',
-    element: <Onboarding/>,
-    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
-  },
-  {
     path: '/privacy',
     element: <PrivacyPolicy/>,
     errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
@@ -74,6 +70,11 @@ const router = createBrowserRouter([
   {
     path: '/school-signup',
     element: <PrivateKeyPage/>,
+    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+  },
+  {
+    path: '/Onboarding',
+    element: <Onboarding/>,
     errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
   },
   {

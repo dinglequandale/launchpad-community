@@ -81,20 +81,14 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
                 <h1>Welcome to Launchpad!</h1>
                 <p>Greetings ${recipientData[i].userName.split(" ")[0]},</p>
                 <p>You've been invited to our community by ${senderName}!</p>
-                <p>Launchpad is a platform that fosters high school students' potential and passion, propelling them into college and beyond. By fostering a vibrant network of mentors, professionals, alumni, and other resourse, we empower our youth to strengthen their portfolio of work experience and extracurriculars.</p>
-                <p>We're excited to have join us in our mission! Click the button below to get started:</p>
-                <a href="https://launchpad.com/signup" class="button">Join Launchpad</a>
-                <p>If you have any questions, feel free to reach out to our support team at support@launchpad.com.</p>
+                <p>Launchpad is a platform that fosters high school students' potential and passion, propelling them into college and beyond. By fostering a vibrant network of mentors, professionals, alumni, and other resources, we empower our youth to strengthen their portfolio of work experience and extracurriculars.</p>
+                <p>We're excited to have you join us on our mission! Click the button below to get started:</p>
+                <a href="https://launchpadhouston.com" class="button">Join Launchpad</a>
+                <p>If you have any questions, feel free to reach out to our support team at launchpadhelpline@gmail.com.</p>
                 <p>Best regards,<br>The Launchpad Team</p>
             </body>
             </html>
             `;
-
-            // <ul>
-            // <li>[Key feature 1]</li>
-            // <li>[Key feature 2]</li>
-            // <li>[Key feature 3]</li>
-            // </ul>
 
             const mailOptions = {
                 from: 'launchpad861@gmail.com',

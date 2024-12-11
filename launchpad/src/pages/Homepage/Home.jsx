@@ -11,9 +11,9 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { auth } from "../../firebase/firebaseConfig";
-// import jsonData from "../Onboarding/tempInitialOrgData.json";
-// import { collection, doc, getDocs, query, updateDoc } from "firebase/firestore";
-// import { db } from "../../firebase/firebaseConfig";
+import jsonData from "../Onboarding/tempInitialOrgData.json";
+import { collection, doc, getDocs, query, setDoc, updateDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebaseConfig";
 
 
 class ErrorBoundary extends React.Component {
@@ -42,8 +42,6 @@ export default function Home(){
     const [userBasicInfo, setUserBasicInfo] = useState(null);
 
     const getUserTokenInfo = async () => {
-      // await currentUser.getIdToken(true);
-
       const idTokenResult = await currentUser.getIdTokenResult();
     
       // Access the school_id claim
@@ -185,14 +183,14 @@ export default function Home(){
 
     // useEffect(() => {
     //   jsonData.map(async (org, index) => {
-    //     await setDoc(doc(db, "opportunities", org.organizationName), org);
-    //     print("Org ", index + 1, " uploaded")
+    //     await setDoc(doc(db, "tenants", "awty", "opportunities", org.organizationName), org);
+    //     // print("Org ", index + 1, " uploaded")
     //   })
     // },[])
     
     // useEffect(() => {
     //   const writeData = async () => {
-    //     const q = query(collection(db, "opportunities"));
+    //     const q = query(collection(db, "tenants", "awty", "opportunities"));
 
     //     const querySnapshot = await getDocs(q);
     //     querySnapshot.forEach(async (d) => {

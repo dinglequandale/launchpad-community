@@ -4,45 +4,73 @@ import { useAuth } from './auth/AuthContext';
 import { useStreamConnection } from '../Streamchat/chatFunctions/setUpUser';
 import PageLoading from '../components/LoadingAnimation/PageLoading';
 import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebase/firebaseConfig';
+import { auth, db } from '../firebase/firebaseConfig';
+import { packageBasicUserInfoToLS } from '../services/onboardingServices';
 
 function GlobalAuthWrapper() {
   const { currentUser, loading } = useAuth();
+  const [schoolId, setSchoolId] = useState("");
   const { chatClient, isConnected, connectToStream } = useStreamConnection();
   const [isInitializing, setIsInitializing] = useState(true);
   const navigate = useNavigate();
   const [userData,setUserData] = useState(null);
+  const basicUserInfo = localStorage.getItem("basicUserInfo");
+
+  const user = auth.currentUser;
+
+  const getUserTokenInfo = async () => {
+    const idTokenResult = await user.getIdTokenResult();
+  
+    // Access the school_id claim
+    console.log("schoolId!!!!! ", idTokenResult.claims.school_id);
+    return idTokenResult.claims.school_id;
+  }
 
   useEffect(() => {
     let unsubscribe;
-    if(!currentUser){navigate("/Login")}
-    const userRef = doc(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', 'users', currentUser.uid);
-    async function initializeApp() {
-      if (currentUser && !isConnected) {
-        unsubscribe = onSnapshot(userRef, (doc) => {
-          if (!doc.exists()) {
-            navigate("/school-signup");
-            return;
+    const fetchUserTokenInfo = async () => {
+      if (!currentUser) {
+        navigate("/Login");
+        return;
+      }
+  
+      try {
+        const schoolId = await getUserTokenInfo();
+        const userRef = doc(db, "tenants", schoolId, 'users', currentUser.uid);
+        async function initializeApp() {
+          if (currentUser && !isConnected) {
+            unsubscribe = onSnapshot(userRef, (doc) => {
+              if (!doc.exists()) {
+                navigate("/school-signup");
+                return;
+              }
+              
+              if(!basicUserInfo){packageBasicUserInfoToLS(doc.data())};
+              console.log(basicUserInfo);
+            });
+            
+            await connectToStream(currentUser);
           }
-
-          // setUserData({...doc.data()});
-        });
-        
-        await connectToStream(currentUser);
+          setIsInitializing(false);
+        }
+    
+        if (!loading) {
+          initializeApp();
+        }
+    
+        return () => {
+          if (unsubscribe) {
+              unsubscribe();
+          }
+      };    
+        // Rest of your code using userRef
+      } catch (error) {
+        console.error("Error fetching user token info:", error);
+        navigate("/school-signup");
       }
-      setIsInitializing(false);
-    }
-
-    if (!loading) {
-      initializeApp();
-    }
-
-    return () => {
-      if (unsubscribe) {
-          unsubscribe();
-      }
-  };
-
+    };
+  
+    fetchUserTokenInfo();
   }, [currentUser, isConnected, connectToStream, loading]);
 
   if (loading || isInitializing) {
