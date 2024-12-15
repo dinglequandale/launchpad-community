@@ -52,7 +52,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
 
     const basicInfoContent = {userPreface: getBasicUserDescription(userData, false),
     userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
-    userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition + " at " + userData.companyName) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
+    userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition + " at " + userData.companyName) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`,
     acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
 };
 

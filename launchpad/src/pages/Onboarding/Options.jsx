@@ -108,7 +108,7 @@ const careerInterests = [
 ];
 
 const graduationYears = [];
-for (let year = 1990; year <= 2028; year++) {
+for (let year = 2026; year >= 1990; year--) {
     graduationYears.push({ value: year, label: year.toString() });
 }
 

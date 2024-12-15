@@ -28,7 +28,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
 
     const basicInfoContent ={userPreface:getBasicUserDescription(userData),
     userFirstDesc: `${userType !== "Professional" ? "Interests" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "shorter") : displayFieldsOfInterest(userData.areasOfInterest, "shorter")}`,
-    userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition ? (userData.industryPosition) : "None") : userType === "Alumni" ? displayColleges([userData.collegeAttending], "shorter") : displayColleges([...userData.collegeInterestsOrDecision], "shorter")}`,
+    userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition ? (userData.industryPosition) : "None") : userType === "Alumni" ? displayColleges([userData.collegeAttending], "shorter") : (Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision], "shorter") : displayColleges([userData.collegeInterestsOrDecision]))}`,
 }
 
     return(
