@@ -12,10 +12,11 @@ const client = new Typesense.Client({
     connectionTimeoutSeconds: 2,
 });
 
-const updateTypesense = async (collectionName, documentId, data) => {
+const updateTypesense = async (collectionName, documentId, data, tenantId) => {
   try {
       await client.collections(collectionName).documents().upsert({
           id: documentId,
+          tenantId,
           ...data,
       });
       console.log(`Typesense: Document with ID ${documentId} in collection ${collectionName} updated.`);

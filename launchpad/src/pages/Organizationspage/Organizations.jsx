@@ -191,7 +191,8 @@ export default function Organizations(){
         e.preventDefault();
         setIsSearching(false);
         if (queryText) {
-            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText);
+            // TODO: How does the user know what school their in? (in order to pass into searchDocuments)
+            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText, 'awty');
             setOrganizationsData(searchResults);
         }
     };

@@ -170,7 +170,8 @@ export default function UserNetwork() {
     e.preventDefault();
     // setIsSearching(false);
     if (queryText) {
-      const searchResults = await searchDocuments('users', queryText);
+      // TODO: How does the user know what school their in? (in order to pass into searchDocuments)
+      const searchResults = await searchDocuments('users', queryText, 'awty');
       setAllVisibleUserData(searchResults);
       setHighSchoolers(searchResults.filter((result) => result.userType === "High Schooler"));
       setCollegeStudents(searchResults.filter((result) => result.userType === "Alumni"));
