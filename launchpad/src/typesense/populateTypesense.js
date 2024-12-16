@@ -32,9 +32,9 @@ const readFirestoreData = async (collectionName, tenantId = null) => {
   const TYPESENSE_CONFIG = {
     nodes: [
       {
-        host: 'launchpad-typesense.westus2.cloudapp.azure.com',
-        port: "443",
-        protocol: 'https',
+        host: '20.3.232.3',
+        port: "8108",
+        protocol: 'http',
       },
     ],
     apiKey: 'xyz',
