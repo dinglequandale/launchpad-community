@@ -47,7 +47,7 @@ export default function Home(){
       // Access the school_id claim
       const schoolId = idTokenResult.claims.school_id;
 
-      console.log("schoolId!!!!! ", schoolId);
+      console.log("School Id:", schoolId);
     }
 
     getUserTokenInfo();
