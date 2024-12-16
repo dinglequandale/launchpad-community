@@ -16,6 +16,7 @@ import { searchDocuments } from "../../services/searchServices";
 import NoResults from "../../components/NoResultsnotifier/NoResults";
 import Loading from "../../components/LoadingAnimation/Loading";
 import toast, { Toaster } from "react-hot-toast";
+import { auth } from "../../firebase/firebaseConfig";
 
 
 const NetworkContext = createContext();
@@ -28,7 +29,7 @@ export default function UserNetwork() {
 
   const pageName = "Network";
 
-
+  const [tenantId, setTenantId] = useState(null);
 
   const [profileModalVisibility, setProfileModalVisibility] = useState(false);
   const [connectModalVisibility, setConnectModalVisibility] = useState(false);
@@ -87,53 +88,53 @@ export default function UserNetwork() {
   },[collegeStudents, highSchoolers, professionals]);
 
   const fetchAllUserTypes = async () => {
-        await Promise.all([
-            fetchUserType('High Schooler'),
-            fetchUserType('Alumni'),
-            fetchUserType('Professional')
-        ]);
-    };
+      await Promise.all([
+          fetchUserType('High Schooler'),
+          fetchUserType('Alumni'),
+          fetchUserType('Professional')
+      ]);
+  };
 
-    const fetchUserType = async (category, isLoadMore = false) => {
-        setLoading(prev => ({ ...prev, [category]: true }));
-        try {
-            const { results, lastVisible } = await getFilteredData(
-                'users', 
-                filters, 
-                currentUser.uid, 
-                category,
-                isLoadMore ? lastDocs[category] : null,
-                loadLimit,
-            );
+  const fetchUserType = async (category, isLoadMore = false) => {
+      setLoading(prev => ({ ...prev, [category]: true }));
+      try {
+          const { results, lastVisible } = await getFilteredData(
+              'users', 
+              filters, 
+              currentUser.uid, 
+              category,
+              isLoadMore ? lastDocs[category] : null,
+              loadLimit,
+          );
 
-            setLastDocs(prev => ({ ...prev, [category]: lastVisible }));
+          setLastDocs(prev => ({ ...prev, [category]: lastVisible }));
 
-            switch(category) {
-                case 'High Schooler':
-                    setHighSchoolers(prev => isLoadMore ? [...prev, ...results] : results);
-                    break;
-                case 'Alumni':
-                    setCollegeStudents(prev => isLoadMore ? [...prev, ...results] : results);
-                    break;
-                case 'Professional':
-                    setProfessionals(prev => isLoadMore ? [...prev, ...results] : results);
-                    break;
-            }
-        } catch (error) {
-            console.error(`Error fetching ${category} data:`, error);
-        } finally {
-            setLoading(prev => ({ ...prev, [category]: false }));
-            setOverallLoading(false);
-            setFilterChanged(false);
-        }
-    };
+          switch(category) {
+              case 'High Schooler':
+                  setHighSchoolers(prev => isLoadMore ? [...prev, ...results] : results);
+                  break;
+              case 'Alumni':
+                  setCollegeStudents(prev => isLoadMore ? [...prev, ...results] : results);
+                  break;
+              case 'Professional':
+                  setProfessionals(prev => isLoadMore ? [...prev, ...results] : results);
+                  break;
+          }
+      } catch (error) {
+          console.error(`Error fetching ${category} data:`, error);
+      } finally {
+          setLoading(prev => ({ ...prev, [category]: false }));
+          setOverallLoading(false);
+          setFilterChanged(false);
+      }
+  };
 
-    const loadMore = (category) => {
-        if (!loading[category] && lastDocs[category]) {
-          console.log("fetching more...");
-          fetchUserType(category, true);
-        }
-    };
+  const loadMore = (category) => {
+      if (!loading[category] && lastDocs[category]) {
+        console.log("fetching more...");
+        fetchUserType(category, true);
+      }
+  };
 
   const handleFilterChange = (filterKey, value) => {
     setFilterChanged(true);
@@ -158,19 +159,29 @@ export default function UserNetwork() {
     setProfileModalVisibility(true);
   }
 
-    useEffect(() => {
-      if (profileModalVisibility) {
-        document.body.classList.add('modal-open');
-      } else {
-        document.body.classList.remove('modal-open');
-      }
-    }, [profileModalVisibility]);
+  useEffect(() => {
+    if (profileModalVisibility) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+  }, [profileModalVisibility]);
+
+  const user = auth.currentUser;
+  useEffect(() => {
+    const getUserTokenInfo = async () => {
+      const idTokenResult = await user.getIdTokenResult();
+      setTenantId(idTokenResult.claims.school_id);
+    };
+
+    getUserTokenInfo();
+  }, [user]);
 
   const handleSearch = async (e, queryText) => {
     e.preventDefault();
     // setIsSearching(false);
     if (queryText) {
-      const searchResults = await searchDocuments('users', queryText);
+      const searchResults = await searchDocuments('users', queryText, tenantId);
       setAllVisibleUserData(searchResults);
       setHighSchoolers(searchResults.filter((result) => result.userType === "High Schooler"));
       setCollegeStudents(searchResults.filter((result) => result.userType === "Alumni"));

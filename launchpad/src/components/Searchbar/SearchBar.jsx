@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import ContentFilter from "../Contentfilter/ContentFilter";
 import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
-import { searchDocuments } from "../../services/searchServices";
 
 export default function SearchBar({filters, pageName, handleFilterChange, handleSearch}) {
     const searchType = () => {

@@ -27,7 +27,7 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
 
 
         // JOSE TODO
-        await updateTypesense('users', currentUser.uid, dataToSave);
+        await updateTypesense('users', currentUser.uid, dataToSave, collegeStudentData.schoolId);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -55,7 +55,7 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        await updateTypesense('users', currentUser.uid, dataToSave);
+        await updateTypesense('users', currentUser.uid, dataToSave, collegeStudentData.schoolId);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -84,7 +84,7 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        await updateTypesense('users', currentUser.uid, dataToSave);
+        await updateTypesense('users', currentUser.uid, dataToSave, collegeStudentData.schoolId);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);

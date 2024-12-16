@@ -14,7 +14,7 @@ import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 // import { collection, getDocs, limit, query } from "firebase/firestore";
-// import { db } from "../../firebase/firebaseConfig";
+import { auth } from "../../firebase/firebaseConfig";
 
 const filterContent = {
     organizationType: ["Any Category", "Clubs", "Workplace Opportunities", "Nonprofits", "Businesses", "Community Service", "Leadership"],
@@ -33,6 +33,7 @@ export default function Organizations(){
     const [profileModalTop, setProfileModalTop] = useState(0);
     const [targetUserData, setTargetUserData] = useState(null);
     const [connectTargetUserId,setConnectTargetUserId] = useState("");
+    const [tenantId, setTenantId] = useState(null);
 
     const [lastDoc, setlastDoc] = useState(null);
     const [hasMore, setHasMore] = useState(true);
@@ -187,11 +188,21 @@ export default function Organizations(){
 
     const pageName = "Opportunities";
 
+    const user = auth.currentUser;
+    useEffect(() => {
+        const getUserTokenInfo = async () => {
+          const idTokenResult = await user.getIdTokenResult();
+          setTenantId(idTokenResult.claims.school_id);
+        };
+      
+        getUserTokenInfo();
+      }, [user]);
+
     const handleSearch = async (e, queryText) => {
         e.preventDefault();
         setIsSearching(false);
         if (queryText) {
-            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText);
+            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText, tenantId);
             setOrganizationsData(searchResults);
         }
     };

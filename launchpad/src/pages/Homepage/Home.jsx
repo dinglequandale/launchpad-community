@@ -4,16 +4,12 @@ import SideNav from "../../components/Sidenav/SideNav";
 import ReactPlayer from "react-player/youtube";
 import ProfileStrength from "../../components/Profilestrength/ProfileStrength";
 import { FaArrowCircleDown } from "react-icons/fa";
-import React, { createRef, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import InviteContactsModal from "../../components/InviteContactsmodal/InviteContactsModal";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { useAuth } from "../../contexts/auth/AuthContext";
 import { auth } from "../../firebase/firebaseConfig";
-import jsonData from "../Onboarding/tempInitialOrgData.json";
-import { collection, doc, getDocs, query, setDoc, updateDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
 
 
 class ErrorBoundary extends React.Component {

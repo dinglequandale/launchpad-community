@@ -1,6 +1,6 @@
 import { client } from '../typesense/typesenseClient'
 
-const searchDocuments = async (collectionName, searchText) => {
+const searchDocuments = async (collectionName, searchText, tenantId) => {
   try {
     let searchParameters;
 
@@ -9,12 +9,14 @@ const searchDocuments = async (collectionName, searchText) => {
         q: searchText,
         query_by: 'organizationName,organizationType,organizationMission',
         num_typos: 1, // Allow up to 1 typo
+        filter_by: `tenantId:=${tenantId}`
       };
     } else {
       searchParameters = {
         q: searchText,
         query_by: 'userName',
         num_typos: 1, // Allow up to 1 typo
+        filter_by: `tenantId:=${tenantId}`
       };
     }
 

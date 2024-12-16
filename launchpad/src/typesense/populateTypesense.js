@@ -7,13 +7,21 @@ initializeApp({
 });
 const db = getFirestore();
 
-const readFirestoreData = async (collectionName) => {
+const readFirestoreData = async (collectionName, tenantId = null) => {
   try {
-    const docsRef = db.collection(collectionName); // Access collection using Admin SDK
-    const snapshot = await docsRef.get(); // Fetch documents using Admin SDK
-
+    let docsRef;
+    
+    if (tenantId) {
+      // For tenant-specific collections, use a subcollection structure
+      docsRef = db.collection('tenants').doc(tenantId).collection(collectionName);
+    } else {
+      // For shared collections (like colleges), use the root collection
+      docsRef = db.collection(collectionName);
+    }
+    
+    const snapshot = await docsRef.get();
     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    return data; // Return the array directly
+    return data;
   } catch (error) {
     console.error('Error reading Firestore data: ', error);
     return [];
@@ -24,9 +32,9 @@ const readFirestoreData = async (collectionName) => {
   const TYPESENSE_CONFIG = {
     nodes: [
       {
-        host: 'launchpad-typesense.westus2.cloudapp.azure.com',
+        host: '20.3.232.3',
         port: "8108",
-        protocol: 'https',
+        protocol: 'http',
       },
     ],
     apiKey: 'xyz',
@@ -43,7 +51,8 @@ const readFirestoreData = async (collectionName) => {
           type: "string",
           facet: false,
         }
-      ]
+      ],
+      metadata: { type: "shared" } // Shared collection among all tenants
     },
     {
       name: "users",
@@ -52,8 +61,14 @@ const readFirestoreData = async (collectionName) => {
           name: "userName",
           type: "string",
           facet: false,
+        },
+        {
+          name: "tenantId", // Add tenant facet for metadata filtering
+          type: "string",
+          facet: true,
         }
       ],
+      metadata: { type: "tenant_specific" } // Metadata to indicate this is tenant-specific
     },
     {
       name: "opportunities",
@@ -72,11 +87,16 @@ const readFirestoreData = async (collectionName) => {
           name: "organizationMission",
           type: "string",
           facet: false,
+        },
+        {
+          name: "tenantId",
+          type: "string",
+          facet: true,
         }
       ],
-    },
-  ]
-
+      metadata: { type: "tenant_specific" }
+    }
+  ];
 
   // Loop over schemas to create collections
   for (const schema of schemas) {
@@ -93,20 +113,42 @@ const readFirestoreData = async (collectionName) => {
     }
   }
 
-  // Loop over the collection names to read data from Firestore and import it to Typesense
-  const collectionNames = ["colleges", "users", "opportunities"];
+  // Fetch the tenants (should only be "awty" for now)
+  const tenantsSnapshot = await db.collection('tenants').get();
+  const tenantIds = tenantsSnapshot.docs.map(doc => doc.id);
 
-  for (const collectionName of collectionNames) {
-    try {
-      const collectionData = await readFirestoreData(collectionName);
-      const returnData = await typesense
-        .collections(collectionName)
-        .documents()
-        .import(collectionData, { action: 'upsert' });
+  // Upload users & opportunities: tenant specific data
+  for (const tenantId of tenantIds) {
+    for (const collectionName of ["users", "opportunities"]) {
+      try {
+        const collectionData = await readFirestoreData(collectionName, tenantId);
+        const dataWithTenant = collectionData.map(doc => ({
+          ...doc,
+          tenantId
+        }));
 
-      console.log(`Data imported to ${collectionName} collection:`, returnData);
-    } catch (err) {
-      console.error(`Error importing data to ${collectionName} collection:`, err);
+        const returnData = await typesense
+          .collections(collectionName)
+          .documents()
+          .import(dataWithTenant, { action: 'upsert' });
+    
+        console.log(`${collectionName} data imported to ${tenantId}:`, returnData);
+      } catch (err) {
+        console.error(`Error importing ${collectionName} data to ${tenantIds}:`, err);
+      }
     }
+  }
+
+  // Upload colleges: shared data
+  try {
+    const collectionData = await readFirestoreData("colleges", null);
+    const returnData = await typesense
+      .collections("colleges")
+      .documents()
+      .import(collectionData, { action: 'upsert' });
+
+    console.log(`Data imported to colleges collection:`, returnData);
+  } catch (err) {
+    console.error(`Error importing data to colleges collection:`, err);
   }
 })();
