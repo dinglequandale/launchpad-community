@@ -171,12 +171,13 @@ export const getBasicUserDescription = (userData, shortened=true) => {
 
 export const editUserData = async (newData, currentUser, origUserData) => {
     try{
-        const userRef = doc(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', "users", currentUser.uid);
+        const tenantId = JSON.parse(localStorage.getItem("basicUserInfo")).schoolId
+        const userRef = doc(db, "tenants", tenantId ?? 'awty', "users", currentUser.uid);
     
         await updateDoc(userRef, newData);
         pushInitialProfileCompletion({... origUserData, ...newData});
 
-        await updateTypesense('users', currentUser.uid, {... origUserData, ...newData});
+        await updateTypesense('users', currentUser.uid, {... origUserData, ...newData}, tenantId);
     }catch(error){console.log(error)};
 }
 

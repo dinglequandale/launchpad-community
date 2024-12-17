@@ -22,11 +22,11 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
         ...opportunityData,
         createdBy: currentUser.uid,
         createdAt: new Date(),
-      });
+      }, basicUserInfo.schoolId);
     } else {
       opportunityRef = doc(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities", opportunityId);
       await updateDoc(opportunityRef, opportunityData);
-      await updateTypesense('opportunities', opportunityId, opportunityData);
+      await updateTypesense('opportunities', opportunityId, opportunityData, basicUserInfo.schoolId);
     }
 
     if (organizationLogo) {
