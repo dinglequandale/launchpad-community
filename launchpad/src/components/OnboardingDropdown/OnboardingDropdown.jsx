@@ -31,6 +31,8 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
                     onChange={handleChange}
                     onInputChange={handleInputChange}
                     options={options}
+                    noOptionsMessage={() => null}
+                    components={{ IndicatorSeparator: null }} 
                 />
             ) : (
                 <Select
@@ -39,6 +41,8 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
                     onChange={handleChange}
                     onInputChange={handleInputChange}
                     options={options}
+                    noOptionsMessage={() => null}
+                    components={{ IndicatorSeparator: null }} 
                 />
             )}
         </div>

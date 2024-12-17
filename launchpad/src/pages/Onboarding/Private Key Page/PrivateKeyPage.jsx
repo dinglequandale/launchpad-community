@@ -4,6 +4,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebaseConfig";
 import { Navigate, useNavigate } from "react-router-dom";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { useAuth } from "../../../contexts/auth/AuthContext";
 
 export default function PrivateKeyPage() {
 
@@ -12,6 +13,7 @@ export default function PrivateKeyPage() {
     const navigate = useNavigate();
 
     const user = auth.currentUser;
+    const {userLoggedIn} = useAuth();
 
     const onSubmit = async (key) => {
         const loadingToast = toast.loading('Verifying your code...');
@@ -53,12 +55,8 @@ export default function PrivateKeyPage() {
     return(
     <>
     <Toaster position="bottom-right" reverseOrder={false} />
-    {/* <div style={{margin: "0 auto", textAlign: "center"}}>
-        <span style={{fontSize: "30px", fontWeight: "bolder", color: "var(--secondary)"}}>Security Key</span>
-        <span className="onboardingQuestion" style={{color: "black"}}>Please enter the security code sent by your school.</span>
-        <SecurityCodeInput onSubmit={onSubmit}/>
-    </div> */}
     {localStorage.getItem("tempSchoolInfo") && <Navigate to="/Onboarding"/>}
+    {!userLoggedIn && <Navigate to="/Login"/>}
     <div className="onboarding-container">
         <div className="onboarding-body">
             <div style={{textAlign: "center", paddingBottom: "8px"}}></div>

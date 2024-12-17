@@ -43,7 +43,7 @@ export default function Home(){
       // Access the school_id claim
       const schoolId = idTokenResult.claims.school_id;
 
-      console.log("schoolId!!!!! ", schoolId);
+      console.log("School Id:", schoolId);
     }
 
     getUserTokenInfo();
@@ -66,7 +66,7 @@ export default function Home(){
             description: "Find your dream career based on your personality, strengths, and experiences! The Career Explorer Career Survey is widely regarded as the #1 career survey in the world for any students seeking to learn more about careers they'd be a great fit for. It is perfect for students who want to learn more about jobs within a certain area of interest (i.e business) or just understand careers better in general. Though long, it is very highly recommended to complete this survey in order to find careers that are a great fit for you (career explorer generates 30 career options based on responses).",
             recommendedBanner: "yes",
             time: "20 minutes",
-            userType: "High Schoolers and Undergads"
+            userType: "High Schoolers and Undergrads"
           },
           {
             title: "VIA Free Character Strength Survey",
@@ -74,7 +74,7 @@ export default function Home(){
             description: "Find your top 3 strengths with the VIA survey! The VIA free personality test is highly recommended by experts for anyone seeking to learn more about their character. It's an excellent, thorough tool for gaining self-awareness, helping highschool students craft compelling college essays, and considering which colleges might be the best fit. For students and professionals alike, it provides valuable insights into which career environments might make you happiest.",
             recommendedBanner: "yes",
             time: "10 minutes",
-            userType: "High Schoolers and Undergads"
+            userType: "High Schoolers and Undergrads"
           },
           {
             title: "Myers Briggs Free Personality Test",
@@ -82,7 +82,7 @@ export default function Home(){
             description: "Possibly the most famous and respected personality test, a test that has helped millions understand themselves better and thus find their dream career. The Myers Briggs personality test places you into one of the 16 personality types and then gives you a multiple page report with recommendations about career paths, what workplace is best for you, famous people with your personality type, etc… Overall, it is a very useful tool to determine what career matches your personality.",
             recommendedBanner: "no",
             time: "10 minutes",
-            userType: "High Schoolers and Undergads"
+            userType: "High Schoolers and Undergrads"
           },
           {
             title: "Indigo Research Career Pathway Guide",
@@ -103,7 +103,7 @@ export default function Home(){
             link: "https://www.mynextmove.org/?fbclid=IwAR2OGpd-YNBFlZu_ZUOW8RQY1kFf1Exanso_MPFmT2vF6aRaluimDiMwde4",
             description: "Discover your ideal career path with My Next Move! Think of it as an interactive version of regular career outlook resources like Occupational Outlook Handbook. My Next Move is a top-rated resource designed to help students identify careers that align with their interests, strengths, and goals - you'll understand the average salary, job growth, and other key metrics about your dream careers. Whether you're passionate about a specific field, like finance or healthcare, or just want to explore your options, My Next Move offers a personalized experience that guides you toward the careers that are the best fit for you.",
             recommendedBanner: "no",
-            userType: "High Schoolers and Undergads"
+            userType: "High Schoolers and Undergrads"
           },
           {
             title: "Occupational Outlook Handbook",

@@ -5,8 +5,8 @@ import toast from 'react-hot-toast';
 import { deleteFromTypesense, updateTypesense } from '../typesense/typesenseClient';
 
 export const saveOpportunity = async (opportunityData, organizationLogo, currentUser, isEditing, opportunityId) => {
-  const basicUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
-  const opportunitiesCollectionRef = collection(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities");
+  const schoolId = localStorage.getItem("schoolId");
+  const opportunitiesCollectionRef = collection(db, "tenants", schoolId, "opportunities");
   let opportunityRef;
 
   try {
@@ -18,15 +18,17 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
       });
 
       // Update Typesense
-      await updateTypesense('opportunities', opportunityRef.id, {
-        ...opportunityData,
-        createdBy: currentUser.uid,
-        createdAt: new Date(),
-      }, basicUserInfo.schoolId);
+      await updateTypesense('opportunities', opportunityRef.id, 
+        {
+          ...opportunityData,
+          createdBy: currentUser.uid,
+          createdAt: new Date(),
+        },
+        schoolId);
     } else {
-      opportunityRef = doc(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities", opportunityId);
+      opportunityRef = doc(db, "tenants", schoolId, "opportunities", opportunityId);
       await updateDoc(opportunityRef, opportunityData);
-      await updateTypesense('opportunities', opportunityId, opportunityData, basicUserInfo.schoolId);
+      await updateTypesense('opportunities', opportunityId, opportunityData, schoolId);
     }
 
     if (organizationLogo) {
@@ -49,7 +51,7 @@ const uploadImage = async (file, opportunityId) => {
 };
 
 export const loadOpportunities = (user, setLoading, setOpportunities) => {
-  const opportunitiesRef = collection(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', "opportunities");
+  const opportunitiesRef = collection(db, "tenants", localStorage.getItem("schoolId"), "opportunities");
   const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", user.uid));
   
   return onSnapshot(qUserOpportunity, async (querySnapshot) => {
@@ -87,7 +89,7 @@ const loadOpportunityLogo = async (opportunityId) => {
 };
 
 export const handleDeleteOpportunity = async (opportunityId) => {
-    const opportunityDoc = doc(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities", opportunityId);
+    const opportunityDoc = doc(db, "tenants", localStorage.getItem("schoolId"), "opportunities", opportunityId);
     try {
         await deleteDoc(opportunityDoc);
         await deleteFromTypesense('opportunities', opportunityId);

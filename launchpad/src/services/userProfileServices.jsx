@@ -3,6 +3,7 @@ import { db, storage } from "../firebase/firebaseConfig";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { updateTypesense } from '../typesense/typesenseClient';
 import { pushInitialProfileCompletion } from "./onboardingServices";
+import { SiNamesilo } from "react-icons/si";
 
 export const lowerAndCapitalize = (title) => {
     const lowerTitle = title.toLowerCase();
@@ -92,10 +93,10 @@ export const displayColleges = (colleges, length = "longer") => {
         "University of Southern California": "USC",
         "New York University": "NYU",
         "University of Chicago": "UChicago",
-        "University of Michigan": "U of M",
+        "University of Michigan Ann Arbor": "UMich",
         "University of Wisconsin-Madison": "UW-Madison",
         "University of North Carolina at Chapel Hill": "UNC Chapel Hill",
-        "University of Texas at Austin": "UT Austin",
+        "The University of Texas at Austin": "UT Austin",
         "Virginia Polytechnic Institute and State University": "Virginia Tech",
         "Pennsylvania State University": "Penn State",
         "Purdue University": "Purdue",
@@ -112,6 +113,7 @@ export const displayColleges = (colleges, length = "longer") => {
         "Duke University": "Duke",
         "Vanderbilt University": "Vanderbilt",
         "Washington University in St. Louis": "WashU",
+        "Washington University": "WashU",
         "Emory University": "Emory",
         "Tufts University": "Tufts",
     };
@@ -120,18 +122,18 @@ export const displayColleges = (colleges, length = "longer") => {
         // Check for known abbreviations
         if (abbreviations[name]) return abbreviations[name];
 
-        // Remove common suffixes
-        name = name.replace(/(University|College|Institute of Technology)$/i, "").trim();
-
         // Handle "University of" cases
-        if (name.startsWith("University of ")) {
-            const parts = name.split(" ");
-            if (parts.length > 3) {
-                return parts.slice(2).map(word => word[0]).join("");
-            }
-            return parts[2];
-        }
+        // if (name.startsWith("The University of ")) {
+        //     const parts = name.split(" ");
+        //     if (parts.length > 3) {
+        //         return parts.slice(2).map(word => word[0]).join("");
+        //     }
+        //     return parts[2];
+        // }
 
+        // Remove common suffixes
+        name = name.replace(/(University|College|Institute of Technology|The University of)/gi, "").trim();
+        return name;
         // For other cases, return the first word or up to two words if they're short
         const words = name.split(" ");
         if (words.length === 1 || (words.length === 2 && words.every(word => word.length <= 5))) {
@@ -171,13 +173,12 @@ export const getBasicUserDescription = (userData, shortened=true) => {
 
 export const editUserData = async (newData, currentUser, origUserData) => {
     try{
-        const tenantId = JSON.parse(localStorage.getItem("basicUserInfo")).schoolId
-        const userRef = doc(db, "tenants", tenantId ?? 'awty', "users", currentUser.uid);
+        const userRef = doc(db, "tenants", localStorage.getItem("schoolId"), "users", currentUser.uid);
     
         await updateDoc(userRef, newData);
         pushInitialProfileCompletion({... origUserData, ...newData});
 
-        await updateTypesense('users', currentUser.uid, {... origUserData, ...newData}, tenantId);
+        await updateTypesense('users', currentUser.uid, {... origUserData, ...newData}, localStorage.getItem("schoolId"));
     }catch(error){console.log(error)};
 }
 
@@ -186,7 +187,7 @@ export const loadUserData = async (currentUser, setLoading, setUserData) => {
     setLoading(true);
 
     if (currentUser) {
-        const userDocRef = doc(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', 'users', currentUser.uid);
+        const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
         unsubscribe = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
                 setUserData(doc.data());

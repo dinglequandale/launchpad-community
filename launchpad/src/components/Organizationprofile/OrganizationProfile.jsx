@@ -39,7 +39,7 @@ export default function OrganizationProfile({organizationData, location, handleS
     }
 
     const getUserData = async (userId) => {
-        const userSnap = await getDoc(doc(db, "tenants", JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', "users", userId));
+        const userSnap = await getDoc(doc(db, "tenants", localStorage.getItem("schoolId"), "users", userId));
         if (userSnap.exists()) {
             setUserData({id: userSnap.id, ...userSnap.data()});
             } else {
@@ -48,21 +48,9 @@ export default function OrganizationProfile({organizationData, location, handleS
     }
 
     useEffect(()=>{
-        // if(location !== "organizations_page"){
-        //     return;
-        // }
+
         getUserData(organizationProfileData.organizationCreatedBy);
     },[])
-
-    // useEffect(() => {
-    //     document.addEventListener("keydown", onKeyPress, true)
-    //   }, [])
-    
-    //   const onKeyPress = (e) => {
-    //     if(e.key === "Escape"){
-    //       setShowPfpCard(false);
-    //     }
-    //   }
 
     useEffect(()=>{
         if(descRef.current.clientHeight <= 16*8){
@@ -85,6 +73,25 @@ export default function OrganizationProfile({organizationData, location, handleS
         if(handleShowProfile){
             handleShowProfile(userData);
             return;
+        }
+    }
+
+    const connectBtnType = (orgType) => {
+        switch(orgType){
+            case "Club":
+                return "Join";
+            case "Shadowing":
+            case "Job":
+            case "Internship":
+            case "Leadership":
+                return "Apply";
+            case "Nonprofit":
+            case "Business":
+                return "Contact Us";
+            case "Community Service":
+                return "Volunteer";
+            default:
+                return "Contact Us";
         }
     }
 
@@ -149,7 +156,7 @@ export default function OrganizationProfile({organizationData, location, handleS
                 </div>
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px", marginLeft: "6px"}}>
                     <button className="btnOrganizationLearnMore btnConnect" onClick={e => handleLearnMore(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> Learn More </button>
-                    {(organizationData.apply !== "NOAPPLY") && <button className="btnOrganizationConnect btnUnfilled" onClick={e => handleConnect(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> {organizationProfileData.organizationType==="Community Service" ? "Volunteer" : ["Club","Nonprofit"].includes(organizationProfileData.organizationType) ? "Join" : "Connect"} </button>}
+                    {(organizationData.apply !== "NOAPPLY") && <button className="btnOrganizationConnect btnUnfilled" onClick={e => handleConnect(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> {connectBtnType(organizationData.organizationType)} </button>}
                 </div>
             </div>
         </>

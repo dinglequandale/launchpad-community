@@ -154,7 +154,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
 
   useEffect(()=>{
     if(requiredQuestionsAnswered(collegeStudentQuestionsConfig,collegeStudentData)){
-      if(collegeStudentData.userSkills && collegeStudentData.userSkills[0].skillDescription === "" && collegeStudentData.userSkills[0].skillCategory === ""){setCollegeStudentData({...collegeStudentData, userSkills: []})};
+      // if(collegeStudentData.userSkills[0] && collegeStudentData.userSkills[0].skillDescription === "" && collegeStudentData.userSkills[0].skillCategory === ""){setCollegeStudentData({...collegeStudentData, userSkills: []})};
       console.log("Can submit")
       setCanSubmit(true);
     }
@@ -327,6 +327,7 @@ const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
 
   const handleAddSkill = () => {
     setSkillData([...skillData, {id: skillData.length, skillCategory: "", skillDescription: ""}]);
+    console.log(skillData, "skilldata");
   };
   
   const handleRemoveSkill = (index) => {

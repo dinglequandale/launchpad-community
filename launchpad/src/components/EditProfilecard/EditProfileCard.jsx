@@ -51,7 +51,7 @@ export default function EditProfileCard() {
         setLoading(true);
 
         if (currentUser) {
-            const userDocRef = doc(db, 'tenants', JSON.parse(localStorage.getItem("basicUserInfo")).schoolId ?? 'awty', 'users', currentUser.uid);
+            const userDocRef = doc(db, 'tenants', localStorage.getItem("schoolId"), 'users', currentUser.uid);
             unsubscribe = onSnapshot(userDocRef, (doc) => {
                 if (doc.exists()) {
                     setUserData(doc.data());
