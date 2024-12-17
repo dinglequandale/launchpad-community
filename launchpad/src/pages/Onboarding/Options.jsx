@@ -61,6 +61,7 @@ const careerInterests = [
   {"value": "artificial_intelligence", "label": "Artificial Intelligence", "group": "STEM"},
   {"value": "information_technology", "label": "Information Technology", "group": "STEM"},
   {"value": "physics", "label": "Physics", "group": "STEM"},
+  {"value": "aerospace", "label": "Aerospace", "group": "STEM"},
   {"value": "public_policy", "label": "Public & Government Policy Administration / Politics", "group": "Social Sciences"},
   {"value": "chemistry", "label": "Chemistry", "group": "STEM"},
   {"value": "political_science", "label": "Political Science", "group": "Social Sciences"},
