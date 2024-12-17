@@ -24,7 +24,7 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
           createdBy: currentUser.uid,
           createdAt: new Date(),
         },
-        localStorage.getItem("schoolId"));
+        schoolId);
     } else {
       opportunityRef = doc(db, "tenants", schoolId, "opportunities", opportunityId);
       await updateDoc(opportunityRef, opportunityData);

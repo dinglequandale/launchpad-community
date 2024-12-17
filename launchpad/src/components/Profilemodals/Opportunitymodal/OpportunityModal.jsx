@@ -330,7 +330,7 @@ const saveOpportunityData = async () => {
             {renderPage()}
           </form>
           </main>
-          <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
+          <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "right"}}>
             {/* <button onClick={
               ()=>setMakeChangesVisibility(true)
               } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
