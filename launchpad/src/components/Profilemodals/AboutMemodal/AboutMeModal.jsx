@@ -11,7 +11,7 @@ export default function AboutMeModal({userData, visibility, onClose}){
   const [aboutMeContent, setAboutMeContent] = useState(userData.userAboutMe ?? "");
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const {currentUser} = useAuth();
-  const wordLimit = 50;
+  const wordLimit = 75;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // TODO: later replace with logic tailored to FireStore
