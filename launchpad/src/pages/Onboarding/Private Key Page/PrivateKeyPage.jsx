@@ -39,7 +39,7 @@ export default function PrivateKeyPage() {
 
             await user.getIdToken(true);
 
-            new Promise( res => setTimeout(res, 700) );
+            // new Promise( res => setTimeout(res, 300) );
 
             
 

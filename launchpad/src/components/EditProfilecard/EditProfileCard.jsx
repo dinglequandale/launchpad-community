@@ -569,14 +569,14 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
     const [loading, setLoading] = useState(false);
     const [isEditing,setIsEditing] = useState(false);
     
-    // console.log("current opportunity", currentOpportunityData)
-    
-    // useEffect(()=>{
-    //     console.log("Current opportunity data:", currentOpportunityData)
-    //     if(currentOpportunityData){
-    //         setOpportunityId(currentOpportunityData.id);
-    //     }
-    // },[currentOpportunityData]);
+    const [isHovered, setIsHovered] = useState(false);
+
+    const getOpportunityOptions = () => {
+        if (userData.userType === "High Schooler") return opportunitiesOptions.highSchool;
+        if (userData.userType === "Alumni") return opportunitiesOptions.alum;
+        return opportunitiesOptions.professional;
+    };
+
 
     return(
         <>
@@ -584,21 +584,6 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
             {deleteWarningVisibility && <DeleteWarningModal onCancel={()=>setDeleteWarningVisibility(false)} onVerify={() => deleteOpportunity(opportunityId)} visibility={deleteWarningVisibility}
                 objectOfDeletation={opportunityData.organizationType}/>}
         </div>
-        {/* <div name="opportunityModal" style={{position: "relative"}}>
-            {userData.userType === "Professional" ? <OpportunityModal 
-                onClose={()=>setOpportunityModalVisibility(false)}
-                visibility={opportunityModalVisibility} 
-                opportunityData={currentOpportunityData} 
-                isEditing={isEditing} 
-                opportunityId={opportunityId}/>
-            
-            : <InitiativeModal 
-                onClose={()=>setOpportunityModalVisibility(false)} 
-                visibility={opportunityModalVisibility}
-                opportunityData={currentOpportunityData} 
-                isEditing={isEditing} 
-                opportunityId={opportunityId}/>}
-        </div> */}
         <div style={{position: "relative"}}>
             { (opportunityData && !loading) ? <>
             <div style={{textAlign: "center", marginBottom: "12px"}}>
@@ -616,15 +601,22 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
                 <Loading/>
             </div>
             :
-            <div className="initiativeOrOpportunity" style={{backgroundColor: "#7ed5d770", borderRadius: "20px",
-                boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
-                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "10px"}}>
-                {userData.userType === "High Schooler" ? opportunitiesOptions.highSchool : userData.userType === "Alumni" ? opportunitiesOptions.alum : opportunitiesOptions.professional}
-                <hr style={{width:"50%", borderColor: "var(--accent)"}}/>
-                <div className="addOne" style={{color: "#006876"}} onClick={()=>setOpportunityModalVisibility(true)}>
-                    <IoAdd size={25} />
-                    <span style={{textDecoration: "underline"}}>Add one!</span>
-                </div>
+            <div 
+            className={`initiative-container ${isHovered ? 'hovered' : ''}`}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {getOpportunityOptions()}
+            
+            <hr className="divider" />
+            
+            <div 
+              className={`add-button ${isHovered ? 'subtle-hover' : ''}`}
+              onClick={() => setOpportunityModalVisibility(true)}
+            >
+              <IoAdd size={25} />
+              <span className="underline">Add one!</span>
+            </div>
             </div>}
             <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
                 <EditInformation isAnswered={opportunityData} questionName={"Opportunity"} onEdit={()=>{
@@ -705,7 +697,7 @@ function ConnectionAvailability(){
                     <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px"}}>
                         {availabilityData.map((availability)=>(
                             <div key={availability} style={{background: "var(--neutral)", padding: "6px 11px", borderRadius: "5px"}}>
-                                <a href='/' style={{lineHeight: "1.5", fontSize: "22px", textDecoration: "underline"}}>{availability}</a>
+                                <span style={{lineHeight: "1.5", fontSize: "22px", color: "var(--secondary)"}}>{availability}</span>
                             </div>
                         ))}
                     </div>

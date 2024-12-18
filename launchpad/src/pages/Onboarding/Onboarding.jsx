@@ -60,7 +60,8 @@ export default function Onboarding() {
     }
 
     const disabledSubmitStyles = {cursor: "not-allowed", background: "gray"};
-    return (
+    return (<>
+        {isSubmitting && <div style={{width: "100vw", height: "100vh", background: "rgb(0,0,0,0.1)", position: "absolute"}}></div>}
         <div className='onboarding-container'>
             {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
             <div className='onboarding-body'>
@@ -100,14 +101,14 @@ export default function Onboarding() {
                 : 
                 <button onClick={()=>{if(canSubmit){
                     setIsSubmitting(true);
-                }}} className='continueButton' style={!canSubmit ? disabledSubmitStyles : {}}>
+                }}} className='continueButton' disabled={isSubmitting} style={!canSubmit ? disabledSubmitStyles : {}}>
                     {!isSubmitting ? "Submit" : <Loading style={{maxWidth: "4px"}}/>}
                 </button>}
             </footer>
             </div>
-            {isSubmitting && <div name="screenBlocker" style={{background:"rgba(0,0,0,0.5)", width: "100%", height: "100%"}}></div>}
+
         </div>
-    );
+    </>);
 };
 
 function UserType({setSelectedOption, selectedOption, setAgreedToTerms, agreedToTerms, location}) {

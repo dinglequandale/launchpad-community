@@ -47,7 +47,7 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         userPfpPreview: pfpURL,
         userResumePreview: resumeURL,
         userId: currentUser.uid,
-        userSkills: (userSkills.length > 0 && userSkills[0].skillDescription === "") ? [] : userSkills,
+        userSkills: (collegeStudentData.userSkills.length > 0 && collegeStudentData.userSkills[0].skillDescription === "") ? [] : collegeStudentData.userSkills,
         };
 
         const docRef = await setDoc(doc(db, 'tenants', collegeStudentData.schoolId, 'users', currentUser.uid), dataToSave);
