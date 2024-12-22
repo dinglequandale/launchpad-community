@@ -81,13 +81,12 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     createdByUserName: "",
   });
 
+  const {userName, userType} = JSON.parse(localStorage.getItem("basicUserInfo"));
   useEffect(() => {
     if (opportunityData) {
         setOrganizationData({... opportunityData});
         return;
     }
-
-    const {userName} = JSON.parse(localStorage.getItem("basicUserInfo"));
     setOrganizationData({...organizationData, createdByUserName: userName});
 
     }, [visibility]);
@@ -98,7 +97,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
       id: "organizationType",
       text: "Initiative Type:",
       type: "select",
-      options: ["Select Type", "Club", "Nonprofit", "Business"],
+      options: userType === "High Schooler" ? ["Select Type", "Club", "Nonprofit", "Business"] : ["Select Type", "Nonprofit", "Business"],
       includers: ["Nonprofit", "Club", "Business", ""],
       required: true,
       page: 1, 
@@ -141,7 +140,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
       text: "Your Mission",
       type: "textarea",
       maxLength: 500,
-      placeholder: `Summarize your ${organizationData.organizationType ?? "initiative"}'s mission and values in a few sentences. ${(organizationData.organizationType === "Business" || organizationData.organizationType === "Nonprofit") && "Invite students and parents to reach out!"}`,
+      placeholder: `Summarize your ${organizationData.organizationType ? organizationData.organizationType.toLowerCase() : "initiative"}'s mission and values in a few sentences.`,
       includers: ["Nonprofit", "Club", "Business", ""],
       required: true,
       page: 2, 
@@ -258,7 +257,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
             {renderPage()}
           </form>
           </main>
-          <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
+          <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "right"}}>
             {/* <button onClick={
               ()=>setMakeChangesVisibility(true)
               } className='btnUnfilled' style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>

@@ -168,7 +168,7 @@ export default function EditProfileCard() {
                     setOpportunityModalVisibility(true);
                 }}>
                     <IoAdd size={25} />
-                    <span style={{textDecoration: "underline"}}>Add another opportunity!</span>
+                    <span style={{textDecoration: "underline"}}>Add another {userData.userType === "Professional" ? "opportunity" : "initiative"}!</span>
                 </div>}
                 <AboutMeDisplay/>
                 {(userData && userData.userType !== "Professional") && <div name="skills" style={{marginTop: "20px"}}>
@@ -334,7 +334,8 @@ function ContactInformation(){
     return(
         <>
         <div style={{marginTop: "10px"}}>
-        <span style={{fontSize: "20px", fontWeight: "bolder"}}>Contact Information</span>
+        <span style={{fontSize: "20px", fontWeight: "bolder"}}>Contact Information</span><br />
+        <span style={{color: "#5a696e", fontSize: "15px"}}>Add an email or LinkedIn where Awty students, alumni, and professionals can reach you. Link your LinkedIn so others can easily learn more about you.</span>
         </div>
         {linkedInModalVisibility && <LinkedinModal userData ={userData} visibility ={linkedInModalVisibility} onClose={() => setLinkedInModalVisibility(false)}/>}
         {emailModalVisibility && <EmailModal userData={userData} visibility={emailModalVisibility} onClose={() => setEmailModalVisibility(false)}/>}

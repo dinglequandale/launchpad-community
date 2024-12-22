@@ -4,9 +4,13 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 import { doSignOut } from "../../firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { disconnectFromStream } from '../../Streamchat/chatFunctions/setUpUser';
+import { useState } from 'react';
+import LogoutVerificationModal from './LogoutVerificationModal';
 
 export default function LogoutButton() {
     const {userLoggedIn } = useAuth();
+
+    const [logoutModalVisibility, setLogoutModalVisibility] = useState(false);
     const navigate = useNavigate();
     const handleLogout = (e) => {
         e.preventDefault();
@@ -27,10 +31,10 @@ export default function LogoutButton() {
     }
     return(
         <>
+            {logoutModalVisibility && <LogoutVerificationModal visibility={logoutModalVisibility} onVerify={(e) => handleLogout(e)} onCancel={() => setLogoutModalVisibility(false)}/>}
             {userLoggedIn &&
-                <div className='logoutGroup' style={{display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column"}} onClick={(e) => handleLogout(e)}>
-                    <FiLogOut size={19} className="logoutButton"/>
-                    <span className='txtLogout' style={{fontSize: "16px"}}>Logout</span>
+                <div className='logoutGroup' style={{display: "flex", alignItems: "center", justifyContent: "center"}} onClick={() => setLogoutModalVisibility(true)}>
+                    <FiLogOut size={25} className="logoutButton"/>
                 </div>}
         </>
     );
