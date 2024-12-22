@@ -112,7 +112,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
           <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Join {userData.userName}'s {userType === "Professional" ? "Opportunity" : "Initiative"} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Send an Introductory Message</span></h2>}
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
-        <main style={{ display: "flex", flexDirection: "column", gap: "7px"}}>
+        <main style={{ display: "flex", flexDirection: "column", gap: "7px", width: "500px"}}>
             <div style={{display: "flex", flexDirection: "column", gap: "5px", padding: "15px 5px"}}>
               <span style={{fontSize: "18px"}}>
                 <span style={{fontWeight: "550", fontSize: "18px"}}>Email:</span>

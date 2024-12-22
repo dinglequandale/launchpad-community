@@ -43,16 +43,13 @@ const highSchools = [
 ];
 
 const careerInterests = [
-  // {"value": "business_management", "label": "Business (Management)", "group": "Business"},
-  // {"value": "business_operations", "label": "Business (Operations)", "group": "Business"},
-  // {"value": "business_sales", "label": "Business (Sales)", "group": "Business"},
-  // {"value": "business_admin", "label": "Business (Administration)", "group": "Business"},
   {"value": "business", "label": "Business Management", "group": "Business"},
   {"value": "engineering", "label": "Engineering", "group": "STEM"},
   {"value": "computer_science", "label": "Computer Science", "group": "STEM"},
   {"value": "medicine_general", "label": "Medicine", "group": "Medical"},
   {"value": "finance", "label": "Finance", "group": "Business"},
   {"value": "economics", "label": "Economics", "group": "Social Sciences"},
+  {"value": "real_estate", "label": "Real Estate", "group": "Business"},
   {"value": "law", "label": "Law", "group": "Legal"},
   {"value": "data_science", "label": "Data Science & Analysis", "group": "STEM"},
   {"value": "marketing", "label": "Marketing & Advertising", "group": "Business"},
@@ -109,7 +106,7 @@ const careerInterests = [
 ];
 
 const graduationYears = [];
-for (let year = 2026; year >= 1990; year--) {
+for (let year = 2030; year >= 1990; year--) {
     graduationYears.push({ value: year, label: year.toString() });
 }
 

@@ -115,7 +115,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                     <main style={{padding: "0px 8px"}}>
                         {(!opportunityLoading && opportunityData) ? <div>
                             <div style={{textAlign: "center", marginBottom: ".6rem"}}>
-                            <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", paddingBottom: "3rem"}}>{userName.split(" ")[0]} is offering {opportunityData.organizationType === "Internship" ? "an" : "a"}<span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()} opportunity!</span></span>
+                            <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", paddingBottom: "3rem"}}>{userName.split(" ")[0]} is {opportunityData.organizationType === "Business" ? "running" : "offering"} {opportunityData.organizationType === "Internship" ? "an" : "a"}<span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()}{opportunityData.organizationType !== "Business" && " opportunity"}!</span></span>
                             </div>
                             <OrganizationProfile location={"user_profile_public"} organizationData={opportunityData} handleReferalClick={handleReferalClick}/> </div> : opportunityLoading ? <Loading/> : null}
                         {(userData.userAboutMe || userData.linkedinLink) && <div name="userAboutMe" style={{paddingTop: "20px"}}>

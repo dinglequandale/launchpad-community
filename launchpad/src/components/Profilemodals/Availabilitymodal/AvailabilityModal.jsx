@@ -3,10 +3,12 @@ import Modal from "react-modal";
 import MakeChanges from "../../Makechanges/MakeChanges";
 import { editUserData } from "../../../services/userProfileServices";
 import { useAuth } from "../../../contexts/auth/AuthContext";
+import { CgClose } from "react-icons/cg";
 
 export default function AvailabilityModal({visibility, onClose, userData, availabilityData}){
 
-    const [selectedOptions, setSelectedOptions] = useState(availabilityData);
+    const [selectedOptions, setSelectedOptions] = useState(availabilityData ?? []);
+    console.log("Options:", selectedOptions)
     const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
 
     const {currentUser} = useAuth();
@@ -107,6 +109,7 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
             contentLabel="Availability Modal"
             >
                 <header>
+                    <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
                     <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Commitment <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Connect. Inspire. Empower.</span></h2>
                     <hr style={{borderColor: "var(--secondary)"}}/>
                 </header>
@@ -137,11 +140,11 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
                 <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
                     <button onClick={
                         ()=>setMakeChangesVisibility(true)
-                        } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+                        } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger"}}>
                         Cancel
                     </button>
-                    <button onClick={saveAvailabilityData} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-                        Save Changes
+                    <button onClick={saveAvailabilityData} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white"}}>
+                        Save
                     </button>
                 </footer>
             </Modal>

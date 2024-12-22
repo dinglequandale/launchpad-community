@@ -134,7 +134,7 @@ export default function OrganizationProfile({organizationData, location, handleS
                             </div>
                             <div style={{
                                 position: "absolute", 
-                                bottom: "-4px", 
+                                bottom: organizationProfileData.organizationLogistics ? "-10px" : "-6px", 
                                 left: "15px", 
                                 width: "calc(100% - 30px)", 
                                 textAlign: "center",

@@ -49,7 +49,7 @@
     width: 100%;
     bottom: 0;
     pointer-events: none;
-    background: rgba(218, 245, 255, 0.479);
+    /* background: rgba(218, 245, 255, 0.479); */
 }
 
 .btnOrganizationLearnMore{
@@ -66,7 +66,6 @@
     width: 80%;
     font-weight: bolder;
     border-width: 1.9px;
-    background-color: var(--);
 }
 
 .organizationDescription{
