@@ -12,8 +12,8 @@ export default function LogoutButton() {
 
     const [logoutModalVisibility, setLogoutModalVisibility] = useState(false);
     const navigate = useNavigate();
-    const handleLogout = (e) => {
-        e.preventDefault();
+    const handleLogout = () => {
+        // e.preventDefault();
         doSignOut().then(() => {
             // clear any auth-related local storage
             localStorage.removeItem('authToken');
@@ -31,7 +31,7 @@ export default function LogoutButton() {
     }
     return(
         <>
-            {logoutModalVisibility && <LogoutVerificationModal visibility={logoutModalVisibility} onVerify={(e) => handleLogout(e)} onCancel={() => setLogoutModalVisibility(false)}/>}
+            {logoutModalVisibility && <LogoutVerificationModal visibility={logoutModalVisibility} onVerify={() => handleLogout()} onCancel={() => setLogoutModalVisibility(false)}/>}
             {userLoggedIn &&
                 <div className='logoutGroup' style={{display: "flex", alignItems: "center", justifyContent: "center"}} onClick={() => setLogoutModalVisibility(true)}>
                     <FiLogOut size={25} className="logoutButton"/>
