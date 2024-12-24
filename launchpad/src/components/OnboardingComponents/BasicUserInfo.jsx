@@ -169,7 +169,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
             value={selectedOptions["linkedinLink"]}
             // TODO: work this into everything
             className="onboardingInput"
-            style={{width: "465px", display: "flex", right: "0", left: "0", marginLeft: "auto", marginRight: "auto"}}
+            style={{width: "465px", display: "flex", right: "0", left: "0", marginTop: "-12px", marginLeft: "auto", marginRight: "auto"}}
           />
         </>}
         
