@@ -7,7 +7,7 @@
     color: black;
     display: flex;
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 12px;
     /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
     flex-direction: column;
     background: var(--primary);
@@ -58,6 +58,14 @@
     padding-left: 10px;
     font-size: smaller;
     padding-bottom: 10px;
+}
+
+.userInfo span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 270px; 
+    display: block;
 }
 
 .userInfo strong {
