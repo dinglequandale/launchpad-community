@@ -2,12 +2,12 @@
     overflow: hidden;
     position: relative;
     width: 310px;
-    height: 173px;
+    height: 160px;
     background-color: aliceblue;
     color: black;
     display: flex;
     padding: 10px;
-    border-radius: 15px;
+    border-radius: 12px;
     /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
     flex-direction: column;
     background: var(--primary);
@@ -35,6 +35,7 @@
     height: 48px;
     border-radius: 50%;
     object-fit: cover;
+    box-shadow: none;
 }
 
 .cardName{
@@ -55,9 +56,21 @@
 .userInfo{
     display: flex;
     flex-direction: column;
-    padding-left: 10px;
+    padding-left: 12px;
     font-size: smaller;
     padding-bottom: 10px;
+}
+
+.userInfo span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 270px; 
+    display: block;
+}
+
+.userInfo strong {
+    font-weight: 500; 
 }
 
 .userCardBtnConnect{
