@@ -18,7 +18,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
             case "Alumni":
                 return "Attending College";
             case "Professional":
-                return "Current Position";
+                return "Job";
             default:
                 return "";
         }
