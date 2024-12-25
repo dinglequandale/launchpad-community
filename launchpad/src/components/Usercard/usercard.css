@@ -60,6 +60,10 @@
     padding-bottom: 10px;
 }
 
+.userInfo strong {
+    font-weight: 500; 
+}
+
 .userCardBtnConnect{
     padding: 5px;
     background-color: var(--secondary);

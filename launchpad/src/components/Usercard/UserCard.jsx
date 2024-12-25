@@ -25,11 +25,26 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
     }
 
     // TODO: change to userData
+    const basicInfoContent = {
+        userPreface: getBasicUserDescription(userData),
+        userFirstDesc: {
+            label: userType !== "Professional" ? "Interests" : "Expertise",
+            content: (userData.areasOfInterest && userData.areasOfInterest.length > 0) 
+                ? displayFieldsOfInterest(userData.areasOfInterest, "shorter") 
+                : displayFieldsOfInterest(userData.areasOfInterest, "shorter")
+        },
+        userSecondDesc: {
+            label: descType(),
+            content: userType === "Professional" 
+                ? (userData.industryPosition ? userData.industryPosition : "None")
+                : userType === "Alumni" 
+                    ? displayColleges([userData.collegeAttending], "shorter")
+                    : (Array.isArray(userData.collegeInterestsOrDecision) 
+                        ? displayColleges([...userData.collegeInterestsOrDecision], "shorter")
+                        : displayColleges([userData.collegeInterestsOrDecision]))
+        }
+    }
 
-    const basicInfoContent ={userPreface:getBasicUserDescription(userData),
-    userFirstDesc: `${userType !== "Professional" ? "Interests" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "shorter") : displayFieldsOfInterest(userData.areasOfInterest, "shorter")}`,
-    userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition ? (userData.industryPosition) : "None") : userType === "Alumni" ? displayColleges([userData.collegeAttending], "shorter") : (Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision], "shorter") : displayColleges([userData.collegeInterestsOrDecision]))}`,
-}
 
     return(
         <>
@@ -51,8 +66,8 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                 </div>
                 <div style={{display: "flex"}}>
                 <div className='userInfo' style={{fontSize: "16px"}}>
-                    <span>{basicInfoContent.userFirstDesc}</span>
-                    <span>{basicInfoContent.userSecondDesc}</span>
+                    <span><strong>{basicInfoContent.userFirstDesc.label}</strong>: {basicInfoContent.userFirstDesc.content}</span>
+                    <span><strong>{basicInfoContent.userSecondDesc.label}</strong>: {basicInfoContent.userSecondDesc.content}</span>
                 </div>
             </div>
             <button className="btnConnect" style={{width: "80%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
