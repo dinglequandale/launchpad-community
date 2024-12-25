@@ -59,14 +59,7 @@
     padding-left: 12px;
     font-size: smaller;
     padding-bottom: 10px;
-}
-
-.userInfo span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 270px; 
-    display: block;
+    font-weight: 345;
 }
 
 .userInfo strong {
