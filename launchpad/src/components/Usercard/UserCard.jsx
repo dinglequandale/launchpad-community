@@ -70,7 +70,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                     <span><strong>{basicInfoContent.userSecondDesc.label}</strong>: {basicInfoContent.userSecondDesc.content}</span>
                 </div>
             </div>
-            <button className="btnConnect" style={{width: "80%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
+            <button className="btnConnect" style={{width: "86%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={22}/>
                     <span>Connect</span>

@@ -56,7 +56,7 @@
 .userInfo{
     display: flex;
     flex-direction: column;
-    padding-left: 10px;
+    padding-left: 12px;
     font-size: smaller;
     padding-bottom: 10px;
 }
