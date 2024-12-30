@@ -55,9 +55,20 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
             </button>
             <div className='basicInfo'>
                 <div>
-                    {userData.userPfpPreview ? <img className="pfpImage" src={userData.userPfpPreview} alt="" style={
-                {width: "60px", height: "60px"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
-                    {width: "60px", height: "60px"}}/>}
+                {userData.userPfpPreview ? (
+                    <img 
+                        className="pfpImage" 
+                        src={userData.userPfpPreview} 
+                        alt="" 
+                    />
+                ) : (
+                    <img 
+                        className="pfpImage" 
+                        src="/assets/placeholder_pfp.png" 
+                        alt="" 
+                        style={{ boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.2)" }} 
+                    />
+                )}
                 </div>
                 <div className='cardNameDescription'>
                     <span className='cardName'>{displayShortenedName(userData.userName)}</span>
@@ -70,7 +81,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                     <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userSecondDesc.label}</strong>: {basicInfoContent.userSecondDesc.content}</span>
                 </div>
             </div>
-            <button className="btnConnect" style={{width: "86%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
+            <button className="btnConnect" style={{width: "88%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "15px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={22}/>
                     <span>Connect</span>

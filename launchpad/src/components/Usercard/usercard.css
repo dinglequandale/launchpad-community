@@ -2,15 +2,15 @@
     overflow: hidden;
     position: relative;
     width: 310px;
-    height: 160px;
+    height: 168px;
     background-color: aliceblue;
     color: black;
     display: flex;
-    padding: 10px;
+    padding: 7px;
     border-radius: 12px;
     /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
     flex-direction: column;
-    background: var(--primary);
+    background: white;
     z-index: 1;
     border-style: solid;
     border-color: var(--secondary);
@@ -28,11 +28,13 @@
 
 .basicInfo{
     display: flex;
+    margin-left: 5px;
+    margin-top: 5px;
 }
 
 .pfpImage {
-    width: 48px;
-    height: 48px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     object-fit: cover;
     box-shadow: none;
@@ -43,7 +45,7 @@
     font-size: larger;
 }
 .cardNameDescription{
-    padding-left: 10px;
+    padding-left: 12px;
     justify-content: center;
     display: flex;
     flex-direction: column;
@@ -58,26 +60,14 @@
     flex-direction: column;
     padding-left: 12px;
     font-size: smaller;
-    padding-bottom: 10px;
     font-weight: 345;
+    margin-top: 5px;
 }
 
 .userInfo strong {
     font-weight: 500; 
 }
 
-.userCardBtnConnect{
-    padding: 5px;
-    background-color: var(--secondary);
-    border-radius: 5px;
-    width: 75%;
-    color: var(--primary);
-    margin: 0 auto; 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
 
 .userCardBtnConnect:hover{
     background-color: rgb(120, 131, 255);
