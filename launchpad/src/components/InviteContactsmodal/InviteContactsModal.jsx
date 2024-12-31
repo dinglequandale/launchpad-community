@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { GrAdd } from "react-icons/gr";
 import Modal from "react-modal";
 
-export default function InviteContactsModal({visibility, onClose,tenantId}){
+export default function InviteContactsModal({visibility, onClose}){
 
     // const [targetUserData, setTargetUserData] = useState([{userName: "", email: ""}]);
     const [targetUserData,setTargetUserData] = useState([{id: 0, userName: "", email: ""}])
@@ -72,7 +72,7 @@ export default function InviteContactsModal({visibility, onClose,tenantId}){
             contentLabel="Invite Contacts Modal"
           >
             <header>
-              <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Help grow the {tenantId} network! <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}> Invite friends, family, and colleagues </span></h2>
+              <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Invite Friends, Family, Colleagues, ... <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Help grow our community!</span></h2>
               <hr style={{borderColor: "var(--secondary)"}}/>
             </header>
             <main style={{paddingTop: "10px", display: "flex", flexDirection: "column", gap: "7px"}}>
