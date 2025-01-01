@@ -38,16 +38,23 @@ export default function Home(){
     const [userBasicInfo, setUserBasicInfo] = useState(null);
 
     const getUserTokenInfo = async () => {
-      const idTokenResult = await currentUser.getIdTokenResult();
-    
-      // Access the school_id claim
-      const schoolId = idTokenResult.claims.school_id;
+        if (currentUser) {
+            const idTokenResult = await currentUser.getIdTokenResult();
+            const schoolId = idTokenResult.claims.school_id;
+            console.log("School Id:", schoolId);
 
-      console.log("School Id:", schoolId);
-    }
+            setUserBasicInfo((prev) => ({
+                ...prev, 
+                schoolId,
+            }));
+        }
+    };
 
-    getUserTokenInfo();
-
+    useEffect(() => {
+        const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
+        setUserBasicInfo(JSON.parse(storedUserBasicInfo));
+        getUserTokenInfo();
+    }, []);
     
     const resourceData = {
         "How To Network": [
@@ -162,12 +169,6 @@ export default function Home(){
           }
         ],
       };
-      
-
-    useEffect(()=>{
-        const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
-        setUserBasicInfo(JSON.parse(storedUserBasicInfo));
-    },[]);
 
     const refSections = useRef({});
 
@@ -177,39 +178,13 @@ export default function Home(){
       refSections.current[sectionTitle] = ref;
     };
 
-    // useEffect(() => {
-    //   jsonData.map(async (org, index) => {
-    //     await setDoc(doc(db, "tenants", "awty", "opportunities", org.organizationName), org);
-    //     // print("Org ", index + 1, " uploaded")
-    //   })
-    // },[])
-    
-    // useEffect(() => {
-    //   const writeData = async () => {
-    //     const q = query(collection(db, "tenants", "awty", "opportunities"));
-
-    //     const querySnapshot = await getDocs(q);
-    //     querySnapshot.forEach(async (d) => {
-    //       if(d.id.includes(" ")){ // doc.data() is never undefined for query doc snapshots
-    //         console.log(d.id);
-    //         const docRef = doc(db, "opportunities", d.id);
-
-    //         new Promise( res => setTimeout(res, 10000) );
-    //         await updateDoc(docRef, {createdAt: new Date()});
-    //       }
-    //     });
-    //   }
-
-    //   writeData();
-    // },[])
-
     return(
         <>
             <TopBar/>
             <SideNav/>
             <div className='homeContainer' style={{paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>
                 <div style={{paddingTop: "20px"}}>
-                    {userBasicInfo && <InviteContacts userName={userBasicInfo.userName.split(" ")[0] ?? "User"} userType = {userBasicInfo.userType}/>}
+                    {userBasicInfo && <InviteContacts userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={userBasicInfo.schoolId}/>}
                 </div>
                 <div style={{display: "flex", paddingTop: "30px", position: "relative", width: "fitParent", height: "400px"}}>
                     <div className="launchpadIntro" style={
@@ -276,17 +251,17 @@ export default function Home(){
     )
 }
 
-function InviteContacts({userName, userType}){
+function InviteContacts({userName, tenantId}){
     const [inviteContactsModalVisibility,setInviteContactsModalVisibility] = useState(false);
     
     return(
         <>
-        {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} />}
+        {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} tenantId={tenantId}/>}
         <div style={
             {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "rgba(14, 195, 111, .3)",
          height: "fitContent", borderRadius: "4px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
          }>
-            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>{userType === "Professional" ? "Greetings" : "Hey"}, {userName}!</span> <br /> Know any <span style={{fontWeight: "550", color: "var(--secondary)"}}>Awty high schoolers</span> or <span style={{fontWeight: "550", color: "var(--secondary)"}}>Awty alumni</span> who would benefit from being on the app? Know other  <span style={{fontWeight: "550", color: "var(--secondary)"}}>professionals</span> in the Awty community willing to share their expertise? <span style={{fontWeight: "650"}}>Invite friends and family below!</span></span>
+            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>Hello, {userName}!</span> <br /> Know any <span style={{fontWeight: "550", color: "var(--secondary)"}}>{tenantId} high schoolers</span> or <span style={{fontWeight: "550", color: "var(--secondary)"}}>{tenantId} alumni</span> who would benefit from being on the app? Know other  <span style={{fontWeight: "550", color: "var(--secondary)"}}>professionals</span> in the {tenantId} community willing to share their expertise? Invite friends and family below!</span>
             <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
                 <button onClick={()=>setInviteContactsModalVisibility(true)} className="btnInviteContacts" style={{}}>Invite Contacts</button>
             </div>
