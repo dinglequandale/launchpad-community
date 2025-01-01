@@ -184,7 +184,7 @@ export default function Home(){
             <SideNav/>
             <div className='homeContainer' style={{paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>
                 <div style={{paddingTop: "20px"}}>
-                    {userBasicInfo && <InviteContacts userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={userBasicInfo.schoolId}/>}
+                    {userBasicInfo && <InviteContacts userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={capitalizeFirstLetter(userBasicInfo.schoolId)}/>}
                 </div>
                 <div style={{display: "flex", paddingTop: "30px", position: "relative", width: "fitParent", height: "400px"}}>
                     <div className="launchpadIntro" style={
@@ -249,6 +249,10 @@ export default function Home(){
             </div>
         </>
     )
+}
+
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function InviteContacts({userName, tenantId}){
