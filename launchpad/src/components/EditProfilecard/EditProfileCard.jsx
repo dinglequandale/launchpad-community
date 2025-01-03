@@ -410,7 +410,7 @@ function ResumeUpload(){
   
     return (
     <>
-        {!pdfUrl && <span style={{fontWeight: "250", fontSize: "15px"}}>Upload a resume so others can understand more about your experiences.</span>} 
+        {!pdfUrl && <span style={{fontWeight: "250", fontSize: "15px"}}>Showcase your experiences and achievements to make a good first impression</span>} 
         <div className="pdf-viewer-container" style={{paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative"}}>
             {pdfUrl ? 
             <>
@@ -650,7 +650,7 @@ function AboutMeDisplay(){
         <div className="aboutMe" style={{paddingTop: "20px"}}>
             <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me</span> <br />
 
-            {!aboutMe && <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>}
+            {!aboutMe && <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with whom do you want to connect?</span>}
             <div className="addOne" id="About Me" onClick={()=>{setAboutMeModalVisibility(true)}}>
                 
                 {!aboutMe && <>
