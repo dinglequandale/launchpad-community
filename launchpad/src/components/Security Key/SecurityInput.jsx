@@ -5,7 +5,9 @@ export default function SecurityCodeInput({onSubmit}) {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [code, setCode] = useState(['', '', '', '', '', '', '', '']);
+
+    const codeLength = 5;
+    const [code, setCode] = useState(['', '', '', '', '']);
     
     const inputRefs = [
         useRef(null),
@@ -13,9 +15,6 @@ export default function SecurityCodeInput({onSubmit}) {
         useRef(null),
         useRef(null),
         useRef(null),
-        useRef(null),
-        useRef(null),
-        useRef(null)
     ];
 
     // Handle input change for each box
@@ -26,7 +25,7 @@ export default function SecurityCodeInput({onSubmit}) {
         newCode[index] = sanitizedValue;
         setCode(newCode);
 
-        if (sanitizedValue && index < 7) {
+        if (sanitizedValue && index < codeLength - 1) {
         inputRefs[index + 1].current.focus();
         }
     };
@@ -46,7 +45,7 @@ export default function SecurityCodeInput({onSubmit}) {
         event.preventDefault();
         setIsSubmitting(true);
         const fullCode = code.join('');
-        if (fullCode.length === 8) {
+        if (fullCode.length === codeLength) {
         console.log('Security Code Submitted:', fullCode);
 
         await onSubmit(fullCode);
@@ -81,9 +80,9 @@ export default function SecurityCodeInput({onSubmit}) {
             <span className="onboardingQuestion" style={{color: "black"}}>Please enter the security code sent by your school.</span>
             <button 
             type="submit" 
-            disabled={isSubmitting || code.join('').length < 8}
+            disabled={isSubmitting || code.join('').length < codeLength}
             className='continueButton'
-            style={{background: (isSubmitting || code.join('').length < 8) ? "gray" : "", cursor: (isSubmitting || code.join('').length < 8) ? "not-allowed" : ""}}
+            style={{background: (isSubmitting || code.join('').length < codeLength) ? "gray" : "", cursor: (isSubmitting || code.join('').length < codeLength) ? "not-allowed" : ""}}
             >
             {!isSubmitting ? "Submit Code" : <Loading size={25}/>}
             </button>

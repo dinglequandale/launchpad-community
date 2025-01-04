@@ -25,7 +25,6 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-
         // JOSE TODO
         await updateTypesense('users', currentUser.uid, dataToSave, highSchoolerData.schoolId);
         onSuccess();
@@ -137,7 +136,8 @@ export const packageBasicUserInfoToLS = (userData) => {
         userPfpPreview: userData.userPfpPreview,
         userShortDescription: userShortDescription,
         userHighSchoolType: (userData.userType === "High Schooler") ? userHighSchoolType(userData.graduationYear) : null,
-        userSchoolId: userData.schoolId
+        userSchoolId: userData.schoolId,
+        isCommitted: (userData.userType === "High Schooler") ? !Array.isArray(userData.collegeInterestsOrDecision) : null,
     };
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));

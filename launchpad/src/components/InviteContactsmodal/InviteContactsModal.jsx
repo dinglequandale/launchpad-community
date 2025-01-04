@@ -92,7 +92,7 @@ export default function InviteContactsModal({visibility, onClose}){
                   <button onClick={onClose} className="btnUnfilled" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger"}}>
                       Cancel</button>
                   <button onClick={onInviteSend} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-                      Send it!</button>
+                      Send</button>
                 </div>
             </footer>
           </Modal>

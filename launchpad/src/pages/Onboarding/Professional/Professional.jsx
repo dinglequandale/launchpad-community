@@ -75,7 +75,7 @@ const professionalQuestionsConfig = [
   },
   {
     id: "yearsOfExperience",
-    text: "How many years of experience do you currently have?",
+    text: "How many years of experience do you have?",
     type: "text-box",
     placeholder: "E.g. 10",
     retired: true,
