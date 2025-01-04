@@ -68,7 +68,7 @@ export default function EmailModal({userData, visibility, onClose}){
       >
         <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
         <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Email <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>{userData.userType === "High Schooler" ? "Showcase who you are what you're capable of!" : "Show our students who you are and what you do!"}</span></h2>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Email <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>{userData.userType === "High Schooler" ? "Showcase who you are and what you're capable of!" : "Show our students who you are and what you do!"}</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{paddingTop: "10px"}}>

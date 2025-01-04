@@ -4,12 +4,11 @@ import { RiGraduationCapLine } from "react-icons/ri";
 import { GoBriefcase } from "react-icons/go";
 import { SlCalender } from "react-icons/sl";
 import { useState, useEffect, useRef } from "react";
-import ProfileModal from "../Profilemodal/ProfileModal";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import ReadMoreButton from "../ReadMorebutton/ReadMore";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
-import { displayFieldsOfInterest, displayShortenedName } from "../../services/userProfileServices";
+import { displayFieldsOfInterest } from "../../services/userProfileServices";
 
 export default function OrganizationProfile({organizationData, location, handleShowProfile, handleReferalClick}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]

@@ -19,13 +19,25 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
     // Use if passing solely an array of options instead of an array of value, label pairs
     // const formattedOptions = options.map(option => ({ value: option, label: option }));
 
+    const getValue = () => {
+        if (!selectedOption) return null;
+        
+        if (type === 'multi-select') {
+          // Ensure selectedOption is always treated as an array
+          const optionArray = Array.isArray(selectedOption) ? selectedOption : [selectedOption];
+          return optionArray.map(option => ({ value: option, label: option }));
+        } else {
+          return { value: selectedOption, label: selectedOption };
+        }
+      };
+
     return (
         <div className="dropDownContainer">
             {showQuestion && <label>{question}</label>}
             {type === 'multi-select' ? (
                 <Select
                     isMulti
-                    value={selectedOption ? selectedOption.map(option => ({ value: option, label: option })) : null}
+                    value={getValue()}
                     // value={options.filter(option => selectedOption.includes(option.label))}
                     // value={selectedOption}
                     onChange={handleChange}
@@ -37,7 +49,7 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
             ) : (
                 <Select
                     // value={options.find(option => option.label === selectedOption)}
-                    value={selectedOption ? { value: selectedOption, label: selectedOption } : null}
+                    value={getValue()}
                     onChange={handleChange}
                     onInputChange={handleInputChange}
                     options={options}
