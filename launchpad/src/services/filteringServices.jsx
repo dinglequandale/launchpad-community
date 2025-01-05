@@ -33,7 +33,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
               // TODO: Check this works...
                 key: "collegeAttending",
                 operation: "in",
-                value: userColleges,
+                value: [...userColleges],
             };
         } else if (Array.isArray(value)) {
             return { key, operation: 'in', value };
