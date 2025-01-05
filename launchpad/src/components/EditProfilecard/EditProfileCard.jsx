@@ -609,7 +609,7 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
           >
             {getOpportunityOptions()}
             
-            <hr className="divider" />
+            <hr className="divider" style={{width: "45%", marginTop: "6px",marginBottom: "6px"}}/>
             
             <div 
               className={`add-button ${isHovered ? 'subtle-hover' : ''}`}

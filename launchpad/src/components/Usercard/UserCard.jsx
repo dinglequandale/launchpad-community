@@ -26,7 +26,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
 
     // TODO: change to userData
     const basicInfoContent = {
-        userPreface: getBasicUserDescription(userData).split(' in ')[0],
+        userPreface: userType === "Alumni" ? getBasicUserDescription(userData) :  getBasicUserDescription(userData).split(' in ')[0],
         userFirstDesc: {
             label: userType !== "Professional" ? "Interests" : "Expertise",
             content: (userData.areasOfInterest && userData.areasOfInterest.length > 0) 

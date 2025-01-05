@@ -62,14 +62,14 @@ const highSchoolQuestionsConfig = [
     options: graduationYears,
     page: 2,
   },
-  {
-    id: "sectionAttending",
-    text: "Are you part of the French or International Section?",
-    type: "select",
-    optional: true,
-    options: ["French", "International"].map(option => ({ value: option, label: option })),
-    page: 2,
-  },
+  // {
+  //   id: "sectionAttending",
+  //   text: "Are you part of the French or International Section?",
+  //   type: "select",
+  //   optional: true,
+  //   options: ["French", "International"].map(option => ({ value: option, label: option })),
+  //   page: 2,
+  // },
 
   // Page 3
   {
@@ -103,7 +103,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
     schoolAttending: schoolInfo.schoolDisplayName,
     schoolId: schoolInfo.schoolId,
     graduationYear: '',
-    sectionAttending: '',
+    // sectionAttending: '',
     areasOfInterest: [],
     userSkills: [],
     collegeDecision: '',
@@ -195,17 +195,18 @@ const SchoolInfo = ({ selectedOptions, handleChange, highSchoolerData }) => {
   return (
     <div className='onboardingQuestions' style={{width: "500px"}}>
       {questionsForPage.map((question) => (
-        (question.id === "sectionAttending") ?
-        highSchoolerData.schoolAttending === "Awty International School" &&
+        // (question.id === "sectionAttending") ?
+        // highSchoolerData.schoolAttending === "Awty International School" &&
+        // <OnboardingDropdown
+        //   key={question.id}
+        //   question={question.text}
+        //   options={question.options}
+        //   selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+        //   onChange={(label) => handleChange(question.id, label)}
+        //   type={question.type}
+        // />
+        // : 
         <OnboardingDropdown
-          key={question.id}
-          question={question.text}
-          options={question.options}
-          selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-          onChange={(label) => handleChange(question.id, label)}
-          type={question.type}
-        />
-        : <OnboardingDropdown
           key={question.id}
           question={question.text}
           options={question.options}
