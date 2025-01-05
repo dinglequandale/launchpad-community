@@ -453,7 +453,7 @@ function ApplicantInfo({handleDropdownChange}){
                   name={question.id}
                   value={organizationData[question.id]}
                   onChange={handleChange}
-                  maxLength={question.maxLength}
+                  // maxLength={question.maxLength}
                   placeholder={question.placeholder}
                 ></textarea>
               </div>

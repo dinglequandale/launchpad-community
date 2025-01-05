@@ -122,24 +122,9 @@ export const displayColleges = (colleges, length = "longer") => {
         // Check for known abbreviations
         if (abbreviations[name]) return abbreviations[name];
 
-        // Handle "University of" cases
-        // if (name.startsWith("The University of ")) {
-        //     const parts = name.split(" ");
-        //     if (parts.length > 3) {
-        //         return parts.slice(2).map(word => word[0]).join("");
-        //     }
-        //     return parts[2];
-        // }
-
         // Remove common suffixes
         name = name.replace(/(University|College|Institute of Technology|The University of)/gi, "").trim();
         return name;
-        // For other cases, return the first word or up to two words if they're short
-        const words = name.split(" ");
-        if (words.length === 1 || (words.length === 2 && words.every(word => word.length <= 5))) {
-            return name;
-        }
-        return words[0];
     };
 
     const listLength = length === "shorter" ? 2 : colleges.length;
@@ -168,7 +153,11 @@ const getUserHS = (schoolName) => {
 
 
 export const getBasicUserDescription = (userData, shortened=true) => {
-    return userData.userType === "High Schooler" ? `Class of ${userData.graduationYear}, ${getUserHS(userData.schoolAttending)}` : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear} from ${getUserHS(userData.schoolAttending)}` : `${userData.yearsOfExperience}+ Years of Experience in ${shortened ? userData.areasOfInterest[0] : displayFieldsOfInterest(userData.areasOfInterest)}`;
+    return userData.userType === "High Schooler" ?
+     `Class of ${userData.graduationYear}, ${getUserHS(userData.schoolAttending)}` 
+     : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${getUserHS(userData.schoolAttending)}` 
+     : `${userData.yearsOfExperience}+ Years of Experience in ${shortened ? userData.areasOfInterest[0] 
+        : displayFieldsOfInterest(userData.areasOfInterest)}`;
 }
 
 export const editUserData = async (newData, currentUser, origUserData) => {

@@ -84,7 +84,7 @@ export default function SkillModal({visibility, onClose, userData}) {
             
             <div className="close-skills" onClick={onClose}><IoCloseOutline size={30} /></div>
             <header>
-                <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Introduce your Skill Set <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress Professionals and Secure Internships</span></h2>
+                <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Introduce your Skill Set <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress professionals and secure internships</span></h2>
                 <hr style={{borderColor: "var(--secondary)"}}/>
             </header>
             

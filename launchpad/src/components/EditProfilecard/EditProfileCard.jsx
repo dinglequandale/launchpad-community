@@ -410,7 +410,7 @@ function ResumeUpload(){
   
     return (
     <>
-        {!pdfUrl && <span style={{fontWeight: "250", fontSize: "15px"}}>Upload a resume so others can understand more about your experiences.</span>} 
+        {!pdfUrl && <span style={{fontWeight: "250", fontSize: "15px"}}>Showcase your experiences and achievements to make a good first impression</span>} 
         <div className="pdf-viewer-container" style={{paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative"}}>
             {pdfUrl ? 
             <>
@@ -486,7 +486,7 @@ function BasicInfoCard({descType}){
     useEffect(()=>{
         setBasicInfoContent({userPreface: getBasicUserDescription(userData, false),
         userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
-        userSecondDesc: `${descType}: ${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : displayColleges([...userData.collegeInterestsOrDecision])}`,
+        userSecondDesc: `${descType}: ${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`,
         acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
     })
     },[userData])
@@ -609,7 +609,7 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
           >
             {getOpportunityOptions()}
             
-            <hr className="divider" />
+            <hr className="divider" style={{width: "45%", marginTop: "6px",marginBottom: "6px"}}/>
             
             <div 
               className={`add-button ${isHovered ? 'subtle-hover' : ''}`}
@@ -650,7 +650,7 @@ function AboutMeDisplay(){
         <div className="aboutMe" style={{paddingTop: "20px"}}>
             <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me</span> <br />
 
-            {!aboutMe && <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with who do you want to connect?</span>}
+            {!aboutMe && <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with whom do you want to connect?</span>}
             <div className="addOne" id="About Me" onClick={()=>{setAboutMeModalVisibility(true)}}>
                 
                 {!aboutMe && <>

@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { GrAdd } from "react-icons/gr";
 import Modal from "react-modal";
 
-export default function InviteContactsModal({visibility, onClose}){
+export default function InviteContactsModal({visibility, onClose,tenantId}){
 
     // const [targetUserData, setTargetUserData] = useState([{userName: "", email: ""}]);
     const [targetUserData,setTargetUserData] = useState([{id: 0, userName: "", email: ""}])
@@ -72,7 +72,7 @@ export default function InviteContactsModal({visibility, onClose}){
             contentLabel="Invite Contacts Modal"
           >
             <header>
-              <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Invite Friends, Family, Colleagues, ... <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Help grow our community!</span></h2>
+              <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Help Grow the {tenantId} Network <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}> Invite Friends, Family, and Colleagues </span></h2>
               <hr style={{borderColor: "var(--secondary)"}}/>
             </header>
             <main style={{paddingTop: "10px", display: "flex", flexDirection: "column", gap: "7px"}}>
@@ -92,7 +92,7 @@ export default function InviteContactsModal({visibility, onClose}){
                   <button onClick={onClose} className="btnUnfilled" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger"}}>
                       Cancel</button>
                   <button onClick={onInviteSend} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-                      Send it!</button>
+                      Send</button>
                 </div>
             </footer>
           </Modal>

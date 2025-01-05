@@ -46,7 +46,10 @@ function GlobalAuthWrapper() {
                 return;
               }
               
-              if(!basicUserInfo){packageBasicUserInfoToLS(doc.data())};
+              // if(!basicUserInfo){packageBasicUserInfoToLS(doc.data())};
+              //IMPORTANT: Switch back later
+              packageBasicUserInfoToLS(doc.data());
+              
               console.log(basicUserInfo);
             });
             

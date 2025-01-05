@@ -18,18 +18,33 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
             case "Alumni":
                 return "Attending College";
             case "Professional":
-                return "Current Position";
+                return "Job";
             default:
                 return "";
         }
     }
 
     // TODO: change to userData
+    const basicInfoContent = {
+        userPreface: userType === "Alumni" ? getBasicUserDescription(userData) :  getBasicUserDescription(userData).split(' in ')[0],
+        userFirstDesc: {
+            label: userType !== "Professional" ? "Interests" : "Expertise",
+            content: (userData.areasOfInterest && userData.areasOfInterest.length > 0) 
+                ? displayFieldsOfInterest(userData.areasOfInterest, "shorter") 
+                : displayFieldsOfInterest(userData.areasOfInterest, "shorter")
+        },
+        userSecondDesc: {
+            label: descType(),
+            content: userType === "Professional" 
+                ? (userData.industryPosition ? userData.industryPosition : "None")
+                : userType === "Alumni" 
+                    ? displayColleges([userData.collegeAttending], "shorter")
+                    : (Array.isArray(userData.collegeInterestsOrDecision) 
+                        ? displayColleges([...userData.collegeInterestsOrDecision], "shorter")
+                        : displayColleges([userData.collegeInterestsOrDecision]))
+        }
+    }
 
-    const basicInfoContent ={userPreface:getBasicUserDescription(userData),
-    userFirstDesc: `${userType !== "Professional" ? "Interests" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "shorter") : displayFieldsOfInterest(userData.areasOfInterest, "shorter")}`,
-    userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition ? (userData.industryPosition) : "None") : userType === "Alumni" ? displayColleges([userData.collegeAttending], "shorter") : (Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision], "shorter") : displayColleges([userData.collegeInterestsOrDecision]))}`,
-}
 
     return(
         <>
@@ -40,9 +55,20 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
             </button>
             <div className='basicInfo'>
                 <div>
-                    {userData.userPfpPreview ? <img className="pfpImage" src={userData.userPfpPreview} alt="" style={
-                {width: "60px", height: "60px"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
-                    {width: "60px", height: "60px"}}/>}
+                {userData.userPfpPreview ? (
+                    <img 
+                        className="pfpImage" 
+                        src={userData.userPfpPreview} 
+                        alt="" 
+                    />
+                ) : (
+                    <img 
+                        className="pfpImage" 
+                        src="/assets/placeholder_pfp.png" 
+                        alt="" 
+                        style={{ boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.2)" }} 
+                    />
+                )}
                 </div>
                 <div className='cardNameDescription'>
                     <span className='cardName'>{displayShortenedName(userData.userName)}</span>
@@ -51,11 +77,11 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                 </div>
                 <div style={{display: "flex"}}>
                 <div className='userInfo' style={{fontSize: "16px"}}>
-                    <span>{basicInfoContent.userFirstDesc}</span>
-                    <span>{basicInfoContent.userSecondDesc}</span>
+                    <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userFirstDesc.label}</strong>: {basicInfoContent.userFirstDesc.content}</span>
+                    <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userSecondDesc.label}</strong>: {basicInfoContent.userSecondDesc.content}</span>
                 </div>
             </div>
-            <button className="btnConnect" style={{width: "80%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "10px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
+            <button className="btnConnect" style={{width: "88%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "15px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={22}/>
                     <span>Connect</span>

@@ -61,7 +61,7 @@ export default function UserNetwork() {
     }
   }
 
-  const { userType } = JSON.parse(localStorage.getItem("basicUserInfo"));
+  const { userType,isCommitted } = JSON.parse(localStorage.getItem("basicUserInfo"));
   const [filters, setFilters] = useState({
     userType: 'Any User',
     collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
@@ -72,7 +72,7 @@ export default function UserNetwork() {
 
   const filterContent = {
     userType: ["Any User", "High Schoolers", "College Students", "Professionals"],
-    collegeInterestsOrDecision: userType === "High Schooler" ? ["Any College", "My Dream Colleges"] : null,
+    collegeInterestsOrDecision: userType === "High Schooler" ? (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]) : null,
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
     // schoolAttending: ["Any High School", "My High School"]
   };
