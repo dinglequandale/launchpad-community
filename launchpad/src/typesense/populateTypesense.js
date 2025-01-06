@@ -10,17 +10,25 @@ const db = getFirestore();
 const readFirestoreData = async (collectionName, tenantId = null) => {
   try {
     let docsRef;
-    
     if (tenantId) {
-      // For tenant-specific collections, use a subcollection structure
       docsRef = db.collection('tenants').doc(tenantId).collection(collectionName);
     } else {
-      // For shared collections (like colleges), use the root collection
       docsRef = db.collection(collectionName);
     }
-    
+
     const snapshot = await docsRef.get();
-    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const data = snapshot.docs.map(doc => {
+      const docData = { id: doc.id, ...doc.data() };
+
+      if (collectionName === "opportunities") {
+        docData.organizationHostCompany = docData.organizationHostCompany || "";
+        docData.applicantPosition = docData.applicantPosition || "";
+        docData.organizationName = docData.organizationName || "";
+        docData.organizationMission = docData.organizationMission || "";
+      }
+      return docData;
+    });
+
     return data;
   } catch (error) {
     console.error('Error reading Firestore data: ', error);
@@ -85,6 +93,16 @@ const readFirestoreData = async (collectionName, tenantId = null) => {
         },
         {
           name: "organizationMission",
+          type: "string",
+          facet: false,
+        },
+        {
+          name: "organizationHostCompany",
+          type: "string",
+          facet: false,
+        },
+        {
+          name: "applicantPosition",
           type: "string",
           facet: false,
         },
