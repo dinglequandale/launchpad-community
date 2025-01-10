@@ -4,7 +4,7 @@ import SearchBar from "../../components/Searchbar/SearchBar";
 import SideNav from "../../components/Sidenav/SideNav";
 import TopBar from "../../components/Topbar/TopBar";
 import OrganizationProfile from "../../components/Organizationprofile/OrganizationProfile";
-import NoResults, { EmptyField } from "../../components/NoResultsnotifier/NoResults";
+import { EmptyField } from "../../components/NoResultsnotifier/NoResults";
 import Loading from "../../components/LoadingAnimation/Loading";
 import { getFilteredData } from "../../services/filteringServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
@@ -13,7 +13,6 @@ import ProfileModal from "../../components/Profilemodal/ProfileModal"
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-// import { collection, getDocs, limit, query } from "firebase/firestore";
 import { auth } from "../../firebase/firebaseConfig";
 
 const filterContent = {
