@@ -77,32 +77,23 @@ export default function Organizations(){
         if (!isSearching && !loading) {
             setLoading(true);
             if(isInitial){setInitLoading(true)};
-
+    
             try {
-                const { results, lastVisible } = await getFilteredData(
+                const { results } = await getFilteredData(
                     'opportunities',
                     filters,
                     currentUser.uid,
                     null,
-                    isInitial ? null : lastDoc,
-                    isInitial ? 10 : 5 // adjust this number as needed
+                    null,
+                    50
                 );
-                setlastDoc(lastVisible);
-                setHasMore(lastVisible !== null);
-                if(isInitial){
-                    setInitLoadLength(results.length);
-                }
-
-                setOrganizationsData(prevData => 
-                    isInitial ? results : [...prevData, ...results]
-                );
+    
+                setOrganizationsData(results);
             } catch (error) {
                 console.error("Error fetching opportunities:", error);
             } finally {
                 setLoading(false);
                 setInitLoading(false);
-
-                console.log(organizationsData)
             }
         }
     };
