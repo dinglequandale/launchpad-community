@@ -34,7 +34,7 @@ export default function SideNav({show}){
 
     return(
         <div className='sideNav'>
-            <img src="https://thebuzzmagazines.com/sites/default/files/events/2021/08/awty_logo_sep16.jpg" alt="school-logo" className='schoollogo' />
+            <img src="/assets/awty_school.png" alt="school-logo" className='schoollogo' />
             <div className='navOptions'>
                 {navList.map(([icon, label, path], index) => (
                     <Link to={path} style={{ color: 'inherit' }}>
