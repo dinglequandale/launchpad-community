@@ -10,8 +10,6 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     const filterOperations = await Promise.all(Object.entries(filters).map(async ([key, value]) => {
     if (value && (Array.isArray(value) || !value.startsWith('Any'))) {
         if (key === "areasOfInterestOrExpertise") {
-          // const dataType = value;
-          //   const userInterests = await getUserData(dataType, currentUserId);
           const userInterestsExtended = getExtendedInterests(userInterests);
           
           if (collectionName === "opportunities") {
@@ -61,40 +59,31 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
       q = query(q, orderBy('userName'));
 
       // Apply pagination
-      if (lastDoc) {
-          q = query(q, startAfter(lastDoc));
-      }
+      if (lastDoc) q = query(q, startAfter(lastDoc));
+
       q = query(q, limit(maxLimit));
     }
     else{
-
-      // Add ordering to ensure consistent pagination
-      q = query(q, orderBy('createdAt'));
-
-      if (lastDoc) {
-          q = query(q, startAfter(lastDoc));
-      }
+      if (lastDoc) q = query(q, startAfter(lastDoc));
+  
       q = query(q, limit(maxLimit));
     }
-    
 
     const querySnapshot = await getDocs(q);
     const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
     // sort results by relevance
     try{
-    const originalInterests = new Set(userInterests);
-    results.sort((a, b) => {
-      const aMatches = a.organizationTags.filter(tag => originalInterests.has(tag)).length;
-      const bMatches = b.organizationTags.filter(tag => originalInterests.has(tag)).length;
-      return bMatches - aMatches; // descending order
-    });
+      const originalInterests = new Set(userInterests);
+      results.sort((a, b) => {
+        const aMatches = a.organizationTags.filter(tag => originalInterests.has(tag)).length;
+        const bMatches = b.organizationTags.filter(tag => originalInterests.has(tag)).length;
+        return bMatches - aMatches; // descending order
+      });
     }catch{}
 
     const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
-  
     return {results, lastVisible};
-  
   }  
 
 const getUserData = async (dataType, currentUserId) => {
