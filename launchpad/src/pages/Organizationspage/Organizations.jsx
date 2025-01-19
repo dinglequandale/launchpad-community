@@ -85,7 +85,7 @@ export default function Organizations(){
                     currentUser.uid,
                     null,
                     null,
-                    50
+                    10
                 );
     
                 setOrganizationsData(results);

@@ -86,7 +86,7 @@ export default function InitializeStream() {
       <>
       <TopBar/>
       <SideNav/>
-      <div style={{paddingTop: "4%", paddingLeft: "10%"}}>
+      <div style={{paddingTop: "3%", paddingLeft: "10%"}}>
         <CustomChat client={chatClient} channels={channels} initialActiveChannel={activeChannel} filters={filters}/>
       </div>
       </>

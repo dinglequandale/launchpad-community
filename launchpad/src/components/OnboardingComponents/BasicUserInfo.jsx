@@ -150,7 +150,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
             accept=".pdf"
             style={{display: 'none'}}
           />
-        <div style={{zIndex: "1", height: "130px", top: "6px", opacity: ".9", backgroundColor: "var(--primary)", display: linkedInOptionSelected ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}><input
+        <div style={{zIndex: "1", height: "150px", top: "6px", opacity: ".9", backgroundColor: "var(--primary)", display: linkedInOptionSelected ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}><input
               type="link"
               onChange={(e) => handleChange("linkedinLink", e.target.value)}
               placeholder="Paste your LinkedIn profile link here"

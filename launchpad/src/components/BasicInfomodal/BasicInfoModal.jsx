@@ -44,7 +44,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     },
     {
       id: "graduationYear",
-      text: "What year did you graduate?",
+      text: "What year did you graduate high school?",
       type: "number",
       userTypeIncluders: ["Alumni"],
       required: true,
@@ -74,14 +74,14 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       userTypeIncluders: ["High Schooler"],
       required: true,
     },
-    {
-      id: "acceptedColleges",
-      text: "What colleges have you been accepted into?",
-      type: "multi-select",
-      options: [],
-      userTypeIncluders: ["High Schooler", "Alumni"],
-      required: false,
-    },
+    // {
+    //   id: "acceptedColleges",
+    //   text: "What colleges have you been accepted into?",
+    //   type: "multi-select",
+    //   options: [],
+    //   userTypeIncluders: ["High Schooler", "Alumni"],
+    //   required: false,
+    // },
     {
       id: "collegeAttending",
       text: "What college are you attending?",
@@ -109,7 +109,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     },
     {
       id: "industryPosition",
-      text: "What is/was your highest position?",
+      text: "What is your current or most recent position?",
       type: "text",
       placeholder: "",
       userTypeIncluders: ["Professional"],
@@ -208,7 +208,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
         shouldCloseOnEsc={false}
       >
         <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px", color: "var(--secondary)", lineHeight: "1.2"}}> My Introduction <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Enlighten us with your {userType==="Professional" ? "expertise" : "interests"} and {userType==="Professional" ? "work experience" : userType==="Alumni" ? "accepted colleges" : "dream colleges"}!</span></h2>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px", color: "var(--secondary)", lineHeight: "1.2"}}> My Introduction <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Enlighten us with your {userType==="Professional" ? "expertise" : "interests"} and {userType==="Professional" ? "work experience" : userType==="Alumni" ? "education" : "dream colleges"}!</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{paddingTop: "20px"}}>

@@ -112,7 +112,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
           <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Join {userData.userName}'s {userType === "Professional" ? "Opportunity" : "Initiative"} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Send an Introductory Message</span></h2>}
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
-        <main style={{ display: "flex", flexDirection: "column", gap: "7px", width: "100%", justifyContent: "center", alignItems: "center"}}>
+        <main style={{ display: "flex", flexDirection: "column", gap: "7px", width: "600px", overflow: "clip"}}>
             <div style={{display: "flex", flexDirection: "column", gap: "5px", padding: "15px 5px"}}>
               <span style={{fontSize: "18px"}}>
                 <span style={{fontWeight: "550", fontSize: "18px"}}>Email:</span>
@@ -123,7 +123,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
                 &nbsp;<Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link>
               </span>}
             </div>
-            {sendDirectMessage && (<div style={{display: "flex", flexDirection: "column"}}>
+            {sendDirectMessage && (<div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
             <textarea className='inputIntroMessage' placeholder='Introduce yourself!' onChange={e => handleIntroChange(e.target.value)} value={introMessage} style={{width: "500px", height: "180px"}}></textarea>
             <div style={{margin: "0 auto", paddingTop: "15px"}}>
                 <input type="checkbox" checked={sendWithResume} onChange={()=>setSendWithResume(!sendWithResume)}/>

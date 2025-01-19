@@ -51,7 +51,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     }
 
     const basicInfoContent = {userPreface: getBasicUserDescription(userData, false),
-    userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest) : displayFieldsOfInterest(userData.areasOfInterest)}`,
+    userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : displayFieldsOfInterest(userData.areasOfInterest, "longer")}`,
     userSecondDesc: `${descType()}: ${userType === "Professional" ? (userData.industryPosition + " at " + userData.companyName) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`,
     acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
 };
@@ -104,7 +104,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 {(userData.acceptedColleges && userData.acceptedColleges.length > 0) && <span>{basicInfoContent.acceptedColleges}</span>}
                             </div>
                         </div>
-                        <button className='btnConnect' style={{width: "80%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(userData.userId)}> 
+                        <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(userData.userId)}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>

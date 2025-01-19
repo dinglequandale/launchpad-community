@@ -335,7 +335,7 @@ function ContactInformation(){
         <>
         <div style={{marginTop: "10px"}}>
         <span style={{fontSize: "20px", fontWeight: "bolder"}}>Contact Information</span><br />
-        <span style={{color: "#5a696e", fontSize: "15px"}}>Add an email or LinkedIn where Awty students, alumni, and professionals can reach you. Link your LinkedIn so others can easily learn more about you.</span>
+        <span style={{color: "#5a696e", fontWeight: "300", fontSize: "15px"}}>Add an email or LinkedIn where Awty students, alumni, and professionals can reach you. Link your LinkedIn so others can easily learn more about you.</span>
         </div>
         {linkedInModalVisibility && <LinkedinModal userData ={userData} visibility ={linkedInModalVisibility} onClose={() => setLinkedInModalVisibility(false)}/>}
         {emailModalVisibility && <EmailModal userData={userData} visibility={emailModalVisibility} onClose={() => setEmailModalVisibility(false)}/>}
@@ -410,7 +410,7 @@ function ResumeUpload(){
   
     return (
     <>
-        {!pdfUrl && <span style={{fontWeight: "250", fontSize: "15px"}}>Showcase your experiences and achievements to make a good first impression</span>} 
+        {!pdfUrl && <span style={{fontWeight: "250", fontSize: "15px"}}>{userData.userType !== "Professional" ? "Showcase your experiences to make a good first impression." : "Add your resume so others can understand your experiences in depth."}</span>} 
         <div className="pdf-viewer-container" style={{paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative"}}>
             {pdfUrl ? 
             <>

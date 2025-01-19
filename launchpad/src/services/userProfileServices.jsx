@@ -26,7 +26,7 @@ export const displayShortenedName = (userName) => {
     return userName;
 }
 
-export const displayFieldsOfInterest = (fieldsOfInterest, length = "longer") => {
+export const displayFieldsOfInterest = (fieldsOfInterest, length = "shorter") => {
     const abbreviations = {
         "Mathematics": "Math",
         "Business Management": "Business",
@@ -67,7 +67,7 @@ export const displayFieldsOfInterest = (fieldsOfInterest, length = "longer") => 
     };
 
     const listLength = length === "shorter" ? 2 : fieldsOfInterest.length;
-    const currentList = fieldsOfInterest.slice(0, listLength).map(shortenFieldName);
+    const currentList = (length === "shorter") ? fieldsOfInterest.slice(0, listLength).map(shortenFieldName) : fieldsOfInterest.slice(0, listLength);
 
     if (currentList.length === 1) {
         return currentList[0];

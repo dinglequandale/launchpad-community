@@ -68,7 +68,7 @@ export default function EmailModal({userData, visibility, onClose}){
       >
         <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
         <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Email <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>{userData.userType === "High Schooler" ? "Showcase who you are and what you're capable of!" : "Show our students who you are and what you do!"}</span></h2>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Input Your Email <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Connect with the Awty Network</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{paddingTop: "10px"}}>
@@ -76,17 +76,17 @@ export default function EmailModal({userData, visibility, onClose}){
         {userData.email ? 
         <>
           <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
-            <span style={{color: "var(--secondary)", fontSize: "19px"}}>Paste your new email:</span>
-            <input style={{width: "300px", margin: "auto"}} placeholder='Paste the link here!' value={newEmail} onChange={(e) => setNewEmail(e.target.value)}/>
+            <span style={{color: "var(--secondary)", fontSize: "19px"}}>Input your new email:</span>
+            <input style={{width: "300px", margin: "auto"}} placeholder='Paste your email here' value={newEmail} onChange={(e) => setNewEmail(e.target.value)}/>
           </div>
             <br />
             <span style={{color: "var(--secondary)", fontSize: "19px"}}>Current Email: <br /> <Link onClick={() => window.open(userData.email, '_blank', 'noopener,noreferrer')}>{userData.email}</Link></span>
         </>
         :
         <>
-        <span style={{color: "var(--secondary)", fontSize: "19px"}}>Input your Email below:</span>
+        <span style={{color: "var(--secondary)", fontSize: "19px"}}>Input your email below:</span>
         <div style={{display: "flex", justifyContent: "center", alignItems: "center", marginTop: "10px"}}>
-            <input style={{width: "300px", margin: "auto"}} placeholder='Paste the link here!' value={newEmail} onChange={(e) => setNewEmail(e.target.value)}/>
+            <input style={{width: "300px", margin: "auto"}} placeholder='Paste your email here' value={newEmail} onChange={(e) => setNewEmail(e.target.value)}/>
         </div>
         </>}
         </form>

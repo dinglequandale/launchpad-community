@@ -65,7 +65,9 @@ export default function Onboarding() {
         <div className='onboarding-container'>
             {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
             <div className='onboarding-body'>
-            <header style={{marginBottom: "1.5rem"}}>
+            {!showComponent && <div style={{position: "absolute", top: "45px", width: "70vw", left: "0", right: "0", marginLeft: "auto", marginRight: "auto", textAlign: "center"}}><span style={{fontSize: "30px"}}>Join your school’s digital network of students, parents, and alumni</span></div>}
+            <header style={{marginBottom: "1.5rem", position: "relative"}}>
+            
                 <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
                     display: "flex", justifyContent: "center", alignItems: "center", height: "80px", padding: "10px 5px",  marginBottom: "17px"}}>
                     <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
