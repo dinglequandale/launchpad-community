@@ -21,10 +21,17 @@ export default function OrganizationProfile({organizationData, location, handleS
     const descRef = useRef();
     const [userData, setUserData] = useState(null);
 
+    const getName = () => {
+        if (organizationData.organizationName)
+            return organizationData.organizationName;
+
+        return `${organizationData.applicantPosition} at ${organizationData.organizationHostCompany}`;
+    }
+
     const organizationProfileData = {
-        organizationName: organizationData.organizationName ?? (organizationData.applicantPosition ? `${organizationData.applicantPosition} at ${organizationData.organizationHostCompany}` : organizationData.organizationHostCompany),
-        organizationType : organizationData.organizationType,
-        organizationHost : organizationData.organizationHostCompany ?? organizationData.organizationHostStudent,
+        organizationName: getName(),
+        organizationType: organizationData.organizationType,
+        organizationHost: organizationData.organizationHostCompany ?? organizationData.organizationHostStudent,
         organizationDescription: organizationData.applicantExpectations ?? organizationData.organizationMission,
         organizationLogistics: organizationData.isPaid ? [organizationData.isPaid,organizationData.applicants, organizationData.workLocation, organizationData.timeFrame] : null,
         organizationRelevanceTags: (organizationData.organizationTags && organizationData.organizationTags.length > 0) ? displayFieldsOfInterest(organizationData.organizationTags) : organizationData.applicantFieldOfWork ? (organizationData.applicantFieldOfWork + ", " + organizationData.applicantPosition) : null,

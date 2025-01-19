@@ -4,7 +4,7 @@ import SearchBar from "../../components/Searchbar/SearchBar";
 import SideNav from "../../components/Sidenav/SideNav";
 import TopBar from "../../components/Topbar/TopBar";
 import OrganizationProfile from "../../components/Organizationprofile/OrganizationProfile";
-import NoResults, { EmptyField } from "../../components/NoResultsnotifier/NoResults";
+import { EmptyField } from "../../components/NoResultsnotifier/NoResults";
 import Loading from "../../components/LoadingAnimation/Loading";
 import { getFilteredData } from "../../services/filteringServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
@@ -13,7 +13,6 @@ import ProfileModal from "../../components/Profilemodal/ProfileModal"
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-// import { collection, getDocs, limit, query } from "firebase/firestore";
 import { auth } from "../../firebase/firebaseConfig";
 
 const filterContent = {
@@ -78,32 +77,23 @@ export default function Organizations(){
         if (!isSearching && !loading) {
             setLoading(true);
             if(isInitial){setInitLoading(true)};
-
+    
             try {
-                const { results, lastVisible } = await getFilteredData(
+                const { results } = await getFilteredData(
                     'opportunities',
                     filters,
                     currentUser.uid,
                     null,
-                    isInitial ? null : lastDoc,
-                    isInitial ? 10 : 5 // adjust this number as needed
+                    null,
+                    50
                 );
-                setlastDoc(lastVisible);
-                setHasMore(lastVisible !== null);
-                if(isInitial){
-                    setInitLoadLength(results.length);
-                }
-
-                setOrganizationsData(prevData => 
-                    isInitial ? results : [...prevData, ...results]
-                );
+    
+                setOrganizationsData(results);
             } catch (error) {
                 console.error("Error fetching opportunities:", error);
             } finally {
                 setLoading(false);
                 setInitLoading(false);
-
-                console.log(organizationsData)
             }
         }
     };

@@ -7,7 +7,7 @@ const searchDocuments = async (collectionName, searchText, tenantId) => {
     if (collectionName === 'opportunities') {
       searchParameters = {
         q: searchText,
-        query_by: 'organizationName,organizationType,organizationMission',
+        query_by: 'organizationName,organizationType,organizationMission,applicantPosition,organizationHostCompany',
         num_typos: 1, // Allow up to 1 typo
         filter_by: `tenantId:=${tenantId}`
       };
