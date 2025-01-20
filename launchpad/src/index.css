@@ -211,7 +211,7 @@ button {
 
 .btnText{
   background-color: transparent;
-  color: var(--accent);
+  color: var(--btnColor);
   text-decoration: underline;
   transition: color 0.3s ease;
   cursor: pointer;

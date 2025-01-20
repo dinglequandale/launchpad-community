@@ -13,6 +13,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import { saveOpportunity } from '../../../services/opportunityServices';
 import OnboardingDropdown from '../../OnboardingDropdown/OnboardingDropdown';
 import { careerInterests } from '../../../pages/Onboarding/Options';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
 const OpportunityContext = createContext({
   organizationData: {},
@@ -83,6 +85,8 @@ const saveOpportunityData = async () => {
       organizationTags: [],
       applicantPosition: '',
       applicantExpectations: '',
+      startDate: '',
+      deadline: '',
       isPaid: 'Unpaid',
       applicants: 'All Education',
       workLocation: 'On-site',
@@ -132,15 +136,29 @@ const saveOpportunityData = async () => {
       id: "organizationType",
       text: "Workplace Opportunity Type:",
       type: "select",
-      options: ["Select Type", "Shadowing", "Internship", "Job", "Community Service"],
+      options: ["Select Type", "Shadowing", "Internship", "Community Service", "Job"],
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
       required: true,
       page: 1, 
     },
     {
+      id: "deadline",
+      text: "Workplace Opportunity Type:",
+      includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
+      required: false,
+      // page: 1, 
+    },
+    {
+      id: "startDate",
+      includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
+      required: false,
+      // page: 1, 
+    },
+    {
       id: "organizationHostCompany",
-      text: "Host Company / Organization:",
+      text: "Host company or organization:",
       type: "text",
+      placeholder: "e.g., \"ExxonMobil\”",
       maxLength: 40,
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
       required: true,
@@ -383,13 +401,79 @@ function OpportunityType(){
                   value={organizationData[question.id] ?? ''}
                   onChange={handleChange}
                   type="text"
+                  placeholder={question.placeholder}
                   style={{width: "42.8%"}}
                   maxLength={question.maxLength}
                 />)}
           </div>
         ))}
+        <ApplicantionTimeline/>
       </div>
     </main>
+    </>
+  )
+}
+
+function ApplicantionTimeline() {
+  const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(OpportunityContext);
+
+  // const { startDate, setStartDate } = useState(new Date());
+
+  const [ startDateDisabled, setStartDateDisabled ] = useState(organizationData.startDate === null);
+  const [ deadlineDisabled, setDeadlineDisabled ] = useState(organizationData.deadline === null);
+  
+
+  const handleDatesChanged = (date, dateType) => {
+    setOrganizationData({...organizationData, [dateType]: date});
+    // console.log(date.toLocaleDateString('en-US')); 
+  }
+
+  const handleNoStartDate = (event) => {
+    event.preventDefault();
+    setStartDateDisabled(!startDateDisabled);
+    setOrganizationData({...organizationData, startDate: null});
+  }
+
+  const handleNoDeadlineDisabled = (event) => {
+    event.preventDefault();
+    setDeadlineDisabled(!deadlineDisabled);
+    setOrganizationData({...organizationData, deadline: deadlineDisabled ? "" : null});
+  }
+
+  return(
+    <>
+      <div style={{display: "flex", alignItems: "center", gap: "50px", justifyContent: "center"}}>
+        <div style={{display: "flex", flexDirection: "column", position: "relative"}}>
+          <label style={{marginBottom: "2px"}}>Enter your application deadline:</label>
+          <DatePicker 
+            selected={organizationData.deadline} 
+            onChange={(date)=>handleDatesChanged(date, "deadline")}
+            placeholderText="Select a date"
+            customInput={<input style={{ width: '94%' }} />}
+          />
+          <div style={{zIndex: "10", height: "70px", top: "6px", opacity: ".6", backgroundColor: "white", display: deadlineDisabled ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}></div>
+          <div style={{paddingTop: "8px", textAlign: "center"}}>
+            <button className='btnText' onClick={handleNoDeadlineDisabled} style={{fontSize: "17px", opacity: ".75", color: deadlineDisabled ? "var(--highlight)" : ""}}>
+              I don't have an application deadline
+            </button>
+          </div>
+        </div>
+        <div style={{display: "flex", flexDirection: "column", position: "relative"}}>
+          <label style={{marginBottom: "2px"}}>Enter your application deadline:</label>
+          <DatePicker 
+            selected={organizationData.startDate} 
+            onChange={(date)=>handleDatesChanged(date, "startDate")}
+            placeholderText="Select a date"
+            customInput={<input style={{ width: '94%' }} />}
+          />
+          <div style={{zIndex: "10", height: "70px", top: "6px", opacity: ".6", backgroundColor: "white", display: startDateDisabled ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}></div>
+          <div style={{paddingTop: "8px", textAlign: "center"}}>
+            <button className='btnText' onClick={handleNoStartDate} style={{fontSize: "17px", opacity: ".75", color: startDateDisabled ? "var(--highlight)" : ""}}>
+              I don't have a set start or end date
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   )
 }
