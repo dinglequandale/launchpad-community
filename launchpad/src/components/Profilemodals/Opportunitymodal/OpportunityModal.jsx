@@ -42,11 +42,11 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
     applicantPosition: '',
     applicantExpectations: '',
     isPaid: 'Unpaid',
-    applicants: 'All Education',
+    applicants: 'High Schoolers/Alumni',
     workLocation: 'On-site',
     timeFrame: 'One Week',
-    learnMore: 'Messages',
-    apply: 'Messages',
+    learnMore: 'Website',
+    apply: 'Email',
     organizationLogoPreview: null,
     createdByUserName: "",
   });
@@ -88,11 +88,11 @@ const saveOpportunityData = async () => {
       startDate: '',
       deadline: '',
       isPaid: 'Unpaid',
-      applicants: 'All Education',
+      applicants: 'High Schoolers/Alumni',
       workLocation: 'On-site',
       timeFrame: 'One Week',
-      learnMore: 'Messages',
-      apply: 'Messages',
+      learnMore: 'Website',
+      apply: 'Email',
       organizationLogoPreview: null,
       createdByUserName: "", createdByUserName: userName});
 
@@ -130,6 +130,23 @@ const saveOpportunityData = async () => {
         return "Applicant"
     }
   }
+  
+  const getPositionTitlePlaceholder = () => {
+    switch(organizationData.organizationType){
+      case "Internship":
+        return "Data Analyst Intern";
+      case "Job":
+        return "Waiter";
+      case "Community Service":
+        return "Fundraiser Volunteer";
+      case "Shadowing":
+        return "Cybersecurity Shadow";
+      default:
+        return ""
+    }
+  }
+
+
   const organizationQuestionsConfig = [
     // Page 1
     {
@@ -168,7 +185,7 @@ const saveOpportunityData = async () => {
     // Page 2
     {
       id: "organizationTags",
-      text: `${organizationData.organizationType} Fields of Work`,
+      text: `${getApplicantType()}'s Field(s) of Work`,
       type: "multi-select",
       includers: ["Internship", "Shadowing", "Job", ""],
       required: true,
@@ -177,20 +194,20 @@ const saveOpportunityData = async () => {
     },
     {
       id: "applicantPosition",
-      text: `${organizationData.organizationType} Position`,
+      text: `${organizationData.organizationType === "Community Service" ? "Volunteering" : organizationData.organizationType} Position Title`,
       type: "text",
       maxLength: 40,
-      placeholder: 'e.g. "data analyst"',
+      placeholder: organizationData.organizationType ? `e.g., "${getPositionTitlePlaceholder()}"` : "",
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
       required: (orgType) => orgType !== "Community Service",
       page: 2, 
     },
     {
       id: "applicantExpectations",
-      text: `${organizationData.organizationType} Expectations`,
+      text: `${organizationData.organizationType} Description, Requirements, and Expectations`,
       type: "textarea",
       maxLength: 500,
-      placeholder: `Briefly describe the tools and knowledge the ${getApplicantType().toLowerCase()}(s) will need to succeed throughout this ${organizationData.organizationType && organizationData.organizationType.toLowerCase()} opportunity.`,
+      placeholder: `Briefly describe what the ${getApplicantType().toLowerCase()}(s) will do and the experience needed to succeed throughout this ${`${organizationData.organizationType && organizationData.organizationType.toLowerCase()} `}opportunity. You’ll have a chance to share a link to more details later.`,
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
       required: true,
       page: 2, 
@@ -217,18 +234,18 @@ const saveOpportunityData = async () => {
     },
     {
       id: "applicants",
-      text: "What is the level of education?",
+      text: "What type of students can apply?",
       type: "select",
-      options: ["High School / College", "High School", "College"],
+      options: ["High Schoolers/Alumni", "High Schoolers", "Alumni"],
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
       required: true,
       page: 3, 
     },
     {
       id: "timeFrame",
-      text: "What is the opportunity timeframe?",
+      text: "What is the opportunity’s duration?",
       type: "select",
-      options: ["One Week", "Two Weeks", "Three Weeks", "4+ Weeks", "6+ Weeks", "Indefinite"],
+      options: ["TBD","<1 Week", "1 Week", "2 Weeks", "3 Weeks", "4+ Weeks", "6+ Weeks", "Indefinite"],
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
       required: true,
       page: 3, 
@@ -237,7 +254,7 @@ const saveOpportunityData = async () => {
     // Page 4
     {
       id: "learnMore",
-      text: "Where would you like users to learn more about this opportunity?",
+      text: "Where can students find more information on this opportunity?",
       type: "link",
       placeholder: "Paste a link here!",
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
@@ -246,7 +263,7 @@ const saveOpportunityData = async () => {
     },
     {
       id: "apply",
-      text: `Where can students ${organizationData.organizationType === "Community Service" ? "volunteer" : "apply"} for this opportunity?`,
+      text: `How should ${organizationData.organizationType === "Community Service" ? "volunteer" : "apply"} for this opportunity?`,
       type: "link",
       placeholder: "Paste a link here!",
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
@@ -431,7 +448,7 @@ function ApplicantionTimeline() {
   const handleNoStartDate = (event) => {
     event.preventDefault();
     setStartDateDisabled(!startDateDisabled);
-    setOrganizationData({...organizationData, startDate: null});
+    setOrganizationData({...organizationData, startDate: startDateDisabled ? "" : null});
   }
 
   const handleNoDeadlineDisabled = (event) => {
@@ -444,7 +461,7 @@ function ApplicantionTimeline() {
     <>
       <div style={{display: "flex", alignItems: "center", gap: "50px", justifyContent: "center"}}>
         <div style={{display: "flex", flexDirection: "column", position: "relative"}}>
-          <label style={{marginBottom: "2px"}}>Enter your application deadline:</label>
+          <label style={{marginBottom: "2px"}}>Enter the application deadline:</label>
           <DatePicker 
             selected={organizationData.deadline} 
             onChange={(date)=>handleDatesChanged(date, "deadline")}
@@ -459,7 +476,7 @@ function ApplicantionTimeline() {
           </div>
         </div>
         <div style={{display: "flex", flexDirection: "column", position: "relative"}}>
-          <label style={{marginBottom: "2px"}}>Enter your application deadline:</label>
+          <label style={{marginBottom: "2px"}}>Enter the opportunity start date:</label>
           <DatePicker 
             selected={organizationData.startDate} 
             onChange={(date)=>handleDatesChanged(date, "startDate")}
@@ -552,7 +569,7 @@ function FinalInfo(){
   const { organizationData, setOrganizationData, organizationQuestionsConfig, setOrganizationLogo } = useContext(OpportunityContext);
   const logoRef = useRef();
   
-  const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
+  const learnMoreAndApplyOptions = [["Website", <CgWebsite size={20}/>], ["Email", <MdEmail size={20}/>], ["Messages", <LuMessagesSquare size={20}/>]];
   
   const [learnMoreType, setLearnMoreType] = useState("");
   const [applyType, setApplyType] = useState("");
