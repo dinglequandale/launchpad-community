@@ -47,11 +47,6 @@ export default function Organizations(){
         subjectMatter: 'Any Subject Matter'
     });
 
-    // useEffect(() => {
-    //     const orgData = getDocs(query(collection(db, "opportunities"), limit(10)));
-    //     console.log(orgData.docs);
-    // },[]);
-
     const handleConnectClick = (userData = null) => {
         if(userData){
             setConnectTargetUserId(userData.userId);
@@ -67,28 +62,37 @@ export default function Organizations(){
     
 
       useEffect(() => {
-        setOrganizationsData([]);
         setlastDoc(null);
         setHasMore(true);
-        fetchOpportunities(true);
+        const fetchInitial = async () => {
+            await fetchOpportunities();
+        }
+        fetchInitial();
     }, [filters]);
 
-    const fetchOpportunities = async (isInitial = false) => {
+    const fetchOpportunities = async (isInitial = true) => {
         if (!isSearching && !loading) {
             setLoading(true);
             if(isInitial){setInitLoading(true)};
     
             try {
-                const { results } = await getFilteredData(
+                const { results, lastVisible } = await getFilteredData(
                     'opportunities',
                     filters,
                     currentUser.uid,
                     null,
-                    null,
-                    10
+                    isInitial ? null : lastDoc,
+                    5
                 );
     
-                setOrganizationsData(results);
+                if(!isInitial){
+                    setOrganizationsData([...organizationsData, ...results])
+                }
+                else{
+                    setOrganizationsData(results);
+                    setInitLoadLength(results.length);
+                }
+                setlastDoc(lastVisible);
             } catch (error) {
                 console.error("Error fetching opportunities:", error);
             } finally {
@@ -99,21 +103,9 @@ export default function Organizations(){
     };
 
     const fetchMoreOpportunities = async () => {
-        if (loading || !hasMore || initLoadLength < 10) return;
-        fetchOpportunities(false);
+        if (loading || !hasMore || initLoadLength < 5) return;
+        await fetchOpportunities(false);
     };
-
-    const observer = useRef();
-    const lastOpportunityElementRef = useCallback(node => {
-        if (loading) return;
-        if (observer.current) observer.current.disconnect();
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) {
-                fetchMoreOpportunities();
-            }
-        });
-        if (node) observer.current.observe(node);
-    }, [loading, hasMore]);
 
 
     const handleEmailClick = async (email) => {
@@ -146,19 +138,6 @@ export default function Organizations(){
                 return;
         }
     }
-    
-    // const handleOnJoin = (organizationData, userData) => {
-    //     setTargetUserData(userData);
-    //     switch(organizationData.apply){
-    //         case "Messages":
-    //             handleConnectClick();
-    //         case "Email":
-    //             handleEmailClick();
-    //         default:
-    //             window.open(organizationData.apply, '_blank', 'noopener,noreferrer');
-
-    //     }
-    // }
 
 
     const handleShowProfile = (userData) => {
@@ -197,6 +176,10 @@ export default function Organizations(){
         }
     };
 
+    const onShowMoreClick = async () => {
+        await fetchMoreOpportunities();
+    }
+
     useEffect(() => {
         if (showPfpCard) {
           document.body.classList.add('modal-open');
@@ -205,7 +188,6 @@ export default function Organizations(){
         }
       }, [showPfpCard]);
 
-    // TODO: make these styles more dynamic
     const loadingStyles = {
         position: 'absolute',
         left: "50%",
@@ -224,7 +206,7 @@ export default function Organizations(){
             <div className='organizationsContainer' style={{paddingTop: "4%", paddingLeft: "10%"}}>
                 <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/> 
                 
-                <div style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "40px", paddingBottom: "40px", position: "relative", background: "var(--primary)"}}>
+                <main style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "20px", paddingBottom: "15px", position: "relative", background: "var(--primary)"}}>
                     {initLoading ?
                         <div style={loadingStyles}>
                             <Loading/>
@@ -233,7 +215,7 @@ export default function Organizations(){
                         
                         (<>
                         {organizationsData.map((organization, index)=>(
-                            <div ref={index === organizationsData.length - 1 ? lastOpportunityElementRef : null} key={index}>
+                            <div key={index}>
                                 <OrganizationProfile handleReferalClick={handleReferalClick} organizationData={organization} handleShowProfile={handleShowProfile} location={"organizations_page"}/>
                             </div>
                             ))}
@@ -246,9 +228,17 @@ export default function Organizations(){
                             <EmptyField/>
                         </div>
                         }
-                </div>
+                </main>
+                {(organizationsData.length % 5 === 0) && <footer style={{display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "25px"}}><ShowMoreButton onShowMoreClick={onShowMoreClick}/></footer>}
             </div>
         </>
         
     )
+}
+
+function ShowMoreButton({onShowMoreClick}){
+
+    return(<>
+        <button className="btnText" style={{fontSize: "25px"}} onClick={onShowMoreClick}>Show More...</button>
+    </>)
 }

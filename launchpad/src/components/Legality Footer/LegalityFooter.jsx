@@ -1,5 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
+import { SocialIcon } from "react-social-icons";
+import 'react-social-icons/instagram';
+import 'react-social-icons/youtube';
+
 export default function LegalityFooter({pathName}){
 
     const navigate = useNavigate();
@@ -10,14 +14,14 @@ export default function LegalityFooter({pathName}){
             <h3>Company</h3>
             <ul>
               <li><a href="#about">About Us</a></li>
-              <li><a href="#careers">Careers</a></li>
-              <li><a href="#press">Press</a></li>
+              {/* <li><a href="#careers">Careers</a></li> */}
+              {/* <li><a href="#press">Press</a></li> */}
             </ul>
           </div>
           <div className="footer-column">
             <h3>Resources</h3>
             <ul>
-              <li><a href="#blog">Blog</a></li>
+              {/* <li><a href="#blog">Blog</a></li> */}
               <li><a href="#faq">FAQ</a></li>
               <li><a href="#support">Support</a></li>
             </ul>
@@ -36,7 +40,8 @@ export default function LegalityFooter({pathName}){
           <div className="footer-column">
             <h3>Connect</h3>
             <div className="social-icons">
-              {/* Add social media icons here */}
+              <SocialIcon url="www.youtube.com"/>
+              <SocialIcon url="www.instagram.com"/>
             </div>
           </div>
         </div>
