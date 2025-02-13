@@ -434,15 +434,13 @@ function OpportunityType(){
 function ApplicantionTimeline() {
   const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(OpportunityContext);
 
-  // const { startDate, setStartDate } = useState(new Date());
 
   const [ startDateDisabled, setStartDateDisabled ] = useState(organizationData.startDate === null);
   const [ deadlineDisabled, setDeadlineDisabled ] = useState(organizationData.deadline === null);
   
 
   const handleDatesChanged = (date, dateType) => {
-    setOrganizationData({...organizationData, [dateType]: date});
-    // console.log(date.toLocaleDateString('en-US')); 
+    setOrganizationData({...organizationData, [dateType]: date.toLocaleDateString('en-US')});
   }
 
   const handleNoStartDate = (event) => {

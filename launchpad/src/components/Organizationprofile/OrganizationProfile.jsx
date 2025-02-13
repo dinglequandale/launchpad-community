@@ -57,8 +57,6 @@ export default function OrganizationProfile({organizationData, location, handleS
 
     useEffect(()=>{
         getUserData(organizationProfileData.organizationCreatedBy);
-
-        console.log("Start:", organizationProfileData.organizationStartDate, "ENd:", organizationProfileData.deadline)
     },[])
 
     useEffect(()=>{
@@ -141,8 +139,8 @@ export default function OrganizationProfile({organizationData, location, handleS
                                     {organizationProfileData.organizationDescription}
                                 </div>
                                 {(organizationProfileData.organizationDeadline || organizationProfileData.organizationStartDate) && <div style={{marginTop: "15px"}}>
-                                    {organizationProfileData.organizationDeadline && <span><span style={{fontWeight: "600"}}>Application Deadline</span>: {organizationProfileData.organizationDeadline.toLocaleDateString('en-US')}<br /></span>}
-                                    {organizationProfileData.organizationStartDate && <span><span style={{fontWeight: "600"}}>Start Date</span>: {organizationProfileData.organizationStartDate.toLocaleDateString('en-US')}</span>}
+                                    {organizationProfileData.organizationDeadline && <span><span style={{fontWeight: "600"}}>Application Deadline</span>: {(organizationProfileData.organizationDeadline)}<br /></span>}
+                                    {organizationProfileData.organizationStartDate && <span><span style={{fontWeight: "600"}}>Start Date</span>: {(organizationProfileData.organizationStartDate)}</span>}
                                 </div>}
                             </div>
                             <div style={{
