@@ -64,51 +64,52 @@ export default function Onboarding() {
         {isSubmitting && <div style={{width: "100vw", height: "100vh", background: "rgb(0,0,0,0.1)", position: "absolute"}}></div>}
         <div className='onboarding-container'>
             {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
-            <div className='onboarding-body'>
-            {!showComponent && <div style={{position: "absolute", top: "45px", width: "70vw", left: "0", right: "0", marginLeft: "auto", marginRight: "auto", textAlign: "center"}}><span style={{fontSize: "30px"}}>Join your school’s digital network of students, parents, and alumni</span></div>}
-            <header style={{marginBottom: "1.5rem", position: "relative"}}>
-            
-                <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
-                    display: "flex", justifyContent: "center", alignItems: "center", height: "80px", padding: "10px 5px",  marginBottom: "17px"}}>
-                    <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
-                </div>
-                {(currentPage !== 0) && <ProgressBar
-                    numOfSections={numOfSections}
-                    currentPage={currentPage}
-                    setCurrentPage={setCurrentPage}
-                    showArrows={false}
-                />}
-            </header>
-            <main style={{marginBottom: "2rem"}}>
-            {!showComponent ? (
-                <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-                    <UserType setSelectedOption={setSelectedOption} selectedOption={selectedOption} agreedToTerms={agreedToTerms} setAgreedToTerms={setAgreedToTerms} location={location}/>
-                </div>
-            ) : (
-                <>
-                    {selectedOption === "High Schooler" && <HighSchooler schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                    {selectedOption === "College Student" && <CollegeStudent schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                    {selectedOption === "Professional" && <Professional schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                </>
-            )}    
-            </main>
-            <footer style={{display: "flex", justifyContent: "space-between", width: "100%"}}>
-                <button style={{visibility: `${currentPage === 0 ? "hidden" : "visible"}`}} className="btnUnfilled prevButton" onClick={handlePrev}>
-                    Previous
-                </button>
-                {(currentPage !== numOfSections || numOfSections === 0) ? 
-                <button className="continueButton" onClick={handleContinue} disabled={!selectedOption || !agreedToTerms}>
-                Continue
-                </button>
-                : 
-                <button onClick={()=>{if(canSubmit){
-                    setIsSubmitting(true);
-                }}} className='continueButton' disabled={isSubmitting} style={!canSubmit ? disabledSubmitStyles : {}}>
-                    {!isSubmitting ? "Submit" : <Loading style={{maxWidth: "4px"}}/>}
-                </button>}
-            </footer>
+            <div style={{position: "relative"}}>
+            <div className='onboarding-body' >
+                {!showComponent && <div style={{position: "absolute", top: "-50px", width: "70vw", textAlign: "center"}}><span style={{fontSize: "30px"}}>Join your school’s digital network of students, parents, and alumni</span></div>}
+                <header style={{marginBottom: "1.5rem", position: "relative"}}>
+                
+                    <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
+                        display: "flex", justifyContent: "center", alignItems: "center", height: "80px", padding: "10px 5px",  marginBottom: "17px"}}>
+                        <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
+                    </div>
+                    {(currentPage !== 0) && <ProgressBar
+                        numOfSections={numOfSections}
+                        currentPage={currentPage}
+                        setCurrentPage={setCurrentPage}
+                        showArrows={false}
+                    />}
+                </header>
+                <main style={{marginBottom: "2rem"}}>
+                {!showComponent ? (
+                    <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+                        <UserType setSelectedOption={setSelectedOption} selectedOption={selectedOption} agreedToTerms={agreedToTerms} setAgreedToTerms={setAgreedToTerms} location={location}/>
+                    </div>
+                ) : (
+                    <>
+                        {selectedOption === "High Schooler" && <HighSchooler schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                        {selectedOption === "College Student" && <CollegeStudent schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                        {selectedOption === "Professional" && <Professional schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                    </>
+                )}    
+                </main>
+                <footer style={{display: "flex", justifyContent: "space-between", width: "100%"}}>
+                    <button style={{visibility: `${currentPage === 0 ? "hidden" : "visible"}`}} className="btnUnfilled prevButton" onClick={handlePrev}>
+                        Previous
+                    </button>
+                    {(currentPage !== numOfSections || numOfSections === 0) ? 
+                    <button className="continueButton" onClick={handleContinue} disabled={!selectedOption || !agreedToTerms}>
+                    Continue
+                    </button>
+                    : 
+                    <button onClick={()=>{if(canSubmit){
+                        setIsSubmitting(true);
+                    }}} className='continueButton' disabled={isSubmitting} style={!canSubmit ? disabledSubmitStyles : {}}>
+                        {!isSubmitting ? "Submit" : <Loading style={{maxWidth: "4px"}}/>}
+                    </button>}
+                </footer>
             </div>
-
+            </div>
         </div>
     </>);
 };

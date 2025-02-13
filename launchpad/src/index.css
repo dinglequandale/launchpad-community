@@ -21,6 +21,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  --container-width-desktop: 500px;
+  --container-width-mobile: 90%;
+  --button-width-desktop: 220px;
+  --button-width-mobile: 100%;
 }
 
 h3{
