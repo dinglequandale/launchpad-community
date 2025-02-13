@@ -229,7 +229,7 @@ export default function Organizations(){
                         </div>
                         }
                 </main>
-                {(organizationsData.length % 5 === 0) && <footer style={{display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "25px"}}><ShowMoreButton onShowMoreClick={onShowMoreClick}/></footer>}
+                {((organizationsData.length % 5 === 0) && !loading) && <footer style={{display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "25px"}}><ShowMoreButton onShowMoreClick={onShowMoreClick}/></footer>}
             </div>
         </>
         

@@ -5,13 +5,16 @@ import SignUp from "./pages/Authentication/Signup";
 import { StreamChat } from 'stream-chat';
 import { useEffect, useState } from 'react';
 import { useAuth } from "./contexts/auth/AuthContext";
+import MobileBlocker from "./contexts/MobileBlocker";
 
 function App() {
   // TODO: later input logic for this boolean to check whether user finished onboarding
 
   return (
     <>
-    <LandingPage/>
+    <MobileBlocker>
+      <LandingPage/>
+    </MobileBlocker>
     </>
   )
 }
