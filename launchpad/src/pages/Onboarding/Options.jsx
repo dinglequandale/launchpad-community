@@ -77,6 +77,7 @@ const careerInterests = [
   {"value": "sociology", "label": "Sociology", "group": "Social Sciences"},
   {"value": "astronomy", "label": "Astronomy", "group": "STEM"},
   {"value": "human_resources", "label": "Human Resources", "group": "Business"},
+  {"value": "entrepreneurship", "label": "Entrepreneurship", "group": "Business"},
   {"value": "criminal_justice", "label": "Criminal Justice", "group": "Legal"},
   {"value": "aviation", "label": "Aviation", "group": "Hands-On Trades"}, 
   {"value": "music", "label": "Music", "group": "Arts & Humanities"},

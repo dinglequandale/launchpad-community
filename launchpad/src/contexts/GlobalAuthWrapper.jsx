@@ -5,7 +5,7 @@ import { useStreamConnection } from '../Streamchat/chatFunctions/setUpUser';
 import PageLoading from '../components/LoadingAnimation/PageLoading';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebaseConfig';
-import { packageBasicUserInfoToLS } from '../services/onboardingServices';
+import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from '../services/onboardingServices';
 
 function GlobalAuthWrapper() {
   const { currentUser, loading } = useAuth();
@@ -46,11 +46,10 @@ function GlobalAuthWrapper() {
                 return;
               }
               
-              // if(!basicUserInfo){packageBasicUserInfoToLS(doc.data())};
+              if(!basicUserInfo){packageBasicUserInfoToLS(doc.data())};
               //IMPORTANT: Switch back later
-              packageBasicUserInfoToLS(doc.data());
-              
-              console.log(basicUserInfo);
+              // packageBasicUserInfoToLS(doc.data());
+              pushInitialProfileCompletion(doc.data());
             });
             
             await connectToStream(currentUser);
