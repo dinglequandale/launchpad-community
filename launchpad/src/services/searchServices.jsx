@@ -14,7 +14,7 @@ const searchDocuments = async (collectionName, searchText, tenantId) => {
     } else {
       searchParameters = {
         q: searchText,
-        query_by: 'userName',
+        query_by: 'userName,companyName',
         num_typos: 1, // Allow up to 1 typo
         filter_by: `tenantId:=${tenantId}`
       };

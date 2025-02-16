@@ -18,8 +18,13 @@ Finally:
 `npm run dev`
 
 # Run typesense server on Azure
+
+`ssh launchpad@20.3.232.3`
+
+password: Spacestation979!
+
 ```
-sudo docker run -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt -v /tmp:/data typesense/typesense:27.1 --data-dir /data --api-key=xyz --enable-cors --cors-domains http://localhost:3000,https://launchpadhouston.com --ssl-certificate /etc/letsencrypt/live/launchpad-typesense.westus2.cloudapp.azure.com/fullchain.pem --ssl-certificate-key /etc/letsencrypt/live/launchpad-typesense.westus2.cloudapp.azure.com/privkey.pem --api-port 443
+sudo docker run -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt -v /tmp:/data typesense/typesense:27.1 --data-dir /data --api-key=xyz --enable-cors --cors-domains http://localhost:3001,https://awty.launchpadhouston.com --ssl-certificate /etc/letsencrypt/live/launchpad-typesense.westus2.cloudapp.azure.com/fullchain.pem --ssl-certificate-key /etc/letsencrypt/live/launchpad-typesense.westus2.cloudapp.azure.com/privkey.pem --api-port 443
 ```
 
 Run unsecurely via http (needed for populating)

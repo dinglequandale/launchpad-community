@@ -1,5 +1,4 @@
 import Typesense from 'typesense';
-import { auth } from '../firebase/firebaseConfig';
 
 const client = new Typesense.Client({
     nodes: [

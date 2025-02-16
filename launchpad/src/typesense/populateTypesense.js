@@ -25,6 +25,8 @@ const readFirestoreData = async (collectionName, tenantId = null) => {
         docData.applicantPosition = docData.applicantPosition || "";
         docData.organizationName = docData.organizationName || "";
         docData.organizationMission = docData.organizationMission || "";
+      } else if (collectionName === "users") {
+        docData.companyName = docData.companyName || "";
       }
       return docData;
     });
@@ -69,6 +71,11 @@ const readFirestoreData = async (collectionName, tenantId = null) => {
           name: "userName",
           type: "string",
           facet: false,
+        },
+        {
+          name: "companyName",
+          type: "string",
+          facet: false
         },
         {
           name: "tenantId", // Add tenant facet for metadata filtering
