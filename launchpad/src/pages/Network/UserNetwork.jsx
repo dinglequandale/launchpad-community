@@ -83,7 +83,8 @@ export default function UserNetwork() {
   },[filters]);
 
   useEffect(() => {
-    setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals])
+    setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals]);
+    
     console.log("All data:", allVisibleUserData)
   },[collegeStudents, highSchoolers, professionals]);
 

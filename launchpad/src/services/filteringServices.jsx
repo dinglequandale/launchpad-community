@@ -70,7 +70,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     }
 
     const querySnapshot = await getDocs(q);
-    const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((user) => user.id !== currentUserId);
 
     // sort results by relevance
     try{
