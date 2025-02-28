@@ -100,7 +100,8 @@ const careerInterests = [
   {"value": "fashion", "label": "Fashion", "group": "Arts & Humanities"},
   {"value": "forestry", "label": "Forestry", "group": "Life Sciences"}, 
   {"value": "linguistics", "label": "Linguistics", "group": "Arts & Humanities"},
-  {"value": "linguistics", "label": "Literature", "group": "Arts & Humanities"},
+  {"value": "literature", "label": "Literature", "group": "Arts & Humanities"},
+  {"value": "creative_writing", "label": "Creative Writing", "group": "Arts & Humanities"},
   {"value": "theater", "label": "Theater & Movies", "group": "Arts & Humanities"},
   {"value": "education", "label": "Education (Teaching, Administration, Counseling)", "group": "Education"},
   {"value": "social_work", "label": "Social Work (Social Services, Counseling)", "group": "Social Sciences"} 

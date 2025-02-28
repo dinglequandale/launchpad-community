@@ -57,6 +57,10 @@
     margin-bottom: 1rem;
     font-weight: 300;
   }
+
+  .inputEmailAndPassword.error{
+    box-shadow: 0 0 3px #CC0000;
+  }
   
   .forgot-password {
     display: block;

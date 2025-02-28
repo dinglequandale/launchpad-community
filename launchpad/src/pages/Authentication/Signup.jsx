@@ -11,13 +11,18 @@ export default function SignUp(){
     // alert(userLoggedIn)
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
+    const [confirmedPassword, setConfirmedPassword] = useState("");
     const [userIsSigningIn, setUserIsSigningIn] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if(userPassword.length <= 6){
-            toast.error("Sorry! Your password requires at least 7 characters.")
+            toast.error("Sorry! Your password requires at least 7 characters.");
+            return;
+        }
+        if(userPassword && userPassword !== confirmedPassword){
+            toast.error("Sorry! Your password verification does not match the original password.")
             return;
         }
         
@@ -29,7 +34,7 @@ export default function SignUp(){
                     {
                         loading: 'Creating your account ...',
                         success: "You're set!",
-                        error: (err) => `Error! ${err.message}`
+                        error: (err) => `Error. Please try again!`
                     }
                 );
                 
@@ -125,6 +130,19 @@ export default function SignUp(){
                         className="inputEmailAndPassword"
                         />
                         </div>
+                        <div style={{width: "100%", display: "flex", flexDirection: "column", gap: "5px", position: "relative"}}>
+                        <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Confirm Password</span>
+                        <input
+                        type="password"
+                        placeholder="Password"
+                        value={confirmedPassword}
+                        onChange={(e) => setConfirmedPassword(e.target.value)}
+                        required
+                        className={`inputEmailAndPassword ${(userPassword && userPassword !== confirmedPassword) ? "error" : ""}`}
+                        />
+                        {(userPassword && userPassword !== confirmedPassword) &&<div style={{position: "absolute", color: "red", fontSize: "12px", fontWeight: "bolder", bottom: "-5px"}}>*Please retype your password.</div>}
+                        </div>
+                    
                     </div>
                     <button type="submit" className="submit-button" disabled={userIsSigningIn}><span style={{fontSize: "larger"}} disabled={userIsSigningIn}>{userIsSigningIn ? 'Signing In...' : 'Continue'}</span></button>
                 </form>

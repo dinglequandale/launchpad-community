@@ -17,6 +17,7 @@ import NoResults from "../../components/NoResultsnotifier/NoResults";
 import Loading from "../../components/LoadingAnimation/Loading";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../firebase/firebaseConfig";
+import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 
 
 const NetworkContext = createContext();
@@ -48,6 +49,8 @@ export default function UserNetwork() {
 
   const [profileTargetData, setProfileTargetData] = useState(null);
   const [connectTargetUser, setConnectTargetUser] = useState("");
+
+  const [isRecommended, setIsRecommended] = useState("(recommended)");
   
   const [profileModalTop, setProfileModalTop] = useState(0);
 
@@ -71,7 +74,7 @@ export default function UserNetwork() {
   const [filterChanged, setFilterChanged] = useState(false);
 
   const filterContent = {
-    userType: ["Any User", "High Schoolers", "College Students", "Professionals"],
+    userType: ["Any User", "Professionals", "College Students", "High Schoolers"],
     collegeInterestsOrDecision: userType === "High Schooler" ? (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]) : null,
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
     // schoolAttending: ["Any High School", "My High School"]
@@ -80,11 +83,17 @@ export default function UserNetwork() {
   useEffect(()=>{
     setOverallLoading(true);
     fetchAllUserTypes();
+    if(filters.areasOfInterestOrExpertise.substring(0,3) === "Any"){
+      setIsRecommended("");
+    }
+    else{
+      setIsRecommended("(recommended)");
+    }
   },[filters]);
 
   useEffect(() => {
     setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals]);
-    
+
     console.log("All data:", allVisibleUserData)
   },[collegeStudents, highSchoolers, professionals]);
 
@@ -236,7 +245,7 @@ export default function UserNetwork() {
                 {highSchoolers.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>High Schoolers</h3>
-                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
+                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>{isRecommended}</span>
                 </div>
                 <UserCarousel 
                   userNetworkData={highSchoolers} 
@@ -247,7 +256,7 @@ export default function UserNetwork() {
                 {collegeStudents.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>College Students</h3>
-                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
+                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>{isRecommended}</span>
                 </div>
                 <UserCarousel 
                   userNetworkData={collegeStudents}
@@ -258,7 +267,7 @@ export default function UserNetwork() {
                 {professionals.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>Professionals</h3>
-                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>(recommended)</span>
+                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>{isRecommended}</span>
                 </div>
                 <UserCarousel 
                   userNetworkData={professionals}
@@ -271,6 +280,9 @@ export default function UserNetwork() {
               </div>
             </div>
         </div>
+        {/* <footer className="landing-footer">
+          <LegalityFooter pathName={location.pathname}/>
+        </footer> */}
       </>
     </NetworkContext.Provider>
   );

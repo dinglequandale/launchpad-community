@@ -29,7 +29,7 @@ export default function LogoutVerificationModal({visibility, onCancel, onVerify}
                 <main style={{textAlign: "center"}}>
                     <span style={{fontWeight: "600", color: "var(--secondary)", fontSize: "40px"}}>Are you sure</span>
                     <hr style={{width: "70%", borderColor: "var(--accent)", borderWidth: "2px"}}/>
-                    <span style={{fontSize: "larger", paddingTop: "10px"}}>You want to <span style={{color: "var(--highlight)", textDecoration: "underline"}}>logout</span> of your account?</span>
+                    <span style={{fontSize: "larger", paddingTop: "10px"}}>You want to logout of your account?</span>
                 </main>
                 <div style={{display: "flex", justifyContent: "space-between", paddingTop: "15px"}}>
                 <button 

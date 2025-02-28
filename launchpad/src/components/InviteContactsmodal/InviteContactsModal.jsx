@@ -87,7 +87,9 @@ export default function InviteContactsModal({visibility, onClose,tenantId}){
                 ))}
             </main>
             <footer style={{paddingTop: "20px", position: "relative"}}>
-                <button className="btnText" onClick={handleAddTargetUser} style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", fontSize: "larger", margin: "0 auto", marginBottom: "20px"}}><GrAdd size={25}/> Add another contact!</button>
+                {targetUserData.length <= 3 && <button className="btnText" onClick={handleAddTargetUser} style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", fontSize: "larger", margin: "0 auto", marginBottom: "20px"}}>
+                  <GrAdd size={25}/> Add another contact
+                  </button>}
                 <div style={{display: "flex", justifyContent: "space-between",}}>
                   <button onClick={onClose} className="btnUnfilled" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger"}}>
                       Cancel</button>

@@ -31,6 +31,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentInitiativePage, setCurrentInitiativePage] = useState(1);
   const [showLast, setShowLast] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   const [organizationLogo, setOrganizationLogo] = useState(null);
 
@@ -38,6 +39,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
 
   const saveInitiativeData = async () => {
     try {
+      setIsSaving(true);
       await toast.promise(
         saveOpportunity(organizationData, organizationLogo, currentUser, isEditing, opportunityId),
         {
@@ -46,9 +48,13 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
           error: (err) => `Failed to ${isEditing ? 'update' : 'create'} initiative: ${err.message}`,
         }
       );
+      onClose();
       // await saveOpportunity(organizationData, organizationLogo, currentUser, isEditing, opportunityId);
     } catch (error) {
       console.error("Error saving initiative: ", error);
+    }
+    finally{
+      setIsSaving(false);
     }
     }
   
@@ -83,7 +89,8 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
 
   const {userName, userType} = JSON.parse(localStorage.getItem("basicUserInfo"));
   useEffect(() => {
-    if (opportunityData) {
+
+    if (isEditing && opportunityData) {
         setOrganizationData({... opportunityData});
         return;
     }
@@ -262,7 +269,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
               ()=>setMakeChangesVisibility(true)
               } className='btnUnfilled' style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Cancel</button> */}
-            {currentInitiativePage === 4 && <button onClick={saveInitiativeData} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+            {currentInitiativePage === 4 && <button onClick={saveInitiativeData} type='submit' className="btnSaveChanges" disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Save Changes</button>}
           </footer>
         </Modal>

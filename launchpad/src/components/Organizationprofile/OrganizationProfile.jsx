@@ -126,7 +126,7 @@ export default function OrganizationProfile({organizationData, location, handleS
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
                     <div style={{display: "flex"}}>
                         <div className="organizationPfp">
-                            <img src={organizationProfileData.organizationLogoPreview} style={{width: "100px", width: "145px", height: "145px"}}/>
+                            <img src={organizationProfileData.organizationLogoPreview} style={{width: "145px", height: "145px", objectFit: "cover"}}/>
                         </div>
                         <div name="organizationContent" style={{padding: "0px 15px", paddingBottom: "11px", position: 'relative'}}>
                             <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>

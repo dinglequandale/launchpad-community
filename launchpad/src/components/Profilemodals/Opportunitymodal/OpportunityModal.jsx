@@ -31,6 +31,7 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
   const [showLast, setShowLast] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { currentUser } = useAuth();
   // console.log("Opportunity data:", opportunityData);
@@ -56,6 +57,7 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
 
 const saveOpportunityData = async () => {
   try {
+    setIsSaving(true);
     await toast.promise(
       saveOpportunity(organizationData, organizationLogo, currentUser, isEditing, opportunityId),
       {
@@ -65,15 +67,19 @@ const saveOpportunityData = async () => {
       }
     );
     onClose();
+
   } catch (error) {
     console.error("Error saving opportunity: ", error);
+  }
+  finally{
+    setIsSaving(false);
   }
 
   // onClose();
   }
 
   useEffect(() => {
-    if (opportunityData !== null) {
+    if (opportunityData !== null && isEditing) {
         setOrganizationData({... opportunityData});
         return;
     }
@@ -370,7 +376,7 @@ const saveOpportunityData = async () => {
               ()=>setMakeChangesVisibility(true)
               } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Cancel</button> */}
-            {currentOpportunityPage === 5 && <button onClick={saveOpportunityData} type='submit' className='btnSaveChanges' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+            {currentOpportunityPage === 5 && <button onClick={saveOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Save Changes</button>}
           </footer>
         </Modal>

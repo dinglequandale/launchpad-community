@@ -104,7 +104,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 {(userData.acceptedColleges && userData.acceptedColleges.length > 0) && <span>{basicInfoContent.acceptedColleges}</span>}
                             </div>
                         </div>
-                        <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(userData.userId)}> 
+                        <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(userData)}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>

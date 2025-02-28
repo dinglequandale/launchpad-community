@@ -10,6 +10,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { auth } from "../../firebase/firebaseConfig";
+import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 
 
 class ErrorBoundary extends React.Component {
@@ -246,6 +247,10 @@ export default function Home(){
                         </div>
                     </div>
                 </div>
+                
+            </div>
+            <div className="landing-footer" style={{zIndex: "4"}}>
+              <LegalityFooter pathName={"/Home"}/>
             </div>
         </>
     )
@@ -265,7 +270,7 @@ function InviteContacts({userName, tenantId}){
             {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "rgba(14, 195, 111, .3)",
          height: "fitContent", borderRadius: "4px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
          }>
-            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder", color: "var(--secondary)"}}>Hello, {userName}!</span> <br /> Know any <span style={{fontWeight: "550", color: "var(--secondary)"}}>{tenantId} high schoolers</span> or <span style={{fontWeight: "550", color: "var(--secondary)"}}>{tenantId} alumni</span> who would benefit from being on the app? Know other  <span style={{fontWeight: "550", color: "var(--secondary)"}}>professionals</span> in the {tenantId} community willing to share their expertise? Invite friends and family below!</span>
+            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder"}}>Hello, {userName}!</span> <br /> Know any <span style={{fontWeight: "550"}}>{tenantId} high schoolers</span> or <span style={{fontWeight: "550"}}>{tenantId} alumni</span> who would benefit from being on the app? Know other  <span style={{fontWeight: "550"}}>professionals</span> in the {tenantId} community willing to share their expertise? Invite friends and family below!</span>
             <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
                 <button onClick={()=>setInviteContactsModalVisibility(true)} className="btnInviteContacts" style={{}}>Invite Contacts</button>
             </div>
