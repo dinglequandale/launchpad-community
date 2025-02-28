@@ -294,6 +294,7 @@ function UserCarousel({userNetworkData, loading, onEndReached}){
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState('');
   const carouselRef = useRef(null);
+  const scrollAmount = 3;
 
   useEffect(()=>{
     console.log(filterChanged)
@@ -318,14 +319,14 @@ function UserCarousel({userNetworkData, loading, onEndReached}){
   const nextSlide = () => {
     setSlideDirection('slide-left');
     setCurrentIndex(prevIndex => 
-      Math.min(prevIndex + 1, userNetworkData.length - itemsPerPage)
+      Math.min(prevIndex + scrollAmount, userNetworkData.length - itemsPerPage)
     );
   };
 
   const prevSlide = () => {
     setSlideDirection('slide-right');
     setCurrentIndex(prevIndex => 
-      Math.max(prevIndex - 1, 0)
+      Math.max(prevIndex - scrollAmount, 0)
     );
   };
 

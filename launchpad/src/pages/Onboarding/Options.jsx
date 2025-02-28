@@ -181,8 +181,8 @@ const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion 
   return (
     <OnboardingDropdown
       question={question}
-      options={options}
-      selectedOption={selectedOption}
+      options={[...options]}
+      selectedOption={selectedOption ?? "N/A"}
       onChange={onChange}
       type={type} // Assuming single-select for college search
       onSearchQueryChange={handleInputChange} // Pass the input change handler

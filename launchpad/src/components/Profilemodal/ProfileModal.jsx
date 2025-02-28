@@ -9,29 +9,40 @@ import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
 import { displayColleges, displayFieldsOfInterest, getBasicUserDescription } from '../../services/userProfileServices';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/auth/AuthContext';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick}) {
 
     const userType = userData.userType;
     const userName = userData.userName;
-    const [opportunityData, setOpportunityData] = useState(null);
+    const [opportunitiesData, setOpportunitiesData] = useState([]);
     // const [loading, setLoading] = useState(false);
-    const [opportunityLoading, setOpportunityLoading] = useState(false);
+    const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
+
+    const {currentUser} = useAuth();
 
     const basicUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
     const isProfessional = basicUserInfo.userType === "Professional";
     useEffect(()=>{
 
         const getOpportunityData = async () => {
-            setOpportunityLoading(true);
+            setOpportunitiesLoading(true);
+            try{
             const opportunitiesRef = collection(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities");
             const userOpportunityQuery = query(opportunitiesRef, where("createdBy", "==", userData.userId));
 
-            const opportunitySnapshot = await getDocs(userOpportunityQuery)
-            opportunitySnapshot.forEach((doc) => {
-                setOpportunityData(doc.data());
-              });
-            setOpportunityLoading(false);
+            const opportunitySnapshot = await getDocs(userOpportunityQuery);
+            setOpportunitiesData(opportunitySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+              })));
+            }
+            catch{
+                console.log("error")
+            }
+            finally{
+                setOpportunitiesLoading(false);
+            }
         }
 
         getOpportunityData();
@@ -113,11 +124,30 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                     </header>
                     <hr style={{width: "95%"}}/>
                     <main style={{padding: "0px 8px"}}>
-                        {(!opportunityLoading && opportunityData) ? <div>
+                    {(!opportunitiesLoading && opportunitiesData.length > 0) ? 
+                        
+                        (
+                            <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
+                                {opportunitiesData.map((opportunityData, index)=>(
+                                    <>
+                                    <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", paddingBottom: ".5rem", textAlign: "center"}}>{userName.split(" ")[0]} is {opportunityData.organizationType === "Business" ? "running" : "offering"} {opportunityData.organizationType === "Internship" ? "an" : "a"}<span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()}{opportunityData.organizationType !== "Business" && " opportunity"}!</span></span>
+                                    <OrganizationProfile 
+                                        location={"user_profile_public"} 
+                                        key={index} 
+                                        organizationData={opportunityData} 
+                                        handleReferalClick={handleReferalClick}
+                                    />
+                                    </>
+                                ))}
+                            </div> )
+                            : opportunitiesLoading ?
+                        <div style={{marginTop: "40px"}}><Loading/></div> :
+                        null}
+                        {/* {(!opportunityLoading && opportunityData) ? <div>
                             <div style={{textAlign: "center", marginBottom: ".6rem"}}>
                             <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", paddingBottom: "3rem"}}>{userName.split(" ")[0]} is {opportunityData.organizationType === "Business" ? "running" : "offering"} {opportunityData.organizationType === "Internship" ? "an" : "a"}<span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()}{opportunityData.organizationType !== "Business" && " opportunity"}!</span></span>
                             </div>
-                            <OrganizationProfile location={"user_profile_public"} organizationData={opportunityData} handleReferalClick={handleReferalClick}/> </div> : opportunityLoading ? <Loading/> : null}
+                            <OrganizationProfile /> </div> : opportunityLoading ? <Loading/> : null} */}
                         {(userData.userAboutMe || userData.linkedinLink) && <div name="userAboutMe" style={{paddingTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s About Me</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
