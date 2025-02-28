@@ -3,6 +3,7 @@ import ConnectionBanner from "../Connectionbanner/ConnectionBanner";
 import { useState } from "react";
 import { FaLink } from "react-icons/fa6";
 import { displayColleges, displayFieldsOfInterest, displayShortenedName, getBasicUserDescription, lowerAndCapitalize } from "../../services/userProfileServices";
+import DefaultIcon from "../DefaultIcon/DefaultIcon";
 
 export default function UserCard({userData, onProfileClick, onConnectClick}) {
     // todo: actual banner
@@ -62,12 +63,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                         alt="" 
                     />
                 ) : (
-                    <img 
-                        className="pfpImage" 
-                        src="/assets/placeholder_pfp.png" 
-                        alt="" 
-                        style={{ boxShadow: "0px 2px 3px rgba(0, 0, 0, 0.2)" }} 
-                    />
+                    <DefaultIcon length={"20px"}/>
                 )}
                 </div>
                 <div className='cardNameDescription'>

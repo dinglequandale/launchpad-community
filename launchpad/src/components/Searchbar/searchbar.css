@@ -8,10 +8,9 @@
 }
 
 .searchBar {
-    background-color: #EFEFEF;
+    background-color: #ffffff;
     border-radius: 20px;
-    border: none;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+    border: 1.5px solid #265773;
     padding: 10px 10px 10px 35px;
     width: 80vw;
 }

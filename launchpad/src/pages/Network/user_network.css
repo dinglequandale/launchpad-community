@@ -71,5 +71,5 @@ body.modal-open {
 }
 
 .slide-left, .slide-right {
-  transition: transform 0.5s ease;
+  transition: transform 1s ease;
 }

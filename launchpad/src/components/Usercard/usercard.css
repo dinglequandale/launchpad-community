@@ -12,8 +12,7 @@
     flex-direction: column;
     background: white;
     z-index: 1;
-    border-style: solid;
-    border-color: var(--secondary);
+    border: 2px solid var(--dark);
 }
 
 .seeProfile{

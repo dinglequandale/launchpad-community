@@ -72,10 +72,12 @@ export default function SignUp(){
         {/* {userLoggedIn && (<Navigate to='/Home' replace={true}/>)} */}
         <div className="signup-container">
             <div className="signup-card">
-                <div style={{textAlign: "center", paddingBottom: "8px"}}><span style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "600"}}>Welcome to</span></div>
-                <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
-                    display: "flex", justifyContent: "center", alignItems: "center", height: "100px"}}>
-                    <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
+                <div style={{display: "flex", justifyContent: "space-around", alignItems: "center"}}>
+                    <div style={{textAlign: "center"}}><span style={{fontSize: "25px", fontWeight: "600", color: "var(--dark)"}}>Welcome to</span></div>
+                    <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
+                        display: "flex", justifyContent: "center", alignItems: "center", height: "55px", width: "220px"}}>
+                        <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
+                    </div>
                 </div>
                 <div style={{textAlign: "center", fontWeight: "350"}}>
                     <p>Your journey starts here!</p>
@@ -110,7 +112,7 @@ export default function SignUp(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Email</span>
                         <input
                         type="email"
-                        placeholder="Email address"
+                        // placeholder="Email address"
                         value={userEmail}
                         onChange={(e) => setUserEmail(e.target.value)}
                         required
@@ -123,7 +125,7 @@ export default function SignUp(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Password</span>
                         <input
                         type="password"
-                        placeholder="Password"
+                        // placeholder="Password"
                         value={userPassword}
                         onChange={(e) => setUserPassword(e.target.value)}
                         required
@@ -134,7 +136,7 @@ export default function SignUp(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Confirm Password</span>
                         <input
                         type="password"
-                        placeholder="Password"
+                        // placeholder="Password"
                         value={confirmedPassword}
                         onChange={(e) => setConfirmedPassword(e.target.value)}
                         required
@@ -148,7 +150,7 @@ export default function SignUp(){
                 </form>
                 
                 <p className="signup-link">
-                    Already have an account? <a href="/Login" disabled={userIsSigningIn}>Log in</a>
+                    Already created an account? <a href="/Login" style={{textDecoration: "underline"}} disabled={userIsSigningIn}>Log in</a>
                 </p>
             </div>
       </div>

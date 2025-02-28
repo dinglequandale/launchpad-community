@@ -122,13 +122,13 @@ export default function Login(){
         {userLoggedIn && (<Navigate to='/Home' replace={true}/>)}
         <div className="signup-container">
             <div className="signup-card">
-                <div style={{textAlign: "center", paddingBottom: "8px"}}><span style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "600"}}>Welcome back to</span></div>
+                <div style={{textAlign: "center", paddingBottom: "8px"}}><span style={{color: "var(--dark)", fontSize: "30px", fontWeight: "600"}}>Welcome back to</span></div>
                 <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
                     display: "flex", justifyContent: "center", alignItems: "center", height: "100px"}}>
                     <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
                 </div>
                 <div style={{textAlign: "center", fontWeight: "350"}}>
-                    <p>Welcome back on-track!</p>
+                    <p>Empowering Student Excellency</p>
                 </div>
                 
                 <button className="social-button btnUnfilled" onClick={(e)=>onContinueWithGoogle(e)}>
@@ -160,7 +160,7 @@ export default function Login(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Email</span>
                         <input
                         type="email"
-                        placeholder="Email address"
+                        // placeholder="Email address"
                         value={userEmail}
                         onChange={(e) => setUserEmail(e.target.value)}
                         required
@@ -173,7 +173,7 @@ export default function Login(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Password</span>
                         <input
                         type="password"
-                        placeholder="Password"
+                        // placeholder="Password"
                         value={userPassword}
                         onChange={(e) => setUserPassword(e.target.value)}
                         required
@@ -186,7 +186,7 @@ export default function Login(){
                 </form>
                 
                 <p className="signup-link">
-                    Don't have an account? <a href="/Signup" disabled={userIsSigningIn}>Sign up</a>
+                    Don't have an account? <a href="/Signup" style={{textDecoration: "underline"}} disabled={userIsSigningIn}>Sign up</a>
                 </p>
             </div>
       </div>
