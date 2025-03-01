@@ -1,4 +1,5 @@
 import Loading from "./Loading";
+import LoadingBar from "./LoadingBar";
 
 export default function PageLoading() {
     return(
@@ -10,6 +11,9 @@ export default function PageLoading() {
             <img src="assets/launchpad_logo.png" alt="" style={{width: "500px"}}/>
           </div>
           <Loading/>
+          <div style={{width: "30%", margin: "0 auto", marginTop: "2rem"}}>
+            <LoadingBar/>
+          </div>
         </div>
       </div>
     )

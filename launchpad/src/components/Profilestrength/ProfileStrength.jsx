@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./profilestrength.css";
 import { useNavigate } from "react-router-dom";
 import { displayShortenedName } from "../../services/userProfileServices";
+import DefaultIcon from "../DefaultIcon/DefaultIcon";
 
 export default function ProfileStrength({userData}){
 
@@ -72,8 +73,7 @@ function ProfileIcon({userData}){
         <div style={{display: "flex", gap: "10px", alignItems: "center", paddingTop: "20px", paddingBottom: "20px", maxWidth: "340px"}}>
             <div>
                 {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
-            {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
-                {width: "80px", height: "80px"}}/>}
+            {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <DefaultIcon length={"70px"} size={50}/>}
             </div>
             <div>
                 <span style={{fontWeight: "bolder", fontSize: "22px"}}>{displayShortenedName(userData.userName)}</span> <br />
