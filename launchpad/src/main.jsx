@@ -86,7 +86,7 @@ const router = createBrowserRouter([
       errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>,
     },
     {
-      path: '/UserNetwork',
+      path: '/network',
       element: <UserNetwork/>,
       errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
     },
@@ -101,7 +101,7 @@ const router = createBrowserRouter([
       errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
     },
     {
-      path: '/MyProfile',
+      path: '/profile',
       element: <EditProfilePage/>,
       errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
     },

@@ -1,5 +1,5 @@
 .mainBody{
-    background: var(--primary);
+    background: white;
     /* background: linear-gradient(360deg, var(--neutral) 0%, rgba(52,197,227,0) 100%); */
 }
 

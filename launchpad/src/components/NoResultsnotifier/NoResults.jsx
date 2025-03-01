@@ -83,7 +83,7 @@ export function EmptyField () {
           We're in need of <span style={{fontWeight: "bolder", color: "var(--secondary)"}}>your</span> help! <br />
           Be the first to pave the futures <br /> of aspiring minds.
         </p>
-        <button className='btnSaveChanges' style={{padding: "10px", borderRadius: "10px", fontSize: "15px"}} onClick={() => (navigate("/MyProfile"))}>
+        <button className='btnSaveChanges' style={{padding: "10px", borderRadius: "10px", fontSize: "15px"}} onClick={() => (navigate("/profile"))}>
           Add one in your profile!
         </button>
       </motion.div>

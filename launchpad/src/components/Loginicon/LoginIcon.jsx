@@ -16,11 +16,13 @@ export default function LoginIcon(){
     return (
         <>
             <article className="iconContainer">
-                {basicUserInfo?.userPfpPreview ? <img className="userPfp" src={basicUserInfo?.userPfpPreview}/> : 
-                <DefaultIcon length={"44px"}/>}
+                <div onClick={() => navigate("/profile")}>
+                    {basicUserInfo?.userPfpPreview ? <img className="userPfp" src={basicUserInfo?.userPfpPreview}/> : 
+                    <DefaultIcon length={"44px"}/>}
+                </div>
                 <div style={{display: "flex", flexDirection: "column", lineHeight: "1.2", justifyContent: "left"}}>
                     <span className="iconUsername"> {displayShortenedName(basicUserInfo?.userName)} </span>
-                    <button className="btnText diff-color" onClick={()=>navigate("/MyProfile")} style={{width: "fit-content", fontSize: "18px"}}>My Profile</button>
+                    <button className="btnText diff-color" onClick={()=>navigate("/profile")} style={{width: "fit-content", fontSize: "18px"}}>My Profile</button>
                 </div>
             </article>
         </>

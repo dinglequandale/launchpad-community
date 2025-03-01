@@ -206,7 +206,7 @@ export default function Organizations(){
             <div className='organizationsContainer' style={{paddingTop: "4%", paddingLeft: "10%"}}>
                 <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/> 
                 
-                <main style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "20px", paddingBottom: "15px", position: "relative", background: "var(--primary)"}}>
+                <main style={{backgroundColor: "white", display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "20px", paddingBottom: "15px", position: "relative"}}>
                     {initLoading ?
                         <div style={loadingStyles}>
                             <Loading/>

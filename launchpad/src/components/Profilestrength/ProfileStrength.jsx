@@ -38,7 +38,7 @@ export default function ProfileStrength({userData}){
                 {nullValues[1] !== 0 && <span style={{fontWeight: "bolder", color: "rgb(255, 178, 35)"}}> {nullValues[1]} optional field{nullValues[1] > 1 ? "s" : ""} missing! </span>} */}
                 <button
                 className="btnViewProfile"
-                onClick={()=>{navigate("/MyProfile", { state: '/' })}}>
+                onClick={()=>{navigate("/profile", { state: '/' })}}>
                     {profileProgress === 1 ? "View Profile" : "Complete your profile"}
                 </button>
             </div>

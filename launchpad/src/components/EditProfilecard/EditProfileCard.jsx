@@ -510,7 +510,7 @@ function BasicInfoCard({descType}){
                 <div className="preview-container">
                     { isUploading ? <div className='btnCircle btnFileUpload' style={{width: "70px", height: "70px"}}><div><Loading/></div></div> 
                     :
-                     <img src={pfpUrl} alt="Profile Preview" className="file-preview" style={{width: "70px", height: "70px", borderRadius: "50%"}} />}
+                     <img src={pfpUrl} alt="Profile Preview" className="file-preview" style={{width: "70px", height: "70px", borderRadius: "50%", border: "2px solid var(--dark)"}} />}
                     <div className="preview-actions" style={{top: "-15px", visibility: (!pfpEditVisibility || isUploading) ? "hidden" : ""}}>
                     <button onClick={() => triggerFileInput(pfpInputRef)} className="action-button">
                         <BiEdit size={20} />

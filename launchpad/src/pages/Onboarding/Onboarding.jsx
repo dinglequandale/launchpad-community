@@ -63,13 +63,14 @@ export default function Onboarding() {
     return (<>
         {isSubmitting && <div style={{width: "100vw", height: "100vh", background: "rgb(0,0,0,0.1)", position: "absolute"}}></div>}
         <div className='onboarding-container'>
+            <div className='background-blend'></div>
             {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
             <div style={{position: "relative"}}>
             <div className='onboarding-body' >
                 {!showComponent && <div style={{position: "absolute", top: "-50px", width: "70vw", textAlign: "center"}}><span style={{fontSize: "30px"}}>Join your school’s digital network of students, parents, and alumni</span></div>}
                 <header style={{marginBottom: "1.5rem", position: "relative"}}>
                 
-                    <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
+                    <div style={{background: "var(--accent)", borderRadius: "25px",
                         display: "flex", justifyContent: "center", alignItems: "center", height: "80px", padding: "10px 5px",  marginBottom: "17px"}}>
                         <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
                     </div>

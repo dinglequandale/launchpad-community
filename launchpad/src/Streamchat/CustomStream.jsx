@@ -24,7 +24,7 @@ const ChannelHeaderContainer = styled.div`
 
 const ChatContainer = styled.div`
   display: flex;
-  height: 94vh;
+  height: 92vh;
   width: 100%;
 
 `;
@@ -41,59 +41,6 @@ const ChannelContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
-
-// const ChannelPreviewCustom = (props) => {
-//   const { channel, setActiveChannel, activeChannel } = props;
-//   const { name = 'Unnamed Channel' } = channel.data || {};
-
-//   const lastMessage = channel.state.messages[channel.state.messages.length - 1];
-//   const [isHovering, setIsHovering] = useState(false);
-//   return (
-//     <div
-//       onClick={
-//         () => {
-//           setActiveChannel(activeChannel === channel ? null : channel);
-//         }
-//       }
-//       onMouseEnter={()=>setIsHovering(true)}
-//       onMouseLeave={()=>setIsHovering(false)}
-//       style={{
-//         display: 'flex',
-//         padding: '10px',
-//         cursor: 'pointer',
-//         boxShadow: "var(--shadowColor)",
-//         width: "90%",
-//         margin: "0 auto",
-//         marginTop: "20px",
-//         borderRadius: "20px",
-//         zIndex: "4",
-//         height: "60px",
-//         overflow: "hidden",
-//         transition: 'background-color 0.3s',
-//         backgroundColor: `${channel === activeChannel || isHovering ? "#9b7bd4" : "var(--neutral)"}`,
-//         color: "var(--primary)",
-//       }}
-//     >
-//       <div
-//         style={{
-//           width: '40px',
-//           height: '40px',
-//           borderRadius: '50%',
-//           backgroundColor: '#e0e0e0',
-//           zIndex: "3",
-//           boxShadow: "2px 0 10px rgba(0, 0, 0, 0.1)",
-//           marginRight: '10px',
-//         }}
-//       />
-//       <div>
-//         <div style={{ fontWeight: 'bold' }}>{name}</div>
-//         <div style={{ fontSize: '0.8em', color: '#888' }}>
-//           {lastMessage?.text || 'No messages yet'}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 const CustomChannelPreview = ({
   channel,

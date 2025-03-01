@@ -34,10 +34,21 @@ but you probably should also make an individual personalized CSS file for each p
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: linear-gradient(0deg, var(--secondary) 0%, rgba(255,255,255,0) 100%);
+  /* background: linear-gradient(0deg, var(--secondary) 0%, rgba(255,255,255,0) 100%); */
+  background-image: url(/assets/onboarding_backdrop.png);
+  background-position: center center;
   /* padding: 1rem; */
   box-sizing: border-box;
   overflow-y: hidden;
+}
+
+.background-blend {
+  background: rgba(225, 239, 255, 0.555);
+  position: fixed; /* Sit on top of the page content */
+  /* display: none; Hidden by default */
+  width: 100vw; /* Full width (cover the whole page) */
+  height: 100vh; /* Full height (cover the whole page) */
+
 }
 
 .onboarding-body {
@@ -56,6 +67,7 @@ but you probably should also make an individual personalized CSS file for each p
   /* Add custom scrollbar styling */
   scrollbar-width: thin;
   scrollbar-color: var(--secondary) transparent;
+  box-shadow: var(--shadowColor);
 }
 
 .onboardingInput{
