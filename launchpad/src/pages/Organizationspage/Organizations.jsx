@@ -203,10 +203,10 @@ export default function Organizations(){
             {showPfpCard && <ProfileModal visibility={showPfpCard} onClose={()=>setShowPfpCard(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={targetUserData} handleReferalClick={handleReferalClick}/>}
             <TopBar/>
             <SideNav/>
-            <div className='organizationsContainer' style={{paddingTop: "4%", paddingLeft: "10%"}}>
+            <div className='organizationsContainer' style={{paddingTop: "4%", paddingLeft: "10%", backgroundColor: "white"}}>
                 <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/> 
                 
-                <main style={{backgroundColor: "white", display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "20px", paddingBottom: "15px", position: "relative"}}>
+                <main style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "20px", position: "relative"}}>
                     {initLoading ?
                         <div style={loadingStyles}>
                             <Loading/>
@@ -228,8 +228,9 @@ export default function Organizations(){
                             <EmptyField/>
                         </div>
                         }
+                        
                 </main>
-                {((organizationsData.length % 5 === 0) && !loading) && <footer style={{display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "25px"}}><ShowMoreButton onShowMoreClick={onShowMoreClick}/></footer>}
+                {((organizationsData.length % 5 === 0) && !loading) && <footer style={{display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "25px", marginTop: "15px"}}><ShowMoreButton onShowMoreClick={onShowMoreClick}/></footer>}
             </div>
         </>
         

@@ -63,7 +63,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                         alt="" 
                     />
                 ) : (
-                    <DefaultIcon length={"20px"}/>
+                    <DefaultIcon/>
                 )}
                 </div>
                 <div className='cardNameDescription'>

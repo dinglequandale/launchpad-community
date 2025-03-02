@@ -359,7 +359,7 @@ const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
                 </div>
                 <input
                     type="text"
-                    placeholder="Skill Category"
+                    placeholder="Skill"
                     value={skill.skillCategory}
                     onChange={(e) => handleInputChange("skillCategory", e.target.value, index)}
                 />

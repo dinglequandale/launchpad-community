@@ -15,12 +15,8 @@ const LoadingBar = ({
     const [elapsedTime, setElapsedTime] = useState(0);
   
     useEffect(() => {
-      // Reset progress when duration changes
-    //   setProgress(0);
+
       setIsComplete(false);
-      
-      // Move startTime inside the effect
-      const startTime = Date.now();
       
       const interval = setInterval(() => {
         setElapsedTime(elapsedTime+speed);

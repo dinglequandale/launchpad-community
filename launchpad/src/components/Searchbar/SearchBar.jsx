@@ -7,9 +7,9 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
     const searchType = () => {
         switch(pageName){
             case "Network":
-                return "connections";
+                return "profession, interests, company, or name";
             case "Opportunities":
-                return "opportunities and organizations"
+                return "company, interest, or name"
         }
     }
     const [queryText, setQueryText] = useState('');
@@ -24,7 +24,7 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
                       type="text"
                       name="fname"
                       className="searchBar"
-                      placeholder={`Search for ${searchType()}`}
+                      placeholder={`Search by ${searchType()}`}
                       value={queryText}
                       onChange={(e) => setQueryText(e.target.value)}
                   />

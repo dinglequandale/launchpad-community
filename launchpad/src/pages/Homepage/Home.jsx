@@ -183,7 +183,7 @@ export default function Home(){
         <>
             <TopBar/>
             <SideNav/>
-            <div className='homeContainer' style={{paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>
+            <div className='homeContainer' style={{background: "var(--primary)", paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>
                 <div style={{paddingTop: "20px"}}>
                     {userBasicInfo && <InviteContacts userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={capitalizeFirstLetter(userBasicInfo.schoolId)}/>}
                 </div>

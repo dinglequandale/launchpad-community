@@ -29,22 +29,27 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
         } else {
           return { value: selectedOption, label: selectedOption };
         }
-      };
+    };
+    
+    // const filteredOptions = getValue() ? options.filter(option => 
+    //     // Filter out options that are already selected
+    //     ![...getValue()].some(selectedOption => selectedOption.value === option.value)
+    //   ) : null;
+    // alert(filteredOptions);
 
     return (
         <div className="dropDownContainer">
             {showQuestion && <label>{question}</label>}
             {type === 'multi-select' ? (
                 <Select
+                    defaultValue={getValue()}
                     isMulti
-                    value={getValue()}
-                    // value={options.filter(option => selectedOption.includes(option.label))}
-                    // value={selectedOption}
                     onChange={handleChange}
                     onInputChange={handleInputChange}
                     options={options}
                     noOptionsMessage={() => null}
                     components={{ IndicatorSeparator: null }} 
+                    closeMenuOnSelect={false}
                 />
             ) : (
                 <Select
@@ -54,7 +59,7 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
                     onInputChange={handleInputChange}
                     options={options}
                     noOptionsMessage={() => null}
-                    components={{ IndicatorSeparator: null }} 
+                    components={{ IndicatorSeparator: null }}
                 />
             )}
         </div>
