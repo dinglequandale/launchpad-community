@@ -75,7 +75,7 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
         { 
             id: "workplaceOpportunities",
             text: "Offer shadow, internship, job, or volunteer opportunities for Awty students or alumni at your company",
-            value: "Workplace",
+            value: "Workplace Opportunities",
             includers: ["Professional"]
         },
       ];

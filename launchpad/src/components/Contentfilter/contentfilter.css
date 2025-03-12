@@ -5,9 +5,11 @@
 }
 
 .dropdown{
-    background-color: var(--primary);
-    border-radius: 0px 0px 5px 5px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    background-color: #e9f5f9;
+    border: var(--border);
+    border-top: none;
+    border-radius: 0px 0px 10px 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden; /* Hide overflowing content initially */
     max-height: 0;    /* Start with zero height */
     transition: max-height 0.3s ease-in-out; /* Smooth transition */
@@ -22,7 +24,7 @@
   }
 
 .filterTop:hover{
-    color: rgb(120, 131, 255);
+    color: var(--highlight);
 }
 
 .filterOptions{
@@ -30,9 +32,114 @@
 }
 
 .filterOptions:hover{
-    color: rgb(120, 131, 255);
+    color: var(--highlight);
 }
 
 .filterOptions.active{
-    color: rgb(120, 131, 255);
+    color: var(--highlight);
 }
+
+
+
+
+
+
+.filter-dropdown {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    /* font-family: sans-serif; */
+  }
+  
+  .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border-radius: 5px;
+  }
+  
+  .filter-title {
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  .dropdown-content {
+    position: absolute;
+    width: 100%;
+    max-height: 350px;
+    /* overflow-x: auto; */
+    margin-top: 5px;
+    background-color: #e9f5f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  .search-container {
+    display: flex;
+    align-items: center;
+    padding: 10px 0px;
+    position: relative;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .search-input {
+    /* flex: 1; */
+    border: none;
+    background-color: white;
+    padding: 8px 8px 8px 30px;
+    /* margin-left: -25px; */
+    border-radius: 20px;
+    font-size: 14px;
+    width: 85%;
+    outline: none;
+  }
+  
+  .clear-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right: 25px;
+    padding: 0;
+  }
+  
+  .divider {
+    height: 1px;
+    background-color: #ccc;
+    margin: 0 15px;
+  }
+  
+  .options-list {
+    padding: 10px 15px;
+  }
+  
+  .option-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    gap: 15px;
+    cursor: pointer;
+  }
+  
+  .option-item input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  
+  .option-label {
+    font-size: 15px;
+  }
+  
+  .no-results {
+    padding: 15px 0;
+    text-align: center;
+    color: #777;
+    font-style: italic;
+  }

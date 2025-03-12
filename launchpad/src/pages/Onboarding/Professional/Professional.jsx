@@ -323,7 +323,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
       { 
           id: "workplaceOpportunities",
           text: "Open to applicants interested in shadowing / volunteering / job opportunities",
-          value: "Workplace",
+          value: "Workplace Opportunities",
       },
     ];
   

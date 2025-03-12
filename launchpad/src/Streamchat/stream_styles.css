@@ -1,12 +1,12 @@
 .str-chat {
-    --str-chat__background-color: var(--primary);
-    --str-chat__secondary-background-color: white;
+    /* --str-chat__background-color: var(--primary); */
+    /* --str-chat__secondary-background-color: white; */
     --stream-chat-header-background: var(--accent);
-    --str-chat__surface-color: var(--accent);
+    --str-chat__surface-color: var(--secondaryHighlight);
     --str-chat__secondary-surface-color: var(--neutral);
     --str-chat__tertiary-surface-color: var(--secondary);
-    --str-chat__text-color: var(--secondary);
-    --str-chat__text-low-emphasis-color: var(--accent);
+    --str-chat__text-color: var(--dark);
+    /* --str-chat__text-low-emphasis-color: var(--accent); */
 }
 
 .str-chat__input-flat {

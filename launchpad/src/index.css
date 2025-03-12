@@ -98,9 +98,9 @@ input[type="checkbox"]::before {
 }
 
 input[type="checkbox"]:checked::before {
-  background-color: #9598f5eb; /* Or your desired color */
+  background-color: var(--secondaryHighlight); /* Or your desired color */
   content: "\2713"; /* Unicode checkmark character */
-  color: white;
+  /* color: white; */
   text-align: center;
   font-size: 16px; /* Adjust size as needed */
 }

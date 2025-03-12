@@ -245,7 +245,7 @@ export default function UserNetwork() {
                 {highSchoolers.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>High Schoolers</h3>
-                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>{isRecommended}</span>
+                  <span style={{fontWeight: "400", fontSize: "smaller"}}>{isRecommended}</span>
                 </div>
                 <UserCarousel 
                   userNetworkData={highSchoolers} 
