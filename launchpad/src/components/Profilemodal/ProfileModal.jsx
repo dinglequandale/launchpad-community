@@ -99,8 +99,8 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                     <header name="userIntro" style={{paddingBottom: "10px"}}>
                         <div className='basicInfo'>
                             <div>
-                                {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
-                            {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
+                                {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" className='pfpImage' style={
+                            {width: "80px", height: "80px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
                                 {width: "80px", height: "80px"}}/>}
                             </div>
                             <div className='cardNameDescription'>

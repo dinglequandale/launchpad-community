@@ -92,7 +92,9 @@
 
 .organizationPfp{
     border-style: solid;
-    border-color: var(--secondary);
+    object-fit: cover;
+    border-color: var(--border);
     width: 145px;
+    border-radius: 20px;
     height: 145px;
 }

@@ -341,24 +341,28 @@ function ContactInformation(){
         {emailModalVisibility && <EmailModal userData={userData} visibility={emailModalVisibility} onClose={() => setEmailModalVisibility(false)}/>}
         <div>
             <div className='emailSection' style={{marginTop: "10px", position: "relative"}}>
-            <span style={{fontWeight: "550"}}>Email: {!userData.email && <span style={{color: "red", fontWeight: "lighter"}}>No Email provided</span>}
-            {userData.email && <span style={{color: "var(--secondary)"}}>{userData.email}</span>}
-            </span>
-            {!userData.email &&
-            <div className='emailUpload'>
-                <div className="addOne" onClick={()=>setEmailModalVisibility(true)}>
-                <IoAdd size={25} />
-                <span style={{textDecoration: "underline"}}>Add your Email</span>
-            </div>
-            </div>}
-            <div className='addOne' style={{position: "absolute", right: "0", top: "-60px", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
-                <EditInformation isAnswered={userData.email} questionName={"Email"} onEdit={()=>setEmailModalVisibility(true)}/>
-            </div>
+                <div>
+                <span style={{fontWeight: "550"}}>Email: {!userData.email && <span style={{color: "red", fontWeight: "lighter"}}>No Email provided</span>}
+                {userData.email && <span style={{color: "var(--secondary)"}}>{userData.email}</span>}
+                </span>
+                </div>
+                {!userData.email &&
+                    <div className='emailUpload'>
+                        <div className="addOne" onClick={()=>setEmailModalVisibility(true)}>
+                        <IoAdd size={25} />
+                        <span style={{textDecoration: "underline"}}>Add your Email</span>
+                    </div>
+                    </div>}
+                <div className='addOne' style={{position: "absolute", right: "0", top: "-60px", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
+                    <EditInformation isAnswered={userData.email} questionName={"Email"} onEdit={()=>setEmailModalVisibility(true)}/>
+                </div>
             </div>
             <div className='linkedInSection' style={{position: "relative", marginTop: "10px"}}>
+                <div style={{overflow: "hidden"}}>
                 <span style={{fontWeight: "550"}}>Linkedin Profile: {!userData.linkedinLink && <span style={{color: "red", fontWeight: "lighter"}}>No Linkedin provided</span>}
                 {userData.linkedinLink && <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link>}
                 </span>
+                </div>
                 {!userData.linkedinLink &&
                 <div className='linkedInUpload'>
                     <div className="addOne" onClick={()=>setLinkedInModalVisibility(true)}>

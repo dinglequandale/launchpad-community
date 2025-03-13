@@ -148,7 +148,7 @@ export default function Login(){
                     <span style={{fontSize: "larger", fontWeight: "500"}}>Continue with Google</span>
                 </button>
                 
-                <div className="divider">
+                <div className="authDivider">
                     <hr className="orDivider"/>
                     <span style={{padding: "4px", opacity: ".5"}}>OR</span>
                     <hr className="orDivider"/>

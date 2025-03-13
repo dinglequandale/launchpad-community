@@ -63,19 +63,19 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                         alt="" 
                     />
                 ) : (
-                    <DefaultIcon/>
+                    <DefaultIcon size={37}/>
                 )}
                 </div>
                 <div className='cardNameDescription'>
                     <span className='cardName'>{displayShortenedName(userData.userName)}</span>
                     <span className='cardDescription'>{basicInfoContent.userPreface}</span>
                 </div>
-                </div>
-                <div style={{display: "flex"}}>
-                <div className='userInfo' style={{fontSize: "16px"}}>
-                    <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userFirstDesc.label}</strong>: {basicInfoContent.userFirstDesc.content}</span>
-                    <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userSecondDesc.label}</strong>: {basicInfoContent.userSecondDesc.content}</span>
-                </div>
+            </div>
+            <div style={{display: "flex", marginTop: !userData.userPfpPreview ? "10px" : ""}}>
+            <div className='userInfo' style={{fontSize: "16px"}}>
+                <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userFirstDesc.label}</strong>: {basicInfoContent.userFirstDesc.content}</span>
+                <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userSecondDesc.label}</strong>: {basicInfoContent.userSecondDesc.content}</span>
+            </div>
             </div>
             <button className="btnConnect" style={{width: "88%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "15px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>

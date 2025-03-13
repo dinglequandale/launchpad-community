@@ -125,13 +125,11 @@ export default function OrganizationProfile({organizationData, location, handleS
                 {organizationProfileData.organizationRelevanceTags && <RelevanceBanner organizationType={organizationProfileData.organizationType} relevanceType={organizationProfileData.organizationRelevanceTags}/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
                     <div style={{display: "flex"}}>
-                        <div className="organizationPfp">
-                            <img src={organizationProfileData.organizationLogoPreview} style={{width: "145px", height: "145px", objectFit: "cover"}}/>
-                        </div>
+                        <img src={organizationProfileData.organizationLogoPreview} className="pfpImage" style={{width: "145px", height: "145px", borderRadius: "20px"}}/>
                         <div name="organizationContent" style={{padding: "0px 15px", paddingBottom: "11px", position: 'relative'}}>
                             <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
                                 <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
-                                <span style={{fontWeight: "bold", color: "var(--secondary)", fontSize: "smaller"}}> {organizationProfileData.organizationType} {["Club", "Initiative", "Business"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
+                                <span style={{fontSize: "smaller", fontWeight: "550"}}> {organizationProfileData.organizationType} {["Club", "Initiative", "Business"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
                                 <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>{organizationProfileData.organizationHost ? "run by" : ""}&nbsp;</span>
                                 <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHostName}</button>
                                 <br />
@@ -177,8 +175,8 @@ export default function OrganizationProfile({organizationData, location, handleS
 function RelevanceBanner({relevanceType, organizationType}){
     return(
         <div style={{display: (relevanceType === "ALL") ? "none" : "", borderRadius: "20px", position: "absolute", top: "-16px", left: "10px", width: "fitContent", padding: "2px 8px", background: "rgb(47,162,52)",
-            background: "linear-gradient(90deg, rgba(47,162,52,1) 48%, rgba(18,123,22,1) 100%)", zIndex: "1"}}>
-            <span style={{color: "white", fontWeight: "600"}}>{["Shadowing", "Job", "Internship"].includes(organizationType) ? "Target fields:" : ""} {relevanceType} </span>
+            background: "var(--secondaryHighlight)", zIndex: "1"}}>
+            <span style={{color: "var(--dark)", fontWeight: "600"}}>{["Shadowing", "Job", "Internship"].includes(organizationType) ? "Target fields:" : ""} {relevanceType} </span>
         </div>
     )
 }

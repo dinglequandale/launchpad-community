@@ -71,7 +71,7 @@ export default function LinkedinModal({userData, visibility, onClose}){
           <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> LinkedIn Profile <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>{userData.userType === "High Schooler" ? "Showcase who you are and what you're capable of!" : "Show our students who you are and what you do!"}</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
-        <main style={{paddingTop: "10px"}}>
+        <main style={{paddingTop: "10px", maxWidth: "600px", overflow: "hidden"}}>
         <form>
         {userData.linkedinLink ? 
         <>
@@ -80,7 +80,7 @@ export default function LinkedinModal({userData, visibility, onClose}){
             <input style={{width: "300px", margin: "auto"}} placeholder='Paste the link here!' value={newLinkedinLink} onChange={(e) => setNewLinkedinLink(e.target.value)}/>
           </div>
             <br />
-            <span style={{color: "var(--secondary)", fontSize: "19px"}}>Current LinkedIn Profile: <br /> <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link></span>
+            <span style={{color: "var(--secondary)", fontSize: "19px", textOverflow: "ellipsis"}}>Current LinkedIn Profile: <br /> <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link></span>
         </>
         :
         <>
