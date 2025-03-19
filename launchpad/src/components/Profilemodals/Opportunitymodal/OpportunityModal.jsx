@@ -360,7 +360,10 @@ const saveOpportunityData = async () => {
           shouldCloseOnEsc={false}
         >
           
-          <header>
+          <header style={{position: "relative"}}>
+            {currentOpportunityPage < 5 && <div name="estimated-time" style={{position: "absolute", fontSize: "17px", fontWeight: "300"}}>
+              Est. Time: {5 - currentOpportunityPage} minute{currentOpportunityPage < 4 ? "s" : ""}
+            </div>}
             <button className='btnClose' onClick={()=>setMakeChangesVisibility(true)} style={{background:"none"}}><CgClose size={25}/></button>
             <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
             <hr style={{borderColor: "var(--secondary)"}}/>
@@ -474,7 +477,7 @@ function ApplicantionTimeline() {
           />
           <div style={{zIndex: "10", height: "70px", top: "6px", opacity: ".6", backgroundColor: "white", display: deadlineDisabled ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}></div>
           <div style={{paddingTop: "8px", textAlign: "center"}}>
-            <button className='btnText' onClick={handleNoDeadlineDisabled} style={{fontSize: "17px", opacity: ".75", color: deadlineDisabled ? "var(--highlight)" : ""}}>
+            <button className='btnText diff-color' onClick={handleNoDeadlineDisabled} style={{fontSize: "17px", opacity: ".75", color: deadlineDisabled ? "var(--highlight)" : ""}}>
               I don't have an application deadline
             </button>
           </div>
@@ -489,7 +492,7 @@ function ApplicantionTimeline() {
           />
           <div style={{zIndex: "10", height: "70px", top: "6px", opacity: ".6", backgroundColor: "white", display: startDateDisabled ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}></div>
           <div style={{paddingTop: "8px", textAlign: "center"}}>
-            <button className='btnText' onClick={handleNoStartDate} style={{fontSize: "17px", opacity: ".75", color: startDateDisabled ? "var(--highlight)" : ""}}>
+            <button className='btnText diff-color' onClick={handleNoStartDate} style={{fontSize: "17px", opacity: ".75", color: startDateDisabled ? "var(--highlight)" : ""}}>
               I don't have a set start or end date
             </button>
           </div>

@@ -253,11 +253,14 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
           // shouldCloseOnEsc={false}
         >
           
-          <header>
-          <button className='btnClose' onClick={()=>setMakeChangesVisibility(true)} style={{background:"none"}}><CgClose size={25}/></button>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Initiative <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Make your voice heard. Garner support from Awty alumni and parents.</span></h2>
-          <hr style={{borderColor: "var(--secondary)"}}/>
-          <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast}/>
+          <header style={{position: "relative"}}>
+            {currentInitiativePage < 4 && <div name="estimated-time" style={{position: "absolute", fontSize: "17px", fontWeight: "300"}}>
+              Est. Time: {4 - currentInitiativePage} minute{currentInitiativePage < 3 ? "s" : ""}
+            </div>}
+            <button className='btnClose' onClick={()=>setMakeChangesVisibility(true)} style={{background:"none"}}><CgClose size={25}/></button>
+            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Initiative <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Make your voice heard. Garner support from Awty alumni and parents.</span></h2>
+            <hr style={{borderColor: "var(--secondary)"}}/>
+            <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast}/>
           </header>
           <main style={{paddingTop:"10px"}}>
           <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
