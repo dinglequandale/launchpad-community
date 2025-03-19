@@ -144,7 +144,7 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
                         Cancel
                     </button>
                     <button onClick={saveAvailabilityData} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white"}}>
-                        Save
+                        Save Changes
                     </button>
                 </footer>
             </Modal>

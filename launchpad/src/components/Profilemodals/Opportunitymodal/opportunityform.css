@@ -1,0 +1,249 @@
+/* .opportunity-form-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .opportunity-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .opportunity-form-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .back-button {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px 8px;
+  }
+  
+  .back-button:hover {
+    color: #333;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .preview-button {
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .save-button {
+    background-color: #e6e6e6;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .publish-button {
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  
+  .opportunity-form-content {
+    padding: 24px;
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+  
+  .form-section {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+  }
+  
+  .form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+  .section-title-container{
+    display: flex;
+    height: 35px;
+  }
+
+  .section-highlight {
+    background-color: var(--accent);
+    border-radius: 5px;
+    height: 100%;
+    width: 20px;
+  }
+
+  .section-title {
+    color: var(--dark);
+    height: 100%;
+    font-weight: 500;
+    font-size: 30px;
+    padding-left: 16px;
+    
+  }
+  
+  .form-field {
+    margin-bottom: 20px;
+  }
+  
+  .form-field label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #333;
+    font-size: 0.95rem;
+  }
+  
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .form-grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .opportunity-form-content input[type="text"],
+  .opportunity-form-content input[type="url"],
+  .opportunity-form-content input[type="date"],
+  .opportunity-form-content textarea,
+  .opportunity-form-content select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    background-color: white;
+  }
+  
+  .opportunity-form-content input[type="text"]:focus,
+  .opportunity-form-content input[type="url"]:focus,
+  .opportunity-form-content input[type="date"]:focus,
+  .opportunity-form-content textarea:focus,
+  .opportunity-form-content select:focus {
+    outline: none;
+    border-color: var(--secondaryHighlight);
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+  }
+  
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  
+  .date-field {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .checkbox-container input[type="checkbox"] {
+    margin: 0;
+  }
+  
+  .checkbox-container label {
+    margin-bottom: 0;
+    font-weight: normal;
+    font-size: 0.9rem;
+  }
+  
+  .checkbox-group, .radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  
+  .checkbox-option, .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .checkbox-option label, .radio-option label {
+    margin-bottom: 0;
+    font-weight: normal;
+    font-size: 0.9rem;
+  }
+  
+  .file-upload {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .upload-button {
+    width: 80px;
+    height: 80px;
+    border: 2px dashed #ddd;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #999;
+    font-size: 2rem;
+  }
+  
+  .upload-button:hover {
+    color: #4caf50;
+  }
+  
+  .logo-preview-container {
+    position: relative;
+  }
+  
+  .logo-preview {
+    max-width: 120px;
+    max-height: 120px;
+    border-radius: 4px;
+  }
+  
+  .remove-logo {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 0.85rem;
+  } */

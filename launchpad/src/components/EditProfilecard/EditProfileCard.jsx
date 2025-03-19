@@ -22,8 +22,9 @@ import { db } from '../../firebase/firebaseConfig';
 import { deletePfp, displayColleges, displayFieldsOfInterest, editUserData, getBasicUserDescription, handleUserProfileUpdate, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
 import { BiEdit, BiPlus, BiTrash } from 'react-icons/bi';
 import SkillModal from '../SkillsModal/SkillModal';
-import LinkedinModal from '../Profilemodals/LinkedInModal/LinkedinModal';
-import EmailModal from '../Profilemodals/EmailModal/EmailModal';
+// import LinkedinModal from '../Profilemodals/LinkedInModal/LinkedinModal';
+import ContactInfoModal from '../Profilemodals/ContactInfoModal/ContactInfoModal';
+import { FaRegEdit } from 'react-icons/fa';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -176,17 +177,11 @@ export default function EditProfileCard() {
                     <SkillBase/>
                 </div>}
                 <div className={`userResume ${userData.userType === "High Schooler" ? "no_border" : ""}`} style={{paddingBottom: "20px", marginTop: "10px"}}>
-                    <div style={{display: "flex", justifyContent: "space-between", position: "relative"}} id="Resume">
-                        <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Resume </span>
-                        <div style={{position: "absolute", right: "0", top: "17px"}}>
-                            <PublicPrivateDropdown/>
-                        </div>
-                    </div>
                     <ResumeUpload/>
                 </div>
                 {(userData.userType === "Professional" || userData.userType === "Alumni") && <hr style={{width: "100%"}}/>}
                 {(userData.userType === "Professional") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
-                    <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userData.userName.split(" ")[0]}</span> is <span style={{fontWeight: "450"}}>open to</span>  </h>
+                    
                     <ConnectionAvailability/>
                 </div>}
                 </>
@@ -201,17 +196,22 @@ export default function EditProfileCard() {
 function EditInformation({questionName, onEdit, isAnswered}){
     return(
         <>
-        {isAnswered && <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", position: "absolute", width: "150px", right: "-180px"}}
+        {isAnswered && <div style={{position: "absolute", right: "10px", top: "0"}}
             onClick={onEdit}>
-            
-            <MdEdit size={30} className='editInfoIcon'/>
-            <span style={{textDecoration: "underline"}}>
-                Edit {questionName}
-            </span>
+            <FaRegEdit size={25}/>
         </div>}
         </>
     )
 }
+// {isAnswered && <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", position: "absolute", width: "150px", right: "-180px"}}
+// onClick={onEdit}>
+
+// <MdEdit size={30} className='editInfoIcon'/>
+// {/* <FaRegEdit size={25}/> */}
+// <span style={{textDecoration: "underline"}}>
+//     Edit {questionName}
+// </span>
+// </div>}
 
 function PublicPrivateDropdown() {
     const dropdownRef = useRef();
@@ -312,7 +312,7 @@ function SkillBase() {
                       </ul>
                     </div>
                   ))}
-                    <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
+                    <div className='addOne' style={{position: "absolute", right: "0", top: "0"}}>
                         <EditInformation isAnswered={true} questionName={"Skills"} onEdit={()=>setSkillModalVisibility(true)}/>
                     </div>
                 </div>
@@ -328,19 +328,20 @@ function SkillBase() {
 function ContactInformation(){
     const { userData, currentUser } = useContext(ProfileContext);
 
-    const [linkedInModalVisibility, setLinkedInModalVisibility] = useState(false);
-    const [emailModalVisibility, setEmailModalVisibility] = useState(false);
+    const [contactModalVisibility, setContactModalVisibility] = useState(false);
 
     return(
         <>
-        <div style={{marginTop: "10px"}}>
+        <div style={{marginTop: "10px", position: "relative"}}>
+        <div className='addOne' style={{position: "absolute", right: "0",bottom: "0", top: "0"}}>
+            <EditInformation isAnswered={userData.email} questionName={"Email"} onEdit={()=>setContactModalVisibility(true)}/>
+        </div>
         <span style={{fontSize: "20px", fontWeight: "bolder"}}>Contact Information</span><br />
         <span style={{color: "#5a696e", fontWeight: "300", fontSize: "15px"}}>Add an email or LinkedIn where Awty students, alumni, and professionals can reach you. Link your LinkedIn so others can easily learn more about you.</span>
         </div>
-        {linkedInModalVisibility && <LinkedinModal userData ={userData} visibility ={linkedInModalVisibility} onClose={() => setLinkedInModalVisibility(false)}/>}
-        {emailModalVisibility && <EmailModal userData={userData} visibility={emailModalVisibility} onClose={() => setEmailModalVisibility(false)}/>}
+        {contactModalVisibility && <ContactInfoModal userData={userData} visibility={contactModalVisibility} onClose={() => setContactModalVisibility(false)}/>}
         <div>
-            <div className='emailSection' style={{marginTop: "10px", position: "relative"}}>
+            <div className='emailSection' style={{marginTop: "10px"}}>
                 <div>
                 <span style={{fontWeight: "550"}}>Email: {!userData.email && <span style={{color: "red", fontWeight: "lighter"}}>No Email provided</span>}
                 {userData.email && <span style={{color: "var(--secondary)"}}>{userData.email}</span>}
@@ -348,16 +349,13 @@ function ContactInformation(){
                 </div>
                 {!userData.email &&
                     <div className='emailUpload'>
-                        <div className="addOne" onClick={()=>setEmailModalVisibility(true)}>
+                        <div className="addOne" onClick={()=>setContactModalVisibility(true)}>
                         <IoAdd size={25} />
                         <span style={{textDecoration: "underline"}}>Add your Email</span>
                     </div>
                     </div>}
-                <div className='addOne' style={{position: "absolute", right: "0", top: "-60px", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
-                    <EditInformation isAnswered={userData.email} questionName={"Email"} onEdit={()=>setEmailModalVisibility(true)}/>
-                </div>
             </div>
-            <div className='linkedInSection' style={{position: "relative", marginTop: "10px"}}>
+            <div className='linkedInSection' style={{marginTop: "10px"}}>
                 <div style={{overflow: "hidden"}}>
                 <span style={{fontWeight: "550"}}>Linkedin Profile: {!userData.linkedinLink && <span style={{color: "red", fontWeight: "lighter"}}>No Linkedin provided</span>}
                 {userData.linkedinLink && <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link>}
@@ -365,14 +363,12 @@ function ContactInformation(){
                 </div>
                 {!userData.linkedinLink &&
                 <div className='linkedInUpload'>
-                    <div className="addOne" onClick={()=>setLinkedInModalVisibility(true)}>
+                    <div className="addOne" onClick={()=>setContactModalVisibility(true)}>
                     <IoAdd size={25} />
                     <span style={{textDecoration: "underline"}}>Add your LinkedIn</span>
                 </div>
                 </div>}
-                <div className='addOne' style={{position: "absolute", right: "0", top: "20px", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
-                    <EditInformation isAnswered={userData.linkedinLink} questionName={"LinkedIn"} onEdit={()=>setLinkedInModalVisibility(true)}/>
-                </div>
+                
             </div>
         </div>
         </>
@@ -385,8 +381,6 @@ function ResumeUpload(){
     const inputRef = useRef();
 
     const { userData, currentUser } = useContext(ProfileContext);
-
-    const [linkedInModalVisibility, setLinkedInModalVisibility] = useState(false);
 
     const handleUploadClick = () => {
         inputRef.current.click();
@@ -414,14 +408,23 @@ function ResumeUpload(){
   
     return (
     <>
+        <div style={{display: "flex", justifyContent: "space-between", position: "relative"}} id="Resume">
+            <div style={{position: "relative", display: "flex", justifyContent: "center", alignItems: "center", paddingTop: "15px", paddingBottom: "10px"}}>
+                <span style={{fontSize: "20px", fontWeight: "bolder"}}>{userData.userName.split(" ")[0]}'s Resume </span>
+                <div className='addOne' style={{marginBottom: "20px", marginLeft: "40px"}}>
+                    <EditInformation isAnswered={pdfUrl} questionName={"LinkedIn"} onEdit={handleUploadClick}/>
+                </div>
+            </div>
+            
+            <div style={{position: "absolute", right: "0", top: "17px"}}>
+                <PublicPrivateDropdown/>
+            </div>
+        </div>
         {!pdfUrl && <span style={{fontWeight: "250", fontSize: "15px"}}>{userData.userType !== "Professional" ? "Showcase your experiences to make a good first impression." : "Add your resume so others can understand your experiences in depth."}</span>} 
         <div className="pdf-viewer-container" style={{paddingTop: "20px", display: "flex", justifyContent: "center", alignItems: "center", position: "relative"}}>
             {pdfUrl ? 
             <>
             <iframe src={pdfUrl} frameborder="0" style={{width: "100%", height: "500px"}}></iframe>
-            <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
-                <EditInformation isAnswered={true} questionName={"Resume"} onEdit={()=>inputRef.current.click()}/>
-            </div>
             </>
             : 
             <button onClick={handleUploadClick} className='btnUpload'>Upload Your&nbsp;<span style={{fontWeight: "bolder"}}>Resume</span></button>}
@@ -499,7 +502,7 @@ function BasicInfoCard({descType}){
         <>
         {basicInfoModalVisibility && <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userData={userData} userType={userType}/>}
         {basicInfoContent && <>
-        <div className='basicInfo'>
+        <div className='basicInfo' style={{position: "relative"}}>
             {/* <div>
                 {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" style={
                 {width: "80px", height: "80px", borderRadius: "50%", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
@@ -546,6 +549,9 @@ function BasicInfoCard({descType}){
                 <span className='cardName'>{userData.userName}</span>
                 <span className='cardDescription'>{basicInfoContent.userPreface}</span>
             </div>   
+            <div className='addOne' style={{position: "absolute", right: "0",bottom: "0", top: "0"}}>
+                <EditInformation isAnswered={true} questionName={"Intro"} onEdit={()=>setBasicInfoModalVisibility(true)}/>
+            </div>
             </div>
             <div style={{display: "flex"}}>
             <div className='userInfo' style={{fontSize: "16px"}}>
@@ -553,10 +559,8 @@ function BasicInfoCard({descType}){
                 <span>{basicInfoContent.userSecondDesc}</span>
                 {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <span>{basicInfoContent.acceptedColleges}</span>}
             </div>
+            
         </div>
-        <div className='addOne' style={{transform: "translate(0,-70px)"}}>
-                <EditInformation isAnswered={true} questionName={"Intro"} onEdit={()=>setBasicInfoModalVisibility(true)}/>
-            </div>
         </>}
         </>
     )
@@ -651,7 +655,10 @@ function AboutMeDisplay(){
     return(
         <>
         <AboutMeModal visibility={aboutMeModalVisibility} onClose={onModalClose} userData={userData}/>
-        <div className="aboutMe" style={{paddingTop: "20px"}}>
+        <div className="aboutMe" style={{paddingTop: "20px", position: "relative"}}>
+            <div style={{position: "absolute", top: "20px", right: "0"}} className='addOne'>
+                    <EditInformation questionName={"About Me"} onEdit={()=>setAboutMeModalVisibility(true)} isAnswered={aboutMe}/>
+            </div>
             <span style={{fontSize: "20px", fontWeight: "bolder"}}>About Me</span> <br />
 
             {!aboutMe && <span style={{fontWeight: "250", fontSize: "15px"}}>Share a little about yourself. Why and with whom do you want to connect?</span>}
@@ -661,7 +668,6 @@ function AboutMeDisplay(){
                 <IoAdd size={25} />
                 <span style={{textDecoration: "underline"}}>Add an About Me Description</span>
                 </>}
-                <EditInformation questionName={"About Me"} onEdit={()=>setAboutMeModalVisibility(true)} isAnswered={aboutMe}/>
             </div><span>{aboutMe}</span>
         </div>
         </>
@@ -688,17 +694,20 @@ function ConnectionAvailability(){
 
     return(
         <>
+            
             {availabilityModalVisibility && <AvailabilityModal visibility={availabilityModalVisibility} availabilityData={availabilityData} onClose={()=>setAvailabilityModalVisibility(false)} userData={userData}/>}
-            <div>
+            <div style={{position: "relative"}}>
+            <h style={{color: "var(--secondary)", fontSize: "30px", fontWeight: "300"}}><span style={{borderBottomStyle: "solid"}}>{userData.userName.split(" ")[0]}</span> is <span style={{fontWeight: "450"}}>open to</span>  </h>
+                <div className='addOne' style={{position: "absolute", top: "10px", right: "0"}}>
+                    <EditInformation isAnswered={true} questionName={"Availability"} onEdit={()=>setAvailabilityModalVisibility(true)}/>
+                </div>
                 {!availabilityData && <span style={{fontWeight: "250", fontSize: "15px"}}>How are you open to assisting prospective students?</span>}
                 {!availabilityData && <div className='addOne' onClick={()=>setAvailabilityModalVisibility(true)}>
                      <IoAdd size={25} />
                     <span style={{textDecoration: "underline"}}>Add Your Availability</span>
                 </div>}
-                {availabilityData && <div style={{position: "relative", paddingTop: "10px", alignItems: "center"}}>
-                    <div className='addOne' style={{position: "absolute", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto", right: "0"}}>
-                        <EditInformation isAnswered={true} questionName={"Availability"} onEdit={()=>setAvailabilityModalVisibility(true)}/>
-                    </div>
+                {availabilityData && <div style={{paddingTop: "10px", alignItems: "center"}}>
+                    
                     <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px"}}>
                         {availabilityData.map((availability)=>(
                             <div key={availability} style={{background: "var(--neutral)", padding: "6px 11px", borderRadius: "5px"}}>

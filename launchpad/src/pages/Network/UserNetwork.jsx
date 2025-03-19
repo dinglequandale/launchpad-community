@@ -28,7 +28,7 @@ export default function UserNetwork() {
 
   const { chatClient, isConnected } = useOutletContext();
 
-  const pageName = "Network";
+  const pageName = "The Ram Network";
 
   const [tenantId, setTenantId] = useState(null);
 

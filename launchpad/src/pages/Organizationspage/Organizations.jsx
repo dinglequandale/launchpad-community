@@ -203,7 +203,7 @@ export default function Organizations(){
             {showPfpCard && <ProfileModal visibility={showPfpCard} onClose={()=>setShowPfpCard(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={targetUserData} handleReferalClick={handleReferalClick}/>}
             <TopBar/>
             <SideNav/>
-            <div className='organizationsContainer' style={{paddingTop: "4%", paddingLeft: "10%", backgroundColor: "white"}}>
+            <div className='organizationsContainer' style={{paddingTop: "4%", paddingLeft: "10%", backgroundColor: "white", paddingBottom: "2%"}}>
                 <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/> 
                 
                 <main style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "20px", position: "relative"}}>

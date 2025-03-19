@@ -67,7 +67,7 @@ export default function Onboarding() {
             {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
             <div style={{position: "relative"}}>
             <div className='onboarding-body' >
-                {!showComponent && <div style={{position: "absolute", top: "-50px", width: "70vw", textAlign: "center"}}><span style={{fontSize: "30px"}}>Join your school’s digital network of students, parents, and alumni</span></div>}
+                {!showComponent && <div style={{position: "absolute", top: "-50px", width: "100vw", textAlign: "center"}}><span style={{fontSize: "30px"}}>Join your school’s digital network of students, parents, and alumni</span></div>}
                 <header style={{marginBottom: "1.5rem", position: "relative"}}>
                 
                     <div style={{background: "var(--accent)", borderRadius: "25px",

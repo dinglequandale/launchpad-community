@@ -249,9 +249,9 @@ export default function Home(){
                 </div>
                 
             </div>
-            <div className="landing-footer" style={{zIndex: "4"}}>
+            {/* <div className="landing-footer" style={{zIndex: "4"}}>
               <LegalityFooter pathName={"/Home"}/>
-            </div>
+            </div> */}
         </>
     )
 }

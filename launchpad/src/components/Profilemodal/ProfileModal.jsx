@@ -8,7 +8,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
 import { displayColleges, displayFieldsOfInterest, getBasicUserDescription } from '../../services/userProfileServices';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/auth/AuthContext';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick}) {
@@ -23,6 +23,10 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
 
     const basicUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
     const isProfessional = basicUserInfo.userType === "Professional";
+
+    const location = useLocation();
+    const currentPath = location.pathname;
+
     useEffect(()=>{
 
         const getOpportunityData = async () => {
@@ -115,7 +119,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 {(userData.acceptedColleges && userData.acceptedColleges.length > 0) && <span>{basicInfoContent.acceptedColleges}</span>}
                             </div>
                         </div>
-                        <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(userData)}> 
+                        <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(currentPath === "/Organizations" ? userData : userData.id)}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>

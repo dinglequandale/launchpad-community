@@ -37,7 +37,7 @@ h3{
 form input{
   border-style: solid;
   border-width: 1.5px;
-  border-color: var(--secondary);
+  border-color: var(--secondaryHighlight);
   border-radius: 5px;
   color: var(--secondary);
   padding: 7px;
@@ -113,7 +113,7 @@ input[type="checkbox"]::before:hover{
 form select{
   border-style: solid;
   border-width: 1.5px;
-  border-color: var(--secondary);
+  border-color: var(--secondaryHighlight);
   border-radius: 5px;
   color: var(--secondary);
   padding: 7px;
@@ -126,7 +126,7 @@ textarea{
   /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
   border-radius: 10px;
   border-style: solid;
-  border-color: var(--secondary);
+  border-color: var(--secondaryHighlight);
   font-family: "Inter";
   border-width: 1.5px;
   font-size: 18px;
@@ -218,7 +218,7 @@ button {
 
 .btnText{
   background-color: transparent;
-  color: var(--accent);
+  color: #34acc7;
   text-decoration: underline;
   transition: color 0.3s ease;
   cursor: pointer;
@@ -227,7 +227,7 @@ button {
 }
 
 .diff-color{
-  color: var(--secondary);
+  color: #00a2ff;
 }
 
 .btnText:hover{

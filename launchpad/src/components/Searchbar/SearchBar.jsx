@@ -6,7 +6,7 @@ import { CiSearch } from "react-icons/ci";
 export default function SearchBar({filters, pageName, handleFilterChange, handleSearch}) {
     const searchType = () => {
         switch(pageName){
-            case "Network":
+            case "The Ram Network":
                 return "profession, interests, company, or name";
             case "Opportunities":
                 return "company, interest, or name"
