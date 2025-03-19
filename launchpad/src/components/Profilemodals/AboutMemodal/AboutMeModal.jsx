@@ -77,7 +77,7 @@ export default function AboutMeModal({userData, visibility, onClose}){
         onRequestClose={onClose}
         style={customStyles}
         contentLabel="About Me Modal"
-        shouldCloseOnOverlayClick={false} 
+        // shouldCloseOnOverlayClick={false} 
       >
         <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
         <header>

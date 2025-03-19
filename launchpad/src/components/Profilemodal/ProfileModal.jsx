@@ -127,7 +127,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                         </button>
                     </header>
                     <hr style={{width: "95%"}}/>
-                    <main style={{padding: "0px 8px"}}>
+                    <main style={{padding: "0px 8px", overflowX: "hidden"}}>
                     {(!opportunitiesLoading && opportunitiesData.length > 0) ? 
                         
                         (

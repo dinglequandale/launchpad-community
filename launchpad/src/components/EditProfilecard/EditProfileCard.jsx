@@ -193,10 +193,15 @@ export default function EditProfileCard() {
     )
 }
 
-function EditInformation({questionName, onEdit, isAnswered}){
+function EditInformation({onEdit, isAnswered, isOpportunity=false}){
     return(
         <>
-        {isAnswered && <div style={{position: "absolute", right: "10px", top: "0"}}
+        {isAnswered && <div style={{position: "absolute", display: "flex", 
+        justifyContent: "center", alignItems: "center", right: "10px", top: "0", 
+        background: isOpportunity ? "var(--secondaryHighlight)" : "", 
+        borderRadius: isOpportunity ? "50%" : "",
+        padding: isOpportunity ? "8px" : "",
+        }}
             onClick={onEdit}>
             <FaRegEdit size={25}/>
         </div>}
@@ -573,6 +578,8 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
     // const [currentOpportunityData, setCurrentOpportunityData] = useState(opportunityData);
     const [deleteWarningVisibility, setDeleteWarningVisibility] = useState(false);
 
+    const [opportunityEditVisibility, setOpportunityEditVisibility] = useState(false);
+
     // TODO: Diagnose...
     const opportunityId = opportunityData ? opportunityData.id : "";
     const [loading, setLoading] = useState(false);
@@ -593,7 +600,7 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
             {deleteWarningVisibility && <DeleteWarningModal onCancel={()=>setDeleteWarningVisibility(false)} onVerify={() => deleteOpportunity(opportunityId)} visibility={deleteWarningVisibility}
                 objectOfDeletation={opportunityData.organizationType}/>}
         </div>
-        <div style={{position: "relative"}}>
+        <div>
             { (opportunityData && !loading) ? <>
             <div style={{textAlign: "center", marginBottom: "12px"}}>
             <span
@@ -601,10 +608,25 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
                 {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
             </span>
             </div>
-            <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "-13px", top: "28px", background: "red", zIndex: "2"}}>
-                <MdDeleteOutline size={30}/>
-            </button>
-            <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
+            <div 
+                onMouseEnter={() => setOpportunityEditVisibility(true)}
+                onMouseLeave={() => setOpportunityEditVisibility(false)}
+                style={{position: "relative"}}>
+                <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
+                
+                {opportunityEditVisibility && <>
+                <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "70px", top: "-17px", background: "red", zIndex: "2"}}>
+                    <MdDeleteOutline size={28}/>
+                </button>
+                <div className='addOne' style={{position: "absolute", right: "0", top: "-17px"}}>
+                    <EditInformation isAnswered={opportunityData} isOpportunity={true} onEdit={()=>{
+                        setEdittingOpportunity(opportunityData);
+                        setOpportunityModalVisibility(true);
+                        setIsEditing(true);
+                        }}/>
+                </div>
+                </>}
+            </div>
             </> : loading ?
             <div>
                 <Loading/>
@@ -627,13 +649,7 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
               <span className="underline">Add one!</span>
             </div>
             </div>}
-            <div className='addOne' style={{position: "absolute", right: "0", top: "0", bottom: "0", marginTop: "auto", marginBottom: "auto"}}>
-                <EditInformation isAnswered={opportunityData} questionName={"Opportunity"} onEdit={()=>{
-                    setEdittingOpportunity(opportunityData);
-                    setOpportunityModalVisibility(true);
-                    setIsEditing(true);
-                    }}/>
-            </div>
+            
         </div>
         </>
     )

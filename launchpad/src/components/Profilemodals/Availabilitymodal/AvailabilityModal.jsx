@@ -91,6 +91,7 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
           marginRight: '-50%',
           transform: 'translate(-50%, -50%)',
           zIndex: "5",
+          maxHeight: "600px",
         },
         overlay: {
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
