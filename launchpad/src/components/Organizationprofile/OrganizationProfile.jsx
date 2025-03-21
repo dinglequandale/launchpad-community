@@ -129,7 +129,9 @@ return(
                     <div style={{fontSize: "16px", position: "absolute", bottom: "7px", left: "43%"}}>
                         {!isExpanded && <ReadMoreButton handleClick={handleReadMoreClick} isExpanded={isExpanded} isLessText={isLessText}/>}
                     </div>
+                    <div>
                     <img src={organizationProfileData.organizationLogoPreview} className="pfpImage" style={{width: "145px", height: "145px", borderRadius: "20px"}}/>
+                    </div>
                     <div name="organizationContent" style={{padding: "0px 15px", paddingBottom: "11px", position: 'relative'}}>
                         <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
                             <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
