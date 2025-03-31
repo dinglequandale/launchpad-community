@@ -33,7 +33,7 @@ const highSchoolQuestionsConfig = [
   },
   {
     id: "userResume",
-    text: "Attach your resume to show Awty professionals and alumni what you're about:",
+    text: "Attach your resume to show professionals and alumni what you're about:",
     type: "file",
     optional: true,
     page: 1
@@ -195,17 +195,6 @@ const SchoolInfo = ({ selectedOptions, handleChange, highSchoolerData }) => {
   return (
     <div className='onboardingQuestions' style={{width: "500px"}}>
       {questionsForPage.map((question) => (
-        // (question.id === "sectionAttending") ?
-        // highSchoolerData.schoolAttending === "Awty International School" &&
-        // <OnboardingDropdown
-        //   key={question.id}
-        //   question={question.text}
-        //   options={question.options}
-        //   selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-        //   onChange={(label) => handleChange(question.id, label)}
-        //   type={question.type}
-        // />
-        // : 
         <OnboardingDropdown
           key={question.id}
           question={question.text}

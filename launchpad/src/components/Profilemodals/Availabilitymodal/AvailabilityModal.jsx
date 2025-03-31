@@ -68,13 +68,13 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
         },
         { 
             id: "mockInterview",
-            text: "Conduct mock interviews to help Awty alumni entering similar career fields", 
+            text: "Conduct mock interviews to help alumni entering similar career fields", 
             value: "Mock Interview", 
             includers: ["Professional"] 
         },
         { 
             id: "workplaceOpportunities",
-            text: "Offer shadow, internship, job, or volunteer opportunities for Awty students or alumni at your company",
+            text: "Offer shadow, internship, job, or volunteer opportunities for students or alumni at your company",
             value: "Workplace Opportunities",
             includers: ["Professional"]
         },

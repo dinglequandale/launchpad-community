@@ -56,7 +56,7 @@ const collegeStudentQuestionsConfig = [
   },
   {
     id: "schoolAttending",
-    text: "What high school did you attend?",
+    text: "What Houston high school did you attend?",
     type: "select",
     options: highSchools,
     page: 2,
@@ -277,7 +277,7 @@ const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
         <div style={{border: "solid 1.5px var(--secondary)", textAlign: "center", padding: "8px 0px", background: "var(--neutral)"}}>
           <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and mentorship</span> <br /> is a valuable reasource for students on this app.</span></div>
         <div style={{position: "relative"}}>
-        <label className='onboardingQuestion'>Please roughly assess your commitment:</label>
+        <label className='onboardingQuestion'>Roughly assess your commitment:</label>
         <div style={{position: "absolute", bottom: "-13px"}}>
             <OptionalLabel />
             </div>
@@ -341,7 +341,7 @@ const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
         {/* <div style={{border: "solid 1.5px var(--secondary)", textAlign: "center", padding: "8px 0px", background: "var(--neutral)"}}>
           <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and mentorship</span> <br /> is a valuable reasource for students on this app.</span></div> */}
         <div style={{position: "relative"}}>
-        <label className='onboardingQuestion'>Professionals in the Awty community may have workplace opportunities for you. List some of your skills to show them what you are about:</label>
+        <label className='onboardingQuestion'>Professionals in your school community may have workplace opportunities for you. List some of your skills to show them what you are about:</label>
         <div style={{position: "absolute", bottom: "-13px"}}>
             <OptionalLabel />
             </div>

@@ -46,7 +46,7 @@ export default function NoResults ( {searchTerm} ) {
           transition={{ delay: 0.5, duration: 0.4 }}
           className="message"
         >
-          Couldn't find who you were looking for? Invite them to Awty's network!
+          Couldn't find who you were looking for? Invite them to your school's network!
         </motion.p>
         {/* <motion.ul
           initial={{ opacity: 0, y: 10 }}

@@ -363,7 +363,7 @@ function ContactInformation(){
             <EditInformation isAnswered={userData.email} questionName={"Email"} onEdit={()=>setContactModalVisibility(true)}/>
         </div>
         <span style={{fontSize: "20px", fontWeight: "bolder"}}>Contact Information</span><br />
-        <span style={{color: "#5a696e", fontWeight: "300", fontSize: "15px"}}>Add an email or LinkedIn where Awty students, alumni, and professionals can reach you. Link your LinkedIn so others can easily learn more about you.</span>
+        <span style={{color: "#5a696e", fontWeight: "300", fontSize: "15px"}}>Add an email or LinkedIn where students, alumni, and professionals can reach you. Link your LinkedIn so others can easily learn more about you.</span>
         </div>
         {contactModalVisibility && <ContactInfoModal userData={userData} visibility={contactModalVisibility} onClose={() => setContactModalVisibility(false)}/>}
         <div>

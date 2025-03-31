@@ -10,6 +10,7 @@ import Loading from '../LoadingAnimation/Loading';
 import { displayColleges, displayFieldsOfInterest, displayShortenedLinkedin, getBasicUserDescription } from '../../services/userProfileServices';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/auth/AuthContext';
+import DefaultIcon from '../DefaultIcon/DefaultIcon';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick}) {
 
@@ -101,11 +102,10 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                     <IoCloseOutline className='closeProfileModal' size={30} onClick={onClose}/>
                     <>
                     <header name="userIntro" style={{paddingBottom: "10px"}}>
-                        <div className='basicInfo'>
+                        <div className='basicInfo' style={{marginBottom: !userData.userPfpPreview ? "10px" : ""}}>
                             <div>
                                 {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" className='pfpImage' style={
-                            {width: "80px", height: "80px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <img className="pfpImage" src="/assets/placeholder_pfp.png" alt="" style={
-                                {width: "80px", height: "80px"}}/>}
+                            {width: "80px", height: "80px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <><DefaultIcon size={50} length={"70px"}/></>}
                             </div>
                             <div className='cardNameDescription'>
                                 <span className='cardName'>{userData.userName}</span>

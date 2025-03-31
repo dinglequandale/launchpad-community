@@ -7,6 +7,7 @@ import { storage } from '../../firebase/firebaseConfig';
 import toast, { Toaster } from 'react-hot-toast';
 import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
 import { CgClose } from 'react-icons/cg';
+import { displayShortenedLinkedin } from '../../services/userProfileServices';
 
 // TODO: actually implement clickedUser logic
 export default function ConnectModal({visibility, chat, onClose, userId, userData, isOpportunity=false, opportunityType=null}){
@@ -120,7 +121,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
               </span>
               {userData.linkedinLink && <span style={{fontSize: "18px"}}>
                 <span style={{textDecoration: "", color: "black", fontWeight: "550"}}>Linkedin:</span>
-                &nbsp;<Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link>
+                &nbsp;<Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{displayShortenedLinkedin(userData.linkedinLink)}</Link>
               </span>}
             </div>
             {sendDirectMessage && (<div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>

@@ -8,6 +8,7 @@ const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
     { "value": "bellaire_high", "label": "Bellaire High School" },
     { "value": "lamar_high", "label": "Lamar High School" },
+    { "value": "john_cooper", "label": "John Cooper School" },
     { "value": "carnegie_vanguard", "label": "Carnegie Vanguard High School" },
     { "value": "debakey_high", "label": "DeBakey High School for Health Professions" },
     { "value": "westside_high", "label": "Westside High School" },
@@ -182,6 +183,7 @@ const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion 
       options={[...options]}
       selectedOption={selectedOption ?? "N/A"}
       onChange={onChange}
+      placeholder={"Start typing..."}
       type={type} // Assuming single-select for college search
       onSearchQueryChange={handleInputChange} // Pass the input change handler
       showQuestion={showQuestion}

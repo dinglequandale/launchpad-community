@@ -12,7 +12,7 @@ const professionalQuestionsConfig = [
   // Page 1
   {
     id: "userName",
-    text: "Please enter your full name:",
+    text: "Enter your full name:",
     placeholder: "E.g. Jimmy Fallon",
     type: "text",
     page: 1
@@ -41,7 +41,7 @@ const professionalQuestionsConfig = [
   {
     id: "linkedinLink",
     optional: true,
-    text: "Please link your Linkedin profile to make it easy for students to learn more about you.",
+    text: "Link your Linkedin profile to make it easy for students to learn more about you.",
     page: 1
   },
   // Page 2
@@ -96,7 +96,7 @@ const professionalQuestionsConfig = [
   {
     id: "companyName",
     text: "Where do you currently work?",
-    placeholder: "Company name ...",
+    placeholder: "E.g ExxonMobil",
     type: "text-box",
     retired: false,
     options: null,
@@ -120,7 +120,7 @@ const professionalQuestionsConfig = [
   {
     id: "networkingLevel",
     text: "You're knowledge and mentorship is a valuable reasource for students on this app.  \
-          Please roughly assess your level of commitment:",
+          Roughly assess your level of commitment:",
     type: "multi-select",
     options: [
         "Casual Connections",
@@ -322,7 +322,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
       },
       { 
           id: "workplaceOpportunities",
-          text: "Open to applicants interested in shadowing / volunteering / job opportunities",
+          text: "Occasionally offer shadowing / internship / volunteer opportunities",
           value: "Workplace Opportunities",
       },
     ];
@@ -404,7 +404,7 @@ const EmailConfirmation = ({ selectedOptions, handleChange, loginEmail }) => {
       </div>
       {btnSelected === "n" && 
       <>
-        <label className='onboardingQuestion' style={{textAlign: "center"}}>Please input a more suitable email:</label>
+        <label className='onboardingQuestion' style={{textAlign: "center"}}>Input a more suitable email:</label>
         <input className="onboardingInput" type="email" value={selectedOptions["email"]} onChange={(e) => handleChange("email", e.target.value)}/>
       </>}
     </div>
