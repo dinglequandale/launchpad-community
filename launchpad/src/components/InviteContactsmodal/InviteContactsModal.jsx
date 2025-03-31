@@ -1,6 +1,7 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { CgClose } from "react-icons/cg";
 import { GrAdd } from "react-icons/gr";
 import Modal from "react-modal";
 
@@ -72,6 +73,7 @@ export default function InviteContactsModal({visibility, onClose,tenantId}){
             contentLabel="Invite Contacts Modal"
           >
             <header>
+              <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
               <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Help Grow the {tenantId} Network <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}> Invite Friends, Family, and Colleagues </span></h2>
               <hr style={{borderColor: "var(--secondary)"}}/>
             </header>

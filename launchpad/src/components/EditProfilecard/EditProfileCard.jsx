@@ -19,7 +19,7 @@ import { handleDeleteOpportunity, loadOpportunities } from '../../services/oppor
 import Loading from '../LoadingAnimation/Loading';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
-import { deletePfp, displayColleges, displayFieldsOfInterest, editUserData, getBasicUserDescription, handleUserProfileUpdate, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
+import { deletePfp, displayColleges, displayFieldsOfInterest, displayShortenedLinkedin, editUserData, getBasicUserDescription, handleUserProfileUpdate, handleUserResumeUpdate, lowerAndCapitalize } from '../../services/userProfileServices';
 import { BiEdit, BiPlus, BiTrash } from 'react-icons/bi';
 import SkillModal from '../SkillsModal/SkillModal';
 // import LinkedinModal from '../Profilemodals/LinkedInModal/LinkedinModal';
@@ -34,6 +34,7 @@ const ProfileContext = createContext({
 export default function EditProfileCard() {
     const navigate = useNavigate();
     const location = useLocation();
+    const prevPath = location.state?.pathName;
 
     const [userData, setUserData] = useState(null);
 
@@ -43,7 +44,8 @@ export default function EditProfileCard() {
     const [opportunitiesData, setOpportunitiesData] = useState([]);
     const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
-    // const [newOpportunityModalVisibility, setNewOpportunityModalVisibility] = useState(false);
+
+    const incompleteOpportunitiesData = JSON.parse(localStorage.getItem("savedOrganizationData"));
 
     const [edittingOpportunity, setEdittingOpportunity] = useState(null);
 
@@ -87,6 +89,10 @@ export default function EditProfileCard() {
         await handleDeleteOpportunity(opportunityId);
     }
 
+    const deleteIncompleteOpportunity = (opportunityId) => {
+        localStorage.setItem("savedOrganizationData", JSON.stringify(incompleteOpportunitiesData.filter(opportunity => opportunity.id !== opportunityId)));
+    }
+
     const opportunitiesOptions = {highSchool: 
     <span style={{color: "#006876", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
     alum:
@@ -128,7 +134,7 @@ export default function EditProfileCard() {
                 {(!loading && userData) ? <>
                 <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", borderWidth: "1.7px", paddingBottom: "5px"}}>
                     <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
-                    onClick={() => {location.state ? navigate(location.state) : navigate("/")}}>
+                    onClick={() => {prevPath ? navigate(prevPath) : navigate("/Home")}}>
                         <RiArrowGoBackFill size={20}/>
                         <span>Go Back</span>
                     </div>
@@ -138,6 +144,21 @@ export default function EditProfileCard() {
                 <hr style={{width:"100%"}}/>
                 
                 <div>
+                    {incompleteOpportunitiesData.length > 0 && (
+                        <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
+                            {incompleteOpportunitiesData.map((opportunityData, index)=>(
+                                <OpportunityPopup 
+                                    opportunityData={opportunityData} 
+                                    isPublished={false}
+                                    key={index}
+                                    opportunitiesOptions={opportunitiesOptions} 
+                                    // opportunityModalVisibility={opportunityModalVisibility} 
+                                    setOpportunityModalVisibility={setOpportunityModalVisibility}
+                                    setEdittingOpportunity={setEdittingOpportunity}
+                                    deleteOpportunity={deleteIncompleteOpportunity}
+                                />
+                            ))}
+                        </div> )}
                     {(!opportunitiesLoading && opportunitiesData.length > 0) ? 
                     
                     (
@@ -363,7 +384,7 @@ function ContactInformation(){
             <div className='linkedInSection' style={{marginTop: "10px"}}>
                 <div style={{overflow: "hidden"}}>
                 <span style={{fontWeight: "550"}}>Linkedin Profile: {!userData.linkedinLink && <span style={{color: "red", fontWeight: "lighter"}}>No Linkedin provided</span>}
-                {userData.linkedinLink && <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{userData.linkedinLink}</Link>}
+                {userData.linkedinLink && <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{displayShortenedLinkedin(userData.linkedinLink)}</Link>}
                 </span>
                 </div>
                 {!userData.linkedinLink &&
@@ -497,10 +518,10 @@ function BasicInfoCard({descType}){
 
     useEffect(()=>{
         setBasicInfoContent({userPreface: getBasicUserDescription(userData, false),
-        userFirstDesc: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}: ${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : displayFieldsOfInterest(userData.areasOfInterest, "longer")}`,
-        userSecondDesc: `${descType}: ${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`,
-        acceptedColleges: `Accepted Colleges: ${userData.acceptedColleges}`,
-    })
+        userFirstDesc: {desc1: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}`, desc2: `${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : displayFieldsOfInterest(userData.areasOfInterest, "longer")}`},
+        userSecondDesc: {desc1: `${descType}`, desc2: `${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`},
+        acceptedColleges: {desc1: `Accepted Colleges`, desc2: `${userData.acceptedColleges}`},
+    });
     },[userData])
 
     return(
@@ -560,9 +581,9 @@ function BasicInfoCard({descType}){
             </div>
             <div style={{display: "flex"}}>
             <div className='userInfo' style={{fontSize: "16px"}}>
-                <span>{basicInfoContent.userFirstDesc}</span>
-                <span>{basicInfoContent.userSecondDesc}</span>
-                {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <span>{basicInfoContent.acceptedColleges}</span>}
+                <span><span style={{fontWeight: "500"}}>{basicInfoContent.userFirstDesc.desc1}</span>: {basicInfoContent.userFirstDesc.desc2}</span>
+                <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>
+                {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
             </div>
             
         </div>
@@ -571,7 +592,7 @@ function BasicInfoCard({descType}){
     )
 }
 
-function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunityModalVisibility, deleteOpportunity, setEdittingOpportunity}){
+function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunityModalVisibility, deleteOpportunity, setEdittingOpportunity, isPublished=true}){
 
     const { currentUser, userData } = useContext(ProfileContext);
 
@@ -612,7 +633,7 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
                 onMouseEnter={() => setOpportunityEditVisibility(true)}
                 onMouseLeave={() => setOpportunityEditVisibility(false)}
                 style={{position: "relative"}}>
-                <OrganizationProfile location={"user_profile"} organizationData={opportunityData}/>
+                <OrganizationProfile location={"user_profile"} organizationData={opportunityData} isPublished={isPublished}/>
                 
                 {opportunityEditVisibility && <>
                 <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "70px", top: "-17px", background: "red", zIndex: "2"}}>

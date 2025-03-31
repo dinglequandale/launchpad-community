@@ -242,15 +242,15 @@ export default function UserNetwork() {
               <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/>
               <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh", position: "relative"}}>
                 {allVisibleUserData && allVisibleUserData.length > 0 ? <>
-                {highSchoolers.length > 0 && <>
+                {professionals.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
-                  <h3>High Schoolers</h3>
-                  <span style={{fontWeight: "400", fontSize: "smaller"}}>{isRecommended}</span>
+                  <h3>Professionals</h3>
+                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>{isRecommended}</span>
                 </div>
                 <UserCarousel 
-                  userNetworkData={highSchoolers} 
-                  onEndReached={() => loadMore('High Schooler')} 
-                  loading={loading.highSchool}
+                  userNetworkData={professionals}
+                  onEndReached={() => loadMore('Professional')} 
+                  loading={loading.professional}
                 />
                 </>}
                 {collegeStudents.length > 0 && <>
@@ -264,15 +264,15 @@ export default function UserNetwork() {
                   loading={loading.college}
                 />
                 </>}
-                {professionals.length > 0 && <>
+                {highSchoolers.length > 0 && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
-                  <h3>Professionals</h3>
-                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>{isRecommended}</span>
+                  <h3>High Schoolers</h3>
+                  <span style={{fontWeight: "400", fontSize: "smaller"}}>{isRecommended}</span>
                 </div>
                 <UserCarousel 
-                  userNetworkData={professionals}
-                  onEndReached={() => loadMore('Professional')} 
-                  loading={loading.professional}
+                  userNetworkData={highSchoolers} 
+                  onEndReached={() => loadMore('High Schooler')} 
+                  loading={loading.highSchool}
                 />
                 </>}
                 </> : overallLoading ? <div style={{position: "absolute", left: "50%",top: "50%", transform: "translate(-50%,-50%)", width: "300px"}}> <Loading/> </div> : 

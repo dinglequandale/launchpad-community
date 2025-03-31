@@ -80,8 +80,8 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
                 </div>
                 <h1>Welcome to Launchpad!</h1>
                 <p>Greetings ${recipientData[i].userName.split(" ")[0]},</p>
-                <p>${senderName} has invited you to Launchpad app, the Awty digital community network hosting our students, alumni, parents, and professionals!</p>
-                <p>Awty has partnered with Launchpad to create a school networking platform that fosters our students' potential and passion, propelling them into college and beyond. By harnessing Awty's  network of experienced alumni and parents, we empower our students to receive real-world insights, gain workplace experience, and explore college & career paths.</p>
+                <p>${senderName} has invited you to Launchpad, your school's digital community network hosting students, alumni, parents, and professionals!</p>
+                <p>Launchpad aims to foster a school networking platform that for students' potential and passion, propelling them into college and beyond. By harnessing your school's network of experienced alumni and parents, we empower our students to receive real-world insights, gain workplace experience, and explore college & career paths.</p>
                 <p>We're excited to have you join us in this mission to support our students’ success! Click the button below to get started:</p>
                 <a href="https://launchpadhouston.com" class="button">Join Launchpad</a>
                 <p>If you have any questions, feel free to reach out to our support team at launchpadhelpline@gmail.com.</p>
@@ -93,7 +93,7 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
             const mailOptions = {
                 from: 'launchpad861@gmail.com',
                 to: recipientData[i].email,
-                subject: `${senderName} invites you to join Launchpad, Awty’s networking app!`,
+                subject: `${senderName} invites you to join Launchpad, your school's networking app!`,
                 html: emailTemplate
             };
             

@@ -27,7 +27,7 @@ const OpportunityContext = createContext({
   organizationQuestionsConfig: {},
 });
 
-export default function OpportunityModal({visibility, onClose, opportunityData, isEditing, opportunityId}){
+export default function OpportunityModal({visibility, onClose, opportunityData, isEditing, opportunityId, isPublished}){
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
   const [showLast, setShowLast] = useState(false);
@@ -55,11 +55,13 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
   const [organizationLogo,setOrganizationLogo] = useState(null);
 
 
-const saveOpportunityData = async () => {
+const publishOpportunityData = async () => {
   try {
     setIsSaving(true);
     await toast.promise(
-      saveOpportunity(organizationData, organizationLogo, currentUser, isEditing, opportunityId),
+      saveOpportunity(Object.fromEntries(
+        Object.entries(organizationData).filter(([key, value]) => key !== "id")
+      ), organizationLogo, currentUser, isEditing, opportunityId),
       {
         loading: isEditing ? 'Updating opportunity...' : 'Creating opportunity...',
         success: isEditing ? 'Opportunity updated successfully!' : 'Opportunity created successfully!',
@@ -76,6 +78,19 @@ const saveOpportunityData = async () => {
   }
 
   // onClose();
+  }
+
+  const saveOpportunityData = () => {
+    const currentOpportunityData = localStorage.getItem("savedOrganizationData") ? JSON.parse(localStorage.getItem("savedOrganizationData")) : [];
+    if(!isEditing){
+      localStorage.setItem("savedOrganizationData", JSON.stringify([...currentOpportunityData, {...organizationData, id: Math.floor(Math.random() * 10000)}]));
+    }
+    else{
+      const orgId = opportunityData.id;
+      localStorage.setItem("savedOrganizationData", JSON.stringify([...currentOpportunityData.filter(opportunity => opportunity.id !== orgId), {...organizationData, id: orgId}]));
+    }
+    toast.success("Opportunity saved!");
+    // onClose();
   }
 
   useEffect(() => {
@@ -379,8 +394,12 @@ const saveOpportunityData = async () => {
               ()=>setMakeChangesVisibility(true)
               } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Cancel</button> */}
-            {currentOpportunityPage === 5 && <button onClick={saveOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Save Changes</button>}
+            {currentOpportunityPage === 5 ? <button onClick={publishOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+              Publish</button> : !isPublished ?
+              <button onClick={saveOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+              Save</button>
+              : 
+              <></>}
           </footer>
         </Modal>
       </OpportunityContext.Provider>
@@ -520,11 +539,11 @@ function ApplicantInfo({handleDropdownChange}){
                   (question.id === "applicantPosition"  && !question.includers.includes(question.id))
               )
               .map((question) => (
-                <div key={question.id} style={{ flex: 1, marginRight: "10px" }}>
+                <div key={question.id} style={{}}>
                   {question.required && (
                     <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "center", justifyContent: "center" }}>
                       <label htmlFor={question.id}>{question.text}</label>
-                    {question.id === "organizationTags" ? <div style={{width: "350px", textAlign: "left"}}>
+                    {question.id === "organizationTags" ? <div style={{width: "360px", textAlign: "left"}}>
                       <OnboardingDropdown
                         showQuestion={false}
                         key={question.id}
@@ -536,7 +555,7 @@ function ApplicantInfo({handleDropdownChange}){
                       /> 
                     </div> : 
                     <input
-                      style={{width: "300px"}}
+                      style={{width: "330px"}}
                       id={question.id}
                       name={question.id}
                       value={organizationData[question.id]}

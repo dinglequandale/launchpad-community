@@ -26,6 +26,15 @@ export const displayShortenedName = (userName) => {
     return userName;
 }
 
+export const displayShortenedLinkedin = (linkedInLink) => {
+    if(linkedInLink.length > 50) {
+        return linkedInLink.substring(0,50);
+    }
+    else{
+        return linkedInLink;
+    }
+}
+
 export const displayFieldsOfInterest = (fieldsOfInterest, length = "shorter") => {
     const abbreviations = {
         "Mathematics": "Math",
