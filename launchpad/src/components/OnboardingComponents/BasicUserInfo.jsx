@@ -62,7 +62,20 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
             placeholder={questionsForPage[0].placeholder}
           />
         </div>
-        
+        {questionsForPage[4] && questionsForPage[4].id === "schoolAttending" && (
+          <div style={{zIndex: "3"}}>
+            <OnboardingDropdown
+              key={questionsForPage[4].id}
+              question={questionsForPage[4].text}
+              options={questionsForPage[4].options}
+              selectedOption={selectedOptions[questionsForPage[4].id] || (questionsForPage[4].type === 'multi-select' ? [] : '')}
+              onChange={(label) => handleChange(questionsForPage[4].id, label)}
+              type={questionsForPage[4].type}
+              placeholder={questionsForPage[4].placeholder}
+              onSearchQueryChange={questionsForPage[4].id === 'whatCollege' ? onSearchQueryChange : null}
+            />
+          </div>
+        )}
         <div className="file-upload-container" style={{display: "flex", alignItems: "center"}}>
         {/* <label className="onboardingQuestion" style={{width: "100%", position: 'relative'}}>
           {questionsForPage[1].text}

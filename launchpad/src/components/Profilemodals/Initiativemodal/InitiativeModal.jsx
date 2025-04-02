@@ -147,7 +147,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
       text: "Your Mission",
       type: "textarea",
       maxLength: 500,
-      placeholder: `Summarize your ${organizationData.organizationType ? organizationData.organizationType.toLowerCase() : "initiative"}'s mission and values in a few sentences.`,
+      placeholder: `Describe your ${organizationData.organizationType ? organizationData.organizationType.toLowerCase() : "initiative"}. Summarize your mission and values in a few sentences, and invite others to join or learn more.`,
       includers: ["Nonprofit", "Club", "Business", ""],
       required: true,
       page: 2, 
@@ -520,7 +520,7 @@ function FinalInfo(){
                   </div>
                   {(question.id === "apply") && (
                     <button className='btnText' onClick={handleNoApplyClick} style={{fontSize: "18px", opacity: ".75", marginTop: "10px", color: applyDisabled ? "var(--highlight)" : ""}}>
-                      I don't want students to apply.
+                      I don’t want other students to participate.
                     </button>
                   )}
                 </div>

@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { getFunctions, httpsCallable } from "firebase/functions";
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import { careerInterests } from './../Options';
+import { careerInterests, highSchools } from './../Options';
 import { requiredQuestionsAnswered, saveProfessional } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
@@ -42,6 +42,15 @@ const professionalQuestionsConfig = [
     id: "linkedinLink",
     optional: true,
     text: "Link your Linkedin profile to make it easy for students to learn more about you.",
+    page: 1
+  },
+  {
+    id: "schoolAttending",
+    // TODO: change to affiliatedSchools
+    text: "What Houston school(s) are you connected to? (e.g. as a parent)",
+    type: "select",
+    options: highSchools,
+    placeholder: "N/A",
     page: 1
   },
   // Page 2
@@ -156,8 +165,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
     companyName: '',
     areasOfInterest: [],
     networkingLevel: [],
-    // userResume: null,
-    // userResumePreview: "",
+    schoolAttending: [],
     linkedinLink: "",
     userType: "Professional",
     userPfpPreview: "",

@@ -8,7 +8,7 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 import ReadMoreButton from "../ReadMorebutton/ReadMore";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
-import { displayFieldsOfInterest } from "../../services/userProfileServices";
+import { displayFieldsOfInterest, getUserHS } from "../../services/userProfileServices";
 
 export default function OrganizationProfile({organizationData, location, handleShowProfile, handleReferalClick}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
@@ -136,6 +136,7 @@ return(
                         <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
                             <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
                             <span style={{fontSize: "smaller", fontWeight: "550"}}> {organizationProfileData.organizationType} {["Club", "Initiative", "Business"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
+                            {organizationProfileData.organizationType === "Club" && userData && <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}> at {getUserHS(userData.schoolAttending)} </span>}
                             <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>{organizationProfileData.organizationHost ? "run by" : ""}&nbsp;</span>
                             <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHostName}</button>
                             <br />
@@ -180,55 +181,3 @@ function RelevanceBanner({relevanceType, organizationType}){
         </div>
     )
 }
-
-// return(
-//     <>
-//         <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : (location === "user_profile" || location === "user_profile_public") ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
-//             {organizationProfileData.organizationRelevanceTags && <RelevanceBanner organizationType={organizationProfileData.organizationType} relevanceType={organizationProfileData.organizationRelevanceTags}/>}
-//             <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
-//                 <div style={{display: "flex"}}>
-//                     <img src={organizationProfileData.organizationLogoPreview} className="pfpImage" style={{width: "145px", height: "145px", borderRadius: "20px"}}/>
-//                     <div name="organizationContent" style={{padding: "0px 15px", paddingBottom: "11px", position: 'relative'}}>
-//                         <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
-//                             <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
-//                             <span style={{fontSize: "smaller", fontWeight: "550"}}> {organizationProfileData.organizationType} {["Club", "Initiative", "Business"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
-//                             <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>{organizationProfileData.organizationHost ? "run by" : ""}&nbsp;</span>
-//                             <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHostName}</button>
-//                             <br />
-//                             <div style={{lineHeight: "1"}}>
-//                                 {organizationProfileData.organizationDescription}
-//                             </div>
-//                             {(organizationProfileData.organizationDeadline || organizationProfileData.organizationStartDate) && <div style={{marginTop: "15px"}}>
-//                                 {organizationProfileData.organizationDeadline && <span><span style={{fontWeight: "600"}}>Application Deadline</span>: {(organizationProfileData.organizationDeadline)}<br /></span>}
-//                                 {organizationProfileData.organizationStartDate && <span><span style={{fontWeight: "600"}}>Start Date</span>: {(organizationProfileData.organizationStartDate)}</span>}
-//                             </div>}
-//                         </div>
-//                         <div style={{
-//                             position: "absolute", 
-//                             bottom: organizationProfileData.organizationLogistics ? "-10px" : "-6px", 
-//                             left: "15px", 
-//                             width: "calc(100% - 30px)", 
-//                             textAlign: "center",
-//                             zIndex: 2
-//                             }}>
-//                             <ReadMoreButton handleClick={handleReadMoreClick} isExpanded={isExpanded} isLessText={isLessText}/>
-//                         </div>
-//                     </div>
-//                 </div>
-
-//                 {organizationProfileData.organizationLogistics && <div className="logisticsDisplay">
-//                     {logisticsList.map((logistic, index)=>(
-//                         <div key={index} className="logisticOption">
-//                             {logistic}
-//                             <span style={{fontWeight: "300"}}>{organizationProfileData.organizationLogistics[index]}</span>
-//                         </div>
-//                     ))}
-//                 </div>}
-//             </div>
-//             <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px", marginLeft: "6px"}}>
-//                 <button className="btnOrganizationLearnMore btnConnect" onClick={e => handleLearnMore(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> Learn More </button>
-//                 {(organizationData.apply !== "NOAPPLY") && <button className="btnOrganizationConnect btnUnfilled" onClick={e => handleConnect(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> {connectBtnType(organizationData.organizationType)} </button>}
-//             </div>
-//         </div>
-//     </>
-// )

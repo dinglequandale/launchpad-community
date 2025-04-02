@@ -46,6 +46,9 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     filterOperations.forEach(filter => {
         if (filter) {
             q = query(q, where(filter.key, filter.operation, filter.value));
+            // if(filter.key === "schoolAttending") {
+            //   q = query(q, where("schoolAffiliated", "array-contains", filter.value));
+            // }
         }
       });
   

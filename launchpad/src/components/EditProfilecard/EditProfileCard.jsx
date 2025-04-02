@@ -229,15 +229,6 @@ function EditInformation({onEdit, isAnswered, isOpportunity=false}){
         </>
     )
 }
-// {isAnswered && <div style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", position: "absolute", width: "150px", right: "-180px"}}
-// onClick={onEdit}>
-
-// <MdEdit size={30} className='editInfoIcon'/>
-// {/* <FaRegEdit size={25}/> */}
-// <span style={{textDecoration: "underline"}}>
-//     Edit {questionName}
-// </span>
-// </div>}
 
 function PublicPrivateDropdown() {
     const dropdownRef = useRef();

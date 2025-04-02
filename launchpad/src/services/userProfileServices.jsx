@@ -150,7 +150,7 @@ export const displayColleges = (colleges, length = "longer") => {
     return currentList.slice(0, -1).join(", ") + ", " + currentList.slice(-1);
 };
 
-const getUserHS = (schoolName) => {
+export const getUserHS = (schoolName) => {
     const hsAbbreviations = {
         "Awty International School":"Awty"
     }
@@ -159,6 +159,20 @@ const getUserHS = (schoolName) => {
     const baseSchoolName = schoolName.replace(/(School|High School)$/i, "").trim();
     return baseSchoolName + " H.S."
 }
+
+export const displaySchools = (schools) => {
+    const currentList = schools.map(getUserHS);
+
+    if (currentList.length === 1) {
+        return currentList[0];
+    }
+
+    if (currentList.length === 2) {
+        return currentList.join(" and ");
+    }
+
+    return currentList.slice(0, -1).join(", ") + ", " + currentList.slice(-1);
+};
 
 
 export const getBasicUserDescription = (userData, shortened=true) => {
