@@ -7,6 +7,7 @@ import { useAuth } from '../../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import EmailConfirmation from '../EmailConfirmation';
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -176,6 +177,8 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
         return <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange} highSchoolerData={highSchoolerData}/>;
       case 3:
         return <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} />;
+      case 4:
+        return <EmailConfirmation selectedOptions={highSchoolerData} handleChange={handleChange} loginEmail={loginEmail}/>
       default:
         return null;
     }

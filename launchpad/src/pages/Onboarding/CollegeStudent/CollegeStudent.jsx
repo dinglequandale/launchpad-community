@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { BiPlus, BiTrash } from 'react-icons/bi';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import EmailConfirmation from '../EmailConfirmation';
 
 const collegeStudentQuestionsConfig = [
   {
@@ -179,6 +180,8 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
         collegeStudentData={collegeStudentData}/>;
       case 3:
         return <UserSkills selectedOptions={collegeStudentData} setSelectedOptions={setCollegeStudentData} />;
+      case 4:
+        return <EmailConfirmation selectedOptions={collegeStudentData} handleChange={handleChange} loginEmail={loginEmail}/>
       default:
         return null;
     }
