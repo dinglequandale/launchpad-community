@@ -47,7 +47,7 @@ const professionalQuestionsConfig = [
   {
     id: "schoolAttending",
     // TODO: change to affiliatedSchools
-    text: "What Houston school(s) are you connected to? (e.g. as a parent)",
+    text: "What Houston school are you connected to? (e.g. as a parent)",
     type: "select",
     options: highSchools,
     placeholder: "N/A",
@@ -165,13 +165,14 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
     companyName: '',
     areasOfInterest: [],
     networkingLevel: [],
-    schoolAttending: [],
+    schoolAttending: schoolInfo.schoolDisplayName,
     linkedinLink: "",
     userType: "Professional",
     userPfpPreview: "",
     yearsOfExperience: "",
     userName: "",
     email: loginEmail,
+    emailIsPublic: true,
     // userAboutMe: "",
     userPfp: null,
     schoolId: schoolInfo.schoolId
@@ -394,27 +395,84 @@ const FinalTouches = ({ selectedOptions, handleChange }) => {
   );
 };
 
+// const EmailConfirmation = ({ selectedOptions, handleChange, loginEmail }) => {
+//   const [btnSelected,setBtnSelected] = useState("");
+//   return (
+//     <div className='onboardingQuestions'>
+//       <div className='onboardingQuestion' style={{textAlign: "center"}}>
+//         <label>Last thing! Please confirm whether you are comfortable with students contacting you via the following email:</label>
+//         <br />
+//         <span style={{color: "black", fontSize: "23px"}}>{loginEmail}</span>
+//       </div>
+//       <div style={{display: "flex", justifyContent: "space-around"}}>
+//         <button className={btnSelected === "y" ? "btnSaveChanges" : 'btnUnfilled'} onClick={()=>{
+//           setBtnSelected("y");
+//           handleChange("email", loginEmail);
+//         }} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>Yes, I confirm.</button>
+//         <button className={btnSelected === "n" ? "btnSaveChanges" : 'btnUnfilled'} onClick={()=>setBtnSelected("n")} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>No, I prefer another email.</button>
+//       </div>
+//       {btnSelected === "n" && 
+//       <>
+//         <label className='onboardingQuestion' style={{textAlign: "center"}}>Input a more suitable email:</label>
+//         <input className="onboardingInput" type="email" value={selectedOptions["email"]} onChange={(e) => handleChange("email", e.target.value)}/>
+//       </>}
+//     </div>
+//   );
+// };
+
 const EmailConfirmation = ({ selectedOptions, handleChange, loginEmail }) => {
-  const [btnSelected,setBtnSelected] = useState("");
+  const [selectedOption, setSelectedOption] = useState("all");
+
+  const handleOptionChange = (optionValue) => {
+    setSelectedOption(optionValue);
+    if(optionValue === "school"){
+      handleChange("emailIsPublic", false);
+    }
+    else{
+      handleChange(emailIsPublic, true);
+    }
+  };
+
   return (
-    <div className='onboardingQuestions'>
-      <div className='onboardingQuestion' style={{textAlign: "center"}}>
-        <label>Last thing! Please confirm whether you are comfortable with students contacting you via the following email:</label>
-        <br />
-        <span style={{color: "black", fontSize: "23px"}}>{loginEmail}</span>
+    <div className="contact-sharing-container">
+      <div className="contact-sharing-header">
+        
+        <span className="onboardingQuestion"><span style={{fontWeight: "bolder"}}>Last thing!</span>  Driven students, alumni, and young professionals will reach out to you for advice. Who are you open to sharing your contact info with, so they can reach out directly to you?</span>
       </div>
-      <div style={{display: "flex", justifyContent: "space-around"}}>
-        <button className={btnSelected === "y" ? "btnSaveChanges" : 'btnUnfilled'} onClick={()=>{
-          setBtnSelected("y");
-          handleChange("email", loginEmail);
-        }} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>Yes, I confirm.</button>
-        <button className={btnSelected === "n" ? "btnSaveChanges" : 'btnUnfilled'} onClick={()=>setBtnSelected("n")} style={{borderRadius: "20px", padding: "9px", fontSize: "17px"}}>No, I prefer another email.</button>
+      
+      <div className="radio-option">
+        <label className="radio-label">
+          <input
+            type="radio"
+            name="contactSharing"
+            value="all"
+            checked={selectedOption === "all"}
+            onChange={() => handleOptionChange("all")}
+            className="radio-input"
+          />
+          <span className="radio-custom"></span>
+          <span className="option-text">
+            I am open to sharing my email address to all users
+          </span>
+        </label>
       </div>
-      {btnSelected === "n" && 
-      <>
-        <label className='onboardingQuestion' style={{textAlign: "center"}}>Input a more suitable email:</label>
-        <input className="onboardingInput" type="email" value={selectedOptions["email"]} onChange={(e) => handleChange("email", e.target.value)}/>
-      </>}
+      
+      <div className="radio-option">
+        <label className="radio-label">
+          <input
+            type="radio"
+            name="contactSharing"
+            value="school"
+            checked={selectedOption === "school"}
+            onChange={() => handleOptionChange("school")}
+            className="radio-input"
+          />
+          <span className="radio-custom"></span>
+          <span className="option-text">
+            I am open to sharing my email address only to users part of my school community
+          </span>
+        </label>
+      </div>
     </div>
   );
 };
