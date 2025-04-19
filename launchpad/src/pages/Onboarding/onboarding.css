@@ -46,7 +46,7 @@ but you probably should also make an individual personalized CSS file for each p
   background: rgba(225, 239, 255, 0.555);
   position: fixed; /* Sit on top of the page content */
   /* display: none; Hidden by default */
-  width: 100vw; /* Full width (cover the whole page) */
+  width: 100%; /* Full width (cover the whole page) */
   height: 100vh; /* Full height (cover the whole page) */
 
 }

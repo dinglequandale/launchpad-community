@@ -153,12 +153,6 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
 
   const getEmail = httpsCallable(getFunctions(), 'getEmail');
   const [loginEmail,setLoginEmail] = useState("");
-  const getUserEmail = async () => {
-    const result = await getEmail();
-    console.log("result:", result);
-    setLoginEmail(result.data.email);
-  }
-  getUserEmail();
 
   const [professionalData, setProfessionalData] = useState({
     retiredStatus: false,
@@ -210,6 +204,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
       console.log("Can submit")
       setCanSubmit(true);
     }
+    // console.log(professionalData);
   },[professionalData])
 
   if(isSubmitting){
@@ -223,6 +218,16 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
     }));
   };
 
+  const getUserEmail = async () => {
+    const result = await getEmail();
+    console.log("result:", result);
+    handleChange("email", result.data.email);
+  }
+  useEffect(()=>{
+    getUserEmail();
+  },[]);
+  
+
   const renderPage = () => {
     switch (currentPage) {
       case 1:
@@ -233,8 +238,8 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
         return <WorkDetails selectedOptions={professionalData} handleChange={handleChange} />;
       case 4:
         return <ConnectionLevel selectedOptions={professionalData} setSelectedOptions={setProfessionalData} />;
-      case 5:
-        return <EmailConfirmation selectedOptions={professionalData} handleChange={handleChange} loginEmail={loginEmail}/>
+      // case 5:
+      //   return <EmailConfirmation selectedOptions={professionalData} handleChange={handleChange} loginEmail={loginEmail}/>
       default:
         return null;
     }

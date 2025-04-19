@@ -29,16 +29,16 @@ export default function Onboarding() {
         schoolId = tempSchoolInfo.schoolId;
         schoolDisplayName = tempSchoolInfo.schoolDisplayName;
     }catch{}
-    console.log("SCHOOLIDwewe: ", schoolId, schoolDisplayName);
+    // console.log("SCHOOLIDwewe: ", schoolId, schoolDisplayName);
 
     const getNumOfSections = () => {
         switch(selectedOption){
             case "High Schooler":
-                return 4;
+                return 3;
             case "College Student":
-                return 4;
+                return 3;
             case "Professional":
-                return 5;
+                return 4;
             default:
                 return null;
         }
