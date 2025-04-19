@@ -115,10 +115,10 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
         </header>
         <main style={{ display: "flex", flexDirection: "column", gap: "7px", width: "600px", overflow: "clip"}}>
             <div style={{display: "flex", flexDirection: "column", gap: "5px", padding: "15px 5px"}}>
-              <span style={{fontSize: "18px"}}>
+              {<span style={{fontSize: "18px"}}>
                 <span style={{fontWeight: "550", fontSize: "18px"}}>Email:</span>
                 &nbsp;{userData.email ? userData.email : "No email provided"}
-              </span>
+              </span>}
               {userData.linkedinLink && <span style={{fontSize: "18px"}}>
                 <span style={{textDecoration: "", color: "black", fontWeight: "550"}}>Linkedin:</span>
                 &nbsp;<Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{displayShortenedLinkedin(userData.linkedinLink)}</Link>

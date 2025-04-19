@@ -177,8 +177,8 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
         return <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange} highSchoolerData={highSchoolerData}/>;
       case 3:
         return <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} />;
-      case 4:
-        return <EmailConfirmation selectedOptions={highSchoolerData} handleChange={handleChange} loginEmail={loginEmail}/>
+      // case 4:
+      //   return <EmailConfirmation selectedOptions={highSchoolerData} handleChange={handleChange} loginEmail={loginEmail}/>
       default:
         return null;
     }

@@ -10,7 +10,7 @@ export default function BasicUserInfo({handleChange, selectedOptions, setSelecte
   const resumeInputRef = useRef(null);
   // const [pfpError, setPfpError] = useState(null);
   const [resumeError, setResumeError] = useState(null);
-  const [linkedInOptionSelected, setLinkedInOptionSelected] = useState(false);
+  const [linkedInOptionSelected, setLinkedInOptionSelected] = useState(selectedOptions.linkedinLink);
 
   const handleFileChange = (event, fileType) => {
     const file = event.target.files[0];

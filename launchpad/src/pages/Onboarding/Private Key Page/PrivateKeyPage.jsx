@@ -19,7 +19,6 @@ export default function PrivateKeyPage() {
         const loadingToast = toast.loading('Verifying your code...');
         
         try {
-            // await editUserData({linkedinLink: newLinkedinLink}, currentUser, userData);
             const schoolsRef = collection(db, "school_configs");
             const q = query(schoolsRef, where("secret_key", "==", key));
             const querySnapshot = await getDocs(q);
@@ -31,6 +30,12 @@ export default function PrivateKeyPage() {
             schoolDisplayName = querySnapshot.docs[0].data().display_name;
             console.log("school:", schoolId, schoolDisplayName);
             toast.success('We found your school!', { id: loadingToast });
+
+            localStorage.setItem("tempSchoolInfo", JSON.stringify({schoolId, schoolDisplayName}));
+
+            // new Promise( res => setTimeout(res, 2000) );
+
+            navigate("/Onboarding", {state: {schoolId, schoolDisplayName}});
             
             const functions = getFunctions();
             const createSchoolClaim = httpsCallable(functions, 'createSchoolClaim');
@@ -39,13 +44,7 @@ export default function PrivateKeyPage() {
 
             await user.getIdToken(true);
 
-            // new Promise( res => setTimeout(res, 300) );
-
-            
-
-            navigate("/Onboarding", {state: {schoolId, schoolDisplayName}});
-            localStorage.setItem("tempSchoolInfo", JSON.stringify({schoolId, schoolDisplayName}));
-
+            console.log("USER TOKEN CREATED");
         } catch (error) {
 
             console.error('Error changing:', error);

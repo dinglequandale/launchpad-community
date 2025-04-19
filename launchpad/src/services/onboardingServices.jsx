@@ -137,6 +137,7 @@ export const packageBasicUserInfoToLS = (userData) => {
         userShortDescription: userShortDescription,
         userHighSchoolType: (userData.userType === "High Schooler") ? userHighSchoolType(userData.graduationYear) : null,
         userSchoolId: userData.schoolId,
+        userSchool: userData.schoolName,
         isCommitted: (userData.userType === "High Schooler") ? !Array.isArray(userData.collegeInterestsOrDecision) : null,
     };
 

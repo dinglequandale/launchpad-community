@@ -144,7 +144,7 @@ export default function EditProfileCard() {
                 <hr style={{width:"100%"}}/>
                 
                 <div>
-                    {incompleteOpportunitiesData.length > 0 && (
+                    {incompleteOpportunitiesData && incompleteOpportunitiesData.length > 0 && (
                         <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
                             {incompleteOpportunitiesData.map((opportunityData, index)=>(
                                 <OpportunityPopup 

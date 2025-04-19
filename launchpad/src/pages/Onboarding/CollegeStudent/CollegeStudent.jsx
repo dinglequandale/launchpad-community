@@ -161,11 +161,12 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
     }
   },[collegeStudentData]);
 
-  useEffect(() => {
-    const getUserEmail = async () => {
-      const result = await getEmail();
-      handleChange("email",result.data.email);
-    }
+  const getUserEmail = async () => {
+    const result = await getEmail();
+    console.log("result:", result);
+    handleChange("email", result.data.email);
+  }
+  useEffect(()=>{
     getUserEmail();
   },[]);
 
@@ -180,8 +181,8 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
         collegeStudentData={collegeStudentData}/>;
       case 3:
         return <UserSkills selectedOptions={collegeStudentData} setSelectedOptions={setCollegeStudentData} />;
-      case 4:
-        return <EmailConfirmation selectedOptions={collegeStudentData} handleChange={handleChange} loginEmail={loginEmail}/>
+      // case 4:
+      //   return <EmailConfirmation selectedOptions={collegeStudentData} handleChange={handleChange} loginEmail={collegeStudentData.email}/>
       default:
         return null;
     }

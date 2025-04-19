@@ -161,6 +161,10 @@ export const getUserHS = (schoolName) => {
 }
 
 export const displaySchools = (schools) => {
+    if(typeof schools === "string"){
+        return getUserHS(schools);
+    }
+
     const currentList = schools.map(getUserHS);
 
     if (currentList.length === 1) {
