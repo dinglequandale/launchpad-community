@@ -3,7 +3,7 @@ import SecurityCodeInput from "../../../components/Security Key/SecurityInput";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebaseConfig";
 import { Navigate, useNavigate } from "react-router-dom";
-import { getFunctions, httpsCallable } from "firebase/functions";
+// import { getFunctions, httpsCallable } from "firebase/functions";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 
 export default function PrivateKeyPage() {
@@ -12,7 +12,7 @@ export default function PrivateKeyPage() {
 
     const navigate = useNavigate();
 
-    const user = auth.currentUser;
+    // const user = auth.currentUser;
     const {userLoggedIn} = useAuth();
 
     const onSubmit = async (key) => {
@@ -33,18 +33,7 @@ export default function PrivateKeyPage() {
 
             localStorage.setItem("tempSchoolInfo", JSON.stringify({schoolId, schoolDisplayName}));
 
-            // new Promise( res => setTimeout(res, 2000) );
-
-            navigate("/Onboarding", {state: {schoolId, schoolDisplayName}});
-            
-            const functions = getFunctions();
-            const createSchoolClaim = httpsCallable(functions, 'createSchoolClaim');
-            
-            const result = await createSchoolClaim({ schoolId });
-
-            await user.getIdToken(true);
-
-            console.log("USER TOKEN CREATED");
+             navigate("/Onboarding", {state: {schoolId, schoolDisplayName}});
         } catch (error) {
 
             console.error('Error changing:', error);

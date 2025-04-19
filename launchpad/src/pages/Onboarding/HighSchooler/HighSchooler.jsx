@@ -112,6 +112,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
     userResume: null,
     userResumePreview: "",
     email: "",
+    // isPublic: false,
     userType: "High Schooler",
     userPfpPreview: "",
     userPfp: null,

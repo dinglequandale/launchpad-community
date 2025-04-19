@@ -167,7 +167,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
     yearsOfExperience: "",
     userName: "",
     email: loginEmail,
-    emailIsPublic: true,
+    // isPublic: false,
     // userAboutMe: "",
     userPfp: null,
     schoolId: schoolInfo.schoolId

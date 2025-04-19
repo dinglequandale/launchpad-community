@@ -1,17 +1,17 @@
 import { useState } from "react";
 
 const EmailConfirmation = ({ selectedOptions, handleChange, loginEmail }) => {
-    const publicity = selectedOptions["emailIsPublic"] ? "all" : "school";
+    const publicity = selectedOptions["isPublic"] ? "all" : "school";
     const [selectedOption, setSelectedOption] = useState(publicity);
     console.log("publicity ", publicity)
   
     const handleOptionChange = (optionValue) => {
       setSelectedOption(optionValue);
       if(optionValue === "school"){
-        handleChange("emailIsPublic", false);
+        handleChange("isPublic", false);
       }
       else{
-        handleChange("emailIsPublic", true);
+        handleChange("isPublic", true);
       }
     };
   

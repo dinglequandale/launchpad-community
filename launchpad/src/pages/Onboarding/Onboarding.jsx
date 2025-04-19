@@ -9,6 +9,8 @@ import { LuGraduationCap } from 'react-icons/lu';
 import ProgressBar from '../../components/Progressbar/ProgressBar';
 import Loading from '../../components/LoadingAnimation/Loading';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { auth } from '../../firebase/firebaseConfig';
 
 export default function Onboarding() {
     const [showComponent, setShowComponent] = useState(false);
@@ -21,7 +23,7 @@ export default function Onboarding() {
     let schoolId, schoolDisplayName;
 
     // localStorage.clear();
-
+    const user = auth.currentUser;
     const location = useLocation();
     const tempSchoolInfo = location.state ?? JSON.parse(localStorage.getItem("tempSchoolInfo"));
 
@@ -30,6 +32,21 @@ export default function Onboarding() {
         schoolDisplayName = tempSchoolInfo.schoolDisplayName;
     }catch{}
     // console.log("SCHOOLIDwewe: ", schoolId, schoolDisplayName);
+
+
+    useState(()=>{
+        const setUserToken = async () => {
+            const functions = getFunctions();
+            const createSchoolClaim = httpsCallable(functions, 'createSchoolClaim');
+            
+            const result = await createSchoolClaim({ schoolId });
+    
+            await user.getIdToken(true);
+            console.log("USER TOKEN CREATED");
+        }
+        setUserToken();
+        
+    },[]);
 
     const getNumOfSections = () => {
         switch(selectedOption){
