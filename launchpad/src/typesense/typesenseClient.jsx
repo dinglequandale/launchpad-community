@@ -1,4 +1,10 @@
 import Typesense from 'typesense';
+import {liteClient as algoliasearch} from 'algoliasearch/lite';
+
+const algoliaClient = algoliasearch(
+  import.meta.env.VITE_ALGOLIA_APP_ID,
+  import.meta.env.VITE_ALGOLIA_SEARCH_KEY
+);
 
 const client = new Typesense.Client({
     nodes: [
@@ -34,4 +40,4 @@ const deleteFromTypesense = async (collectionName, documentId) => {
   }
 };
 
-export { client, updateTypesense, deleteFromTypesense };
+export { algoliaClient, client, updateTypesense, deleteFromTypesense };

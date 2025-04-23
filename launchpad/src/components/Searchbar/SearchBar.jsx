@@ -13,7 +13,7 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
         }
     }
     const [queryText, setQueryText] = useState('');
-
+ 
     return (
       <div className="searchContainer" style={{background: "white"}}>
           <h2 style={{ paddingLeft: "3%" }}>{pageName}</h2>

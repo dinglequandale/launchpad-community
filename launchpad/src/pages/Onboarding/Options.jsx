@@ -2,7 +2,8 @@ import { db } from '../../firebase/firebaseConfig';
 import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
 import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
-import { client } from '../../typesense/typesenseClient'
+import { algoliaClient } from '../../typesense/typesenseClient';
+// import {algoliasearch} from 'algoliasearch/lite';
 
 const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
@@ -106,86 +107,70 @@ const careerInterests = [
   {"value": "theater", "label": "Theater & Movies", "group": "Arts & Humanities"},
   {"value": "visual_arts", "label": "Visual Arts", "group": "Arts & Humanities"}
 ]
+
+const client = algoliaClient;
+
 const graduationYears = [];
 for (let year = 2030; year >= 1990; year--) {
     graduationYears.push({ value: year, label: year.toString() });
 }
 
-const getColleges = (searchQuery = null) => {
-    const [colleges, setColleges] = useState([]);
+const getColleges = (searchQuery = '') => {
+  const [colleges, setColleges] = useState([]);
 
-  const fetchColleges = useCallback(async () => {
+  useEffect(() => {
     if (searchQuery.length < 2) {
       setColleges([]);
       return;
     }
 
-    const collegesRef = collection(db, "colleges");
-    const q = query(
-      collegesRef,
-      orderBy('label'),
-      startAt(searchQuery),
-      endAt(searchQuery + '\uf8ff'),
-      limit(5) // Limit the number of results
-    );
+    const searchColleges = async () => {
+      try {
 
-    const querySnapshot = await getDocs(q);
-    const collegeData = querySnapshot.docs.map(doc => ({
-      label: doc.data().label,
-      value: doc.data().value
-    }));
+        const {results} = await client.search({
+          requests: [{ indexName: 'colleges', query: searchQuery, hitsPerPage: 5 }],
+        });
+        
+        const hits = results[0].hits;
+        setColleges(hits.map(hit => ({
+          label: hit.label,
+          value: hit.value || hit.objectID, // Fallback to Algolia's ID
+        })));
+      } catch (error) {
+        console.error('Algolia search error:', error);
+      }
+    };
 
-    setColleges(collegeData);
+    const debouncedSearch = setTimeout(searchColleges, 300);
+    return () => clearTimeout(debouncedSearch);
   }, [searchQuery]);
-
-  useEffect(() => {
-    fetchColleges();
-  }, [fetchColleges]);
 
   return colleges;
 };
 
-const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion = true}) => {
+const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion = true }) => {
   const [options, setOptions] = useState([]);
+  const [inputValue, setInputValue] = useState('');
 
-  const handleInputChange = async (inputValue) => {
-    if (inputValue.length < 1) {
-      setOptions([]); // Clear options if input is empty
-      return;
-    }
+  const searchResults = getColleges(inputValue);
 
-    const searchParameters = {
-      q: inputValue,
-      query_by: 'label',
-      num_typos: 1, // Allow up to 1 typo
-    };
+  useEffect(() => {
+    setOptions(searchResults);
+  }, [searchResults]);
 
-    try {
-      const searchResults = await client
-        .collections('colleges')
-        .documents()
-        .search(searchParameters);
-
-      const formattedOptions = searchResults.hits.map((hit) => ({
-        value: hit.document.id,
-        label: hit.document.label,
-      }));
-
-      setOptions(formattedOptions);
-    } catch (error) {
-      console.error('Error searching Typesense:', error);
-    }
+  const handleInputChange = (inputValue) => {
+    setInputValue(inputValue);
   };
 
   return (
     <OnboardingDropdown
       question={question}
-      options={[...options]}
+      options={options}
       selectedOption={selectedOption ?? "N/A"}
       onChange={onChange}
-      placeholder={"Start typing..."}
-      type={type} // Assuming single-select for college search
-      onSearchQueryChange={handleInputChange} // Pass the input change handler
+      placeholder="Start typing..."
+      type={type}
+      onSearchQueryChange={handleInputChange}
       showQuestion={showQuestion}
     />
   );

@@ -173,6 +173,7 @@ export default function Organizations(){
         if (queryText) {
             const searchResults = await searchDocuments(pageName.toLowerCase(), queryText, tenantId);
             setOrganizationsData(searchResults);
+            console.log(searchResults);
         }
     };
 

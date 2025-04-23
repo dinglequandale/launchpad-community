@@ -2,7 +2,7 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { getBasicUserDescription } from './userProfileServices';
-import { updateTypesense } from '../typesense/typesenseClient';
+// import { updateTypesense } from '../typesense/typesenseClient';
 
 export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess) => {
     try {
@@ -26,7 +26,7 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         packageBasicUserInfoToLS(dataToSave);
 
         // JOSE TODO
-        await updateTypesense('users', currentUser.uid, dataToSave, highSchoolerData.schoolId);
+        // await updateTypesense('users', currentUser.uid, dataToSave, highSchoolerData.schoolId);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -54,7 +54,7 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        await updateTypesense('users', currentUser.uid, dataToSave, collegeStudentData.schoolId);
+        // await updateTypesense('users', currentUser.uid, dataToSave, collegeStudentData.schoolId);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -83,7 +83,7 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        await updateTypesense('users', currentUser.uid, dataToSave, professionalData.schoolId);
+        // await updateTypesense('users', currentUser.uid, dataToSave, professionalData.schoolId);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);

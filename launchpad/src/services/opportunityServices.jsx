@@ -2,7 +2,7 @@ import { db, storage } from '../firebase/firebaseConfig';
 import { collection, addDoc, updateDoc, doc, query, where, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
-import { deleteFromTypesense, updateTypesense } from '../typesense/typesenseClient';
+// import { deleteFromTypesense, updateTypesense } from '../typesense/typesenseClient';
 
 export const saveOpportunity = async (opportunityData, organizationLogo, currentUser, isEditing, opportunityId) => {
   const schoolId = localStorage.getItem("schoolId");
@@ -18,17 +18,17 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
       });
 
       // Update Typesense
-      await updateTypesense('opportunities', opportunityRef.id, 
-        {
-          ...opportunityData,
-          createdBy: currentUser.uid,
-          createdAt: new Date(),
-        },
-        schoolId);
+      // await updateTypesense('opportunities', opportunityRef.id, 
+      //   {
+      //     ...opportunityData,
+      //     createdBy: currentUser.uid,
+      //     createdAt: new Date(),
+      //   },
+      //   schoolId);
     } else {
       opportunityRef = doc(db, "tenants", schoolId, "opportunities", opportunityId);
       await updateDoc(opportunityRef, opportunityData);
-      await updateTypesense('opportunities', opportunityId, opportunityData, schoolId);
+      // await updateTypesense('opportunities', opportunityId, opportunityData, schoolId);
     }
 
     if (organizationLogo) {
@@ -92,7 +92,7 @@ export const handleDeleteOpportunity = async (opportunityId) => {
     const opportunityDoc = doc(db, "tenants", localStorage.getItem("schoolId"), "opportunities", opportunityId);
     try {
         await deleteDoc(opportunityDoc);
-        await deleteFromTypesense('opportunities', opportunityId);
+        // await deleteFromTypesense('opportunities', opportunityId);
         toast.success("Opportunity deleted successfully!");
     } catch (error) {
         console.error("Error deleting user profile: ", error);

@@ -1,7 +1,7 @@
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 import { db, storage } from "../firebase/firebaseConfig";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { updateTypesense } from '../typesense/typesenseClient';
+// import { updateTypesense } from '../typesense/typesenseClient';
 import { pushInitialProfileCompletion } from "./onboardingServices";
 import { SiNamesilo } from "react-icons/si";
 
@@ -194,7 +194,7 @@ export const editUserData = async (newData, currentUser, origUserData) => {
         await updateDoc(userRef, newData);
         pushInitialProfileCompletion({... origUserData, ...newData});
 
-        await updateTypesense('users', currentUser.uid, {... origUserData, ...newData}, localStorage.getItem("schoolId"));
+        // await updateTypesense('users', currentUser.uid, {... origUserData, ...newData}, localStorage.getItem("schoolId"));
     }catch(error){console.log(error)};
 }
 

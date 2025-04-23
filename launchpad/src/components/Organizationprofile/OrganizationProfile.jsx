@@ -57,7 +57,8 @@ export default function OrganizationProfile({organizationData, location, handleS
 
     useEffect(()=>{
         getUserData(organizationProfileData.organizationCreatedBy);
-    },[])
+        console.log(organizationProfileData, "created by");
+    },[]);
 
     useEffect(()=>{
         if(descRef.current.clientHeight <= 16*8){
