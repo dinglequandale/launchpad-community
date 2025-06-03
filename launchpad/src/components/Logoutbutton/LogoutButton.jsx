@@ -13,7 +13,6 @@ export default function LogoutButton() {
     const [logoutModalVisibility, setLogoutModalVisibility] = useState(false);
     const navigate = useNavigate();
     const handleLogout = () => {
-        // e.preventDefault();
         doSignOut().then(() => {
             // clear any auth-related local storage
             localStorage.removeItem('authToken');
@@ -23,6 +22,7 @@ export default function LogoutButton() {
             
             // redirect to login page
             navigate('/Landing', { replace: true });
+            localStorage.clear();
             
             // unmount user from Stream
             disconnectFromStream();

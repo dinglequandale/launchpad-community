@@ -18,6 +18,7 @@ import Loading from "../../components/LoadingAnimation/Loading";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../firebase/firebaseConfig";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
+import { capitalizeFirstLetter } from "../Homepage/Home";
 
 
 const NetworkContext = createContext();
@@ -28,7 +29,7 @@ export default function UserNetwork() {
 
   const { chatClient, isConnected } = useOutletContext();
 
-  const pageName = "The Ram Network";
+  const pageName = `The ${capitalizeFirstLetter(localStorage.getItem("schoolId"))} Network`;
 
   const [tenantId, setTenantId] = useState(null);
 

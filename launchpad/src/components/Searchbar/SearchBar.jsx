@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import ContentFilter from "../Contentfilter/ContentFilter";
 import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
+import { capitalizeFirstLetter } from '../../pages/Homepage/Home';
 
 export default function SearchBar({filters, pageName, handleFilterChange, handleSearch}) {
     const searchType = () => {
         switch(pageName){
-            case "The Ram Network":
+            case `The ${capitalizeFirstLetter(localStorage.getItem("schoolId"))} Network`: 
                 return "profession, interests, company, or name";
             case "Opportunities":
                 return "company, interest, or name"
