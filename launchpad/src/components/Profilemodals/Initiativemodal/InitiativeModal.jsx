@@ -13,6 +13,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { saveOpportunity } from '../../../services/opportunityServices';
 import { careerInterests } from '../../../pages/Onboarding/Options';
 import OnboardingDropdown from '../../OnboardingDropdown/OnboardingDropdown';
+import SaveChanges from '../../Makechanges/SaveChanges';
 
 
 const InitiativeContext = createContext({
@@ -32,12 +33,13 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
   const [currentInitiativePage, setCurrentInitiativePage] = useState(1);
   const [showLast, setShowLast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [changesMade, setChangesMade] = useState(false);
   
   const [organizationLogo, setOrganizationLogo] = useState(null);
 
   const { currentUser } = useAuth();
 
-  const saveInitiativeData = async () => {
+  const publishInitiativeData = async () => {
     try {
       setIsSaving(true);
       await toast.promise(
@@ -208,7 +210,21 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
       ...organizationData,
       [name]: type === 'file' ? files[0] : value
     });
+    setChangesMade(true);
   };
+
+  const saveInitiativeData = () => {
+    const currentOpportunityData = localStorage.getItem("savedOrganizationData") ? JSON.parse(localStorage.getItem("savedOrganizationData")) : [];
+    if(!isEditing){
+      localStorage.setItem("savedOrganizationData", JSON.stringify([...currentOpportunityData, {...organizationData, id: Math.floor(Math.random() * 10000)}]));
+    }
+    else{
+      const orgId = opportunityData.id;
+      localStorage.setItem("savedOrganizationData", JSON.stringify([...currentOpportunityData.filter(opportunity => opportunity.id !== orgId), {...organizationData, id: orgId}]));
+    }
+    toast.success("Opportunity saved!");
+    // onClose();
+  }
 
   const renderPage = () => {
     switch(currentInitiativePage){
@@ -231,7 +247,11 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     position="bottom-right"
     reverseOrder={false}/>
     <div>
-      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
+      <SaveChanges visibility={makeChangesVisibility} onCancel={ ()=>{
+        saveInitiativeData();
+        setMakeChangesVisibility(false);
+        onClose();
+      }} onVerify={onClose}/>
       <InitiativeContext.Provider 
       value={{
         organizationData,
@@ -257,8 +277,14 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
             {currentInitiativePage < 4 && <div name="estimated-time" style={{position: "absolute", fontSize: "17px", fontWeight: "300"}}>
               Est. Time: {4 - currentInitiativePage} minute{currentInitiativePage < 3 ? "s" : ""}
             </div>}
-            <button className='btnClose' onClick={()=>setMakeChangesVisibility(true)} style={{background:"none"}}><CgClose size={25}/></button>
-            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Initiative <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Make your voice heard. Garner support from alumni and parents.</span></h2>
+            <button className='btnClose' onClick={()=>{
+              if(changesMade){
+                setMakeChangesVisibility(true);
+              }
+              else{
+                onClose();
+              }}} style={{background:"none"}}><CgClose size={25}/></button>
+            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Your Initiative <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Make your voice heard. Garner support from alumni and parents.</span></h2>
             <hr style={{borderColor: "var(--secondary)"}}/>
             <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast}/>
           </header>
@@ -272,7 +298,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
               ()=>setMakeChangesVisibility(true)
               } className='btnUnfilled' style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Cancel</button> */}
-            {currentInitiativePage === 4 && <button onClick={saveInitiativeData} type='submit' className="btnSaveChanges" disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+            {currentInitiativePage === 4 && <button onClick={publishInitiativeData} type='submit' className="btnSaveChanges" disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Save Changes</button>}
           </footer>
         </Modal>

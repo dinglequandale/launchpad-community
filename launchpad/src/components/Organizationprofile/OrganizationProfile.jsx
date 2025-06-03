@@ -10,7 +10,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { displayFieldsOfInterest, getUserHS } from "../../services/userProfileServices";
 
-export default function OrganizationProfile({organizationData, location, handleShowProfile, handleReferalClick}){
+export default function OrganizationProfile({organizationData, location, handleShowProfile, handleReferalClick, isPublished=true}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
     const [isDisabled, setIsDisabled] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -124,7 +124,8 @@ return(
     <>
         <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : (location === "user_profile" || location === "user_profile_public") ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
             <div style={{display: "flex"}}>
-            {organizationProfileData.organizationRelevanceTags && <RelevanceBanner organizationType={organizationProfileData.organizationType} relevanceType={organizationProfileData.organizationRelevanceTags}/>}
+            {(organizationProfileData.organizationRelevanceTags && isPublished) && <RelevanceBanner organizationType={organizationProfileData.organizationType} relevanceType={organizationProfileData.organizationRelevanceTags}/>}
+            {!isPublished && <UnpublishedBanner/>}
             <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
                 <div style={{display: "flex"}}>
                     <div style={{fontSize: "16px", position: "absolute", bottom: "7px", left: "43%"}}>
@@ -172,6 +173,15 @@ return(
         
     </>
 )
+}
+
+function UnpublishedBanner(){
+    return(
+        <div style={{borderRadius: "20px", position: "absolute", top: "-16px", left: "10px", width: "fitContent", padding: "2px 8px", backgroundColor: "rgb(255,82,0,.9)", border: "solid 1px black",
+        zIndex: "1"}}>
+            <span style={{color: "var(--dark)", fontWeight: "600"}}>Unpublished</span>
+        </div>
+    )
 }
 
 function RelevanceBanner({relevanceType, organizationType}){

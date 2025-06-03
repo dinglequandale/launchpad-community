@@ -10,10 +10,11 @@ import { IoCloseOutline } from "react-icons/io5";
 
 export default function SkillModal({visibility, onClose, userData}) {
 
-    const initialUserSkills = userData.userSkills ?? [{id: 0, skillCategory: "", skillDescription: ""}];
+    const initialUserSkills = ((userData.userSkills === null) || (userData.userSkills && userData.userSkills.length === 0)) ? [{id: 0, skillCategory: "", skillDescription: ""}] : userData.userSkills;
+    console.log(initialUserSkills);
     const [skillData,setSkillData] = useState(initialUserSkills);
     const {currentUser} = useAuth();
-    console.log(skillData);
+    console.log("tittel", skillData);
     const customStyles = {
         content: {
             top: '50%',
@@ -33,12 +34,10 @@ export default function SkillModal({visibility, onClose, userData}) {
     
     const handleInputChange = (key, value, index) => {
         setSkillData([...skillData.map((skill) => (skill.id === index ? {id: index, ... skillData[index], [key]: value} : skill))]);
-        console.log(skillData);
     }
 
     const handleAddSkill = () => {
     setSkillData([...skillData, {id: skillData.length, skillCategory: "", skillDescription: ""}]);
-    console.log(skillData)
     };
     
     const handleRemoveSkill = (index) => {
@@ -84,7 +83,7 @@ export default function SkillModal({visibility, onClose, userData}) {
             
             <div className="close-skills" onClick={onClose}><IoCloseOutline size={30} /></div>
             <header>
-                <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Introduce your Skill Set <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress professionals and secure internships</span></h2>
+                <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Introduce your Skill Set <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress professionals and secure internships</span></h2>
                 <hr style={{borderColor: "var(--secondary)"}}/>
             </header>
             

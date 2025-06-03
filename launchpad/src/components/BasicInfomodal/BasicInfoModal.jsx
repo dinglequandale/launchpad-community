@@ -208,7 +208,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       >
         <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
         <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px", color: "var(--secondary)", lineHeight: "1.2"}}> My Introduction <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Enlighten us with your {userType==="Professional" ? "expertise" : "interests"} and {userType==="Professional" ? "work experience" : userType==="Alumni" ? "education" : "dream colleges"}!</span></h2>
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px",  lineHeight: "1.2"}}> My Introduction <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Enlighten us with your {userType==="Professional" ? "expertise" : "interests"} and {userType==="Professional" ? "work experience" : userType==="Alumni" ? "education" : "dream colleges"}!</span></h2>
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{paddingTop: "20px"}}>

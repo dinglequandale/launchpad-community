@@ -14,6 +14,9 @@ import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../firebase/firebaseConfig";
+// import jsonData from "../Onboarding/tempInitialOrgData.json";
+// import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+// import { db } from "../../firebase/firebaseConfig";
 
 const filterContent = {
     organizationType: ["Any Category", "Clubs", "Workplace Opportunities", "Nonprofits", "Businesses", "Community Service", "Leadership"],
@@ -28,7 +31,6 @@ export default function Organizations(){
     const [loading, setLoading] = useState(false);
     const [initLoading, setInitLoading] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    // const [isFiltering, setIsFiltering] = useState(false);
     const [profileModalTop, setProfileModalTop] = useState(0);
     const [targetUserData, setTargetUserData] = useState(null);
     const [connectTargetUserId,setConnectTargetUserId] = useState("");
@@ -60,7 +62,12 @@ export default function Organizations(){
         setConnectModalVisibility(true);
       }
     
-
+        // useEffect(() => {
+        // jsonData.map(async (org, index) => {
+        //     await setDoc(doc(db, "tenants", "awty", "opportunities", org.organizationName), org);
+        //     // print("Org ", index + 1, " uploaded")
+        // })
+        // },[]);
       useEffect(() => {
         setlastDoc(null);
         setHasMore(true);

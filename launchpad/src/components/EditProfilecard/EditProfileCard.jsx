@@ -614,12 +614,12 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
         </div>
         <div>
             { (opportunityData && !loading) ? <>
-            <div style={{textAlign: "center", marginBottom: "12px"}}>
+            {isPublished && <div style={{ textAlign: "center", marginBottom: "12px"}}>
             <span
             style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)"}}>
                 {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
             </span>
-            </div>
+            </div>}
             <div 
                 onMouseEnter={() => setOpportunityEditVisibility(true)}
                 onMouseLeave={() => setOpportunityEditVisibility(false)}

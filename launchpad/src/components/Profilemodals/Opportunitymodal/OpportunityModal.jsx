@@ -1,7 +1,6 @@
 import { useEffect, useState, createContext, useContext, useRef } from 'react';
 import Modal from 'react-modal';
 import "./opportunitymodal.css";
-import MakeChanges from '../../Makechanges/MakeChanges';
 import OrganizationProfile from '../../Organizationprofile/OrganizationProfile';
 import ProgressBar from '../../Progressbar/ProgressBar';
 import { GrAdd } from 'react-icons/gr';
@@ -15,6 +14,7 @@ import OnboardingDropdown from '../../OnboardingDropdown/OnboardingDropdown';
 import { careerInterests } from '../../../pages/Onboarding/Options';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import SaveChanges from '../../Makechanges/SaveChanges';
 
 const OpportunityContext = createContext({
   organizationData: {},
@@ -354,7 +354,11 @@ const publishOpportunityData = async () => {
     reverseOrder={false}
     />
     <div>
-      <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
+      <SaveChanges visibility={makeChangesVisibility} onCancel={ ()=>{
+              saveOpportunityData();
+              setMakeChangesVisibility(false);
+              onClose();
+            }} onVerify={onClose}/>
       <OpportunityContext.Provider 
       value={{
         organizationData,
@@ -380,7 +384,7 @@ const publishOpportunityData = async () => {
               Est. Time: {5 - currentOpportunityPage} minute{currentOpportunityPage < 4 ? "s" : ""}
             </div>}
             <button className='btnClose' onClick={()=>setMakeChangesVisibility(true)} style={{background:"none"}}><CgClose size={25}/></button>
-            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
+            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
             <hr style={{borderColor: "var(--secondary)"}}/>
             <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
           </header>
@@ -394,12 +398,14 @@ const publishOpportunityData = async () => {
               ()=>setMakeChangesVisibility(true)
               } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
               Cancel</button> */}
-            {currentOpportunityPage === 5 ? <button onClick={publishOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Publish</button> : !isPublished ?
-              <button onClick={saveOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Save</button>
-              : 
-              <></>}
+            {currentOpportunityPage === 5 && <button onClick={publishOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+              Publish</button>
+              //  : !isPublished ?
+              // <button onClick={saveOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
+              // Save</button>
+              // : 
+              // <></>
+              }
           </footer>
         </Modal>
       </OpportunityContext.Provider>
