@@ -22,6 +22,7 @@ import PrivateKeyPage from './pages/Onboarding/Private Key Page/PrivateKeyPage.j
 import GlobalAuthWrapper from './contexts/GlobalAuthWrapper.jsx';
 import AboutUs from './components/Legality Footer/AboutUs.jsx';
 import FAQs from './components/Legality Footer/FAQs.jsx';
+import SettingsPage from './pages/Settings/SettingsPage.jsx';
 
 const ErrorPage = () => {
   return (
@@ -181,6 +182,11 @@ const router = createBrowserRouter([
       element: <EditProfilePage/>,
       errorElement:<ErrorPage/>
     },
+    {
+      path: '/settings',
+      element: <SettingsPage/>,
+      errorElement:<ErrorPage/>
+    }
 ]
 }
 ]);

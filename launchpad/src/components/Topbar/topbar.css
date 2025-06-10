@@ -16,7 +16,19 @@
     display: flex;
     padding-right: clamp(10px, 2vw, 20px);
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.9rem;
+}
+
+.settings-tab {
+    color: var(--border);
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-tab:hover {
+    color: var(--highlight);
 }
 
 .topBarTitle{
