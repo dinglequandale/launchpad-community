@@ -41,8 +41,10 @@ const professionalQuestionsConfig = [
   // },
   {
     id: "linkedinLink",
-    optional: true,
-    text: "Link your Linkedin profile to make it easy for students to learn more about you.",
+    // text: "Link your LinkedIn profile to verify your professional status:",
+    text: "Link your LinkedIn profile:",
+    placeholder: "https://www.linkedin.com/in/your-profile",
+    type: "text",
     page: 1
   },
   {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import MakeChanges from '../../Makechanges/MakeChanges';
-import { editUserData } from '../../../services/userProfileServices';
+import { editUserData, validateLinkedInUrl } from '../../../services/userProfileServices';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { CgClose } from 'react-icons/cg';
@@ -13,6 +13,7 @@ export default function ContactInfoModal({userData, visibility, onClose}){
 
   const [newEmail, setNewEmail] = useState(userData.email);
   const [newLinkedinLink, setNewLinkedinLink] = useState(userData.linkedinLink);
+  const [linkedInError, setLinkedInError] = useState("");
 
   const saveLinkedIn = async () => {
     setIsSubmitting(true);
@@ -38,6 +39,15 @@ export default function ContactInfoModal({userData, visibility, onClose}){
     }
     onClose();
   }
+
+  const validateAndSaveLinkedIn = async () => {
+    if (userData.userType === "Professional" && !validateLinkedInUrl(newLinkedinLink)) {
+      setLinkedInError("Please enter a valid LinkedIn profile URL (e.g., https://www.linkedin.com/in/username)");
+      return;
+    }
+    setLinkedInError("");
+    await saveLinkedIn();
+  };
 
   const customStyles = {
     content: {
@@ -79,14 +89,26 @@ export default function ContactInfoModal({userData, visibility, onClose}){
             </div>
             <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
               <span style={{color: "var(--secondary)", fontSize: "19px"}}>Paste your new LinkedIn profile:</span>
-              <input style={{width: "500px", margin: "auto"}} placeholder='Paste the link here!' value={newLinkedinLink} onChange={(e) => setNewLinkedinLink(e.target.value)}/>
+              <input 
+                style={{
+                  width: "500px", 
+                  margin: "auto",
+                  borderColor: linkedInError ? "red" : undefined
+                }} 
+                placeholder='Paste the link here!' 
+                value={newLinkedinLink} 
+                onChange={(e) => setNewLinkedinLink(e.target.value)}
+              />
+              {linkedInError && (
+                <span style={{color: "red", fontSize: "14px", textAlign: "center"}}>{linkedInError}</span>
+              )}
             </div>
           </form>
         </main>
         <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
           <button disabled={isSubmitting} className='btnUnfilled' onClick={()=>setMakeChangesVisibility(true)} style={{borderRadius: "4px", width: "40%", padding: "8px", fontSize: "larger"}}>
             Cancel</button>
-          <button onClick={saveLinkedIn} type='submit' disabled={isSubmitting || newEmail===""} className="btnSaveChanges" style={{background: (newEmail === "" || isSubmitting) ? "gray": "", borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", cursor: (newEmail === "") ? "not-allowed" : ""}}>
+          <button onClick={validateAndSaveLinkedIn} type='submit' disabled={isSubmitting || newEmail===""} className="btnSaveChanges" style={{background: (newEmail === "" || isSubmitting) ? "gray": "", borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", cursor: (newEmail === "") ? "not-allowed" : ""}}>
             Save Changes</button>
         </footer>
       </Modal>

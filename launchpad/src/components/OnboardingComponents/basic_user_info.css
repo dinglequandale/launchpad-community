@@ -1,0 +1,89 @@
+.onboarding-basic-info-container {
+  width: 465px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.onboarding-upload {
+    font-size: larger;
+    padding: 14px;
+    margin-top: 10px;
+}
+
+
+
+.onboarding-linkedin-overlay {
+  /* position: relative; */
+  z-index: 1;
+  height: 150px;
+  top: 6px;
+  opacity: 0.9;
+  background-color: var(--primary);
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.onboarding-linkedin-input {
+  width: 465px;
+  box-shadow: var(--shadowColor);
+  display: flex;
+  right: 0;
+  left: 0;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 40px;
+}
+
+.onboarding-linkedin-section {
+  position: relative;
+}
+
+.onboarding-linkedin-verification {
+  position: absolute;
+  top: 0px;
+  right: -10px;
+  font-size: 18px;
+}
+
+.onboarding-verification-status {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
+}
+
+.onboarding-verification-status.verified {
+  color: green;
+}
+
+.onboarding-verification-status.unverified {
+  color: red;
+}
+
+.onboarding-link-btn {
+  font-size: 19px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.onboarding-link-btn.active {
+  color: rgb(48, 160, 240);
+}
+
+.onboarding-dropdown-container {
+  z-index: 3;
+}
+
+.onboarding-dropdown-container-secondary {
+  z-index: 2;
+}
+
+.onboarding-optional-label-container {
+  position: absolute;
+  bottom: -20px;
+}

@@ -7,7 +7,7 @@ import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
-import { displayColleges, displayFieldsOfInterest, displaySchools, displayShortenedLinkedin, getBasicUserDescription } from '../../services/userProfileServices';
+import { displayColleges, displayFieldsOfInterest, displaySchools, displayShortenedLinkedin, getBasicUserDescription, getVerificationStatus } from '../../services/userProfileServices';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import DefaultIcon from '../DefaultIcon/DefaultIcon';
@@ -119,6 +119,26 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>
                                 {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
                                 {userData.userType === "Professional" && userData.schoolAttending && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.affiliatedSchools.desc1}</span>: {basicInfoContent.affiliatedSchools.desc2}</span></>}
+                                {userData.userType === "Professional" && (
+                                  <div style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    marginTop: "8px"
+                                  }}>
+                                    <span style={{fontWeight: "500"}}>Verification Status:</span>
+                                    <div style={{
+                                      padding: "4px 8px",
+                                      borderRadius: "4px",
+                                      fontSize: "14px",
+                                      backgroundColor: getVerificationStatus(userData) === "pending" ? "#FFA500" : 
+                                                    getVerificationStatus(userData) === "verified" ? "#4CAF50" : "#FF0000",
+                                      color: "white"
+                                    }}>
+                                      {getVerificationStatus(userData).charAt(0).toUpperCase() + getVerificationStatus(userData).slice(1)}
+                                    </div>
+                                  </div>
+                                )}
                             </div>
                         </div>
                         <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(currentPath === "/Organizations" ? userData : userData.id)}> 
