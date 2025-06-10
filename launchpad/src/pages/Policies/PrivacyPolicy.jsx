@@ -1,6 +1,7 @@
 import { RiArrowGoBackFill } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom"
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
+import LegalityGoBack from "../../components/Legality Footer/LegalityGoBack";
 
 export default function PrivacyPolicy() {
 
@@ -11,13 +12,7 @@ export default function PrivacyPolicy() {
 
     return(
     <div className="privacyContainer">
-    <header style={{position: "absolute", top: "20px", left: "20px"}}>
-    <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", cursor: "pointer", fontWeight: "bolder"}}
-        onClick={() => {previousTab && navigate(previousTab)}}>
-            <RiArrowGoBackFill size={25}/>
-            <span style={{fontSize: "20px"}}>Go Back</span>
-    </div>
-    </header>
+    <LegalityGoBack/>
     <main style={{margin: "50px 200px"}}>
     <h1>Privacy Policy</h1>
     <p>Last updated: November 25, 2024</p>

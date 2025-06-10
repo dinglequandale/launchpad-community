@@ -20,62 +20,138 @@ import PrivacyPolicy from './pages/Policies/PrivacyPolicy.jsx';
 import Terms from './pages/Policies/Terms.jsx';
 import PrivateKeyPage from './pages/Onboarding/Private Key Page/PrivateKeyPage.jsx';
 import GlobalAuthWrapper from './contexts/GlobalAuthWrapper.jsx';
+import AboutUs from './components/Legality Footer/AboutUs.jsx';
+import FAQs from './components/Legality Footer/FAQs.jsx';
+
+const ErrorPage = () => {
+  return (
+    <div style={{
+      height: '100vh',
+      display: 'flex', 
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem',
+      textAlign: 'center',
+      backgroundColor: '#f8f9fa'
+    }}>
+      <h1 style={{
+        fontSize: '2rem',
+        color: '#2c5282',
+        marginBottom: '1rem'
+      }}>Oops! Something went wrong</h1>
+      
+      <p style={{
+        fontSize: '1.1rem',
+        color: '#444',
+        maxWidth: '600px',
+        lineHeight: '1.6',
+        marginBottom: '2rem'
+      }}>
+        We're sorry, but it seems we've encountered an error. Please try reloading the page.
+        If the issue persists, don't hesitate to reach out to our support team.
+      </p>
+
+      <div style={{
+        display: 'flex',
+        gap: '1rem',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}>
+        <button 
+          onClick={() => window.location.reload()}
+          style={{
+            padding: '0.75rem 1.5rem',
+            backgroundColor: '#2c5282',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '1rem'
+          }}
+        >
+          Reload Page
+        </button>
+
+        <a 
+          href="mailto:launchpadhelpline@gmail.com"
+          style={{
+            color: '#2c5282',
+            textDecoration: 'underline'
+          }}
+        >
+          Contact Support
+        </a>
+      </div>
+    </div>
+  );
+};
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App/>,
-    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement: <ErrorPage/>
   },
   {
     path: '/Landing',
     element: <LandingPage/>,
-    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement: <ErrorPage/>
+  },
+  {
+    path: '/about-us',
+    element: <AboutUs/>,
+    errorElement: <ErrorPage/>
+  },
+  {
+    path: '/faqs',
+    element: <FAQs/>,
+    errorElement: <ErrorPage/>,
   },
   {
     path: '/highschoolers',
     element: <LandingPage/>,
-    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement: <ErrorPage/>
   },
   {
     path: '/professionals',
     element: <Professional_LandingPage/>,
-    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement: <ErrorPage/>
   },
   {
     path: '/undergrads',
     element: <Alumni_LandingPage/>,
-    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement: <ErrorPage/>
   },
   {
     path: '/Signup',
     element: <SignUp/>,
-    errorElement: <div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement: <ErrorPage/>
   },
   {
     path: '/Login',
     element: <Login/>,
-    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement:<ErrorPage/>
   },
   {
     path: '/privacy',
     element: <PrivacyPolicy/>,
-    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement:<ErrorPage/>
   },
   {
     path: '/terms',
     element: <Terms/>,
-    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement:<ErrorPage/>
   },
   {
     path: '/school-signup',
     element: <PrivateKeyPage/>,
-    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement:<ErrorPage/>
   },
   {
     path: '/Onboarding',
     element: <Onboarding/>,
-    errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+    errorElement:<ErrorPage/>
   },
   {
     element: <GlobalAuthWrapper/>,
@@ -83,29 +159,28 @@ const router = createBrowserRouter([
     {
       path: '/Home',
       element: <Home/>,
-      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>,
+      errorElement:<ErrorPage/>,
     },
     {
       path: '/network',
       element: <UserNetwork/>,
-      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+      errorElement:<ErrorPage/>
     },
     {
       path: '/messages',
       element: <InitializeStream/>,
-      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+      errorElement:<ErrorPage/>
     },
     {
       path: '/Organizations',
       element: <Organizations/>,
-      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+      errorElement:<ErrorPage/>
     },
     {
       path: '/profile',
       element: <EditProfilePage/>,
-      errorElement:<div>Sorry! We’ve got an error on our hands ... Try to reload! If the issue persists, email us at launchpadhelpline@gmail.com.</div>
+      errorElement:<ErrorPage/>
     },
-    
 ]
 }
 ]);

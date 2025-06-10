@@ -1,7 +1,7 @@
 .sideNav{
     background-color: white;
     position: fixed;
-    width: 10vw;
+    width: clamp(60px, 10vw, 200px);
     height: 100vh;
     color: black;
     overflow: hidden;
@@ -10,7 +10,7 @@
     justify-content: center;
     align-items: center;
     /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
-    top:8vh;
+    top: min(8vh, 80px);
     border-right: 1.5px solid var(--dark);
     left: 0;
     /* transform: translateX(-100%);
@@ -26,7 +26,7 @@
     position: absolute;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: clamp(15px, 3vh, 30px);
     align-items: center;
     justify-content: center;
 }
@@ -39,6 +39,9 @@
     justify-content: center;
     align-items: center;
     color: black;
+    width: 100%;
+    /* padding: 0.5rem; */
+    padding: 0.5rem 0;
 }
 
 .destinationNav:hover{
@@ -47,7 +50,7 @@
 }
 
 .schoollogo{
-    width: 7.5vw;
+    width: min(7.5vw, 100px);
     padding: 5px;
     margin-top: 20px;
     margin-bottom: auto;
@@ -56,4 +59,26 @@
 
 .destinationNav.selected{
     color: var(--highlight);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .sideNav {
+        width: 60px;
+    }
+    
+    .schoollogo {
+        width: 40px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .navOptions {
+        gap: 15px;
+        padding: 0.5rem 0;
+    }
+    
+    .destinationNav {
+        padding: 0.25rem;
+    }
 }

@@ -250,7 +250,7 @@ export default function Home(){
                 
             </div>
             {/* <div className="landing-footer" style={{zIndex: "4"}}>
-              <LegalityFooter pathName={"/Home"}/>
+              <LegalityFooter/>
             </div> */}
         </>
     )

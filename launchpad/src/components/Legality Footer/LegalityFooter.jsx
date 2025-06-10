@@ -4,7 +4,7 @@ import { SocialIcon } from "react-social-icons";
 import 'react-social-icons/instagram';
 import 'react-social-icons/youtube';
 
-export default function LegalityFooter({pathName}){
+export default function LegalityFooter({pathname = null}){
 
     const navigate = useNavigate();
 
@@ -13,7 +13,7 @@ export default function LegalityFooter({pathName}){
           <div className="footer-column">
             <h3>Company</h3>
             <ul>
-              <li><a href="#about">About Us</a></li>
+              <li><a href="/about-us">About Us</a></li>
               {/* <li><a href="#careers">Careers</a></li> */}
               {/* <li><a href="#press">Press</a></li> */}
             </ul>
@@ -22,18 +22,18 @@ export default function LegalityFooter({pathName}){
             <h3>Resources</h3>
             <ul>
               {/* <li><a href="#blog">Blog</a></li> */}
-              <li><a href="#faq">FAQ</a></li>
-              <li><a href="#support">Support</a></li>
+              <li><a href="/faqs">FAQ</a></li>
+              <li><a href="/faqs">Support</a></li>
             </ul>
           </div>
           <div className="footer-column">
             <h3>Legal</h3>
             <ul>
             <li><a onClick={() => {
-                navigate("/terms", {state: pathName});
+                navigate("/terms");
               }}>Terms of Service</a></li>
               <li><a onClick={() => {
-                navigate("/privacy", {state: pathName});
+                navigate("/privacy");
               }}>Privacy Policy</a></li>
             </ul>
           </div>

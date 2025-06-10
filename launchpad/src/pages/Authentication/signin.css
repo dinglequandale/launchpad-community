@@ -3,27 +3,29 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    /* background: #f0f2f5; */
-    /* background: linear-gradient(0deg, var(--secondary) 0%, rgba(255,255,255,0) 100%); */
+    /* padding: 1rem; */
     background-image: url(/assets/onboarding_backdrop.png);
     background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
     box-shadow: var(--shadowColor);
-  }
+}
   
-  .signup-card {
+.signup-card {
     background-color: white;
-    padding: 2rem;
+    padding: clamp(1rem, 5vw, 2rem);
     border-radius: 8px;
     box-shadow: 20px 15px 20px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
-  }
+    margin: auto;
+}
   
-  h2 {
+h2 {
     margin-bottom: 0.5rem;
-  }
+}
   
-  .social-button {
+.social-button {
     width: 100%;
     padding: 0.5rem;
     margin-bottom: 1rem;
@@ -31,40 +33,45 @@
     border-radius: 4px;
     cursor: pointer;
     display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 10px;
-  }
+    min-height: 44px;
+}
   
-  .google {
+.google {
     background-color: var(--secondary);
     color: white;
-  }
+}
   
-  .orDivider{
+.orDivider{
     width: 45.5%;
     display: inline-block;
     transform: translate(0px, 2px);
-  }
+}
   
-  .authDivider {
+.authDivider {
     /* align-items: center; */
     /* text-align: center; */
     width: 100%;
     margin: 0 auto;
     justify-content: center;
     /* margin: 1rem 0; */
-  }
+}
   
-  .inputEmailAndPassword {
+.inputEmailAndPassword {
     width: 95%;
     margin-bottom: 1rem;
     font-weight: 300;
-  }
+    padding: 8px;
+    font-size: 16px;
+}
 
-  .inputEmailAndPassword.error{
+.inputEmailAndPassword.error{
     box-shadow: 0 0 3px #CC0000;
-  }
+}
   
-  .forgot-password {
+.forgot-password {
     display: block;
     text-align: right;
     margin-bottom: 1rem;
@@ -72,13 +79,13 @@
     text-decoration: none;
     cursor: pointer;
     font-size: 17px;
-  }
+}
 
-  .forgot-password:hover{
+.forgot-password:hover{
     color: var(--highlight);
-  }
+}
   
-  .submit-button {
+.submit-button {
     width: 100%;
     padding: 0.75rem;
     background-color: var(--secondary);
@@ -86,15 +93,31 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-  }
+    min-height: 44px;
+    font-size: 16px;
+}
   
-  .signup-link {
+.signup-link {
     text-align: center;
     margin-top: 1rem;
-  }
+}
   
-  .signup-link a {
+.signup-link a {
     color: var(--secondary);
     text-decoration: none;
-  }
+}
+  
+@media (max-width: 480px) {
+    .signup-card {
+        padding: 1rem;
+    }
+    
+    .orDivider {
+        width: 42%;
+    }
+    
+    .forgot-password {
+        font-size: 15px;
+    }
+}
   

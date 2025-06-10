@@ -1,6 +1,6 @@
-import { RiArrowGoBackFill } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router-dom";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
+import LegalityGoBack from "../../components/Legality Footer/LegalityGoBack";
 
 export default function Terms(){
 
@@ -11,13 +11,7 @@ export default function Terms(){
     return(
     <div className="termsContainer">
     <body>
-        <header style={{position: "absolute", top: "20px", left: "20px"}}>
-        <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", cursor: "pointer", fontWeight: "bolder"}}
-            onClick={() => {previousTab && navigate(previousTab)}}>
-                <RiArrowGoBackFill size={25}/>
-                <span style={{fontSize: "20px"}}>Go Back</span>
-        </div>
-        </header>
+        <LegalityGoBack/>
         <main>
         <div class="container">
             <h1>Terms and Conditions</h1>

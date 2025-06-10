@@ -1,0 +1,62 @@
+.confirmation-modal__content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.confirmation-modal__title {
+  font-weight: 600;
+  color: var(--secondary);
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+.confirmation-modal__divider {
+  width: 70%;
+  border: none;
+  height: 2px;
+  background-color: var(--accent);
+  margin: 1.5rem auto;
+}
+
+.confirmation-modal__message {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: #4a4a4a;
+  margin: 1rem 0 1.5rem;
+}
+
+.confirmation-modal__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.confirmation-modal__button {
+  width: 120px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 550;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.confirmation-modal__button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.confirmation-modal__button--cancel {
+  composes: btnUnfilled;
+  border: 2px solid var(--secondary);
+}
+
+.confirmation-modal__button--confirm {
+  composes: btnSaveChanges;
+}
+
+.confirmation-modal__highlight {
+  font-weight: 500;
+  color: var(--secondary);
+} 

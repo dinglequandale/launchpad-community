@@ -191,7 +191,6 @@ export default function UserNetwork() {
 
   const handleSearch = async (e, queryText) => {
     e.preventDefault();
-    // setIsSearching(false);
     if (queryText) {
       const searchResults = await searchDocuments('users', queryText, tenantId);
       setAllVisibleUserData(searchResults);

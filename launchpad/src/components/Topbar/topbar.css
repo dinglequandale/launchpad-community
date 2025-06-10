@@ -4,8 +4,9 @@
     justify-content: space-between;
     position: fixed;
     align-items: center;
-    padding: .5vh;
-    height: 7%;
+    padding: 0.5rem;
+    min-height: 60px;
+    height: min(7vh, 80px);
     width: 100%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     z-index: 4;
@@ -13,14 +14,33 @@
 
 .user{
     display: flex;
-    padding-right: 20px;
+    padding-right: clamp(10px, 2vw, 20px);
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .topBarTitle{
     font-weight: 600;
-    font-size: 20px;
+    font-size: clamp(16px, 2.5vw, 20px);
     padding: 5px;
     text-shadow: 1px 1px 2px black,
     0 0 1em rgb(214, 214, 249),
     0 0 0.2em rgb(240, 240, 255);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .topBar {
+        padding: 0.25rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .topBar {
+        height: min(8vh, 70px);
+    }
+    
+    .user {
+        padding-right: 10px;
+    }
 }
