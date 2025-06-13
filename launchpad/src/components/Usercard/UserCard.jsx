@@ -11,6 +11,8 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
 
     // TODO: currently localStorage, transition to database
     const userType = userData.userType;
+
+    const viewingUserType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
     
     const descType = () => {
         switch(userData.userType){
@@ -77,12 +79,12 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                 <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userSecondDesc.label}</strong>: {basicInfoContent.userSecondDesc.content}</span>
             </div>
             </div>
-            <button className="btnConnect" style={{width: "88%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "15px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
+            {viewingUserType !== "Professional" && <button className="btnConnect" style={{width: "88%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "15px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={22}/>
                     <span>Connect</span>
                 </div>
-            </button>
+            </button>}
         </div>
         </>
     )

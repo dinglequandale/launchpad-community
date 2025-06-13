@@ -1,6 +1,7 @@
 import './profilemodal.css';
 import React from 'react';
 import { IoCloseOutline } from "react-icons/io5";
+import { FaFlag } from "react-icons/fa";
 import { useState, useEffect, useRef } from 'react';
 import { FaLink } from 'react-icons/fa6';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
@@ -11,13 +12,17 @@ import { displayColleges, displayFieldsOfInterest, displaySchools, displayShorte
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import DefaultIcon from '../DefaultIcon/DefaultIcon';
+import { CgClose } from 'react-icons/cg';
+import { BiFlag } from 'react-icons/bi';
+import toast from 'react-hot-toast';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick}) {
 
     const userType = userData.userType;
+    const viewingUserType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
+
     const userName = userData.userName;
     const [opportunitiesData, setOpportunitiesData] = useState([]);
-    // const [loading, setLoading] = useState(false);
     const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
 
     const {currentUser} = useAuth();
@@ -27,6 +32,10 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
 
     const location = useLocation();
     const currentPath = location.pathname;
+
+    const [reportVisibility, setReportVisibility] = useState(false);
+    const [reportReason, setReportReason] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(()=>{
 
@@ -96,11 +105,78 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         }
     }, []);
 
+    const handleReport = async () => {
+        if (!reportReason.trim()) {
+            toast.error('Please provide a reason for reporting');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const mailtoLink = `mailto:launchpadhelpline@gmail.com?subject=Report for User: ${userData.userName}&body=Report Reason: ${reportReason}%0D%0A%0D%0AReported User ID: ${userData.userId}%0D%0AReported User Name: ${userData.userName}`;
+            window.location.href = mailtoLink;
+            
+            toast.success('Report submitted successfully');
+            
+            setTimeout(() => {
+                setReportVisibility(false);
+                setReportReason('');
+            }, 2000);
+        } catch (error) {
+            toast.error('Failed to submit report. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     return(
         <>
             <div className='blurOverlay'>
                 <div className='profileModalContent' style={{ top: top }} ref={menuRef}>
-                    <IoCloseOutline className='closeProfileModal' size={30} onClick={onClose}/>
+                    <div style={{position:"absolute", right: "10px", top: "9px"}}>
+                        <div className="modal-right-header">
+                            <BiFlag 
+                                className='reportProfileModal' 
+                                size={25} 
+                                onClick={() => setReportVisibility(true)}
+                            />
+                            <IoCloseOutline 
+                                className='closeProfileModal' 
+                                size={30} 
+                                onClick={onClose}
+                            />
+                        </div>
+                    </div>
+                    {reportVisibility && (
+                        <div className="reportDialogContainer">
+                            <button className='btnClose' onClick={() => setReportVisibility(false)} style={{background:"none"}}><CgClose size={25}/></button>
+                            <div className="reportDialog">
+                                <h3>Report User</h3>
+                                <textarea
+                                    placeholder="Please provide a reason for reporting this user..."
+                                    value={reportReason}
+                                    onChange={(e) => setReportReason(e.target.value)}
+                                    disabled={isSubmitting}
+                                />
+                                <div className="reportActions">
+                                    <button 
+                                        className='btnUnfilled' 
+                                        onClick={() => setReportVisibility(false)}
+                                        disabled={isSubmitting}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        className='btnSaveChanges' 
+                                        onClick={handleReport}
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit Report'}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <>
                     <header name="userIntro" style={{paddingBottom: "10px"}}>
                         <div className='basicInfo' style={{marginBottom: !userData.userPfpPreview ? "10px" : ""}}>
@@ -141,12 +217,12 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 )}
                             </div>
                         </div>
-                        <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(currentPath === "/Organizations" ? userData : userData.id)}> 
+                        {viewingUserType !== "Professional" && <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(currentPath === "/Organizations" ? userData : userData.id)}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>
                             </div>
-                        </button>
+                        </button>}
                     </header>
                     <hr style={{width: "95%"}}/>
                     <main style={{padding: "0px 8px"}}>
@@ -169,11 +245,6 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                             : opportunitiesLoading ?
                         <div style={{marginTop: "40px"}}><Loading/></div> :
                         null}
-                        {/* {(!opportunityLoading && opportunityData) ? <div>
-                            <div style={{textAlign: "center", marginBottom: ".6rem"}}>
-                            <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", paddingBottom: "3rem"}}>{userName.split(" ")[0]} is {opportunityData.organizationType === "Business" ? "running" : "offering"} {opportunityData.organizationType === "Internship" ? "an" : "a"}<span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()}{opportunityData.organizationType !== "Business" && " opportunity"}!</span></span>
-                            </div>
-                            <OrganizationProfile /> </div> : opportunityLoading ? <Loading/> : null} */}
                         {(userData.userAboutMe || userData.linkedinLink) && <div name="userAboutMe" style={{paddingTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s About Me</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
