@@ -2,16 +2,62 @@ import React, { useState } from 'react';
 import { BiDownload } from 'react-icons/bi';
 import { CiWarning } from 'react-icons/ci';
 import { FiDelete } from 'react-icons/fi';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '../../../firebase/firebaseConfig';
+import { useAuth } from '../../../contexts/auth/AuthContext';
+import toast from 'react-hot-toast';
+import { CgClose } from 'react-icons/cg';
 
 const AccountSettings = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState('');
+  const { currentUser } = useAuth();
 
-  const handleDeleteAccount = () => {
+  const handleExportData = async () => {
+    try {
+      const loadingToast = toast.loading('Preparing your data export...');
+      e
+      const userDoc = await getDoc(doc(db, "tenants", localStorage.getItem("schoolId"), "users", currentUser.uid));
+      
+      if (!userDoc.exists()) {
+        toast.error('Could not find your user data', { id: loadingToast });
+        return;
+      }
+
+      const userData = userDoc.data();
+      
+      // Create a JSON file with the user's data
+      const dataStr = JSON.stringify(userData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      // Create download link and trigger download
+      const exportFileDefaultName = `user_data.json`;
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      toast.success('Data exported successfully!', { id: loadingToast });
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      toast.error('Failed to export data. Please try again.');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
     if (confirmDelete === 'DELETE') {
-      // TODO: Implement account deletion logic
-      console.log('Account deletion confirmed');
-      setDeleteDialogOpen(false);
+      try {
+        const loadingToast = toast.loading('Deleting your account...');
+        const userDoc = doc(db, "tenants", localStorage.getItem("schoolId"), "users", currentUser.uid);
+        await deleteDoc(userDoc);
+        await currentUser.delete();
+        localStorage.clear();
+        toast.success('Account deleted successfully', { id: loadingToast });
+        window.location.href = '/Landing';
+      } catch (error) {
+        console.error('Error deleting account:', error);
+        toast.error('Failed to delete account. Please try again.');
+      }
     }
   };
 
@@ -27,11 +73,8 @@ const AccountSettings = () => {
             Download a copy of your data, including your profile information, preferences, and activity history.
           </p>
           <button
-            className="settings-button settings-button-secondary"
-            onClick={() => {
-              // TODO: Implement data export logic
-              console.log('Export data clicked');
-            }}
+            className="settings-button"
+            onClick={handleExportData}
           >
             <BiDownload className="settings-button-icon" />
             Export Data
@@ -79,7 +122,7 @@ const AccountSettings = () => {
         {/* Delete Account Section */}
         <div className="settings-card settings-card-danger">
           <div className="settings-card-header">
-            <CiWarning className="settings-card-icon" />
+            <CiWarning className="settings-card-icon" size={40}/>
             <h3 className="settings-card-title">Danger Zone</h3>
           </div>
           <p className="settings-card-description">
@@ -98,20 +141,15 @@ const AccountSettings = () => {
       {/* Delete Account Dialog */}
       {deleteDialogOpen && (
         <div className="settings-dialog-overlay" onClick={() => setDeleteDialogOpen(false)}>
-          <div className="settings-dialog" onClick={(e) => e.stopPropagation()}>
+          <div className="settings-dialog" style={{position: "relative"}} onClick={(e) => e.stopPropagation()}>
+          <button className='btnClose' onClick={() => setDeleteDialogOpen(false)} style={{background:"none"}}><CgClose size={25}/></button>
             <div className="settings-dialog-header">
               <h3 className="settings-dialog-title settings-text-error">Delete Account</h3>
-              <button
-                className="settings-dialog-close"
-                onClick={() => setDeleteDialogOpen(false)}
-              >
-                ×
-              </button>
             </div>
             <div className="settings-dialog-content">
-              <div className="settings-alert settings-alert-warning">
+              {/* <div className="settings-alert settings-alert-warning">
                 This action cannot be undone. All your data will be permanently deleted.
-              </div>
+              </div> */}
               <p className="settings-dialog-text">Please type "DELETE" to confirm:</p>
               <input
                 type="text"
