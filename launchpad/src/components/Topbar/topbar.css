@@ -40,6 +40,10 @@
     0 0 0.2em rgb(240, 240, 255);
 }
 
+.diff-color {
+    color: black;
+}
+
 /* Responsive adjustments */
 @media screen and (max-width: 768px) {
     .topBar {

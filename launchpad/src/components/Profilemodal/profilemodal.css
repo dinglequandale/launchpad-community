@@ -71,57 +71,12 @@
     transition: color 0.2s ease;
 }
 
-.reportProfileModal:hover {
+.reportProfileModal:hover,.reportProfileModal-diff-color:hover {
     color: rgb(255, 127, 127);
 }
 
-.reportDialogContainer {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 80%;
-    /* max-width: 400px; */
-    z-index: 6;
-}
-
-.reportDialog {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.reportDialog h3 {
-    margin: 0 0 15px 0;
-    /* color: var(--secondary); */
-}
-
-.reportDialog textarea {
-    width: 95%;
-    height: 100px;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
-    margin: 0 auto;
-}
-
-.reportActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-    align-items: left;
-    width: 100%;
-}
-
-.reportActions button {
-    padding: 8px 16px;
-    border-radius: 4px;
+.reportProfileModal-diff-color {
+    cursor: pointer;
+    color: black;
+    transition: color 0.2s ease;
 }

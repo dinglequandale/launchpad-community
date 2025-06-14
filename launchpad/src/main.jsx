@@ -9,6 +9,7 @@ import Organizations from './pages/Organizationspage/Organizations.jsx';
 import EditProfilePage from './pages/Editprofilepage/EditProfilePage.jsx';
 import Home from './pages/Homepage/Home.jsx';
 import { AuthProvider } from './contexts/auth/AuthContext.jsx';
+import { ReportProvider } from './contexts/report/ReportContext.jsx';
 import SignUp from './pages/Authentication/Signup.jsx';
 import Login from './pages/Authentication/Login.jsx';
 import LandingPage from './pages/landing_page/LandingPage.jsx';
@@ -23,6 +24,7 @@ import GlobalAuthWrapper from './contexts/GlobalAuthWrapper.jsx';
 import AboutUs from './components/Legality Footer/AboutUs.jsx';
 import FAQs from './components/Legality Footer/FAQs.jsx';
 import SettingsPage from './pages/Settings/SettingsPage.jsx';
+import ReportModal from './components/ReportModal/ReportModal.jsx';
 
 const ErrorPage = () => {
   return (
@@ -195,7 +197,10 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
-        <RouterProvider router = {router} /> 
+      <ReportProvider>
+        <RouterProvider router={router} />
+        <ReportModal />
+      </ReportProvider>
     </AuthProvider>
   </React.StrictMode>,
 )

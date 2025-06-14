@@ -3,8 +3,10 @@ import { RiMoneyDollarBoxLine } from "react-icons/ri";
 import { RiGraduationCapLine } from "react-icons/ri";
 import { GoBriefcase } from "react-icons/go";
 import { SlCalender } from "react-icons/sl";
+import { BiFlag } from "react-icons/bi";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../contexts/auth/AuthContext";
+import { useReport } from "../../contexts/report/ReportContext";
 import ReadMoreButton from "../ReadMorebutton/ReadMore";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
@@ -17,6 +19,7 @@ export default function OrganizationProfile({organizationData, location, handleS
     const [isLessText, setIsLessText] = useState(false);
 
     const { currentUser } = useAuth();
+    const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
 
     const descRef = useRef();
     const [userData, setUserData] = useState(null);
@@ -124,39 +127,51 @@ return(
     <>
         <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : (location === "user_profile" || location === "user_profile_public") ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
             <div style={{display: "flex"}}>
-            {(organizationProfileData.organizationRelevanceTags && isPublished) && <RelevanceBanner organizationType={organizationProfileData.organizationType} relevanceType={organizationProfileData.organizationRelevanceTags}/>}
-            {!isPublished && <UnpublishedBanner/>}
-            <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
-                <div style={{display: "flex"}}>
-                    <div style={{fontSize: "16px", position: "absolute", bottom: "7px", left: "43%"}}>
-                        {!isExpanded && <ReadMoreButton handleClick={handleReadMoreClick} isExpanded={isExpanded} isLessText={isLessText}/>}
-                    </div>
-                    <div>
-                    <img src={organizationProfileData.organizationLogoPreview} className="pfpImage" style={{width: "145px", height: "145px", borderRadius: "20px"}}/>
-                    </div>
-                    <div name="organizationContent" style={{padding: "0px 15px", paddingBottom: "11px", position: 'relative'}}>
-                        <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
-                            <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
-                            <span style={{fontSize: "smaller", fontWeight: "550"}}> {organizationProfileData.organizationType} {["Club", "Initiative", "Business"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
-                            {organizationProfileData.organizationType === "Club" && userData && <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}> at {getUserHS(userData.schoolAttending)} </span>}
-                            <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>{organizationProfileData.organizationHost ? "run by" : ""}&nbsp;</span>
-                            <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHostName}</button>
-                            <br />
-                            <div style={{lineHeight: "1"}}>
-                                {organizationProfileData.organizationDescription}
+                <div style={{position: "absolute", right: "10px", top: "10px", zIndex: 2}}>
+                    <BiFlag 
+                        className='reportProfileModal' 
+                        size={25} 
+                        onClick={() => {
+                            setReportTarget("Organization");
+                            setReportedUser(organizationProfileData.organizationName);
+                            setShowReportUserName(false);
+                            setReportVisibility(true);
+                        }}
+                    />
+                </div>
+                {(organizationProfileData.organizationRelevanceTags && isPublished) && <RelevanceBanner organizationType={organizationProfileData.organizationType} relevanceType={organizationProfileData.organizationRelevanceTags}/>}
+                {!isPublished && <UnpublishedBanner/>}
+                <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
+                    <div style={{display: "flex"}}>
+                        <div style={{fontSize: "16px", position: "absolute", bottom: "7px", left: "43%"}}>
+                            {!isExpanded && <ReadMoreButton handleClick={handleReadMoreClick} isExpanded={isExpanded} isLessText={isLessText}/>}
+                        </div>
+                        <div>
+                        <img src={organizationProfileData.organizationLogoPreview} className="pfpImage" style={{width: "145px", height: "145px", borderRadius: "20px"}}/>
+                        </div>
+                        <div name="organizationContent" style={{padding: "0px 15px", paddingBottom: "11px", position: 'relative'}}>
+                            <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
+                                <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
+                                <span style={{fontSize: "smaller", fontWeight: "550"}}> {organizationProfileData.organizationType} {["Club", "Initiative", "Business"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
+                                {organizationProfileData.organizationType === "Club" && userData && <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}> at {getUserHS(userData.schoolAttending)} </span>}
+                                <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>{organizationProfileData.organizationHost ? "run by" : ""}&nbsp;</span>
+                                <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHostName}</button>
+                                <br />
+                                <div style={{lineHeight: "1"}}>
+                                    {organizationProfileData.organizationDescription}
+                                </div>
+                                {(organizationProfileData.organizationDeadline || organizationProfileData.organizationStartDate) && <div style={{marginTop: "15px"}}>
+                                    {organizationProfileData.organizationDeadline && <span><span style={{fontWeight: "600"}}>Application Deadline</span>: {(organizationProfileData.organizationDeadline)}<br /></span>}
+                                    {organizationProfileData.organizationStartDate && <span><span style={{fontWeight: "600"}}>Start Date</span>: {(organizationProfileData.organizationStartDate)}</span>}
+                                </div>}
                             </div>
-                            {(organizationProfileData.organizationDeadline || organizationProfileData.organizationStartDate) && <div style={{marginTop: "15px"}}>
-                                {organizationProfileData.organizationDeadline && <span><span style={{fontWeight: "600"}}>Application Deadline</span>: {(organizationProfileData.organizationDeadline)}<br /></span>}
-                                {organizationProfileData.organizationStartDate && <span><span style={{fontWeight: "600"}}>Start Date</span>: {(organizationProfileData.organizationStartDate)}</span>}
-                            </div>}
                         </div>
                     </div>
                 </div>
-            </div>
-            <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px", marginLeft: "6px"}}>
-                <button className="btnOrganizationLearnMore btnConnect" onClick={e => handleLearnMore(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> Learn More </button>
-                {(organizationData.apply !== "NOAPPLY") && <button className="btnOrganizationConnect btnUnfilled" onClick={e => handleConnect(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> {connectBtnType(organizationData.organizationType)} </button>}
-            </div>
+                <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px", marginLeft: "6px"}}>
+                    <button className="btnOrganizationLearnMore btnConnect" onClick={e => handleLearnMore(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> Learn More </button>
+                    {(organizationData.apply !== "NOAPPLY") && <button className="btnOrganizationConnect btnUnfilled" onClick={e => handleConnect(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> {connectBtnType(organizationData.organizationType)} </button>}
+                </div>
 
             </div>
             <div>

@@ -15,6 +15,7 @@ import DefaultIcon from '../DefaultIcon/DefaultIcon';
 import { CgClose } from 'react-icons/cg';
 import { BiFlag } from 'react-icons/bi';
 import toast from 'react-hot-toast';
+import { useReport } from '../../contexts/report/ReportContext';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick}) {
 
@@ -33,9 +34,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     const location = useLocation();
     const currentPath = location.pathname;
 
-    const [reportVisibility, setReportVisibility] = useState(false);
-    const [reportReason, setReportReason] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
 
     useEffect(()=>{
 
@@ -105,29 +104,6 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         }
     }, []);
 
-    const handleReport = async () => {
-        if (!reportReason.trim()) {
-            toast.error('Please provide a reason for reporting');
-            return;
-        }
-
-        setIsSubmitting(true);
-        try {
-            const mailtoLink = `mailto:launchpadhelpline@gmail.com?subject=Report for User: ${userData.userName}&body=Report Reason: ${reportReason}%0D%0A%0D%0AReported User ID: ${userData.userId}%0D%0AReported User Name: ${userData.userName}`;
-            window.location.href = mailtoLink;
-            
-            toast.success('Report submitted successfully');
-            
-            setTimeout(() => {
-                setReportVisibility(false);
-                setReportReason('');
-            }, 2000);
-        } catch (error) {
-            toast.error('Failed to submit report. Please try again.');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
 
     return(
         <>
@@ -138,7 +114,13 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                             <BiFlag 
                                 className='reportProfileModal' 
                                 size={25} 
-                                onClick={() => setReportVisibility(true)}
+                                onClick={() => {
+                                    setReportTarget("User");
+                                    setReportVisibility(true);
+                                    setReportedUser(userData.userName);
+                                    setShowReportUserName(false);
+                                    onClose();
+                                }}
                             />
                             <IoCloseOutline 
                                 className='closeProfileModal' 
@@ -147,36 +129,6 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                             />
                         </div>
                     </div>
-                    {reportVisibility && (
-                        <div className="reportDialogContainer">
-                            <button className='btnClose' onClick={() => setReportVisibility(false)} style={{background:"none"}}><CgClose size={25}/></button>
-                            <div className="reportDialog">
-                                <h3>Report User</h3>
-                                <textarea
-                                    placeholder="Please provide a reason for reporting this user..."
-                                    value={reportReason}
-                                    onChange={(e) => setReportReason(e.target.value)}
-                                    disabled={isSubmitting}
-                                />
-                                <div className="reportActions">
-                                    <button 
-                                        className='btnUnfilled' 
-                                        onClick={() => setReportVisibility(false)}
-                                        disabled={isSubmitting}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button 
-                                        className='btnSaveChanges' 
-                                        onClick={handleReport}
-                                        disabled={isSubmitting}
-                                    >
-                                        {isSubmitting ? 'Submitting...' : 'Submit Report'}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                     <>
                     <header name="userIntro" style={{paddingBottom: "10px"}}>
                         <div className='basicInfo' style={{marginBottom: !userData.userPfpPreview ? "10px" : ""}}>
