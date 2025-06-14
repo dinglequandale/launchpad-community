@@ -5,7 +5,7 @@ const admin = require('firebase-admin');
 const { google } = require('googleapis');
 const nodemailer = require('nodemailer');
 
-// admin.initializeApp();
+// admin.initializeApp() is automatically called by Firebase Functions runtime
 
 // const serverClient = new StreamChat(
 //   process.env.STREAM_API_KEY,
@@ -25,12 +25,32 @@ oauth2Client.setCredentials({
 
 // Function to send email notification
 exports.sendEmailNotifications = functions.https.onCall(async (data, context) => {
-    const { receiverId, senderName, messagePreview, schoolId } = data;
-    // Get user's email from Firestore
-    const userDoc = await admin.firestore().collection('tenants').doc(schoolId).collection('users').doc(receiverId).get();
-    const userData = userDoc.data();
-    const userEmail = userData.email;
-    await sendEmailNotification(userEmail, senderName, messagePreview);
+    try {
+        const { receiverId, senderName, messagePreview, schoolId } = data;
+        console.log('Received data:', { receiverId, senderName, schoolId });
+        
+        // Get user's email from Firestore
+        const userDoc = await admin.firestore().collection('tenants').doc(schoolId).collection('users').doc(receiverId).get();
+        
+        if (!userDoc.exists) {
+            console.error('User document not found:', { receiverId, schoolId });
+            throw new Error('User not found');
+        }
+        
+        const userData = userDoc.data();
+        const userEmail = userData.email;
+        
+        if (!userEmail) {
+            console.error('User email not found in document:', { receiverId, schoolId });
+            throw new Error('User email not found');
+        }
+        
+        await sendEmailNotification(userEmail, senderName, messagePreview);
+        return { success: true };
+    } catch (error) {
+        console.error('Error in sendEmailNotifications:', error);
+        throw new functions.https.HttpsError('internal', error.message);
+    }
 });
 
 async function sendEmailNotification(userEmail, senderName, messagePreview) {

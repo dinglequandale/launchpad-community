@@ -127,7 +127,7 @@ return(
     <>
         <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : (location === "user_profile" || location === "user_profile_public") ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
             <div style={{display: "flex"}}>
-                <div style={{position: "absolute", right: "10px", top: "10px", zIndex: 2}}>
+                {(location !== "user_profile") && <div style={{position: "absolute", right: "10px", top: "10px", zIndex: 2}}>
                     <BiFlag 
                         className='reportProfileModal' 
                         size={25} 
@@ -138,7 +138,7 @@ return(
                             setReportVisibility(true);
                         }}
                     />
-                </div>
+                </div>}
                 {(organizationProfileData.organizationRelevanceTags && isPublished) && <RelevanceBanner organizationType={organizationProfileData.organizationType} relevanceType={organizationProfileData.organizationRelevanceTags}/>}
                 {!isPublished && <UnpublishedBanner/>}
                 <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>

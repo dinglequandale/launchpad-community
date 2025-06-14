@@ -10,10 +10,10 @@ import { BiLock, BiNotification, BiPalette, BiUser } from 'react-icons/bi';
 import LegalityGoBack from '../../components/Legality Footer/LegalityGoBack.jsx';
 
 const settingsSections = [
-  { id: 'notifications', label: 'Notifications', icon: <BiNotification className="settings-nav-icon"/>, component: NotificationSettings },
+  { id: 'notifications', label: 'Notifications', icon: <BiNotification className="settings-nav-icon" size={25}/>, component: NotificationSettings },
   // { id: 'display', label: 'Display', icon: <BiPalette className="settings-nav-icon"/>, component: DisplaySettings },
-  { id: 'security', label: 'Security', icon: <BiLock className="settings-nav-icon"/>, component: SecuritySettings },
-  { id: 'account', label: 'Account', icon: <BiUser className="settings-nav-icon"/>, component: AccountSettings },
+  { id: 'security', label: 'Security', icon: <BiLock className="settings-nav-icon" size={25}/>, component: SecuritySettings },
+  { id: 'account', label: 'Account', icon: <BiUser className="settings-nav-icon" size={25}/>, component: AccountSettings },
 ];
 
 const SettingsPage = () => {
@@ -22,6 +22,7 @@ const SettingsPage = () => {
   const ActiveComponent = settingsSections.find(
     (section) => section.id === activeSection
   )?.component || NotificationSettings;
+
 
   return (
     <div className='settings-holder'>

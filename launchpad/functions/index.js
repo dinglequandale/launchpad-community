@@ -9,9 +9,11 @@ const {sendInviteEmail} = require("./callableFunctions/sendInvite");
 const {getEmail} = require("./callableFunctions/getEmail");
 const {createSchoolClaim} = require("./callableFunctions/createSchoolClaim");
 const {sendEmailNotifications} = require("./callableFunctions/sendEmailNotifications");
+const {sendReport} = require("./callableFunctions/sendReport");
 
 exports.createStreamToken = createStreamToken;
 exports.sendInviteEmail = sendInviteEmail;
 exports.getEmail = getEmail;
 exports.createSchoolClaim = createSchoolClaim;
 exports.sendEmailNotifications = sendEmailNotifications;
+exports.sendReport = sendReport;

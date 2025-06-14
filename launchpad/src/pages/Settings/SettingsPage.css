@@ -204,11 +204,6 @@
   cursor: not-allowed;
 }
 
-.settings-button-primary {
-  /* background-color: var(--primary); */
-  /* color: white; */
-}
-
 .settings-button-primary:hover:not(:disabled) {
   background-color: var(--highlight);
 }
@@ -392,7 +387,7 @@
 }
 
 input:checked + .settings-switch-slider {
-  background-color: var(--primary);
+  background-color: var(--secondary);
 }
 
 input:checked + .settings-switch-slider:before {

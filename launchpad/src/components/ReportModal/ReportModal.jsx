@@ -3,6 +3,7 @@ import { CgClose } from "react-icons/cg";
 import toast from 'react-hot-toast';
 import './report_modal.css';
 import { useReport } from '../../contexts/report/ReportContext';
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 export default function ReportModal() {
     const { reportVisibility, setReportVisibility, isSubmitting, setIsSubmitting, reportTarget, reportedUser, setReportedUser, showReportUserName } = useReport();
@@ -16,8 +17,13 @@ export default function ReportModal() {
 
         setIsSubmitting(true);
         try {
-            const mailtoLink = `mailto:launchpadhelpline@gmail.com?subject=Report addressed to ${reportedUser} for ${reportTarget}&body=Report Reason: ${reportReason}`;
-            window.location.href = mailtoLink;
+            toast.loading('Sending report ...');
+            const sendReport = httpsCallable(getFunctions(), "sendReport");
+            await sendReport({ 
+                reportedUser, 
+                reportTarget, 
+                reportReason 
+            });
             
             toast.success('Report submitted successfully');
             
@@ -26,6 +32,7 @@ export default function ReportModal() {
                 setReportReason('');
             }, 2000);
         } catch (error) {
+            console.error('Error submitting report:', error);
             toast.error('Failed to submit report. Please try again.');
         } finally {
             setIsSubmitting(false);
@@ -40,8 +47,8 @@ export default function ReportModal() {
 
     return (
         <div className="reportDialogContainer">
-            <button className='btnClose' onClick={() => setReportVisibility(false)} style={{background:"none"}}><CgClose size={25}/></button>
             <div className="reportDialog" style={{gap: "20px"}}>
+                <button className='btnClose' onClick={() => setReportVisibility(false)} style={{background:"none"}}><CgClose size={25}/></button>
                 <h3>Report {reportTarget}</h3>
                 {showReportUserName && <input type="text" onChange={(e) => setReportedUser(e.target.value)} value={reportedUser} placeholder="Input the reported user's name" style={{width: "95%", padding: "10px", fontSize: "18px"}} />}
                 <textarea
