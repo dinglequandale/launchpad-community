@@ -39,7 +39,7 @@ const AccountSettings = () => {
         </div>
 
         {/* Connected Services Section */}
-        <div className="settings-card">
+        {/* <div className="settings-card">
           <h3 className="settings-card-title">Connected Services</h3>
           <ul className="settings-list">
             <li className="settings-list-item">
@@ -74,7 +74,7 @@ const AccountSettings = () => {
               </button>
             </li>
           </ul>
-        </div>
+        </div> */}
 
         {/* Delete Account Section */}
         <div className="settings-card settings-card-danger">

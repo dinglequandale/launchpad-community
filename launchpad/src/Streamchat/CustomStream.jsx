@@ -31,7 +31,7 @@ const ChannelHeaderContainer = styled.div`
 
 const ChatContainer = styled.div`
   display: flex;
-  height: 92vh;
+  height: 90vh;
   width: 100%;
 `;
 

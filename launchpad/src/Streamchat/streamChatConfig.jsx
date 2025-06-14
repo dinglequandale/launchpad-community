@@ -83,12 +83,12 @@ export default function InitializeStream() {
   if(!chatClient || !channels) return ( <PageLoading/> );
 
   return (
-      <>
+      <div style={{maxHeight: "100%"}}>
       <TopBar/>
       <SideNav/>
-      <div style={{paddingTop: "4%", paddingLeft: "10%"}}>
+      <div style={{paddingTop: "5%", paddingLeft: "10%"}}>
         <CustomChat client={chatClient} channels={channels} initialActiveChannel={activeChannel} filters={filters}/>
       </div>
-      </>
+      </div>
     )
 }

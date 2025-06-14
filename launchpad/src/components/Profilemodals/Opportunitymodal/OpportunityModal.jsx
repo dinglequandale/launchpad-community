@@ -131,7 +131,7 @@ const publishOpportunityData = async () => {
     overlay: {
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       backdropFilter: 'blur(5px)',
-      zIndex: "3",
+      zIndex: "5",
     }
   };
 
