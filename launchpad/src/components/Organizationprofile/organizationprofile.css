@@ -21,6 +21,15 @@
     width: 95%;
 }
 
+.reportProfileModal {
+    color: var(--secondary);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.reportProfileModal:hover {
+    transform: scale(1.1);
+}
 
 .organizationInfo.contracted{
     display: -webkit-box;

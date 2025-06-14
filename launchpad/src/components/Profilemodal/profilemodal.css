@@ -28,9 +28,6 @@
 
 .closeProfileModal{
     cursor: pointer;
-    position: absolute;
-    right: 7px;
-    top: 9px;
     color: var(--secondary);
 }
 
@@ -58,3 +55,28 @@
   .profileModalContent::-webkit-scrollbar-thumb:hover {
     background-color: #555; /* Darker color on hover */
   }
+
+.modal-right-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    right: 10px;
+    top: 9px;
+}
+
+.reportProfileModal {
+    cursor: pointer;
+    color: var(--secondary);
+    transition: color 0.2s ease;
+}
+
+.reportProfileModal:hover,.reportProfileModal-diff-color:hover {
+    color: rgb(255, 127, 127);
+}
+
+.reportProfileModal-diff-color {
+    cursor: pointer;
+    color: black;
+    transition: color 0.2s ease;
+}

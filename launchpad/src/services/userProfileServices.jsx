@@ -289,3 +289,19 @@ const updateLocalPfpPreview = (newPfp) => {
     
     localStorage.setItem("basicUserInfo", JSON.stringify(newBasicInfo));
 }
+
+export const validateLinkedInUrl = (url) => {
+  // Basic LinkedIn URL validation
+  const linkedInRegex = /^https:\/\/(www\.)?linkedin\.com\/in\/[\w-]+\/?$/;
+  return linkedInRegex.test(url);
+};
+
+export const getVerificationStatus = (userData) => {
+  if (!userData.linkedinLink) {
+    return "unverified";
+  }
+  if (!validateLinkedInUrl(userData.linkedinLink)) {
+    return "invalid";
+  }
+  return userData.verificationStatus || "pending";
+};

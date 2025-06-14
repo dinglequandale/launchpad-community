@@ -23,6 +23,8 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   // const userType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
   const userType = userData.userType;
 
+  const schoolId = localStorage.getItem("schoolId");
+
   const navigate = useNavigate();
 
   const onSendClick = async () => {
@@ -51,7 +53,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
         if(sendWithResume){
           const resumeRef = ref(storage, `resumes/resume_${currentUser.uid}.pdf`);
           if(!resumeRef){
-            await sendConnectMessageWithoutResume(introMessage, currentUser.uid, userId, setChannelId, chat);
+            await sendConnectMessageWithoutResume(introMessage, currentUser.uid, userId, setChannelId, chat, schoolId);
             return;
           }
           //TODO: Check this
@@ -61,10 +63,10 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
           const metaData = await getMetadata(resumeRef);
           
           
-          await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, userId, setChannelId, chat);
+          await sendConnectMessageWithResume(introMessage, resumeURL, metaData, currentUser.uid, userId, setChannelId, chat, schoolId);
         }
         else{
-          await sendConnectMessageWithoutResume(introMessage, currentUser.uid, userId, setChannelId, chat);
+          await sendConnectMessageWithoutResume(introMessage, currentUser.uid, userId, setChannelId, chat, schoolId);
         }
     }catch(error){
         console.log(error);
@@ -96,6 +98,12 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
       zIndex: "4",
     }
   };
+
+  useEffect(() => {
+    console.log("schoolId", schoolId);
+    console.log("receiving user", userId);
+    console.log("current user", currentUser.uid);
+  }, [schoolId]);
 
   return (
     <div>

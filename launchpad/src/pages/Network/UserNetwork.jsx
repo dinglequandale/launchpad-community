@@ -265,7 +265,7 @@ export default function UserNetwork() {
                   loading={loading.college}
                 />
                 </>}
-                {highSchoolers.length > 0 && <>
+                {highSchoolers.length > 0 && userType !== "Professional" && <>
                 <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
                   <h3>High Schoolers</h3>
                   <span style={{fontWeight: "400", fontSize: "smaller"}}>{isRecommended}</span>
