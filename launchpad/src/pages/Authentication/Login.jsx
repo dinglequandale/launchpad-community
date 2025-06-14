@@ -8,22 +8,24 @@ import { loadUserData } from "../../services/userProfileServices";
 import { packageBasicUserInfoToLS } from "../../services/onboardingServices";
 
 export default function Login(){
-
     const { userLoggedIn, currentUser } = useAuth();
-
     const navigate = useNavigate();
-
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
-
     const [userData, setUserData] = useState(null);
+    const [userIsSigningIn, setUserIsSigningIn] = useState(false);
+
+    // Check for school code validation
+    const tempSchoolInfo = JSON.parse(localStorage.getItem("tempSchoolInfo"));
+    if (!tempSchoolInfo) {
+        return <Navigate to="/school-signup" replace={true}/>;
+    }
 
     const updateBasicUserData = async (user) => {
         if (!user || !user.uid) {
             throw new Error('User or user ID is undefined after login');
         }
 
-        // Create a promise that resolves when userData is set
         const userDataPromise = new Promise((resolve) => {
             loadUserData(user, () => {}, (newUserData) => {
                 setUserData(newUserData);
@@ -31,7 +33,6 @@ export default function Login(){
             });
         });
 
-        // Wait for userData to be loaded
         const newUserData = await userDataPromise;
 
         if (!newUserData) {
@@ -41,7 +42,6 @@ export default function Login(){
         packageBasicUserInfoToLS(newUserData);
     };
 
-    const [userIsSigningIn, setUserIsSigningIn] = useState(false);
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!userIsSigningIn) {
@@ -57,10 +57,9 @@ export default function Login(){
                 );
     
                 const user = userCredential.user;
-    
                 await updateBasicUserData(user);
     
-                navigate('/Home');
+                navigate('/Onboarding', {state: tempSchoolInfo});
             } catch (error) {
                 console.error("Error logging in:", error);
                 toast.error(`Login failed: ${error.message}`);
@@ -69,7 +68,6 @@ export default function Login(){
             }
         }
     }
-    
 
     const handlePasswordReset = async (e) => {
         e.preventDefault();
@@ -82,8 +80,6 @@ export default function Login(){
                     error: (err) => `Error! ${err.message}`
                 }
             );
-            
-            // Redirect to homepage after successful account creation
         } catch (error) {
             console.error("Error logging in:", error);
         }
@@ -94,13 +90,12 @@ export default function Login(){
         if (!userIsSigningIn) {
             setUserIsSigningIn(true);
             try {
-                // Sign in with Google
                 const userCredential = await doSignInWithGoogle();
                 const user = userCredential.user;
     
                 await updateBasicUserData(user);
     
-                navigate('/Home');
+                navigate('/Onboarding', {state: tempSchoolInfo});
             } catch (error) {
                 console.error("Error signing in with Google:", error);
                 toast.error("Sorry! There was an issue signing you in. Try again!");
@@ -109,7 +104,6 @@ export default function Login(){
             }
         }
     }
-    
 
     return(
         <>
@@ -160,7 +154,6 @@ export default function Login(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Email</span>
                         <input
                         type="email"
-                        // placeholder="Email address"
                         value={userEmail}
                         onChange={(e) => setUserEmail(e.target.value)}
                         required
@@ -173,7 +166,6 @@ export default function Login(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Password</span>
                         <input
                         type="password"
-                        // placeholder="Password"
                         value={userPassword}
                         onChange={(e) => setUserPassword(e.target.value)}
                         required
