@@ -51,7 +51,19 @@ export default function Terms(){
                 <p>Any misuse of the platform, including attempts to exploit or disrupt its services, may result in immediate removal and potential legal action.</p>
             </section>
             <section>
-                <h3>5. Privacy Policy</h3>
+                <h3>5. Minor Safety and Appropriate Interactions</h3>
+                <p>Launchpad is committed to maintaining a safe environment for all users, particularly minors. The following guidelines must be strictly followed:</p>
+                <ul>
+                    <li>All interactions between minors and adults must be professional and focused on academic or career development.</li>
+                    <li>Adults must not request or share personal contact information with minors outside the platform.</li>
+                    <li>Any inappropriate behavior, including but not limited to harassment, grooming, or attempts to establish non-professional relationships with minors, will result in immediate account termination and may be reported to law enforcement.</li>
+                    <li>Minors are encouraged to report any uncomfortable interactions to their school administrators or through our reporting system.</li>
+                    <li>Parents and legal guardians have the right to monitor their child's account activity and can request account termination at any time.</li>
+                </ul>
+                <p>By using Launchpad, you acknowledge and agree to these safety guidelines and understand that violation may result in legal consequences.</p>
+            </section>
+            <section>
+                <h3>6. Privacy Policy</h3>
                 <p>We prioritize the privacy of our users. Your personal information is collected, stored, and processed in accordance with our Privacy Policy. This includes:</p>
                 <ul>
                     <li>Information collected during registration, such as your name, email address, and profile details.</li>
@@ -61,7 +73,7 @@ export default function Terms(){
                 <p>For more details, please review our full <a href="/privacy">Privacy Policy</a>.</p>
             </section>
             <section>
-                <h3>6. Limitations of Liability</h3>
+                <h3>7. Limitations of Liability</h3>
                 <p>While we strive to provide a reliable and secure platform, Launchpad and its affiliates cannot be held liable for:</p>
                 <ul>
                     <li>Any interruptions or errors in the operation of the platform.</li>
@@ -71,7 +83,7 @@ export default function Terms(){
                 <p>Use of the platform is at your own risk, and you agree to indemnify Launchpad against any claims or damages resulting from your use of the services.</p>
             </section>
             <section>
-                <h3>7. Termination</h3>
+                <h3>8. Termination</h3>
                 <p>Launchpad reserves the right to suspend or terminate your account at any time if you violate these Terms and Conditions or engage in behavior that we deem harmful to the community. Upon termination:</p>
                 <ul>
                     <li>Your access to the platform and services will be revoked.</li>
@@ -80,7 +92,7 @@ export default function Terms(){
                 <p>If you wish to close your account voluntarily, please contact us at <a href="mailto:launchpadhelpline@gmail.com">launchpadhelpline@gmail.com</a>.</p>
             </section>
             <section>
-                <h3>8. Modifications</h3>
+                <h3>9. Modifications</h3>
                 <p>We may revise these Terms and Conditions from time to time to reflect changes in our services, policies, or legal requirements. When updates are made:</p>
                 <ul>
                     <li>The "Last updated" date at the top of this page will be revised.</li>

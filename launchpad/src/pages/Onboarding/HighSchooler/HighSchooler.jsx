@@ -8,6 +8,71 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import EmailConfirmation from '../EmailConfirmation';
+import { FaExclamationTriangle } from 'react-icons/fa';
+import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
+
+function SafetyWarning({isShortened = true}) {
+  const [isExpanded, setIsExpanded] = useState(isShortened);
+
+  return(
+    <div style={{
+      backgroundColor: '#fff3cd',
+      border: '1px solid #ffeeba',
+      borderRadius: '8px',
+      padding: '15px',
+      marginBottom: '20px',
+      color: '#856404',
+      position: 'relative',
+      maxHeight: (!isExpanded && isShortened) ? "100px" : "none",
+      overflow: "hidden",
+      transition: "all 0.3s ease-in-out"
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+        <FaExclamationTriangle style={{ marginRight: '10px' }} />
+        <h3 style={{ margin: 0, flex: 1 }}>Important Safety Guidelines</h3>
+        {isShortened && (
+          <button 
+            onClick={() => setIsExpanded(!isExpanded)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#856404',
+              padding: '5px'
+            }}
+          >
+            {isExpanded ? <IoIosArrowUp size={20} /> : <IoIosArrowDown size={20} />}
+          </button>
+        )}
+      </div>
+      <div style={{
+        opacity: (!isExpanded && isShortened) ? 0.7 : 1,
+        transition: "opacity 0.3s ease-in-out"
+      }}>
+        <p>As a high school student using Launchpad, please remember:</p>
+        <ul style={{ margin: '10px 0', paddingLeft: '20px' }}>
+          <li>Always maintain professional communication with adults</li>
+          <li>Never share personal contact information outside the platform</li>
+          <li>Report any inappropriate behavior immediately</li>
+          <li>Keep all interactions focused on academic and career development</li>
+          <li>If you feel uncomfortable with any interaction, contact your school administrator</li>
+        </ul>
+        <p style={{ margin: 0, fontSize: '0.9em', fontWeight: "550" }}>By continuing, you acknowledge these guidelines and agree to follow them.</p>
+      </div>
+      {!isExpanded && isShortened && (
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '40px',
+          background: 'linear-gradient(transparent, #fff3cd)',
+          pointerEvents: 'none'
+        }} />
+      )}
+    </div>
+  )
+}
 
 const highSchoolQuestionsConfig = [
   // Page 1
@@ -173,11 +238,31 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
   const renderPage = () => {
     switch (currentPage) {
       case 1:
-        return <BasicUserInfo questionsForPage={highSchoolQuestionsConfig.filter((question)=>(question.page === 1))} setSelectedOptions={setHighSchoolerData} selectedOptions={highSchoolerData} handleChange={handleChange}/>;
+        return (
+          <>
+            <SafetyWarning isShortened={false}/>
+            <BasicUserInfo 
+              questionsForPage={highSchoolQuestionsConfig.filter((question)=>(question.page === 1))} 
+              setSelectedOptions={setHighSchoolerData} 
+              selectedOptions={highSchoolerData} 
+              handleChange={handleChange}
+            />
+          </>
+        );
       case 2:
-        return <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange} highSchoolerData={highSchoolerData}/>;
+        return (
+          <>
+            <SafetyWarning isShortened={true}/>
+            <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange} highSchoolerData={highSchoolerData}/>
+          </>
+        );
       case 3:
-        return <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} />;
+        return (
+          <>
+            <SafetyWarning isShortened={true}/>
+            <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} />
+          </>
+        );
       // case 4:
       //   return <EmailConfirmation selectedOptions={highSchoolerData} handleChange={handleChange} loginEmail={loginEmail}/>
       default:
