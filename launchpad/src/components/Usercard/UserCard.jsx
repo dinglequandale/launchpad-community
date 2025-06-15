@@ -13,6 +13,8 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
     const userType = userData.userType;
 
     const viewingUserType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
+
+    const hideConnectBtn = viewingUserType === "Professional" && userType === "High Schooler";
     
     const descType = () => {
         switch(userData.userType){
@@ -51,7 +53,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
 
     return(
         <>
-        <div className='networkProfileCard'>
+        <div className='networkProfileCard' style={{height: hideConnectBtn ? "120px" : "160px"}}>
             {bannerVisibility && <ConnectionBanner/>}
             <button style={{fontSize: "16px", position: "absolute", right: "3%"}} className="btnText" onClick={onProfileClick}>
                 See Profile
@@ -79,7 +81,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                 <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userSecondDesc.label}</strong>: {basicInfoContent.userSecondDesc.content}</span>
             </div>
             </div>
-            {viewingUserType !== "Professional" && <button className="btnConnect" style={{width: "88%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "15px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
+            {!hideConnectBtn && <button className="btnConnect" style={{width: "88%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "15px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={22}/>
                     <span>Connect</span>

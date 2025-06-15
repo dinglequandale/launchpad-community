@@ -23,7 +23,7 @@ export default function LoginIcon(){
                 </div>
                 <div style={{display: "flex", flexDirection: "column", lineHeight: "1.2", justifyContent: "left"}}>
                     <span className="iconUsername"> {displayShortenedName(basicUserInfo?.userName)} </span>
-                    <button className="btnText diff-color" onClick={()=>navigate("/profile", { state: {pathName : window.location.pathname }})} style={{width: "fit-content", fontSize: "18px"}}>My Profile</button>
+                    <button className="btnText-diff" onClick={()=>navigate("/profile", { state: {pathName : window.location.pathname }})} style={{width: "fit-content", fontSize: "18px"}}>My Profile</button>
                 </div>
             </article>
         </>

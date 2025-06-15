@@ -22,6 +22,8 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     const userType = userData.userType;
     const viewingUserType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
 
+    const hideConnectBtn = viewingUserType === "Professional" && userType === "High Schooler";
+
     const userName = userData.userName;
     const [opportunitiesData, setOpportunitiesData] = useState([]);
     const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
@@ -169,7 +171,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 )}
                             </div>
                         </div>
-                        {viewingUserType !== "Professional" && <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(currentPath === "/Organizations" ? userData : userData.id)}> 
+                        {!hideConnectBtn && <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={() => onConnectClick(currentPath === "/Organizations" ? userData : userData.id)}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>

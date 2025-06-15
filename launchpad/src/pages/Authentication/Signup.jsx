@@ -6,14 +6,18 @@ import { Navigate, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function SignUp(){
-
     const { userLoggedIn } = useAuth();
-    // alert(userLoggedIn)
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
     const [confirmedPassword, setConfirmedPassword] = useState("");
     const [userIsSigningIn, setUserIsSigningIn] = useState(false);
     const navigate = useNavigate();
+
+    // Check for school code validation
+    const tempSchoolInfo = JSON.parse(localStorage.getItem("tempSchoolInfo"));
+    if (!tempSchoolInfo) {
+        return <Navigate to="/school-signup" replace={true}/>;
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -38,8 +42,7 @@ export default function SignUp(){
                     }
                 );
                 
-                // navigate("/Onboarding");
-                navigate("/school-signup");
+                navigate("/Onboarding", {state: tempSchoolInfo});
             } catch (error) {
                 console.error("Error creating account:", error);
             } finally {
@@ -56,7 +59,7 @@ export default function SignUp(){
                 setUserIsSigningIn(false);
                 toast.error("Sorry! There was an issue signing you in. Try again!");
             }).then(()=>{
-                navigate("/school-signup");
+                navigate("/Onboarding", {state: tempSchoolInfo});
             })
         }
     }
@@ -112,7 +115,6 @@ export default function SignUp(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Email</span>
                         <input
                         type="email"
-                        // placeholder="Email address"
                         value={userEmail}
                         onChange={(e) => setUserEmail(e.target.value)}
                         required
@@ -125,7 +127,6 @@ export default function SignUp(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Password</span>
                         <input
                         type="password"
-                        // placeholder="Password"
                         value={userPassword}
                         onChange={(e) => setUserPassword(e.target.value)}
                         required
@@ -136,7 +137,6 @@ export default function SignUp(){
                         <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Confirm Password</span>
                         <input
                         type="password"
-                        // placeholder="Password"
                         value={confirmedPassword}
                         onChange={(e) => setConfirmedPassword(e.target.value)}
                         required

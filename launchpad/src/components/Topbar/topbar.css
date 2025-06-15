@@ -20,7 +20,7 @@
 }
 
 .settings-tab {
-    color: var(--border);
+    color: #0e2b2e;
     padding: 0;
     display: flex;
     justify-content: center;
@@ -40,8 +40,8 @@
     0 0 0.2em rgb(240, 240, 255);
 }
 
-.diff-color {
-    color: black;
+.diff-color-top-bar {
+    color: #0e2b2e;
 }
 
 /* Responsive adjustments */

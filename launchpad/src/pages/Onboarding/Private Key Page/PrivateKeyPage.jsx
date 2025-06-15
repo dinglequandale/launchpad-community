@@ -7,12 +7,8 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 
 export default function PrivateKeyPage() {
-
     let schoolId, schoolDisplayName;
-
     const navigate = useNavigate();
-
-    // const user = auth.currentUser;
     const {userLoggedIn} = useAuth();
 
     const onSubmit = async (key) => {
@@ -28,23 +24,23 @@ export default function PrivateKeyPage() {
             }
             schoolId = querySnapshot.docs[0].id;
             schoolDisplayName = querySnapshot.docs[0].data().display_name;
-            console.log("school:", schoolId, schoolDisplayName);
+            
             toast.success('We found your school!', { id: loadingToast });
 
             localStorage.setItem("tempSchoolInfo", JSON.stringify({schoolId, schoolDisplayName}));
-
-             navigate("/Onboarding", {state: {schoolId, schoolDisplayName}});
+            
+            // Redirect to Login instead of Onboarding
+            navigate("/Login", {state: {schoolId, schoolDisplayName}});
         } catch (error) {
-
             console.error('Error changing:', error);
+            toast.error('An error occurred while verifying your code', { id: loadingToast });
         }
     }
 
     return(
     <>
     <Toaster position="bottom-right" reverseOrder={false} />
-    {localStorage.getItem("tempSchoolInfo") && <Navigate to="/Onboarding"/>}
-    {!userLoggedIn && <Navigate to="/Login"/>}
+    {localStorage.getItem("tempSchoolInfo") && <Navigate to="/Login"/>}
     <div className="onboarding-container">
         <div className="onboarding-body">
             <div style={{textAlign: "center", paddingBottom: "8px"}}></div>
