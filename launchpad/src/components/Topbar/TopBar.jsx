@@ -17,13 +17,13 @@ export default function TopBar({onBurgerPress}){
             <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "320px", cursor: "pointer"}} onClick={()=>navigate("/Home")}/>
             <div className='user'>
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "15px"}}>
-                    <LoginIcon/>
                     <div className='settings-tab'><FiSettings size={30} onClick={() => {navigate("/settings")}}/></div>
                     <BiFlag 
                         className='reportProfileModal-diff-color'
                         size={35} 
                         onClick={() => setReportVisibility(true)}
                     />
+                    <LoginIcon/>
                 </div>
                 <LogoutButton/>
             </div>

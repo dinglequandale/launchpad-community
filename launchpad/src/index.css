@@ -226,11 +226,21 @@ button {
   display: inline-block;
 }
 
+.btnText-diff {
+  background-color: transparent;
+  color: #145778;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  padding: 0;
+  display: inline-block;
+}
+
 .diff-color{
   color: #00a2ff;
 }
 
-.btnText:hover{
+.btnText,.btnText-diff:hover{
   background-color: transparent;
   color: var(--highlight);
 }
