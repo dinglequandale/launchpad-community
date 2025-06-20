@@ -152,6 +152,17 @@ const highSchoolQuestionsConfig = [
     options: [], // Will fill this in later from Firebase
     page: 3  
   },
+  {
+    id: "parentEmail",
+    text: "Parent/Guardian Email (required for full access)",
+    type: "text",
+    page: 4
+  },
+
+  {
+    id: "parentRequested",
+    page: 5
+  }
 ];
 
 export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, schoolInfo}) {
@@ -182,6 +193,9 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
     userPfpPreview: "",
     userPfp: null,
     linkedinLink:'',
+    parentEmail: '',
+    parentVerified: false,
+    parentRequested: false,
   });
 
   const handleSubmit = async () => {
@@ -263,8 +277,10 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
             <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} />
           </>
         );
-      // case 4:
-      //   return <EmailConfirmation selectedOptions={highSchoolerData} handleChange={handleChange} loginEmail={loginEmail}/>
+      case 4:
+        return (
+          <ParentEmailPage selectedOptions={highSchoolerData} handleChange={handleChange} />
+        );
       default:
         return null;
     }
@@ -302,6 +318,7 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
   
   const collegeChosen = selectedOptions['collegeDecision'] === "Yes";
 
+
   return (
     <div className='onboardingQuestions' style={{width: "500px"}}>
       <OnboardingDropdown
@@ -312,12 +329,115 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
         type={questions[0].type}
       />
 
-    <CollegeSearch
+      <CollegeSearch
         question={questions[1].text(collegeChosen)}
         selectedOption={selectedOptions['collegeInterestsOrDecision']}
         onChange={(label) => handleChange('collegeInterestsOrDecision', label)}
         type={questions[1].type(collegeChosen)}
       />
+    </div>
+  );
+};
+
+const ParentEmailPage = ({ selectedOptions, handleChange }) => {
+  const [requesting, setRequesting] = useState(false);
+  const [requested, setRequested] = useState(false);
+  const [error, setError] = useState('');
+
+  const validateParentEmail = () => {
+    const studentEmail = selectedOptions['email'] || '';
+    const parentEmail = selectedOptions['parentEmail'] || '';
+    if (!parentEmail) {
+      setError('Parent/Guardian email is required.');
+      return false;
+    }
+    if (studentEmail && parentEmail.trim().toLowerCase() === studentEmail.trim().toLowerCase()) {
+      setError("Parent/Guardian email cannot be the same as your own email.");
+      return false;
+    }
+    setError('');
+    return true;
+  };
+
+  const handleRequestAccess = () => {
+    if (!validateParentEmail()) return;
+    setRequesting(true);
+    setTimeout(() => {
+      setRequesting(false);
+      setRequested(true);
+      // Simulate sending email
+    }, 1500);
+  };
+
+  useEffect(() => {
+    handleChange("parentRequested", requested);
+  },[requested])
+
+  return (
+    <div className='onboardingQuestions' style={{ width: '500px' }}>
+      {/* Note Card */}
+      <div style={{
+        background: '#f5f7fa',
+        border: '1px solid #e0e3ea',
+        borderRadius: '12px',
+        padding: '20px',
+        marginBottom: '24px',
+        boxShadow: '0 2px 8px rgba(60,72,88,0.07)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '16px',
+      }}>
+        <span style={{ fontSize: 28, color: '#1976d2', marginTop: 2 }}>👨‍👩‍👧‍👦</span>
+        <div>
+          <div style={{ fontWeight: 600, fontSize: '1.1em', marginBottom: 4 }}>Parental Consent Required</div>
+          <div style={{ color: '#444', fontSize: '1em' }}>
+            To ensure your safety and comply with our policies, we require a parent or guardian to approve your access to Launchpad. We'll send them a secure agreement form to review and sign. You can still explore the app, but full functionality will be unlocked once your parent or guardian approves.
+          </div>
+        </div>
+      </div>
+      <label className='onboardingQuestion' style={{ fontWeight: 500 }}>
+        Parent/Guardian Email (required for full access)
+      </label>
+      <input
+        type="email"
+        value={selectedOptions['parentEmail'] || ''}
+        onChange={e => handleChange('parentEmail', e.target.value)}
+        placeholder="e.g. parent@email.com"
+        style={{
+          width: '97%',
+          padding: '8px',
+          borderRadius: '6px',
+          border: '1px solid #ccc',
+          marginTop: 4,
+          fontSize: '1em',
+        }}
+      />
+      {error && <div style={{ color: 'red', marginTop: 4 }}>{error}</div>}
+      <button
+        type="button"
+        onClick={handleRequestAccess}
+        className='btnSaveChanges'
+        disabled={requesting || !selectedOptions['parentEmail']}
+        style={{
+          background: requested ? '#4caf50' : '',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 6,
+          padding: '10px 18px',
+          fontWeight: 600,
+          cursor: requesting ? 'not-allowed' : 'pointer',
+          marginBottom: 8,
+          marginTop: 12,
+          opacity: requesting ? 0.7 : 1,
+        }}
+      >
+        {requesting ? 'Requesting...' : (requested ? 'Requested!' : 'Request Access')}
+      </button>
+      {requested && (
+        <div style={{ color: '#4caf50', fontWeight: 500, marginTop: 4 }}>
+          Request sent! Your parent/guardian will receive an email to approve your access.
+        </div>
+      )}
     </div>
   );
 };

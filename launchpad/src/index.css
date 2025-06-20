@@ -240,7 +240,7 @@ button {
   color: #00a2ff;
 }
 
-.btnText,.btnText-diff:hover{
+.btnText:hover,.btnText-diff:hover{
   background-color: transparent;
   color: var(--highlight);
 }

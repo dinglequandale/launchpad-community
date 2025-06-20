@@ -51,7 +51,7 @@ export default function Onboarding() {
     const getNumOfSections = () => {
         switch(selectedOption){
             case "High Schooler":
-                return 3;
+                return 4;
             case "College Student":
                 return 3;
             case "Professional":

@@ -15,7 +15,9 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         ...otherData,
         userPfpPreview: pfpURL,
         userResumePreview: resumeURL,
-        userId: currentUser.uid
+        userId: currentUser.uid,
+        parentEmail: highSchoolerData.parentEmail,
+        parentVerified: false,
         };
 
         // here, highSchoolerData.schoolId is basically always going to equal 'awty' for now
@@ -92,7 +94,7 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
 
 export const requiredQuestionsAnswered = (questionConfig, userData) => {
     const requiredQuestions = questionConfig.filter((question)=>!question.optional);
-    const emptyRequiredQuestions = requiredQuestions.filter((question)=>(userData[question.id] === "" || userData[question.id] === null || (Array.isArray(userData[question.id]) && userData[question.id].length===0)));
+    const emptyRequiredQuestions = requiredQuestions.filter((question)=>(userData[question.id] === "" || userData[question.id] === null || (Array.isArray(userData[question.id]) && userData[question.id].length===0) || userData[question.id] === false));
     console.log(emptyRequiredQuestions);
     return emptyRequiredQuestions.length === 0;
 }
@@ -118,7 +120,6 @@ export const packageBasicUserInfoToLS = (userData) => {
 
     const userShortDescription = getBasicUserDescription(userData);
 
-    // Check whether user is upperclassman or lowerclassman
     const currYear = new Date().getFullYear();
     
     const userHighSchoolType = (graduationYear) => {
@@ -139,6 +140,8 @@ export const packageBasicUserInfoToLS = (userData) => {
         userSchoolId: userData.schoolId,
         userSchool: userData.schoolName,
         isCommitted: (userData.userType === "High Schooler") ? !Array.isArray(userData.collegeInterestsOrDecision) : null,
+        parentEmail: (userData.userType === "High Schooler") ? userData.parentEmail : null,
+        parentVerified: (userData.userType === "High Schooler") ? userData.parentVerified : null,
     };
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));

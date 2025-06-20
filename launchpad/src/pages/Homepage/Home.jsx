@@ -9,8 +9,11 @@ import InviteContactsModal from "../../components/InviteContactsmodal/InviteCont
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { auth } from "../../firebase/firebaseConfig";
+import { auth, db } from "../../firebase/firebaseConfig";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
+import ParentalVerificationModal from '../../components/ParentalVerificationModal';
+import ConnectionStatusModal from '../../components/ConnectionStatusModal';
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
 
 class ErrorBoundary extends React.Component {
@@ -37,7 +40,22 @@ export default function Home(){
     const currentUser = auth.currentUser;
 
     const [userBasicInfo, setUserBasicInfo] = useState(null);
+    const [showParentModal, setShowParentModal] = useState(false);
+    const [showConnectionModal, setShowConnectionModal] = useState(false);
 
+    const getUserData = async () => {
+      const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
+      unsubscribe = onSnapshot(userDocRef, (doc) => {
+          if (doc.exists()) {
+              return doc.data();
+          } else {
+              console.log("No such document!");
+              return null;
+          }
+      });
+    }
+
+    
     const getUserTokenInfo = async () => {
         if (currentUser) {
             const idTokenResult = await currentUser.getIdTokenResult();
@@ -55,6 +73,37 @@ export default function Home(){
         const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
         setUserBasicInfo(JSON.parse(storedUserBasicInfo));
         getUserTokenInfo();
+
+        const sessionFlag = sessionStorage.getItem('parentalModalShown');
+        const info = JSON.parse(storedUserBasicInfo);
+        if (
+          info &&
+          info.userType === 'High Schooler' &&
+          info.parentEmail &&
+          info.parentVerified === false &&
+          !sessionFlag
+        ) {
+          setShowParentModal(true);
+          sessionStorage.setItem('parentalModalShown', 'true');
+        }
+
+        const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
+        if (
+          info &&
+          info.userType === 'High Schooler' &&
+          info.parentVerified === true &&
+          !connectionSessionFlag
+        ) {
+          const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
+          const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+
+          //TODO: check that pending / approve logic here works
+          
+          if (pendingConnections.length > 0 || approvedConnections.length > 0) {
+            setShowConnectionModal(true);
+            sessionStorage.setItem('connectionModalShown', 'true');
+          }
+        }
     }, []);
     
     const resourceData = {
@@ -181,6 +230,31 @@ export default function Home(){
 
     return(
         <>
+            {showParentModal && (
+              <ParentalVerificationModal
+                parentEmail={userBasicInfo.parentEmail}
+                parentVerified={userBasicInfo.parentVerified}
+                userEmail={userBasicInfo.email}
+                onResend={() => {}}
+                onClose={() => setShowParentModal(false)}
+                onUpdateEmail={async (newEmail) => {
+                  const updatedBasicUserInfo = { ...userBasicInfo, parentEmail: newEmail };
+                  localStorage.setItem('basicUserInfo', JSON.stringify(updatedBasicUserInfo));
+                  setUserBasicInfo(updatedBasicUserInfo);
+                  const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
+                  try{
+                    await updateDoc(userDocRef, {parentEmail: newEmail});
+                  } catch (error) {
+                    console.error("Error updating parent email:", error);
+                  }
+                }}
+              />
+            )}
+            {showConnectionModal && (
+              <ConnectionStatusModal
+                onClose={() => setShowConnectionModal(false)}
+              />
+            )}
             <TopBar/>
             <SideNav/>
             <div className='homeContainer' style={{background: "var(--primary)", paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>

@@ -50,8 +50,9 @@ export default function ReportModal() {
             <div className="reportDialog" style={{gap: "20px"}}>
                 <button className='btnClose' onClick={() => setReportVisibility(false)} style={{background:"none"}}><CgClose size={25}/></button>
                 <h3>Report {reportTarget}</h3>
-                {showReportUserName && <input type="text" onChange={(e) => setReportedUser(e.target.value)} value={reportedUser} placeholder="Input the reported user's name" style={{width: "95%", padding: "10px", fontSize: "18px"}} />}
+                {showReportUserName && <input type="text" className="onboardingInput" onChange={(e) => setReportedUser(e.target.value)} value={reportedUser} placeholder="Input the reported user's name" style={{width: "95%", padding: "10px", fontSize: "18px"}} />}
                 <textarea
+                    className="onboardingInput"
                     placeholder="Please provide a reason for reporting..."
                     value={reportReason}
                     onChange={(e) => setReportReason(e.target.value)}

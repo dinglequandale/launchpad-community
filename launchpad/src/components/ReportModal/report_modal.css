@@ -40,10 +40,14 @@
     height: 100px;
     padding: 10px;
     margin-bottom: 20px;
-    border: 1px solid #ddd;
+    border: 1px solid #34343480;
     border-radius: 4px;
     resize: vertical;
     margin: 0 auto;
+}
+
+.reportDialog input {
+    border-color: #34343480;
 }
 
 .reportActions {
@@ -65,3 +69,4 @@
     opacity: 0.7;
     cursor: not-allowed;
 }
+
