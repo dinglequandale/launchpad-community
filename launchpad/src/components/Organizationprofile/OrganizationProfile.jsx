@@ -24,6 +24,9 @@ export default function OrganizationProfile({organizationData, location, handleS
     const descRef = useRef();
     const [userData, setUserData] = useState(null);
 
+    const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+    const disableActions = userBasicInfo && userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
+
     const getName = () => {
         if (organizationData.organizationName)
             return organizationData.organizationName;
@@ -169,8 +172,20 @@ return(
                     </div>
                 </div>
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px", marginLeft: "6px"}}>
-                    <button className="btnOrganizationLearnMore btnConnect" onClick={e => handleLearnMore(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> Learn More </button>
-                    {(organizationData.apply !== "NOAPPLY") && <button className="btnOrganizationConnect btnUnfilled" onClick={e => handleConnect(e)} disabled={isDisabled} style={{cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}> {connectBtnType(organizationData.organizationType)} </button>}
+                    <button className="btnOrganizationLearnMore btnConnect" 
+                        onClick={e => { if (!disableActions) handleLearnMore(e); }} 
+                        disabled={disableActions}
+                        title={disableActions ? "Parent/guardian approval required" : ""}
+                        style={{cursor: disableActions ? "not-allowed" : "pointer", opacity: disableActions ? 0.6 : 1}}>
+                        Learn More 
+                    </button>
+                    {(organizationData.apply !== "NOAPPLY") && <button className="btnOrganizationConnect btnUnfilled" 
+                        onClick={e => { if (!disableActions) handleConnect(e); }} 
+                        disabled={disableActions}
+                        title={disableActions ? "Parent/guardian approval required" : ""}
+                        style={{cursor: disableActions ? "not-allowed" : "pointer", opacity: disableActions ? 0.6 : 1}}>
+                        {connectBtnType(organizationData.organizationType)} 
+                    </button>}
                 </div>
 
             </div>

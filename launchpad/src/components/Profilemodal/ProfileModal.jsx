@@ -8,7 +8,7 @@ import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
-import { displayColleges, displayFieldsOfInterest, displaySchools, displayShortenedLinkedin, getBasicUserDescription, getVerificationStatus } from '../../services/userProfileServices';
+import { displayColleges, displayFieldsOfInterest, displaySchools, displayShortenedLinkedin, getBasicUserDescription,  addOrUpdateConnection } from '../../services/userProfileServices';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import DefaultIcon from '../DefaultIcon/DefaultIcon';
@@ -24,6 +24,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     const viewingUserType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
     const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
     const [showParentalConnectionModal, setShowParentalConnectionModal] = useState(false);
+    const disableActions = userBasicInfo && userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
 
     const hideConnectBtn = viewingUserType === "Professional" && userType === "High Schooler";
 
@@ -86,13 +87,27 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     const menuRef = useRef();
 
     useEffect(() => {
-      let onClickOutside = (e) => {
-          if(!menuRef.current.contains(e.target)){
-            onClose();
-          }
-      }
-      document.addEventListener("mousedown", onClickOutside)
-  })
+        function onClickOutside(e) {
+            // If either modal is open, check if click is outside both
+            const profileModal = menuRef.current;
+            const parentalModal = document.querySelector('.parental-connection-modal'); // Add a className to your ParentalConnectionModal root div
+            if (
+                profileModal &&
+                !profileModal.contains(e.target) &&
+                (!parentalModal || !parentalModal.contains(e.target))
+            ) {
+                onClose();
+            }
+        }
+
+        if (!showParentalConnectionModal) {
+            document.addEventListener("mousedown", onClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", onClickOutside);
+        };
+    }, [showParentalConnectionModal, onClose]);
 
     useEffect(() => {
         const modalOverlay = document.querySelector('.blurOverlay');
@@ -108,50 +123,43 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
 
     // Check if connection is approved for high schoolers
     const isConnectionApproved = () => {
-      if (userBasicInfo.userType !== 'High Schooler' || userType !== 'Professional') {
-        return true; // Not a high schooler connecting to professional
-      }
-      
-      if (!userBasicInfo.parentVerified) {
-        return false; // Parent not verified
-      }
-      
-      const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
-      return approvedConnections.includes(userData.userId);
+        if (userBasicInfo.userType !== 'High Schooler' || userType === 'High Schooler') {
+            return true; // Not a high schooler connecting to professional
+        }
+        
+        if (!userBasicInfo.parentVerified) {
+            return false; // Parent not verified
+        }
+        
+
+        const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+        return approvedConnections.includes(userData.id);
     };
 
     const handleConnectClick = () => {
-      if (userBasicInfo.userType === 'High Schooler' && userType === 'Professional') {
-        if (!userBasicInfo.parentVerified) {
+      if (userBasicInfo.userType === 'High Schooler' && userType !== 'High Schooler') {
+        const approved = isConnectionApproved();
+        console.log("approved status: " + approved);
+        if (!approved) {
           // Show parent verification modal
-          toast.error('Parent verification required before connecting with professionals');
+          setShowParentalConnectionModal(true);
+        //   toast.error('Parent verification required before connecting with professionals and alumni');
           return;
         }
         
-        if (!isConnectionApproved()) {
-          // Show parental connection modal
-          setShowParentalConnectionModal(true);
-          return;
-        }
+        // if (!isConnectionApproved()) {
+        //   // Show parental connection modal
+        //   return;
+        // }
       }
       
-      // Proceed with normal connection
+      // normal connection logic
       onConnectClick(currentPath === "/Organizations" ? userData : userData.id);
     };
 
-    const handleParentalConnectionApproved = () => {
+    const handleParentalConnectionApproved = async () => {
       // Move from pending to approved (simulate parent approval)
-      const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-      const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
-      
-      if (pendingConnections.includes(userData.userId)) {
-        const newPending = pendingConnections.filter(id => id !== userData.userId);
-        const newApproved = [...approvedConnections, userData.userId];
-        
-        localStorage.setItem('pendingConnections', JSON.stringify(newPending));
-        localStorage.setItem('approvedConnections', JSON.stringify(newApproved));
-      }
-      
+      await addOrUpdateConnection(currentUser, userData, 'approved');
       // Now proceed with connection
       onConnectClick(currentPath === "/Organizations" ? userData : userData.id);
     };
@@ -212,22 +220,14 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                     gap: "8px",
                                     marginTop: "8px"
                                   }}>
-                                    <span style={{fontWeight: "500"}}>Verification Status:</span>
-                                    <div style={{
-                                      padding: "4px 8px",
-                                      borderRadius: "4px",
-                                      fontSize: "14px",
-                                      backgroundColor: getVerificationStatus(userData) === "pending" ? "#FFA500" : 
-                                                    getVerificationStatus(userData) === "verified" ? "#4CAF50" : "#FF0000",
-                                      color: "white"
-                                    }}>
-                                      {getVerificationStatus(userData).charAt(0).toUpperCase() + getVerificationStatus(userData).slice(1)}
-                                    </div>
                                   </div>
                                 )}
                             </div>
                         </div>
-                        {!hideConnectBtn && <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto"}} onClick={handleConnectClick}> 
+                        {!hideConnectBtn && <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto", cursor: disableActions ? "not-allowed" : "pointer", opacity: disableActions ? 0.6 : 1}} 
+                            disabled={disableActions}
+                            title={disableActions ? "Parent/guardian approval required" : ""}
+                            onClick={() => { if (!disableActions) handleConnectClick(); }}> 
                             <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                                 <FaLink size={20}/>
                                 <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>

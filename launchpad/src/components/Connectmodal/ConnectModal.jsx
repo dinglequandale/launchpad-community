@@ -90,12 +90,12 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
       bottom: 'auto',
       marginRight: '-50%',
       transform: 'translate(-50%, -50%)',
-      zIndex: "4",
+      zIndex: "9999",
     },
     overlay: {
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       backdropFilter: 'blur(5px)',
-      zIndex: "4",
+      zIndex: "9999",
     }
   };
 

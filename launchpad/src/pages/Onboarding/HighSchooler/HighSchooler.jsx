@@ -10,6 +10,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import EmailConfirmation from '../EmailConfirmation';
 import { FaExclamationTriangle } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
+import { parentVerificationInitialTemplate } from '../../../utils/parentVerificationTemplates';
 
 function SafetyWarning({isShortened = true}) {
   const [isExpanded, setIsExpanded] = useState(isShortened);
@@ -359,14 +360,32 @@ const ParentEmailPage = ({ selectedOptions, handleChange }) => {
     return true;
   };
 
-  const handleRequestAccess = () => {
+  const handleRequestAccess = async () => {
     if (!validateParentEmail()) return;
     setRequesting(true);
-    setTimeout(() => {
-      setRequesting(false);
-      setRequested(true);
-      // Simulate sending email
-    }, 1500);
+
+    const sendSESEmail = httpsCallable(getFunctions(), "sendSESEmail");
+
+    const generateVerificationLink = httpsCallable(getFunctions(), "generateVerificationLink");
+      const verificationLinkResult = await generateVerificationLink({
+        uid: currentUser.uid,
+        action: "verify_account",
+        schoolId: localStorage.getItem("schoolId"),
+      });
+
+      // Extract the verification link from the result
+      const verificationLink = verificationLinkResult.data;
+
+    const result = await sendSESEmail({ 
+      recipient: [ selectedOptions['parentEmail'] ],
+      subject: "Verify Your Student's Account", 
+      htmlTemplate: parentVerificationInitialTemplate({
+        studentName: selectedOptions['userName'],
+        parentName: "",
+        verificationLink: verificationLink})});
+
+    setRequesting(false);
+    setRequested(true);
   };
 
   useEffect(() => {

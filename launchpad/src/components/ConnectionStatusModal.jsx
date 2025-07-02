@@ -1,36 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { Toaster, toast } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import { CgClose } from 'react-icons/cg';
+import { db } from '../firebase/firebaseConfig'; // adjust path as needed
+import { doc, getDoc } from 'firebase/firestore';
 
-export default function ConnectionStatusModal({ onClose }) {
+export default function ConnectionStatusModal({ onClose, onConnect }) {
   const [pendingConnections, setPendingConnections] = useState([]);
   const [approvedConnections, setApprovedConnections] = useState([]);
-  const [professionalData, setProfessionalData] = useState({});
+  const [connectionData, setConnectionData] = useState({}); // { id: userData }
 
   useEffect(() => {
-    // Get connection data from localStorage
+    // Get connection IDs from localStorage
     const pending = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
     const approved = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
-    
     setPendingConnections(pending);
     setApprovedConnections(approved);
 
-    // For demo purposes, let's simulate some professional data
-    // In real app, you'd fetch this from your database
-    const mockProfessionalData = {
-      'prof1': { userName: 'John Smith', industryPosition: 'Software Engineer', companyName: 'Google' },
-      'prof2': { userName: 'Sarah Johnson', industryPosition: 'Marketing Director', companyName: 'Microsoft' },
-      'prof3': { userName: 'Mike Davis', industryPosition: 'Data Scientist', companyName: 'Amazon' },
-    };
-    setProfessionalData(mockProfessionalData);
+    // Fetch user data for all IDs
+    const allIds = [...pending, ...approved];
+    if (allIds.length === 0) return;
+
+    const schoolId = localStorage.getItem('schoolId');
+    Promise.all(
+      allIds.map(async (uid) => {
+        const userDoc = await getDoc(doc(db, 'tenants', schoolId, 'users', uid));
+        return userDoc.exists() ? { id: uid, ...userDoc.data() } : null;
+      })
+    ).then(users => {
+      const data = {};
+      users.forEach(user => {
+        if (user) data[user.id] = user;
+      });
+      setConnectionData(data);
+    });
   }, []);
 
   const hasUpdates = pendingConnections.length > 0 || approvedConnections.length > 0;
-
   if (!hasUpdates) {
     onClose();
     return null;
   }
+
+  // Helper to get description
+  const getDescription = (user) => {
+    if (!user) return '';
+    if (user.userType === 'Professional') {
+      return `${user.industryPosition || ''}${user.companyName ? ' at ' + user.companyName : ''}`;
+    } else if (user.userType === 'Alumni') {
+      return `Field: ${user.areasOfInterest?.join(', ') || ''} | College: ${user.collegeAttending || ''}`;
+    } else {
+      return '';
+    }
+  };
 
   return (
     <>
@@ -76,47 +97,76 @@ export default function ConnectionStatusModal({ onClose }) {
             {approvedConnections.length > 0 && (
               <div style={{ marginBottom: '20px' }}>
                 <h3 style={{ color: '#4caf50', marginBottom: '8px' }}>✅ Approved Connections</h3>
-                {approvedConnections.map((profId, index) => (
-                  <div key={index} style={{ 
-                    background: '#f8fff8', 
-                    border: '1px solid #4caf50', 
-                    borderRadius: '6px', 
-                    padding: '12px', 
-                    marginBottom: '8px' 
-                  }}>
-                    <strong>{professionalData[profId]?.userName || 'Professional'}</strong>
-                    {professionalData[profId] && (
-                      <div style={{ fontSize: '0.9em', color: '#666' }}>
-                        {professionalData[profId].industryPosition} at {professionalData[profId].companyName}
+                {approvedConnections.map((uid, index) => {
+                  const user = connectionData[uid];
+                  return (
+                    <div key={uid} style={{ 
+                      background: '#f8fff8', 
+                      border: '1px solid #4caf50', 
+                      borderRadius: '6px', 
+                      padding: '12px', 
+                      marginBottom: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}>
+                      <div>
+                        <strong>{user?.userName || 'Professional/Alumni'}</strong>
+                        <div style={{ fontSize: '0.9em', color: '#666' }}>
+                          {user?.areasOfInterest?.join(', ')}
+                        </div>
+                        <div style={{ fontSize: '0.9em', color: '#666' }}>
+                          {getDescription(user)}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <button
+                        className="btnConnect"
+                        style={{
+                          background: '#1976d2',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: 6,
+                          padding: '8px 16px',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          fontSize: '0.95em',
+                        }}
+                        onClick={() => onConnect && onConnect(user)}
+                      >
+                        Connect
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
             {pendingConnections.length > 0 && (
               <div>
                 <h3 style={{ color: '#ff9800', marginBottom: '8px' }}>⏳ Pending Approval</h3>
-                {pendingConnections.map((profId, index) => (
-                  <div key={index} style={{ 
-                    background: '#fff8f0', 
-                    border: '1px solid #ff9800', 
-                    borderRadius: '6px', 
-                    padding: '12px', 
-                    marginBottom: '8px' 
-                  }}>
-                    <strong>{professionalData[profId]?.userName || 'Professional'}</strong>
-                    {professionalData[profId] && (
+                {pendingConnections.map((uid, index) => {
+                  const user = connectionData[uid];
+                  return (
+                    <div key={uid} style={{ 
+                      background: '#fff8f0', 
+                      border: '1px solid #ff9800', 
+                      borderRadius: '6px', 
+                      padding: '12px', 
+                      marginBottom: '8px' 
+                    }}>
+                      <strong>{user?.userName || 'Professional/Alumni'}</strong>
                       <div style={{ fontSize: '0.9em', color: '#666' }}>
-                        {professionalData[profId].industryPosition} at {professionalData[profId].companyName}
+                        {user?.areasOfInterest?.join(', ')}
                       </div>
-                    )}
-                    <div style={{ fontSize: '0.8em', color: '#ff9800', marginTop: '4px' }}>
-                      Waiting for parent approval
+                      <div style={{ fontSize: '0.9em', color: '#666' }}>
+                        {getDescription(user)}
+                      </div>
+                      <div style={{ fontSize: '0.8em', color: '#ff9800', marginTop: '4px' }}>
+                        Waiting for parent approval
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

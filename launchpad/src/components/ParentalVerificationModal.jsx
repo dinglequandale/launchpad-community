@@ -23,14 +23,12 @@ export default function ParentalVerificationModal({ parentEmail, parentVerified,
     };
   }, [onClose]);
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setResending(true);
-    setTimeout(() => {
-      setResending(false);
-      setResent(true);
-      toast.success('Parent verification email sent successfully!');
-      if (onResend) onResend();
-    }, 1200);
+    await onResend();
+    setResending(false);
+    setResent(true);
+    toast.success('Parent verification email sent successfully!');
   };
 
   const handleEdit = () => {

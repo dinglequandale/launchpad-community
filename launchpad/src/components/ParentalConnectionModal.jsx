@@ -1,44 +1,85 @@
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import React, { useState, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { CgClose } from 'react-icons/cg';
+import { parentConnectionRequestTemplate } from '../utils/parentVerificationTemplates';
+import { addOrUpdateConnection } from '../services/userProfileServices';
+import { useAuth } from '../contexts/auth/AuthContext';
 
-export default function ParentalConnectionModal({ professionalData, onClose, onApproved }) {
+export default function ParentalConnectionModal({ professionalData, onClose, onApproved=()=>{} }) {
   const [requesting, setRequesting] = useState(false);
   const [requested, setRequested] = useState(false);
   const [error, setError] = useState('');
 
+  const {currentUser} = useAuth();
+  const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+
   // Check if already requested
   useEffect(() => {
     const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-    const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+    // const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
     
-    if (pendingConnections.includes(professionalData.userId)) {
+    console.log("pending shit: ", pendingConnections);
+
+    if (pendingConnections.includes(professionalData.id)) {
+      console.log("is requested");
       setRequested(true);
     }
-  }, [professionalData.userId]);
+  }, [professionalData.id]);
 
-  const handleRequestApproval = () => {
+  const handleRequestApproval = async () => {
     setRequesting(true);
-    setTimeout(() => {
-      setRequesting(false);
-      setRequested(true);
-      
-      // Add to pending connections
-      const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-      if (!pendingConnections.includes(professionalData.userId)) {
-        pendingConnections.push(professionalData.userId);
-        localStorage.setItem('pendingConnections', JSON.stringify(pendingConnections));
+
+    try {
+      // Generate verification link
+      const generateVerificationLink = httpsCallable(getFunctions(), "generateVerificationLink");
+      const verificationLinkResult = await generateVerificationLink({
+        uid: currentUser.uid,
+        action: "connection",
+        schoolId: localStorage.getItem("schoolId"),
+        connectionId: professionalData.id,
+        connectionName: professionalData.userName
+      });
+
+      // Extract the verification link from the result
+      const verificationLink = verificationLinkResult.data;
+
+      if (!verificationLink) {
+        throw new Error('Failed to generate verification link');
       }
-      
-      toast.success('Connection request sent to parent for approval!');
-    }, 1500);
+
+      // Send email
+      const sendSESEmail = httpsCallable(getFunctions(), "sendSESEmail");
+      const result = await sendSESEmail({
+          recipient: [ userBasicInfo.parentEmail ], 
+          subject: "Verify Your Student's Connection", 
+          htmlTemplate: parentConnectionRequestTemplate({
+            studentName: userBasicInfo.userName ? userBasicInfo.userName.split(" ")[0] : "",
+            parentName: "", 
+            professionalData, 
+            verificationLink: verificationLink, 
+            connectionType: professionalData.userType})
+        });
+        console.log("result: ", result);
+        toast.success('Connection request sent to parent for approval!');
+    }
+    catch(e){
+      console.log("ERROR: ", e);
+      toast.error("Error sending your request. Please try again!");
+    }
+
+    // add to pending connections
+    await addOrUpdateConnection(currentUser, professionalData, 'pending', professionalData.userName);
+  
+    setRequesting(false);
+    setRequested(true);
   };
 
   const handleClose = () => {
-    if (requested) {
-      // If already requested, close and allow viewing the professional
-      onApproved && onApproved();
-    }
+    // if (requested) {
+    //   // If already requested, close and allow viewing the professional
+    //   onApproved && onApproved();
+    // }
     onClose();
   };
 
@@ -60,11 +101,11 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
           alignItems: 'center',
           justifyContent: 'center',
         }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            handleClose();
-          }
-        }}
+        // onClick={(e) => {
+        //   if (e.target === e.currentTarget) {
+        //     handleClose();
+        //   }
+        // }}
       >
         <div style={{
           background: '#fff',

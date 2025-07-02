@@ -6,6 +6,7 @@ import PageLoading from '../components/LoadingAnimation/PageLoading';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebaseConfig';
 import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from '../services/onboardingServices';
+import { fetchConnectionsByStatus } from '../services/userProfileServices';
 
 function GlobalAuthWrapper() {
   const { currentUser, loading } = useAuth();
@@ -20,9 +21,7 @@ function GlobalAuthWrapper() {
 
   const getUserTokenInfo = async () => {
     const idTokenResult = await user.getIdTokenResult();
-  
-    // Access the school_id claim
-    console.log("schoolId!!!!! ", idTokenResult.claims.school_id);
+    // console.log("schoolId!!!!! ", idTokenResult.claims.school_id);
     return idTokenResult.claims.school_id;
   }
 
@@ -36,7 +35,9 @@ function GlobalAuthWrapper() {
   
       try {
         const schoolId = await getUserTokenInfo();
-        if(localStorage.getItem("schoolId") !== schoolId){localStorage.setItem("schoolId", schoolId);}
+        if(localStorage.getItem("schoolId") !== schoolId){
+          localStorage.setItem("schoolId", schoolId);
+        }
         const userRef = doc(db, "tenants", schoolId, 'users', currentUser.uid);
         async function initializeApp() {
           if (currentUser && !isConnected) {
@@ -46,10 +47,22 @@ function GlobalAuthWrapper() {
                 return;
               }
               
-              if(!basicUserInfo){packageBasicUserInfoToLS(doc.data())};
+              // if(!basicUserInfo){packageBasicUserInfoToLS(doc.data())};
               //IMPORTANT: Switch back later
-              // packageBasicUserInfoToLS(doc.data());
+              packageBasicUserInfoToLS(doc.data());
               pushInitialProfileCompletion(doc.data());
+
+              // connections population logic (single subcollection)
+              (async () => {
+                const fetchAndStoreConnections = async () => {
+                  const pending = await fetchConnectionsByStatus(currentUser, 'pending');
+                  const approved = await fetchConnectionsByStatus(currentUser, 'approved');
+                  localStorage.setItem('pendingConnections', JSON.stringify(pending));
+                  localStorage.setItem('approvedConnections', JSON.stringify(approved));
+                  localStorage
+                };
+                fetchAndStoreConnections();
+              })();
             });
             
             await connectToStream(currentUser);

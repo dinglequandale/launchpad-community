@@ -25,6 +25,7 @@ import AboutUs from './components/Legality Footer/AboutUs.jsx';
 import FAQs from './components/Legality Footer/FAQs.jsx';
 import SettingsPage from './pages/Settings/SettingsPage.jsx';
 import ReportModal from './components/ReportModal/ReportModal.jsx';
+import ParentVerificationPage from './pages/ParentVerificationPage.jsx';
 
 const ErrorPage = () => {
   return (
@@ -94,6 +95,11 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App/>,
+    errorElement: <ErrorPage/>
+  },
+  {
+    path: '/parent-verify',
+    element: <ParentVerificationPage />,
     errorElement: <ErrorPage/>
   },
   {

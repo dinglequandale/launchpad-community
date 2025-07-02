@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FaLink } from "react-icons/fa6";
 import { displayColleges, displayFieldsOfInterest, displayShortenedName, getBasicUserDescription, lowerAndCapitalize } from "../../services/userProfileServices";
 import DefaultIcon from "../DefaultIcon/DefaultIcon";
+import ParentalConnectionModal from "../ParentalConnectionModal";
 
 export default function UserCard({userData, onProfileClick, onConnectClick}) {
     // todo: actual banner
@@ -50,6 +51,9 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
         }
     }
 
+    const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+    const disableActions = userBasicInfo && userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
+  
 
     return(
         <>
@@ -81,7 +85,11 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
                 <span style={{whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "270px", display: "block"}}><strong>{basicInfoContent.userSecondDesc.label}</strong>: {basicInfoContent.userSecondDesc.content}</span>
             </div>
             </div>
-            {!hideConnectBtn && <button className="btnConnect" style={{width: "88%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "15px", position: "absolute"}} onClick={() => onConnectClick(userData.userId)}> 
+            {!hideConnectBtn && <button className="btnConnect" 
+                style={{width: "88%", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", bottom: "15px", position: "absolute", cursor: disableActions ? "not-allowed" : "pointer", opacity: disableActions ? 0.6 : 1}}
+                disabled={disableActions}
+                title={disableActions ? "Parent/guardian approval required" : ""}
+                onClick={() => { if (!disableActions) onConnectClick(userData.userId); }}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={22}/>
                     <span>Connect</span>

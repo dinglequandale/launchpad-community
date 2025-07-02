@@ -19,6 +19,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../firebase/firebaseConfig";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 import { capitalizeFirstLetter } from "../Homepage/Home";
+import ParentalConnectionModal from "../../components/ParentalConnectionModal";
 
 
 const NetworkContext = createContext();
@@ -35,6 +36,8 @@ export default function UserNetwork() {
 
   const [profileModalVisibility, setProfileModalVisibility] = useState(false);
   const [connectModalVisibility, setConnectModalVisibility] = useState(false);
+  const [showParentalConnectionModal, setShowParentalConnectionModal] = useState(false);
+
   const [connectTargetUserId, setConnectTargetUserId] = useState("");
 
   const [highSchoolers, setHighSchoolers] = useState([]);
@@ -49,7 +52,7 @@ export default function UserNetwork() {
   const [allVisibleUserData, setAllVisibleUserData] = useState(null);
 
   const [profileTargetData, setProfileTargetData] = useState(null);
-  const [connectTargetUser, setConnectTargetUser] = useState("");
+  const [connectTargetUser, setConnectTargetUser] = useState(null);
 
   const [isRecommended, setIsRecommended] = useState("(recommended)");
   
@@ -65,7 +68,7 @@ export default function UserNetwork() {
     }
   }
 
-  const { userType,isCommitted } = JSON.parse(localStorage.getItem("basicUserInfo"));
+  const { userType,isCommitted,parentVerified } = JSON.parse(localStorage.getItem("basicUserInfo"));
   const [filters, setFilters] = useState({
     userType: 'Any User',
     collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
@@ -123,7 +126,7 @@ export default function UserNetwork() {
 
           switch(category) {
               case 'High Schooler':
-                  setHighSchoolers(prev => isLoadMore ? [...prev, ...results] : results);
+                  setHighSchoolers(prev => isLoadMore ? [...prev, ...results].filter(result => result.parentVerified) : results.filter(result => result.parentVerified));
                   break;
               case 'Alumni':
                   setCollegeStudents(prev => isLoadMore ? [...prev, ...results] : results);
@@ -155,10 +158,11 @@ export default function UserNetwork() {
 
   const handleConnectClick = (userId) => {
     setConnectTargetUserId(userId);
-    setConnectTargetUser(allVisibleUserData.filter((user)=>(user.userId === userId))[0]);
+    setConnectTargetUser(allVisibleUserData.filter((user) => user.userId === userId)[0]);
     setProfileModalVisibility(false);
-    setConnectModalVisibility(true);
-  }
+    // Modal logic moved to useEffect below
+  };
+
   const handleOnProfileClick = (userId) => {
     const scrollY = window.scrollY || document.documentElement.scrollTop;
     const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2 + 80);
@@ -194,7 +198,7 @@ export default function UserNetwork() {
     if (queryText) {
       const searchResults = await searchDocuments('users', queryText, tenantId);
       setAllVisibleUserData(searchResults);
-      setHighSchoolers(searchResults.filter((result) => result.userType === "High Schooler"));
+      setHighSchoolers(searchResults.filter((result) => (result.userType === "High Schooler" && result.parentVerified)));
       setCollegeStudents(searchResults.filter((result) => result.userType === "Alumni"));
       setProfessionals(searchResults.filter((result) => result.userType === "Professional"));
     }
@@ -227,12 +231,45 @@ export default function UserNetwork() {
         case "Website":
             window.open(referalValue, '_blank', 'noopener,noreferrer');
             return;
+      }
+  }
+
+  const isConnectionApproved = (targetUser) => {
+    if (userType !== 'High Schooler' || targetUser.userType === 'High Schooler') {
+      return true;
     }
-}
-    
+    if (!parentVerified) {
+      return false;
+    }
+    const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+    return approvedConnections.includes(targetUser.id);
+  };
+
+  useEffect(() => {
+    if (!connectTargetUser) return;
+
+    if (userType === 'High Schooler' && connectTargetUser.userType !== 'High Schooler') {
+      const approved = isConnectionApproved(connectTargetUser);
+      if (!approved) {
+        setShowParentalConnectionModal(true);
+        setConnectModalVisibility(false);
+        return;
+      }
+    }
+    setShowParentalConnectionModal(false);
+    setConnectModalVisibility(true);
+  }, [connectTargetUser]);
+
   return (
     <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick, loadLimit, filterChanged}}>
       <>
+        {showParentalConnectionModal && (
+              <ParentalConnectionModal
+                professionalData={connectTargetUser}
+                onClose={() => setShowParentalConnectionModal(false)}
+                // onApproved={handleParentalConnectionApproved}
+              />
+            )}
         <Toaster position={'bottom-right'} reverseOrder={false}/>
         {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userData={connectTargetUser} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
         {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} handleReferalClick={handleReferalClick} userData={profileTargetData}/>}

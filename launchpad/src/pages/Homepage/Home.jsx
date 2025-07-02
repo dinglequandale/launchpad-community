@@ -13,7 +13,11 @@ import { auth, db } from "../../firebase/firebaseConfig";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 import ParentalVerificationModal from '../../components/ParentalVerificationModal';
 import ConnectionStatusModal from '../../components/ConnectionStatusModal';
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { parentVerificationResendTemplate } from "../../utils/parentVerificationTemplates";
+import ConnectModal from "../../components/Connectmodal/ConnectModal";
+import { useOutletContext } from "react-router-dom";
 
 
 class ErrorBoundary extends React.Component {
@@ -41,7 +45,11 @@ export default function Home(){
 
     const [userBasicInfo, setUserBasicInfo] = useState(null);
     const [showParentModal, setShowParentModal] = useState(false);
-    const [showConnectionModal, setShowConnectionModal] = useState(false);
+    const [showConnectionModal, setShowConnectionModal] = useState(true);
+    const [connectedUserData, setConnectedUserData] = useState(null);
+    const [showVerifedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
+
+    const { chatClient } = useOutletContext();
 
     const getUserData = async () => {
       const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
@@ -53,7 +61,41 @@ export default function Home(){
               return null;
           }
       });
-    }
+    };
+
+    const onUpdateParentEmail = async (newEmail) => {
+      const updatedBasicUserInfo = { ...userBasicInfo, parentEmail: newEmail };
+      localStorage.setItem('basicUserInfo', JSON.stringify(updatedBasicUserInfo));
+      setUserBasicInfo(updatedBasicUserInfo);
+      const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
+      try{
+        await updateDoc(userDocRef, {parentEmail: newEmail});
+      } catch (error) {
+        console.error("Error updating parent email:", error);
+      }
+    };
+
+    const onParentVerificationResend = async () => {
+
+      const generateVerificationLink = httpsCallable(getFunctions(), "generateVerificationLink");
+      const verificationLinkResult = await generateVerificationLink({
+        uid: currentUser.uid,
+        action: "verify_account",
+        schoolId: localStorage.getItem("schoolId"),
+      });
+
+      // Extract the verification link from the result
+      const verificationLink = verificationLinkResult.data;
+
+      const sendSESEmail = httpsCallable(getFunctions(), "sendSESEmail");
+      const result = await sendSESEmail({
+        recipient: [ userBasicInfo.parentEmail ], 
+        subject: "Verify Your Student's Account", 
+        htmlTemplate: parentVerificationResendTemplate({
+          studentName: userBasicInfo.userName ? userBasicInfo.userName.split(" ")[0] : "",
+          parentName: "",
+          verificationLink: verificationLink})});
+    };
 
     
     const getUserTokenInfo = async () => {
@@ -70,41 +112,56 @@ export default function Home(){
     };
 
     useEffect(() => {
-        const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
-        setUserBasicInfo(JSON.parse(storedUserBasicInfo));
-        getUserTokenInfo();
+      const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
+      setUserBasicInfo(JSON.parse(storedUserBasicInfo));
+      getUserTokenInfo();
 
-        const sessionFlag = sessionStorage.getItem('parentalModalShown');
-        const info = JSON.parse(storedUserBasicInfo);
-        if (
-          info &&
-          info.userType === 'High Schooler' &&
-          info.parentEmail &&
-          info.parentVerified === false &&
-          !sessionFlag
-        ) {
-          setShowParentModal(true);
-          sessionStorage.setItem('parentalModalShown', 'true');
+      const sessionFlag = sessionStorage.getItem('parentalModalShown');
+      const info = JSON.parse(storedUserBasicInfo);
+      if (
+        info &&
+        info.userType === 'High Schooler' &&
+        info.parentEmail &&
+        !info.parentVerified &&
+        !sessionFlag
+      ) {
+        setShowParentModal(true);
+        sessionStorage.setItem('parentalModalShown', 'true');
+      }
+
+      // connection status visibility check
+
+      const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
+      if (
+        info &&
+        info.userType === 'High Schooler' &&
+        info.parentVerified &&
+        !connectionSessionFlag
+      ) {
+        const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections'));
+        const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections'));
+        
+        console.log("we're in!", pendingConnections);
+
+        //TODO: check that pending / approve logic here works
+
+        if (pendingConnections.length > 0 || approvedConnections.length > 0) {
+          console.log("we're soooo in!");
+          setShowConnectionModal(true);
+          sessionStorage.setItem('connectionModalShown', 'true');
         }
-
-        const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
-        if (
-          info &&
-          info.userType === 'High Schooler' &&
-          info.parentVerified === true &&
-          !connectionSessionFlag
-        ) {
-          const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-          const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
-
-          //TODO: check that pending / approve logic here works
-          
-          if (pendingConnections.length > 0 || approvedConnections.length > 0) {
-            setShowConnectionModal(true);
-            sessionStorage.setItem('connectionModalShown', 'true');
-          }
-        }
+      }
     }, []);
+
+    const handleOnConnectClick = async (connectingUserData) => {
+      setConnectedUserData(connectingUserData);
+      setShowVerifiedConnectionModal(true);
+    }
+
+    useEffect(()=>{
+      console.log("showing: ", showConnectionModal);
+      console.log("showing verification: ", showParentModal);
+    },[showConnectionModal])
     
     const resourceData = {
         "How To Network": [
@@ -230,29 +287,21 @@ export default function Home(){
 
     return(
         <>
+            {showVerifedConnectionModal && <ConnectModal onClose = {()=>setShowVerifiedConnectionModal(false)} userData={connectedUserData} visibility={showVerifedConnectionModal} chat={chatClient} userId = {connectedUserData.id}/>}
             {showParentModal && (
               <ParentalVerificationModal
                 parentEmail={userBasicInfo.parentEmail}
                 parentVerified={userBasicInfo.parentVerified}
                 userEmail={userBasicInfo.email}
-                onResend={() => {}}
+                onResend={onParentVerificationResend}
                 onClose={() => setShowParentModal(false)}
-                onUpdateEmail={async (newEmail) => {
-                  const updatedBasicUserInfo = { ...userBasicInfo, parentEmail: newEmail };
-                  localStorage.setItem('basicUserInfo', JSON.stringify(updatedBasicUserInfo));
-                  setUserBasicInfo(updatedBasicUserInfo);
-                  const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
-                  try{
-                    await updateDoc(userDocRef, {parentEmail: newEmail});
-                  } catch (error) {
-                    console.error("Error updating parent email:", error);
-                  }
-                }}
+                onUpdateEmail={onUpdateParentEmail}
               />
             )}
             {showConnectionModal && (
               <ConnectionStatusModal
                 onClose={() => setShowConnectionModal(false)}
+                onConnect={handleOnConnectClick}
               />
             )}
             <TopBar/>
