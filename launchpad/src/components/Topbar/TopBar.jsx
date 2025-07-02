@@ -12,6 +12,8 @@ export default function TopBar({onBurgerPress}){
     const navigate = useNavigate();
     const { setReportVisibility } = useReport();
 
+    const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+    const disableActions = userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
     return (
         <div className='topBar'>
             <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "320px", cursor: "pointer"}} onClick={()=>navigate("/Home")}/>
@@ -21,9 +23,12 @@ export default function TopBar({onBurgerPress}){
                     <BiFlag 
                         className='reportProfileModal-diff-color'
                         size={35} 
-                        onClick={() => setReportVisibility(true)}
+                        disabled={disableActions}
+                        style={{cursor: disableActions ? "not-allowed" : "pointer"}} 
+                        title={disableActions ? "Parent/guardian approval required" : ""}
+                        onClick={() => { if(!disableActions){setReportVisibility(true)}}}
                     />
-                    <LoginIcon/>
+                    <LoginIcon storedBasicUserInfo={userBasicInfo}/>
                 </div>
                 <LogoutButton/>
             </div>

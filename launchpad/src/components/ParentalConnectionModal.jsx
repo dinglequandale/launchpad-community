@@ -134,14 +134,27 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
                   marginBottom: '16px',
                   textAlign: 'left'
                 }}>
-                  <div style={{ fontWeight: 600, marginBottom: '8px' }}>Professional Details:</div>
-                  <div><strong>Name:</strong> {professionalData.userName}</div>
-                  <div><strong>Position:</strong> {professionalData.industryPosition} at {professionalData.companyName}</div>
-                  {professionalData.areasOfInterest && (
-                    <div><strong>Expertise:</strong> {professionalData.areasOfInterest.join(', ')}</div>
-                  )}
+                  {professionalData.userType === 'Professional' ? (
+                    <>
+                      <div style={{ fontWeight: 600, marginBottom: '8px' }}>Professional Details:</div>
+                      <div><strong>Name:</strong> {professionalData.userName}</div>
+                      <div><strong>Position:</strong> {professionalData.industryPosition} at {professionalData.companyName}</div>
+                      {professionalData.areasOfInterest && (
+                        <div><strong>Expertise:</strong> {professionalData.areasOfInterest.join(', ')}</div>
+                      )}
+                    </>
+                  ) : professionalData.userType === 'Alumni' ? (
+                    <>
+                      <div style={{ fontWeight: 600, marginBottom: '8px' }}>Alumni Details:</div>
+                      <div><strong>Name:</strong> {professionalData.userName}</div>
+                      <div><strong>College:</strong> {professionalData.collegeAttending || ''}</div>
+                      {professionalData.areasOfInterest && professionalData.areasOfInterest.length > 0 && (
+                        <div><strong>Fields of Study:</strong> {professionalData.areasOfInterest.join(', ')}</div>
+                      )}
+                    </>
+                  ) : null}
                 </div>
-                <p>To connect with this professional, we need your parent or guardian's approval for your safety.</p>
+                <p>To connect with this {professionalData.userType === 'Alumni' ? 'alumnus/alumna' : 'professional'}, we need your parent or guardian's approval for your safety.</p>
               </>
             ) : (
               <>

@@ -201,7 +201,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
 
   const handleSubmit = async () => {
     
-    const loadingToast = toast.loading('Saving your information...');
+    // const loadingToast = toast.loading('Saving your information...');
 
     try {
       await saveHighSchooler(
@@ -280,7 +280,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
         );
       case 4:
         return (
-          <ParentEmailPage selectedOptions={highSchoolerData} handleChange={handleChange} />
+          <ParentEmailPage selectedOptions={highSchoolerData} handleChange={handleChange} currentUser={currentUser}/>
         );
       default:
         return null;
@@ -340,7 +340,7 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
   );
 };
 
-const ParentEmailPage = ({ selectedOptions, handleChange }) => {
+const ParentEmailPage = ({ selectedOptions, handleChange, currentUser }) => {
   const [requesting, setRequesting] = useState(false);
   const [requested, setRequested] = useState(false);
   const [error, setError] = useState('');
@@ -367,10 +367,13 @@ const ParentEmailPage = ({ selectedOptions, handleChange }) => {
     const sendSESEmail = httpsCallable(getFunctions(), "sendSESEmail");
 
     const generateVerificationLink = httpsCallable(getFunctions(), "generateVerificationLink");
+
+      console.log("SOME STUFF : " + currentUser.uid + " " + localStorage.getItem("schoolId"));
+
       const verificationLinkResult = await generateVerificationLink({
         uid: currentUser.uid,
         action: "verify_account",
-        schoolId: localStorage.getItem("schoolId"),
+        schoolId: selectedOptions.schoolId,
       });
 
       // Extract the verification link from the result

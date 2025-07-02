@@ -308,7 +308,7 @@ export default function Home(){
             <SideNav/>
             <div className='homeContainer' style={{background: "var(--primary)", paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>
                 <div style={{paddingTop: "20px"}}>
-                    {userBasicInfo && <InviteContacts userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={capitalizeFirstLetter(userBasicInfo.schoolId)}/>}
+                    {userBasicInfo && <InviteContacts userBasicInfo={userBasicInfo} userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={capitalizeFirstLetter(userBasicInfo.schoolId)}/>}
                 </div>
                 <div style={{display: "flex", paddingTop: "30px", position: "relative", width: "fitParent", height: "400px"}}>
                     <div className="launchpadIntro" style={
@@ -383,9 +383,11 @@ export function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function InviteContacts({userName, tenantId}){
+function InviteContacts({userName, tenantId, userBasicInfo}){
     const [inviteContactsModalVisibility,setInviteContactsModalVisibility] = useState(false);
-    
+
+    const disableActions = userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
+
     return(
         <>
         {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} tenantId={tenantId}/>}
@@ -395,7 +397,15 @@ function InviteContacts({userName, tenantId}){
          }>
             <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder"}}>Hello, {userName}!</span> <br /> Know any <span style={{fontWeight: "550"}}>{tenantId} high schoolers</span> or <span style={{fontWeight: "550"}}>{tenantId} alumni</span> who would benefit from being on the app? Know other  <span style={{fontWeight: "550"}}>professionals</span> in the {tenantId} community willing to share their expertise? Invite friends and family below!</span>
             <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
-                <button onClick={()=>setInviteContactsModalVisibility(true)} className="btnInviteContacts" style={{}}>Invite Contacts</button>
+                <button 
+                  disabled={disableActions} 
+                  style={{cursor: disableActions ? "not-allowed" : "pointer"}} 
+                  onClick={()=>{if(!disableActions)setInviteContactsModalVisibility(true)}} 
+                  className="btnInviteContacts"
+                  title={disableActions ? "Parent/guardian approval required" : ""}
+                >
+                  Invite Contacts
+                </button>
             </div>
         </div>
         </>

@@ -6,7 +6,7 @@ import { getBasicUserDescription } from './userProfileServices';
 
 export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess) => {
     try {
-        const { userPfp, userResume, ...otherData } = highSchoolerData;
+        const { userPfp, userResume, parentRequested, ...otherData } = highSchoolerData;
 
         const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
         const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');

@@ -119,7 +119,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
 
   const handleSubmit = async () => {
     
-    const loadingToast = toast.loading('Saving your information...');
+    // const loadingToast = toast.loading('Saving your information...');
 
     try {
       await saveCollegeStudent(

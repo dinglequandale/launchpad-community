@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { displayShortenedName } from "../../services/userProfileServices";
 import DefaultIcon from "../DefaultIcon/DefaultIcon";
 
-export default function LoginIcon(){
-    const [basicUserInfo, setBasicUserInfo] = useState(null);
-    useEffect(()=>{
-        const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
-        setBasicUserInfo(JSON.parse(storedUserBasicInfo));
-    },[]);
+export default function LoginIcon({storedBasicUserInfo}){
+    const [basicUserInfo, setBasicUserInfo] = useState(storedBasicUserInfo);
+    // useEffect(()=>{
+    //     const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
+    //     setBasicUserInfo(JSON.parse(storedUserBasicInfo));
+    // },[]);
 
     const navigate = useNavigate();
     

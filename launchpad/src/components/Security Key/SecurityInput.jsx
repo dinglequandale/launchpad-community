@@ -7,9 +7,9 @@ export default function SecurityCodeInput({onSubmit}) {
 
 
     const codeLength = 5;
-    // const [code, setCode] = useState(['', '', '', '', '']);
+    const [code, setCode] = useState(['', '', '', '', '']);
     // TODO: TEMPORARY
-    const [code, setCode] = useState(['1', 'B', 'Z', 'X', 'B']);
+    // const [code, setCode] = useState(['1', 'B', 'Z', 'X', 'B']);
     const inputRefs = [
         useRef(null),
         useRef(null),

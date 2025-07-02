@@ -327,6 +327,10 @@ export const addOrUpdateConnection = async (currentUser, targetUser, status,name
                 createdAt: new Date()
             }, { merge: true });
         }
+        if(status==="pending") {
+            const pending = JSON.parse(localStorage.getItem("pendingConnections"));
+            localStorage.setItem("pendingConnections", JSON.stringify([...pending, targetUser.id]));
+        }
     } catch (e) {
         console.log("Error adding/updating connection: ", e);
     }
