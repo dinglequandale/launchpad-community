@@ -142,22 +142,26 @@
 
 /* For the user type selector */
 .userType-options-container {
-    width: 80%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-  }
-  
+  width: 80%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 15px;
+  align-items: center;
+  justify-items: center;
+}
+
 .userType-option {
-    display: flex;
-    width: 200px;
-    gap: 5px;
-    flex-direction: column;
-    font-size: large;
-    height: 100px;
-    transition: background-color 0.3s ease;
-    box-shadow: var(--shadowColor);
+  display: flex;
+  width: 180px;
+  gap: 5px;
+  flex-direction: column;
+  font-size: large;
+  height: 100px;
+  transition: background-color 0.3s ease;
+  box-shadow: var(--shadowColor);
+  justify-content: center;
+  align-items: center;
 }
 
 .userType-option:hover {
@@ -254,10 +258,11 @@ background-color: var(--neutral);
   }
 
   .userType-options-container {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
   }
-
   .userType-option {
     width: 100%;
   }

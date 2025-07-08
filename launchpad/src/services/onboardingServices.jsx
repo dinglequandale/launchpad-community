@@ -92,6 +92,21 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
     }
 };
 
+export const saveStaff = async (currentUser, staffData, onSuccess) => {
+    try {
+        const docRef = await setDoc(doc(db, 'tenants', staffData.schoolId, 'users', currentUser.uid), staffData);
+        // console.log("Professional info saved -- written with ID: ", docRef.id);
+
+        pushInitialProfileCompletion(staffData);
+        packageBasicUserInfoToLS(staffData);
+
+        // await updateTypesense('users', currentUser.uid, dataToSave, professionalData.schoolId);
+        onSuccess();
+    } catch (e) {
+        console.error("Error adding document: ", e);
+    }
+}
+
 export const requiredQuestionsAnswered = (questionConfig, userData) => {
     const requiredQuestions = questionConfig.filter((question)=>!question.optional);
     const emptyRequiredQuestions = requiredQuestions.filter((question)=>(userData[question.id] === "" || userData[question.id] === null || (Array.isArray(userData[question.id]) && userData[question.id].length===0) || userData[question.id] === false));

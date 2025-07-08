@@ -54,7 +54,7 @@ const professionalQuestionsConfig = [
     type: "select",
     options: highSchools,
     placeholder: "N/A",
-    page: 1
+    // page: 1
   },
   // Page 2
   {
@@ -71,7 +71,7 @@ const professionalQuestionsConfig = [
     id: "industryPosition",
     text: "What was the last position you held?",
     type: "text-box",
-    placeholder: "E.g. 'financial analyst'",
+    placeholder: "E.g. financial analyst",
     retired: true,
     options: null,
     page: 3,
@@ -188,6 +188,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
           // toast.success('Information saved successfully!', {
           //   id: loadingToast,
           // });
+          toast.success('Information saved successfully!')
           navigate("/Home");
         }
       );

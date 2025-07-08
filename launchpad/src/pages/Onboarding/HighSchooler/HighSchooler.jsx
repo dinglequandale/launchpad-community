@@ -209,9 +209,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
         highSchoolerData,
         () => {
           // Success callback
-          toast.success('Information saved successfully!', {
-            id: loadingToast,
-          });
+          toast.success('Information saved successfully!');
           navigate("/Home");
         }
       );

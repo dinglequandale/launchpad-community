@@ -127,9 +127,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
         collegeStudentData,
         () => {
           // Success callback
-          toast.success('Information saved successfully!', {
-            id: loadingToast,
-          });
+          toast.success('Information saved successfully!');
           navigate("/Home");
         }
       );

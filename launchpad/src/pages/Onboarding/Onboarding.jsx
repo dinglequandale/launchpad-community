@@ -3,6 +3,7 @@ import CollegeStudent from './CollegeStudent/CollegeStudent';
 import HighSchooler from './HighSchooler/HighSchooler';
 import "./onboarding.css"
 import Professional from './Professional/Professional';
+import Staff from './Staff/Staff';
 import { BsBackpack } from 'react-icons/bs';
 import { BiBriefcase } from 'react-icons/bi';
 import { LuGraduationCap } from 'react-icons/lu';
@@ -11,6 +12,7 @@ import Loading from '../../components/LoadingAnimation/Loading';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { auth } from '../../firebase/firebaseConfig';
+import { GrOrganization } from 'react-icons/gr';
 
 export default function Onboarding() {
     const [showComponent, setShowComponent] = useState(false);
@@ -56,6 +58,8 @@ export default function Onboarding() {
                 return 3;
             case "Professional":
                 return 4;
+            case "Staff":
+                return 3;
             default:
                 return null;
         }
@@ -108,6 +112,7 @@ export default function Onboarding() {
                         {selectedOption === "High Schooler" && <HighSchooler schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
                         {selectedOption === "College Student" && <CollegeStudent schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
                         {selectedOption === "Professional" && <Professional schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
+                        {selectedOption === "Staff" && <Staff schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
                     </>
                 )}    
                 </main>
@@ -140,6 +145,7 @@ function UserType({setSelectedOption, selectedOption, setAgreedToTerms, agreedTo
         { id: 'highschool', label: 'High Schooler', icon: <BsBackpack size={25}/> },
         { id: 'college', label: 'College Student', icon: <LuGraduationCap size={30}/> },
         { id: 'professional', label: 'Professional', icon: <BiBriefcase size={25}/> },
+        { id: 'staff', label: 'Staff', icon: <GrOrganization size={25}/> },
       ];
 
     const handleUserTypeSelection = (userType) => {
