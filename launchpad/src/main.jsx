@@ -26,6 +26,7 @@ import FAQs from './components/Legality Footer/FAQs.jsx';
 import SettingsPage from './pages/Settings/SettingsPage.jsx';
 import ReportModal from './components/ReportModal/ReportModal.jsx';
 import ParentVerificationPage from './pages/ParentVerificationPage.jsx';
+import LandingPageRevamped from './pages/landing_page/LandingPageRevamped.jsx';
 
 const ErrorPage = () => {
   return (
@@ -104,7 +105,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/Landing',
-    element: <LandingPage/>,
+    element: <LandingPageRevamped/>,
     errorElement: <ErrorPage/>
   },
   {

@@ -9,30 +9,42 @@ export default function Terms(){
     const previousTab = location.state;
 
     return(
-    <div className="termsContainer">
+    <div className="termsContainer" style={{marginTop: "70px"}}>
     <body>
         <LegalityGoBack/>
         <main>
         <div class="container">
             <h1>Terms and Conditions</h1>
-            <p>Last updated: November 25, 2024</p>
+            <p>Last updated: January 24, 2025</p>
             <section>
-                <h3>1. Introduction</h3>
-                <p>Welcome to Launchpad, an online platform that connects high school students with mentors, professionals, and alumni to help them achieve their academic and career goals. By using this website and the services provided, you acknowledge that you have read, understood, and agreed to be bound by these Terms and Conditions. If you do not agree, please discontinue the use of Launchpad.</p>
+                <h3>Definitions</h3>
+                <p>For the purposes of these Terms and Conditions, the following terms have the meanings set forth below. Additional definitions may be provided in context.</p>
+                <ul>
+                    <li><strong>"Service"</strong> means the Launchpad platform, website, and related services.</li>
+                    <li><strong>"User"</strong> means any individual who accesses or uses the Service.</li>
+                    <li><strong>"Account"</strong> means a registered user profile on the Service.</li>
+                    <li><strong>"Content"</strong> means any information, data, text, images, or other materials uploaded, posted, or transmitted via the Service.</li>
+                    <li><strong>"Minor"</strong> means any user under the age of 18.</li>
+                    <li><strong>"Parent/Guardian"</strong> means a legal parent or guardian of a minor user.</li>
+                </ul>
             </section>
             <section>
-                <h3>2. User Eligibility</h3>
-                <p>Launchpad is available to high school students, professionals, mentors, and alumni who are interested in fostering a productive network for career and educational growth. Users must:</p>
+                <h3>1. Acceptance of Terms</h3>
+                <p>By accessing or using the Service, you agree to be bound by these Terms and Conditions and all applicable laws and regulations. If you do not agree, you must discontinue use of the Service immediately. If you are under the age of majority in your jurisdiction, you represent that you have obtained parental or legal guardian consent to use the Service.</p>
+            </section>
+            <section>
+                <h3>2. User Eligibility and Parental Consent</h3>
+                <p>The Service is available to high school students, professionals, mentors, and alumni. Users must:</p>
                 <ul>
                     <li>Be at least 13 years old. If under the age of majority in your jurisdiction, you must have parental or legal guardian consent.</li>
-                    <li>Provide accurate information during registration, including a valid email address and relevant details about your profile.</li>
-                    <li>Comply with all applicable laws and regulations while using our platform.</li>
+                    <li>Provide accurate and complete information during registration.</li>
+                    <li>Comply with all applicable laws and regulations while using the Service.</li>
                 </ul>
-                <p>We reserve the right to deny access to users who fail to meet these criteria.</p>
+                <p>We reserve the right to deny or terminate access to users who fail to meet these criteria or who provide false information.</p>
             </section>
             <section>
-                <h3>3. Account Responsibilities</h3>
-                <p>You are solely responsible for maintaining the confidentiality of your account credentials, including your password, and for all activities carried out under your account. You agree to:</p>
+                <h3>3. Account Security and Responsibilities</h3>
+                <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to:</p>
                 <ul>
                     <li>Notify Launchpad immediately of any unauthorized use of your account or any other security breach.</li>
                     <li>Ensure that all account information is up-to-date and accurate.</li>
@@ -41,14 +53,17 @@ export default function Terms(){
                 <p>Failure to uphold these responsibilities may result in suspension or termination of your account.</p>
             </section>
             <section>
-                <h3>4. Usage of Services</h3>
-                <p>Launchpad provides a platform for students to connect with mentors and explore career development opportunities. By using our services, you agree to:</p>
+                <h3>4. Acceptable Use and Prohibited Conduct</h3>
+                <p>By using the Service, you agree to:</p>
                 <ul>
                     <li>Engage respectfully and professionally with other users.</li>
-                    <li>Use the platform solely for its intended purpose of networking, mentorship, and learning.</li>
+                    <li>Use the Service solely for its intended purpose of networking, mentorship, and learning.</li>
                     <li>Refrain from engaging in harmful activities such as spamming, harassment, or disseminating false information.</li>
+                    <li>Not upload, post, or transmit any content that is unlawful, offensive, or infringes on the rights of others.</li>
+                    <li>Not attempt to gain unauthorized access to the Service or its related systems or networks.</li>
+                    <li>Not use the Service for any commercial purpose without our express written consent.</li>
                 </ul>
-                <p>Any misuse of the platform, including attempts to exploit or disrupt its services, may result in immediate removal and potential legal action.</p>
+                <p>Any misuse of the Service may result in immediate removal and potential legal action.</p>
             </section>
             <section>
                 <h3>5. Minor Safety and Appropriate Interactions</h3>
@@ -63,8 +78,8 @@ export default function Terms(){
                 <p>By using Launchpad, you acknowledge and agree to these safety guidelines and understand that violation may result in legal consequences.</p>
             </section>
             <section>
-                <h3>6. Privacy Policy</h3>
-                <p>We prioritize the privacy of our users. Your personal information is collected, stored, and processed in accordance with our Privacy Policy. This includes:</p>
+                <h3>6. Privacy and Data Use</h3>
+                <p>Your personal information is collected, stored, and processed in accordance with our <a href="/privacy">Privacy Policy</a>. This includes:</p>
                 <ul>
                     <li>Information collected during registration, such as your name, email address, and profile details.</li>
                     <li>How we use this information to connect you with relevant opportunities and mentors.</li>
@@ -73,7 +88,11 @@ export default function Terms(){
                 <p>For more details, please review our full <a href="/privacy">Privacy Policy</a>.</p>
             </section>
             <section>
-                <h3>7. Limitations of Liability</h3>
+                <h3>7. Intellectual Property</h3>
+                <p>All content, trademarks, logos, and intellectual property on the Service are the property of Launchpad or its licensors. You may not use, reproduce, or distribute any content from the Service without our express written permission, except as permitted by law or for your personal, non-commercial use.</p>
+            </section>
+            <section>
+                <h3>8. Disclaimers and Limitation of Liability</h3>
                 <p>While we strive to provide a reliable and secure platform, Launchpad and its affiliates cannot be held liable for:</p>
                 <ul>
                     <li>Any interruptions or errors in the operation of the platform.</li>
@@ -83,16 +102,24 @@ export default function Terms(){
                 <p>Use of the platform is at your own risk, and you agree to indemnify Launchpad against any claims or damages resulting from your use of the services.</p>
             </section>
             <section>
-                <h3>8. Termination</h3>
+                <h3>9. Indemnification</h3>
+                <p>You agree to indemnify, defend, and hold harmless Launchpad, its affiliates, officers, directors, employees, and agents from and against any and all claims, damages, obligations, losses, liabilities, costs, or expenses (including attorney's fees) arising from your use of the Service, your violation of these Terms, or your violation of any rights of another.</p>
+            </section>
+            <section>
+                <h3>10. Termination</h3>
                 <p>Launchpad reserves the right to suspend or terminate your account at any time if you violate these Terms and Conditions or engage in behavior that we deem harmful to the community. Upon termination:</p>
                 <ul>
                     <li>Your access to the platform and services will be revoked.</li>
                     <li>We may retain certain information as required by law or for legitimate business purposes.</li>
                 </ul>
-                <p>If you wish to close your account voluntarily, please contact us at <a href="mailto:launchpadhelpline@gmail.com">launchpadhelpline@gmail.com</a>.</p>
+                <p>If you wish to close your account voluntarily, please contact us at <a href="mailto:support@launchpadhouston.com">support@launchpadhouston.com</a>.</p>
             </section>
             <section>
-                <h3>9. Modifications</h3>
+                <h3>11. Governing Law and Dispute Resolution</h3>
+                <p>These Terms and Conditions are governed by the laws of the State of Texas, United States, without regard to its conflict of law principles. Any disputes arising from or relating to these Terms or the Service shall be resolved through good faith negotiations. If a resolution cannot be reached, the dispute shall be submitted to binding arbitration in Harris County, Texas, except where prohibited by law. You waive any right to participate in class actions or jury trials.</p>
+            </section>
+            <section>
+                <h3>12. Modifications</h3>
                 <p>We may revise these Terms and Conditions from time to time to reflect changes in our services, policies, or legal requirements. When updates are made:</p>
                 <ul>
                     <li>The "Last updated" date at the top of this page will be revised.</li>
@@ -100,7 +127,14 @@ export default function Terms(){
                     <li>Your continued use of the platform signifies acceptance of the updated terms.</li>
                 </ul>
             </section>
-            <p>If you have any questions or concerns about these Terms and Conditions, please reach out to us at <a href="mailto:launchpadhelpline@gmail.com">launchpadhelpline@gmail.com</a>.</p>
+            <section>
+                <h3>13. Contact Information</h3>
+                <p>If you have any questions or concerns about these Terms and Conditions, please reach out to us at <a href="mailto:support@launchpadhouston.com">support@launchpadhouston.com</a>.</p>
+            </section>
+            <section>
+                <h3>14. Effective Date and Version History</h3>
+                <p>These Terms and Conditions are effective as of January 24, 2025. Previous versions are available upon request.</p>
+            </section>
         </div>
         </main>
         <footer className="landing-footer">

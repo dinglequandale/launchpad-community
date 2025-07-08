@@ -3,14 +3,14 @@ import { useNavigate, Routes, Route, useLocation } from 'react-router-dom';
 import './landing_nav.css';
 
 export default function Landing_Nav () {
-  const [activePage, setActivePage] = useState('highschoolers');
+  const [activePage, setActivePage] = useState('Landing');
   const navigate = useNavigate();
   const location = useLocation();
 
   const navItems = [
-    { id: 'professionals', label: 'For Professionals' },
-    { id: 'highschoolers', label: 'For High Schoolers' },
-    { id: 'undergrads', label: 'For College Students' },
+    { id: '?userType=professional', label: 'For Professionals' },
+    { id: '?userType=highschooler', label: 'For High Schoolers' },
+    { id: '?userType=alumni', label: 'For College Students' },
   ];
 
   
@@ -22,7 +22,7 @@ export default function Landing_Nav () {
 
   const handleNavigation = (id) => {
     setActivePage(id);
-    navigate(`/${id}`);
+    navigate(`/Landing${id}`);
   };
 
   return (

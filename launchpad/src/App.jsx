@@ -1,4 +1,4 @@
-import LandingPage from "./pages/landing_page/LandingPage";
+// import LandingPage from "./pages/landing_page/LandingPage";
 import Home from "./pages/Homepage/Home";
 import EditProfilePage from "./pages/Editprofilepage/EditProfilePage";
 import SignUp from "./pages/Authentication/Signup";
@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from "./contexts/auth/AuthContext";
 import MobileBlocker from "./contexts/MobileBlocker";
 import LegalityFooter from "./components/Legality Footer/LegalityFooter";
+import LandingPageRevamped from "./pages/landing_page/LandingPageRevamped";
 
 function App() {
   // TODO: later input logic for this boolean to check whether user finished onboarding
@@ -14,7 +15,7 @@ function App() {
   return (
     <>
     <MobileBlocker>
-      <LandingPage/>
+      <LandingPageRevamped/>
     </MobileBlocker>
     </>
   )

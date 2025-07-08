@@ -4,6 +4,7 @@ import LegalityGoBack from './LegalityGoBack';
 
 export default function AboutUs() {
     return (
+        <>
         <div className="legality-holder">
             <LegalityGoBack />
             <div className="about-us-container">
@@ -41,7 +42,10 @@ export default function AboutUs() {
                     </p>
                 </div>
             </div>
-            <LegalityFooter/>
         </div>
+        <footer className="landing-footer">
+            <LegalityFooter pathName={location.pathname}/>
+        </footer>
+        </>
     );
 }

@@ -31,17 +31,19 @@ export default function LegalityFooter({pathname = null}){
             <ul>
             <li><a onClick={() => {
                 navigate("/terms");
+                window.scrollTo(0, 0);
               }}>Terms of Service</a></li>
               <li><a onClick={() => {
                 navigate("/privacy");
+                window.scrollTo(0, 0);
               }}>Privacy Policy</a></li>
             </ul>
           </div>
           <div className="footer-column">
             <h3>Connect</h3>
-            <div className="social-icons">
-              <SocialIcon url="www.youtube.com"/>
-              <SocialIcon url="www.instagram.com"/>
+            <div className="social-icons" style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", gap: "20px"}}>
+              <SocialIcon url="https://www.youtube.com"/>
+              <SocialIcon url="https://www.instagram.com"/>
             </div>
           </div>
         </div>
