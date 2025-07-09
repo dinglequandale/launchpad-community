@@ -31,7 +31,25 @@ export default function SecurityCodeInput({onSubmit}) {
         }
     };
 
-    // Handle keydown for backspace functionality
+    // Handle paste event for bulk input
+    const handlePaste = (event) => {
+        event.preventDefault();
+        const pasted = event.clipboardData.getData('Text').toUpperCase().replace(/[^A-Z0-9]/g, '');
+        if (!pasted) return;
+        const chars = pasted.slice(0, codeLength).split('');
+        const newCode = [...code];
+        for (let i = 0; i < chars.length; i++) {
+            newCode[i] = chars[i];
+        }
+        setCode(newCode);
+        // Focus the last filled input
+        if (chars.length > 0 && chars.length <= codeLength) {
+            setTimeout(() => {
+                inputRefs[Math.min(chars.length - 1, codeLength - 1)].current.focus();
+            }, 0);
+        }
+    };
+
     const handleKeyDown = (index, event) => {
         // Move focus back and clear current input on backspace
         if (event.key === 'Backspace' && !code[index] && index > 0) {
@@ -69,6 +87,7 @@ export default function SecurityCodeInput({onSubmit}) {
                 value={digit}
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
+                onPaste={handlePaste}
                 style={{
                     ...styles.input,
                     ...(document.activeElement === inputRefs[index].current 

@@ -35,15 +35,16 @@ function GlobalAuthWrapper() {
   
       try {
         const schoolId = await getUserTokenInfo();
-        if(localStorage.getItem("schoolId") !== schoolId){
+        if(!localStorage.getItem("schoolId")){
           localStorage.setItem("schoolId", schoolId);
         }
+        console.log("School id: ", schoolId, "UID: ", currentUser.uid);
         const userRef = doc(db, "tenants", schoolId, 'users', currentUser.uid);
         async function initializeApp() {
           if (currentUser && !isConnected) {
             unsubscribe = onSnapshot(userRef, (doc) => {
               if (!doc.exists()) {
-                navigate("/school-signup");
+                navigate("/Onboarding");
                 return;
               }
               
@@ -59,7 +60,6 @@ function GlobalAuthWrapper() {
                   const approved = await fetchConnectionsByStatus(currentUser, 'approved');
                   localStorage.setItem('pendingConnections', JSON.stringify(pending));
                   localStorage.setItem('approvedConnections', JSON.stringify(approved));
-                  localStorage
                 };
                 fetchAndStoreConnections();
               })();
@@ -79,10 +79,9 @@ function GlobalAuthWrapper() {
               unsubscribe();
           }
       };    
-        // Rest of your code using userRef
       } catch (error) {
         console.error("Error fetching user token info:", error);
-        navigate("/school-signup");
+        // navigate("/Onboarding");
       }
     };
   

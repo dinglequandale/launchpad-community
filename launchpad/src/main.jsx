@@ -27,6 +27,7 @@ import SettingsPage from './pages/Settings/SettingsPage.jsx';
 import ReportModal from './components/ReportModal/ReportModal.jsx';
 import ParentVerificationPage from './pages/ParentVerificationPage.jsx';
 import LandingPageRevamped from './pages/landing_page/LandingPageRevamped.jsx';
+import UserType from './pages/Onboarding/UserType.jsx';
 
 const ErrorPage = () => {
   return (
@@ -131,6 +132,11 @@ const router = createBrowserRouter([
   {
     path: '/undergrads',
     element: <Alumni_LandingPage/>,
+    errorElement: <ErrorPage/>
+  },
+  {
+    path: '/user-type',
+    element: <UserType/>,
     errorElement: <ErrorPage/>
   },
   {

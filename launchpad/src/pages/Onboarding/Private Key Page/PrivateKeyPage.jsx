@@ -1,6 +1,6 @@
 import toast, { Toaster } from "react-hot-toast";
 import SecurityCodeInput from "../../../components/Security Key/SecurityInput";
-import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDocs, query, updateDoc, where, or } from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebaseConfig";
 import { Navigate, useNavigate } from "react-router-dom";
 // import { getFunctions, httpsCallable } from "firebase/functions";
@@ -12,38 +12,60 @@ export default function PrivateKeyPage() {
     const {userLoggedIn} = useAuth();
     const today = (new Date()).toLocaleDateString('en-US');
 
+    console.log(localStorage.getItem("tempSchoolInfo"));
+
     const onSubmit = async (key) => {
         const loadingToast = toast.loading('Verifying your code...');
         
         try {
             const schoolsRef = collection(db, "school_configs");
-            const q = query(schoolsRef, where("secret_key", "==", key));
-            const querySnapshot = await getDocs(q);
-            if(querySnapshot.empty){
+            const querySnapshot = await getDocs(schoolsRef);
+            let matchedKeyType = null;
+            let matchedDoc = null;
+            let codeData = null;
+
+            querySnapshot.forEach(docSnap => {
+                const keys = docSnap.data().secret_keys || {};
+                for (const [type, value] of Object.entries(keys)) {
+                    if (value === key) {
+                        matchedKeyType = type;
+                        matchedDoc = docSnap;
+                        codeData = docSnap.data();
+                        break;
+                    }
+                }
+            });
+
+            if (!matchedDoc) {
                 toast.error(`Invalid code!`, { id: loadingToast });
                 return;
             }
-
-            const codeData = querySnapshot.docs[0].data();
             
+            // if (matchedKeyType === "general") {
+            //     // TODO: Insert custom logic for general key here
+                
+            // } else if (matchedKeyType === "admin") {
+            //     // TODO: Insert custom logic for admin key here
+            // }
+
             // expiration date in timestamp on Firestore
-            if (codeData.expiration_date.toDate && new Date() > codeData.expiration_date.toDate()) {
+            if (codeData.expiration_date?.toDate && new Date() > codeData.expiration_date.toDate()) {
                 toast.error("This code has expired. Please request a new one!");
                 return;
             }
             
             if((codeData.usages_threshold <= codeData.usages_count) || codeData.daily_usages_threshold <= codeData.daily_usage_tracker[today]){
                 toast.error("Code usages limit reached. Please contact us at launchpadhelpline@gmail.com for help.");
-                await updateDoc(doc(db, "school_configs", schoolId), {threshold_breached: true});
+                await updateDoc(doc(db, "school_configs", matchedDoc.id), {threshold_breached: true});
                 return;
             }
                         
-            schoolId = querySnapshot.docs[0].id;
-            schoolDisplayName = querySnapshot.docs[0].data().display_name;
+            schoolId = matchedDoc.id;
+            schoolDisplayName = codeData.display_name;
             
             toast.success('We found your school!', { id: loadingToast });
 
-            localStorage.setItem("tempSchoolInfo", JSON.stringify({schoolId, schoolDisplayName}));
+            localStorage.setItem("tempSchoolInfo", JSON.stringify({schoolId, schoolDisplayName, userRole: matchedKeyType}));
 
             await updateDoc(
                 doc(db, "school_configs", schoolId), 
@@ -53,7 +75,13 @@ export default function PrivateKeyPage() {
                     daily_usage_tracker: {...codeData.daily_usage_tracker, [today]: codeData.daily_usage_tracker[today] ? codeData.daily_usage_tracker[today] + 1 : 1}
                 }
             );
-            navigate("/Login", {state: {schoolId, schoolDisplayName}});
+            if(matchedKeyType === "admin"){
+                localStorage.setItem("userType", "Staff");
+                navigate("/Signup", {state: {schoolId, schoolDisplayName, userRole: matchedKeyType}})
+            }
+            else if(matchedKeyType === "general"){
+                navigate("/user-type", {state: {schoolId, schoolDisplayName, userRole: matchedKeyType}});
+            }
         } catch (error) {
             console.error('Error changing:', error);
             toast.error('An error occurred while verifying your code', { id: loadingToast });

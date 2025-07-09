@@ -108,6 +108,8 @@ export default function EditProfileCard() {
                 return "Attending College";
             case "Professional":
                 return "Current Position";
+            case "Staff":
+                return "Role at School";
             default:
                 return "";
         }
@@ -115,26 +117,29 @@ export default function EditProfileCard() {
     return(
         <>
         <div name="opportunityModal" style={{position: "relative"}}>
-            {userData && userData.userType === "Professional" ? <OpportunityModal 
-                onClose={()=>setOpportunityModalVisibility(false)}
-                visibility={opportunityModalVisibility} 
-                opportunityData={edittingOpportunity} 
-                isEditing={edittingOpportunity !== null} 
-                opportunityId={edittingOpportunity ? edittingOpportunity.id : ""}/>
-            
-            : <InitiativeModal 
-                onClose={()=>setOpportunityModalVisibility(false)} 
-                visibility={opportunityModalVisibility}
-                opportunityData={edittingOpportunity} 
-                isEditing={edittingOpportunity !== null} 
-                opportunityId={edittingOpportunity ? edittingOpportunity.id : ""}/>}
+            {userData && userData.userType === "Professional" ? (
+                <OpportunityModal 
+                    onClose={()=>setOpportunityModalVisibility(false)}
+                    visibility={opportunityModalVisibility} 
+                    opportunityData={edittingOpportunity} 
+                    isEditing={edittingOpportunity !== null} 
+                    opportunityId={edittingOpportunity ? edittingOpportunity.id : ""}/>
+            ) : userData && userData.userType !== "Staff" ? (
+                <InitiativeModal 
+                    onClose={()=>setOpportunityModalVisibility(false)} 
+                    visibility={opportunityModalVisibility}
+                    opportunityData={edittingOpportunity} 
+                    isEditing={edittingOpportunity !== null} 
+                    opportunityId={edittingOpportunity ? edittingOpportunity.id : ""}/>
+            ) : null}
         </div>
             <ProfileContext.Provider value={{currentUser, userData}}>
             <div className='editprofileCard'>
                 {(!loading && userData) ? <>
                 <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", borderWidth: "1.7px", paddingBottom: "5px"}}>
-                    <div className='return' style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
-                    onClick={() => {prevPath ? navigate(prevPath) : navigate("/Home")}}>
+                    <div className='return' 
+                        style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
+                        onClick={() => {prevPath ? navigate(prevPath) : navigate("/Home")}}>
                         <RiArrowGoBackFill size={20}/>
                         <span>Go Back</span>
                     </div>
@@ -144,48 +149,47 @@ export default function EditProfileCard() {
                 <hr style={{width:"100%"}}/>
                 
                 <div>
-                    {incompleteOpportunitiesData && incompleteOpportunitiesData.length > 0 && (
-                        <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
-                            {incompleteOpportunitiesData.map((opportunityData, index)=>(
-                                <OpportunityPopup 
-                                    opportunityData={opportunityData} 
-                                    isPublished={false}
-                                    key={index}
-                                    opportunitiesOptions={opportunitiesOptions} 
-                                    // opportunityModalVisibility={opportunityModalVisibility} 
-                                    setOpportunityModalVisibility={setOpportunityModalVisibility}
-                                    setEdittingOpportunity={setEdittingOpportunity}
-                                    deleteOpportunity={deleteIncompleteOpportunity}
-                                />
-                            ))}
-                        </div> )}
-                    {(!opportunitiesLoading && opportunitiesData.length > 0) ? 
-                    
-                    (
-                        <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
-                            {opportunitiesData.map((opportunityData, index)=>(
-                                <OpportunityPopup 
-                                    opportunityData={opportunityData} 
-                                    key={index}
-                                    opportunitiesOptions={opportunitiesOptions} 
-                                    // opportunityModalVisibility={opportunityModalVisibility} 
-                                    setOpportunityModalVisibility={setOpportunityModalVisibility}
-                                    setEdittingOpportunity={setEdittingOpportunity}
-                                    deleteOpportunity={deleteOpportunity}
-                                />
-                            ))}
-                        </div> )
+                    {userData.userType !== "Staff" && (
+                        <>
+                        {incompleteOpportunitiesData && incompleteOpportunitiesData.length > 0 && (
+                            <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
+                                {incompleteOpportunitiesData.map((opportunityData, index)=>(
+                                    <OpportunityPopup 
+                                        opportunityData={opportunityData} 
+                                        isPublished={false}
+                                        key={index}
+                                        opportunitiesOptions={opportunitiesOptions} 
+                                        setOpportunityModalVisibility={setOpportunityModalVisibility}
+                                        setEdittingOpportunity={setEdittingOpportunity}
+                                        deleteOpportunity={deleteIncompleteOpportunity}
+                                    />
+                                ))}
+                            </div> )}
+                        {(!opportunitiesLoading && opportunitiesData.length > 0) ? 
+                            <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
+                                {opportunitiesData.map((opportunityData, index)=>(
+                                    <OpportunityPopup 
+                                        opportunityData={opportunityData} 
+                                        key={index}
+                                        opportunitiesOptions={opportunitiesOptions} 
+                                        setOpportunityModalVisibility={setOpportunityModalVisibility}
+                                        setEdittingOpportunity={setEdittingOpportunity}
+                                        deleteOpportunity={deleteOpportunity}
+                                    />
+                                ))}
+                            </div>
+                        : (opportunitiesLoading) ? 
+                            <div style={{marginTop: "40px"}}><Loading/></div>
                         :
-                    (opportunitiesLoading) ? 
-                    <div style={{marginTop: "40px"}}><Loading/></div>
-                     :
-                    <div style={{marginTop: "20px"}}>
-                        <OpportunityPopup opportunityData={null}  opportunitiesOptions={opportunitiesOptions} 
-                        setOpportunityModalVisibility={setOpportunityModalVisibility}/>
-                    </div>
-                    }
+                            <div style={{marginTop: "20px"}}>
+                                <OpportunityPopup opportunityData={null}  opportunitiesOptions={opportunitiesOptions} 
+                                setOpportunityModalVisibility={setOpportunityModalVisibility}/>
+                            </div>
+                        }
+                        </>
+                    )}
                 </div>
-                {(!opportunitiesLoading && opportunitiesData.length > 0) && <div className="addOne" onClick={()=>{
+                {userData.userType !== "Staff" && (!opportunitiesLoading && opportunitiesData.length > 0) && <div className="addOne" onClick={()=>{
                     setEdittingOpportunity(null);
                     setOpportunityModalVisibility(true);
                 }}>
@@ -193,7 +197,7 @@ export default function EditProfileCard() {
                     <span style={{textDecoration: "underline"}}>Add another {userData.userType === "Professional" ? "opportunity" : "initiative"}!</span>
                 </div>}
                 <AboutMeDisplay/>
-                {(userData && userData.userType !== "Professional") && <div name="skills" style={{marginTop: "20px"}}>
+                {(userData && userData.userType !== "Professional" && userData.userType !== "Staff") && <div name="skills" style={{marginTop: "20px"}}>
                     <span style={{fontSize: "20px", fontWeight: "bolder", paddingTop: "15px", paddingBottom: "10px"}}>{userData.userName.split(" ")[0]}'s Skills </span>
                     <SkillBase/>
                 </div>}
@@ -202,7 +206,6 @@ export default function EditProfileCard() {
                 </div>
                 {(userData.userType === "Professional" || userData.userType === "Alumni") && <hr style={{width: "100%"}}/>}
                 {(userData.userType === "Professional") && <div className='networkingCommitment' style={{textAlign: "center", paddingTop: "10px"}}>
-                    
                     <ConnectionAvailability/>
                 </div>}
                 </>
@@ -211,7 +214,7 @@ export default function EditProfileCard() {
             </div>
             </ProfileContext.Provider>
         </>
-    )
+    );
 }
 
 function EditInformation({onEdit, isAnswered, isOpportunity=false}){
@@ -354,17 +357,30 @@ function ContactInformation(){
             <EditInformation isAnswered={userData.email} questionName={"Email"} onEdit={()=>setContactModalVisibility(true)}/>
         </div>
         <span style={{fontSize: "20px", fontWeight: "bolder"}}>Contact Information</span><br />
-        <span style={{color: "#5a696e", fontWeight: "300", fontSize: "15px"}}>Add an email or LinkedIn where students, alumni, and professionals can reach you. Link your LinkedIn so others can easily learn more about you.</span>
+        <span style={{color: "#5a696e", fontWeight: "300", fontSize: "15px"}}>
+            {userData.userType === "Staff" ? "Add your school email and LinkedIn so students and colleagues can reach you." : "Add an email or LinkedIn where students, alumni, and professionals can reach you. Link your LinkedIn so others can easily learn more about you."}
+        </span>
         </div>
-        {contactModalVisibility && <ContactInfoModal userData={userData} visibility={contactModalVisibility} onClose={() => setContactModalVisibility(false)}/>}
+        {contactModalVisibility && <ContactInfoModal userData={userData} visibility={contactModalVisibility} onClose={() => setContactModalVisibility(false)}/>} 
         <div>
             <div className='emailSection' style={{marginTop: "10px"}}>
                 <div>
-                <span style={{fontWeight: "550"}}>Email: {!userData.email && <span style={{color: "red", fontWeight: "lighter"}}>No Email provided</span>}
-                {userData.email && <span style={{color: "var(--secondary)"}}>{userData.email}</span>}
+                <span style={{fontWeight: "550"}}>
+                    {userData.userType === "Staff" ? "School Email: " : "Email: "}
+                    {userData.userType === "Staff" && !userData.personalEmail && <span style={{color: "red", fontWeight: "lighter"}}>No Personal Email provided</span>}
+                    {userData.userType === "Staff" && userData.personalEmail && <span style={{color: "var(--secondary)"}}>{userData.personalEmail}</span>}
+                    {userData.userType !== "Staff" && !userData.email && <span style={{color: "red", fontWeight: "lighter"}}>No Email provided</span>}
+                    {userData.userType !== "Staff" && userData.email && <span style={{color: "var(--secondary)"}}>{userData.email}</span>}
                 </span>
                 </div>
-                {!userData.email &&
+                {userData.userType === "Staff" && !userData.personalEmail &&
+                    <div className='emailUpload'>
+                        <div className="addOne" onClick={()=>setContactModalVisibility(true)}>
+                        <IoAdd size={25} />
+                        <span style={{textDecoration: "underline"}}>Add your Personal Email</span>
+                    </div>
+                    </div>}
+                {userData.userType !== "Staff" && !userData.email &&
                     <div className='emailUpload'>
                         <div className="addOne" onClick={()=>setContactModalVisibility(true)}>
                         <IoAdd size={25} />
@@ -508,11 +524,20 @@ function BasicInfoCard({descType}){
     }
 
     useEffect(()=>{
-        setBasicInfoContent({userPreface: getBasicUserDescription(userData, false),
-        userFirstDesc: {desc1: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}`, desc2: `${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : displayFieldsOfInterest(userData.areasOfInterest, "longer")}`},
-        userSecondDesc: {desc1: `${descType}`, desc2: `${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`},
-        acceptedColleges: {desc1: `Accepted Colleges`, desc2: `${userData.acceptedColleges}`},
-    });
+        let userFirstDesc, userSecondDesc;
+        if (userType === "Staff") {
+            userFirstDesc = {desc1: "Fields of Interest", desc2: (userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : ""};
+            userSecondDesc = {desc1: "Role at School", desc2: userData.schoolRole || ""};
+        } else {
+            userFirstDesc = {desc1: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}`, desc2: (userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : ""};
+            userSecondDesc = {desc1: `${descType}`, desc2: `${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`};
+        }
+        setBasicInfoContent({
+            userPreface: getBasicUserDescription(userData, false),
+            userFirstDesc,
+            userSecondDesc,
+            acceptedColleges: {desc1: `Accepted Colleges`, desc2: `${userData.acceptedColleges}`},
+        });
     },[userData])
 
     return(

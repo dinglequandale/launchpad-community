@@ -11,7 +11,14 @@ export default function SignUp(){
     const [userPassword, setUserPassword] = useState("");
     const [confirmedPassword, setConfirmedPassword] = useState("");
     const [userIsSigningIn, setUserIsSigningIn] = useState(false);
+    const [emailIncorrect, setEmailIncorrect] = useState(false);
     const navigate = useNavigate();
+
+    const userType = localStorage.getItem("userType") || '';
+    const schoolInfo = localStorage.getItem("tempSchoolInfo") || '';
+    const schoolId = schoolInfo ? JSON.parse(schoolInfo).schoolId : "";
+
+    const schoolEmailCondition = userType === "High Schooler" || userType === "Staff";
 
     // Check for school code validation
     const tempSchoolInfo = JSON.parse(localStorage.getItem("tempSchoolInfo"));
@@ -21,6 +28,19 @@ export default function SignUp(){
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (schoolEmailCondition) {
+            try {
+                const schoolEmailPattern = new RegExp(`^[^@]+@${schoolId}\\.org$`, 'i');
+                if (!schoolEmailPattern.test(userEmail)) {
+                    toast.error(`Please use your school email (e.g. yourname@${schoolId}.org).`);
+                    setEmailIncorrect(true);
+                    return;
+                }
+            } catch {
+                toast.error('School information missing. Please restart onboarding.');
+                return;
+            }
+        }
         if(userPassword.length <= 6){
             toast.error("Sorry! Your password requires at least 7 characters.");
             return;
@@ -86,7 +106,7 @@ export default function SignUp(){
                     <p>Your journey starts here!</p>
                 </div>
                 
-                <button className="social-button btnUnfilled" onClick={(e)=>onContinueWithGoogle(e)}>
+                {(!schoolEmailCondition) && <><button className="social-button btnUnfilled" onClick={(e)=>onContinueWithGoogle(e)}>
                     <svg style={{width: "25px"}} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g clipPath="url(#clip0_17_40)">
                             <path d="M47.532 24.5528C47.532 22.9214 47.3997 21.2811 47.1175 19.6761H24.48V28.9181H37.4434C36.9055 31.8988 35.177 34.5356 32.6461 36.2111V42.2078H40.3801C44.9217 38.0278 47.532 31.8547 47.532 24.5528Z" fill="#4285F4" />
@@ -107,19 +127,24 @@ export default function SignUp(){
                     <hr className="orDivider"/>
                     <span style={{padding: "4px", opacity: ".5"}}>OR</span>
                     <hr className="orDivider"/>
-                </div>
+                </div></>}
                 
                 <form onSubmit={(e)=>handleSubmit(e)}>
                     <div style={{display: "flex", justifyContent: "cemter", alignItems: "center", flexDirection: "column", gap: "10px", paddingBottom: "1rem"}}>
                         <div style={{width: "100%", display: "flex", flexDirection: "column", gap: "5px"}}>
-                        <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Email</span>
+                        <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>{ (schoolEmailCondition) ? "School Email" : "Email"}</span>
                         <input
                         type="email"
                         value={userEmail}
-                        onChange={(e) => setUserEmail(e.target.value)}
+                        onChange={(e) => {
+                            setEmailIncorrect(false);
+                            setUserEmail(e.target.value);
+
+                        }}
                         required
+                        placeholder={`(...)@${schoolId}.org`}
                         disabled={userIsSigningIn}
-                        className="inputEmailAndPassword"
+                        className={`inputEmailAndPassword ${emailIncorrect ? "error" : ""}`}
                         />
                         </div>
 
@@ -149,9 +174,9 @@ export default function SignUp(){
                     <button type="submit" className="submit-button" disabled={userIsSigningIn}><span style={{fontSize: "larger"}} disabled={userIsSigningIn}>{userIsSigningIn ? 'Signing In...' : 'Continue'}</span></button>
                 </form>
                 
-                <p className="signup-link">
+                {!userType && <p className="signup-link">
                     Already created an account? <a href="/Login" style={{textDecoration: "underline"}} disabled={userIsSigningIn}>Log in</a>
-                </p>
+                </p>}
             </div>
       </div>
       </>

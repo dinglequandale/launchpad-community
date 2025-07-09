@@ -48,10 +48,11 @@ const staffQuestionsConfig = [
     page: 2
   },
   {
-    id: "workEmail",
-    text: "Enter your work email:",
-    placeholder: "your.name@school.org",
+    id: "personalEmail",
+    text: "Enter your personal email: (optional)",
+    // placeholder: "your.name@school.org",
     type: "text",
+    optional: true,
     page: 2
   },
 //   {
@@ -92,7 +93,7 @@ export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolI
     schoolAttending: schoolInfo?.schoolDisplayName || '',
     schoolId: schoolInfo?.schoolId || '',
     schoolRole: '',
-    workEmail: '',
+    personalEmail: '',
     // phoneNumber: '',
     linkedinLink: '',
     userAboutMe: '',
@@ -117,7 +118,7 @@ export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolI
 
   // Validation: require name, school, role, work email, and areasOfInterest
   useEffect(() => {
-    const required = staffData.userName && staffData.schoolAttending && staffData.schoolRole && staffData.workEmail && staffData.areasOfInterest && staffData.areasOfInterest.length > 0;
+    const required = staffData.userName && staffData.schoolAttending && staffData.schoolRole && staffData.areasOfInterest && staffData.areasOfInterest.length > 0;
     setCanSubmit(!!required);
   }, [staffData, setCanSubmit]);
 

@@ -11,7 +11,7 @@ export default function ContactInfoModal({userData, visibility, onClose}){
   const {currentUser} = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [newEmail, setNewEmail] = useState(userData.email);
+  const [newEmail, setNewEmail] = useState(userData.userType === "Staff" ? userData.personalEmail : userData.email);
   const [newLinkedinLink, setNewLinkedinLink] = useState(userData.linkedinLink);
   const [linkedInError, setLinkedInError] = useState("");
 
@@ -21,13 +21,18 @@ export default function ContactInfoModal({userData, visibility, onClose}){
     const loadingToast = toast.loading('Making your changes...');
     
     try {
+      if(userData.userType === "Staff"){
+        await editUserData({personalEmail: newEmail, linkedinLink: newLinkedinLink}, currentUser, userData);
+      }
+      else{
         await editUserData({email: newEmail, linkedinLink: newLinkedinLink}, currentUser, userData);
+      }
 
-        toast.success('Changes made successfully!', { id: loadingToast });
+      toast.success('Changes made successfully!', { id: loadingToast });
 
-        new Promise( res => setTimeout(res, 500) );
+      new Promise( res => setTimeout(res, 500) );
 
-        onClose();
+      onClose();
 
     } catch (error) {
         toast.error(`Failed to make changes!`, { id: loadingToast });

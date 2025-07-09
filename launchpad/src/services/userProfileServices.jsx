@@ -183,8 +183,9 @@ export const getBasicUserDescription = (userData, shortened=true) => {
     return userData.userType === "High Schooler" ?
      `Class of ${userData.graduationYear}, ${getUserHS(userData.schoolAttending)}` 
      : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${getUserHS(userData.schoolAttending)}` 
-     : `${userData.yearsOfExperience}+ Years of Experience in ${shortened ? userData.areasOfInterest[0] 
-        : displayFieldsOfInterest(userData.areasOfInterest)}`;
+     : userData.userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${shortened ? userData.areasOfInterest[0] 
+        : displayFieldsOfInterest(userData.areasOfInterest)}`
+    : `${userData.schoolRole} at ${getUserHS(userData.schoolAttending)}`;
 }
 
 export const editUserData = async (newData, currentUser, origUserData) => {

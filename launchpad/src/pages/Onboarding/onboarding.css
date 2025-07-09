@@ -143,9 +143,7 @@
 /* For the user type selector */
 .userType-options-container {
   width: 80%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  display: flex;
   gap: 15px;
   align-items: center;
   justify-items: center;
@@ -153,15 +151,15 @@
 
 .userType-option {
   display: flex;
-  width: 180px;
+  width: 200px;
   gap: 5px;
   flex-direction: column;
   font-size: large;
   height: 100px;
   transition: background-color 0.3s ease;
   box-shadow: var(--shadowColor);
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center;
+  align-items: center; */
 }
 
 .userType-option:hover {

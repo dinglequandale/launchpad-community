@@ -253,7 +253,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
       case 1:
         return (
           <>
-            <SafetyWarning isShortened={false}/>
+            <SafetyWarning isShortened={true}/>
             <BasicUserInfo 
               questionsForPage={highSchoolQuestionsConfig.filter((question)=>(question.page === 1))} 
               setSelectedOptions={setHighSchoolerData} 
@@ -265,14 +265,14 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
       case 2:
         return (
           <>
-            <SafetyWarning isShortened={true}/>
+            {/* <SafetyWarning isShortened={true}/> */}
             <SchoolInfo selectedOptions={highSchoolerData} handleChange={handleChange} highSchoolerData={highSchoolerData}/>
           </>
         );
       case 3:
         return (
           <>
-            <SafetyWarning isShortened={true}/>
+            {/* <SafetyWarning isShortened={true}/> */}
             <HSCollegeInfo selectedOptions={highSchoolerData} handleChange={handleChange} />
           </>
         );
