@@ -15,7 +15,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick}) {
 
     const viewingUserType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
 
-    const hideConnectBtn = viewingUserType === "Professional" && userType === "High Schooler";
+    const hideConnectBtn = (viewingUserType !== "High Schooler") && userType === "High Schooler";
     
     const descType = () => {
         switch(userData.userType){

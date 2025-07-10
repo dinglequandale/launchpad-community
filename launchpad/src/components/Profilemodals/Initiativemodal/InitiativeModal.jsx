@@ -248,10 +248,14 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     reverseOrder={false}/>
     <div>
       <SaveChanges visibility={makeChangesVisibility} onCancel={ ()=>{
-        saveInitiativeData();
+        // saveInitiativeData();
         setMakeChangesVisibility(false);
         onClose();
-      }} onVerify={onClose}/>
+      }} onVerify={() => {
+          saveInitiativeData();
+          setMakeChangesVisibility(false);
+          onClose();
+        }}/>
       <InitiativeContext.Provider 
       value={{
         organizationData,

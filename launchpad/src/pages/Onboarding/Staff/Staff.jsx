@@ -72,6 +72,14 @@ const staffQuestionsConfig = [
     page: 2
   },
   {
+    id: "sponsoredClubs",
+    type: "text",
+    text: "Sponsored clubs, if any (separate by commas):",
+    placeholder: "E.g. Math Club, Environmental Club",
+    optional: true,
+    page: 3,
+  },
+  {
     id: "userAboutMe",
     text: "Short bio (optional):",
     placeholder: "Tell us a bit about your background and your role at the school...",
@@ -100,6 +108,7 @@ export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolI
     areasOfInterest: [],
     userPfp: null,
     userType: 'Staff',
+    sponsoredClubs: '',
     email: '', // login email
   });
 

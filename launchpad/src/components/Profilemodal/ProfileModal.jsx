@@ -23,10 +23,10 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     const userType = userData.userType;
     const viewingUserType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
     const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
-    const [showParentalConnectionModal, setShowParentalConnectionModal] = useState(false);
+    const schoolId = localStorage.getItem("schoolId");
     const disableActions = userBasicInfo && userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
 
-    const hideConnectBtn = viewingUserType === "Professional" && userType === "High Schooler";
+    const hideConnectBtn = viewingUserType !== "High Schooler" && userType === "High Schooler";
 
     const userName = userData.userName;
     const [opportunitiesData, setOpportunitiesData] = useState([]);
@@ -44,7 +44,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         const getOpportunityData = async () => {
             setOpportunitiesLoading(true);
             try{
-            const opportunitiesRef = collection(db, "tenants", basicUserInfo.schoolId ?? 'awty', "opportunities");
+            const opportunitiesRef = collection(db, "tenants", schoolId, "opportunities");
             const userOpportunityQuery = query(opportunitiesRef, where("createdBy", "==", userData.userId));
 
             const opportunitySnapshot = await getDocs(userOpportunityQuery);
@@ -53,8 +53,8 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                 ...doc.data()
               })));
             }
-            catch{
-                console.log("error")
+            catch(error){
+                console.log("error: " + error)
             }
             finally{
                 setOpportunitiesLoading(false);
@@ -100,14 +100,12 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
             }
         }
 
-        if (!showParentalConnectionModal) {
-            document.addEventListener("mousedown", onClickOutside);
-        }
+        document.addEventListener("mousedown", onClickOutside);
 
         return () => {
             document.removeEventListener("mousedown", onClickOutside);
         };
-    }, [showParentalConnectionModal, onClose]);
+    }, [onClose]);
 
     useEffect(() => {
         const modalOverlay = document.querySelector('.blurOverlay');
@@ -142,7 +140,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         console.log("approved status: " + approved);
         if (!approved) {
           // Show parent verification modal
-          setShowParentalConnectionModal(true);
+          // setShowParentalConnectionModal(true); // This line is removed
         //   toast.error('Parent verification required before connecting with professionals and alumni');
           return;
         }
@@ -166,13 +164,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
 
     return(
         <>
-            {showParentalConnectionModal && (
-              <ParentalConnectionModal
-                professionalData={userData}
-                onClose={() => setShowParentalConnectionModal(false)}
-                onApproved={handleParentalConnectionApproved}
-              />
-            )}
+            {/* The ParentalConnectionModal component is now managed globally */}
             <div className='blurOverlay'>
                 <div className='profileModalContent' style={{ top: top }} ref={menuRef}>
                     <div style={{position:"absolute", right: "10px", top: "9px"}}>

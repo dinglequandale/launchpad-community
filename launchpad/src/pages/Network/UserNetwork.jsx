@@ -20,6 +20,7 @@ import { auth } from "../../firebase/firebaseConfig";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 import { capitalizeFirstLetter } from "../Homepage/Home";
 import ParentalConnectionModal from "../../components/ParentalConnectionModal";
+import { useModal } from '../../contexts/ModalContext';
 
 
 const NetworkContext = createContext();
@@ -34,11 +35,7 @@ export default function UserNetwork() {
 
   const [tenantId, setTenantId] = useState(null);
 
-  const [profileModalVisibility, setProfileModalVisibility] = useState(false);
-  const [connectModalVisibility, setConnectModalVisibility] = useState(false);
-  const [showParentalConnectionModal, setShowParentalConnectionModal] = useState(false);
-
-  const [connectTargetUserId, setConnectTargetUserId] = useState("");
+  const { openProfileModal, openConnectModal, openParentalConnectionModal } = useModal();
 
   const [highSchoolers, setHighSchoolers] = useState([]);
   const [collegeStudents, setCollegeStudents] = useState([]);
@@ -51,20 +48,15 @@ export default function UserNetwork() {
 
   const [allVisibleUserData, setAllVisibleUserData] = useState(null);
 
-  const [profileTargetData, setProfileTargetData] = useState(null);
-  const [connectTargetUser, setConnectTargetUser] = useState(null);
-
   const [isRecommended, setIsRecommended] = useState("(recommended)");
   
-  const [profileModalTop, setProfileModalTop] = useState(0);
-
   useEffect(() => {
     document.addEventListener("keydown", onKeyPress, true)
   }, [])
 
   const onKeyPress = (e) => {
     if(e.key === "Escape"){
-      setProfileModalVisibility(false);
+      // setProfileModalVisibility(false); // This line is removed
     }
   }
 
@@ -157,31 +149,24 @@ export default function UserNetwork() {
   };
 
   const handleConnectClick = (userId) => {
-    setConnectTargetUserId(userId);
-    setConnectTargetUser(allVisibleUserData.filter((user) => user.userId === userId)[0]);
-    setProfileModalVisibility(false);
-    // Modal logic moved to useEffect below
+    const user = allVisibleUserData.filter((user) => user.userId === userId)[0];
+    // Parental connection logic
+    if (userType === 'High Schooler' && user.userType !== 'High Schooler') {
+      const approved = isConnectionApproved(user);
+      if (!approved) {
+        openParentalConnectionModal({ professionalData: user });
+        return;
+      }
+    }
+    openConnectModal({ userData: user, chat: chatClient, userId });
   };
 
   const handleOnProfileClick = (userId) => {
-    const scrollY = window.scrollY || document.documentElement.scrollTop;
-    const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2 + 80);
-    
-    setProfileModalTop(modalTop);
-    if(allVisibleUserData){
-      setProfileTargetData(allVisibleUserData.filter((user) => (user.userId === userId))[0]);
-    }
+    const user = allVisibleUserData.filter((user) => (user.userId === userId))[0];
+    openProfileModal({ userData: user, onConnectClick: handleConnectClick, handleReferalClick });
+  };
 
-    setProfileModalVisibility(true);
-  }
-
-  useEffect(() => {
-    if (profileModalVisibility) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
-    }
-  }, [profileModalVisibility]);
+  // All modal logic is now handled via ModalContext
 
   const user = auth.currentUser;
   useEffect(() => {
@@ -245,38 +230,30 @@ export default function UserNetwork() {
     return approvedConnections.includes(targetUser.id);
   };
 
-  useEffect(() => {
-    if (!connectTargetUser) return;
-
-    if (userType === 'High Schooler' && connectTargetUser.userType !== 'High Schooler') {
-      const approved = isConnectionApproved(connectTargetUser);
-      if (!approved) {
-        setShowParentalConnectionModal(true);
-        setConnectModalVisibility(false);
-        return;
-      }
-    }
-    setShowParentalConnectionModal(false);
-    setConnectModalVisibility(true);
-  }, [connectTargetUser]);
+  // Remove all unused modal state and related variables
+  // Remove: profileModalVisibility, connectModalVisibility, showParentalConnectionModal, profileTargetData, connectTargetUser, connectTargetUserId, profileModalTop, setProfileTargetData, setConnectTargetUser, setConnectTargetUserId, setProfileModalTop
+  // Remove any useEffect or logic that references these variables
+  // Remove lines:
+  //   if (profileModalVisibility) { ... }
+  //   }, [profileModalVisibility]);
+  //   if (!connectTargetUser) return;
+  //   if (userType === 'High Schooler' && connectTargetUser.userType !== 'High Schooler') { ... }
+  //   setShowParentalConnectionModal(true);
+  //   setConnectModalVisibility(false);
+  //   setShowParentalConnectionModal(false);
+  //   setConnectModalVisibility(true);
+  //   }, [connectTargetUser]);
+  // All modal logic is now handled via ModalContext
 
   return (
     <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick, loadLimit, filterChanged}}>
       <>
-        {showParentalConnectionModal && (
-              <ParentalConnectionModal
-                professionalData={connectTargetUser}
-                onClose={() => setShowParentalConnectionModal(false)}
-                // onApproved={handleParentalConnectionApproved}
-              />
-            )}
         <Toaster position={'bottom-right'} reverseOrder={false}/>
-        {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userData={connectTargetUser} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId}/>}
-        {profileModalVisibility && <ProfileModal visibility={profileModalVisibility} onClose={()=>setProfileModalVisibility(false)} top={profileModalTop} onConnectClick={handleConnectClick} handleReferalClick={handleReferalClick} userData={profileTargetData}/>}
+        {/* All modals are now handled globally via ModalContext */}
         <div>
             <TopBar/>
             <SideNav/>
-            <div className='networkContainer' id="networkContainer" style={{paddingTop: "4%", paddingLeft: "10%"}}>
+            <div className='networkContainer' id="networkContainer" style={{paddingTop: "6%", paddingLeft: "10%"}}>
               <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/>
               <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh", position: "relative"}}>
                 {allVisibleUserData && allVisibleUserData.length > 0 ? <>

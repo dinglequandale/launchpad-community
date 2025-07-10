@@ -44,6 +44,15 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
   }
 };
 
+export const stableLinkCheck = (link) => {
+  if(!link.includes("http")){
+    return "https://" + link;
+  }
+  else{
+    return link;
+  }
+}
+
 const uploadImage = async (file, opportunityId) => {
   const storageRef = ref(storage, `opportunity-logos/${opportunityId}`);
   await uploadBytes(storageRef, file);

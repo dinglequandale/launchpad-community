@@ -11,6 +11,8 @@ import ReadMoreButton from "../ReadMorebutton/ReadMore";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase/firebaseConfig";
 import { displayFieldsOfInterest, getUserHS } from "../../services/userProfileServices";
+import { useModal } from '../../contexts/ModalContext';
+import { stableLinkCheck } from "../../services/opportunityServices";
 
 export default function OrganizationProfile({organizationData, location, handleShowProfile, handleReferalClick, isPublished=true}){
     const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
@@ -20,6 +22,7 @@ export default function OrganizationProfile({organizationData, location, handleS
 
     const { currentUser } = useAuth();
     const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
+    const { openApplyModal } = useModal();
 
     const descRef = useRef();
     const [userData, setUserData] = useState(null);
@@ -46,8 +49,16 @@ export default function OrganizationProfile({organizationData, location, handleS
         organizationHostName: organizationData.createdByUserName,
         organizationLearnMoreMethod: organizationData.learnMore.split(": ")[0],
         organizationApplyMethod: organizationData.apply.split(": ")[0],
-        organizationApply: organizationData.apply.split(": ")[1] ?? null,
-        organizationLearnMore: organizationData.learnMore.split(": ")[1] ?? null,
+        organizationApply: (organizationData.apply.split(": ")[1] && organizationData.apply.split(": ")[0] === "Website") ?
+         stableLinkCheck(organizationData.apply.split(": ")[1]) 
+         : organizationData.apply.split(": ")[1] 
+         ? organizationData.apply.split(": ")[1] 
+         : null,
+        organizationLearnMore: (organizationData.learnMore.split(": ")[1] && organizationData.learnMore.split(": ")[0] === "Website") ?
+        stableLinkCheck(organizationData.learnMore.split(": ")[1]) 
+        : organizationData.learnMore.split(": ")[1] 
+        ? organizationData.learnMore.split(": ")[1] 
+        : null,
         organizationDeadline: organizationData.deadline,
         organizationStartDate: organizationData.startDate,
     }
@@ -111,13 +122,32 @@ export default function OrganizationProfile({organizationData, location, handleS
 
     const handleConnect = (e) => {
         e.preventDefault();
-        // console.log("Connect data:", userData)
+        if(organizationData.organizationHostCompany){
+            openApplyModal({
+                requirements: organizationData.applicantRequirements,
+                applyType: organizationProfileData.organizationApplyMethod,
+                applyValue: organizationProfileData.organizationApply,
+                orgName: organizationProfileData.organizationHost,
+                opportunityDetails: {
+                    format: organizationProfileData.organizationLogistics ? organizationProfileData.organizationLogistics[2] : undefined,
+                    eligibility: organizationProfileData.organizationLogistics ? organizationProfileData.organizationLogistics[1] : undefined,
+                    compensation: organizationProfileData.organizationLogistics ? organizationProfileData.organizationLogistics[0] : undefined,
+                    duration: organizationProfileData.organizationLogistics ? organizationProfileData.organizationLogistics[3] : undefined,
+                    startDate: organizationProfileData.organizationStartDate,
+                    timeCommitment: organizationData.timeCommitment || undefined,
+                    deadline: organizationProfileData.organizationDeadline,
+                    learnMoreType: organizationProfileData.organizationLearnMoreMethod,
+                    learnMoreValue: organizationProfileData.organizationLearnMore,
+                    organizationType: organizationProfileData.organizationType,
+                }
+            });
+            return;
+        }
         handleReferalClick("apply", organizationProfileData, userData);
     }
 
     const handleLearnMore = (e) => {
         e.preventDefault();
-        // console.log("Connect data:", userData)
         handleReferalClick("learnMore", organizationProfileData, userData);
     }
 

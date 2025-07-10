@@ -45,9 +45,15 @@ export default function EditProfileCard() {
     const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
 
-    const incompleteOpportunitiesData = JSON.parse(localStorage.getItem("savedOrganizationData"));
+    const [incompleteOpportunitiesData, setIncompleteOpportunitiesData] = useState(null);
 
     const [edittingOpportunity, setEdittingOpportunity] = useState(null);
+
+    useEffect(() => {
+        setIncompleteOpportunitiesData(localStorage.getItem("savedOrganizationData") ?
+        JSON.parse(localStorage.getItem("savedOrganizationData")) 
+       : []);
+    },[opportunityModalVisibility]);
 
     useEffect(() => {
         let unsubscribe;
@@ -81,9 +87,6 @@ export default function EditProfileCard() {
         return () => unsubscribe();
       }, [currentUser]);
 
-    // console.log(opportunitiesData);
-    // console.log(edittingOpportunity);
-
     const deleteOpportunity = async (opportunityId) => {
         setOpportunitiesData(opportunitiesData.filter((opportunity) => (opportunity.id !== opportunityId)));
         await handleDeleteOpportunity(opportunityId);
@@ -91,6 +94,8 @@ export default function EditProfileCard() {
 
     const deleteIncompleteOpportunity = (opportunityId) => {
         localStorage.setItem("savedOrganizationData", JSON.stringify(incompleteOpportunitiesData.filter(opportunity => opportunity.id !== opportunityId)));
+        setIncompleteOpportunitiesData(incompleteOpportunitiesData.filter(opportunity => opportunity.id !== opportunityId));
+
     }
 
     const opportunitiesOptions = {highSchool: 
@@ -524,10 +529,11 @@ function BasicInfoCard({descType}){
     }
 
     useEffect(()=>{
-        let userFirstDesc, userSecondDesc;
+        let userFirstDesc, userSecondDesc, sponsoredClubs;
         if (userType === "Staff") {
             userFirstDesc = {desc1: "Fields of Interest", desc2: (userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : ""};
             userSecondDesc = {desc1: "Role at School", desc2: userData.schoolRole || ""};
+            sponsoredClubs = {desc1: "Sponsored Clubs", desc2: userData.sponsoredClubs}
         } else {
             userFirstDesc = {desc1: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}`, desc2: (userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : ""};
             userSecondDesc = {desc1: `${descType}`, desc2: `${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`};
@@ -600,6 +606,7 @@ function BasicInfoCard({descType}){
                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userFirstDesc.desc1}</span>: {basicInfoContent.userFirstDesc.desc2}</span>
                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>
                 {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
+                {userData.sponsoredClubs && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.sponsoredClubs.desc1}</span>: {basicInfoContent.sponsoredClubs.desc2}</span></>}
             </div>
             
         </div>

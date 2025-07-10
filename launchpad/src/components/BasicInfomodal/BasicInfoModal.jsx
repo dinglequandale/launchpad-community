@@ -31,6 +31,8 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     // industryOfExperience: userData.industryOfExperience ?? "",
     industryPosition: userData.industryPosition ?? "",
     graduationYear: userData.graduationYear ?? "",
+    schoolRole: userData.schoolRole ?? "",
+    sponsoredClubs: userData.sponsoredClubs ?? "",
   });
 
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
@@ -64,7 +66,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       text: "What are your fields of expertise?",
       type: "multi-select",
       options: careerInterests,
-      userTypeIncluders: ["Professional"],
+      userTypeIncluders: ["Professional", "Staff"],
       required: true,
     },
     {
@@ -115,6 +117,20 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       placeholder: "",
       userTypeIncluders: ["Professional"],
       required: true,
+    },
+    {
+      id: "schoolRole",
+      text: "What is your position at the school?",
+      placeholder: "E.g. History Teacher, IT Admin",
+      type: "text",
+      userTypeIncluders: ["Staff"],
+    },
+    {
+      id: "sponsoredClubs",
+      type: "text",
+      text: "Sponsored clubs, if any (separate by commas):",
+      placeholder: "E.g. Math Club, Environmental Club",
+      userTypeIncluders: ["Staff"]
     },
   ]
 

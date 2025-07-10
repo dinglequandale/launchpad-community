@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import UserNetwork from './pages/Network/UserNetwork.jsx';
 import Onboarding from './pages/Onboarding/Onboarding.jsx';
 import Organizations from './pages/Organizationspage/Organizations.jsx';
@@ -28,6 +28,7 @@ import ReportModal from './components/ReportModal/ReportModal.jsx';
 import ParentVerificationPage from './pages/ParentVerificationPage.jsx';
 import LandingPageRevamped from './pages/landing_page/LandingPageRevamped.jsx';
 import UserType from './pages/Onboarding/UserType.jsx';
+import { ModalProvider } from './contexts/ModalContext.jsx';
 
 const ErrorPage = () => {
   return (
@@ -93,127 +94,121 @@ const ErrorPage = () => {
   );
 };
 
+// Create a Root component that wraps the router content with providers
+const Root = () => {
+  return (
+    <ReportProvider>
+      <ModalProvider>
+        <ReportModal />
+        <Outlet />
+      </ModalProvider>
+    </ReportProvider>
+  );
+};
+
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App/>,
-    errorElement: <ErrorPage/>
-  },
-  {
-    path: '/parent-verify',
-    element: <ParentVerificationPage />,
-    errorElement: <ErrorPage/>
-  },
-  {
-    path: '/Landing',
-    element: <LandingPageRevamped/>,
-    errorElement: <ErrorPage/>
-  },
-  {
-    path: '/about-us',
-    element: <AboutUs/>,
-    errorElement: <ErrorPage/>
-  },
-  {
-    path: '/faqs',
-    element: <FAQs/>,
+    element: <Root />,
     errorElement: <ErrorPage/>,
-  },
-  {
-    path: '/highschoolers',
-    element: <LandingPage/>,
-    errorElement: <ErrorPage/>
-  },
-  {
-    path: '/professionals',
-    element: <Professional_LandingPage/>,
-    errorElement: <ErrorPage/>
-  },
-  {
-    path: '/undergrads',
-    element: <Alumni_LandingPage/>,
-    errorElement: <ErrorPage/>
-  },
-  {
-    path: '/user-type',
-    element: <UserType/>,
-    errorElement: <ErrorPage/>
-  },
-  {
-    path: '/Signup',
-    element: <SignUp/>,
-    errorElement: <ErrorPage/>
-  },
-  {
-    path: '/Login',
-    element: <Login/>,
-    errorElement:<ErrorPage/>
-  },
-  {
-    path: '/privacy',
-    element: <PrivacyPolicy/>,
-    errorElement:<ErrorPage/>
-  },
-  {
-    path: '/terms',
-    element: <Terms/>,
-    errorElement:<ErrorPage/>
-  },
-  {
-    path: '/school-signup',
-    element: <PrivateKeyPage/>,
-    errorElement:<ErrorPage/>
-  },
-  {
-    path: '/Onboarding',
-    element: <Onboarding/>,
-    errorElement:<ErrorPage/>
-  },
-  {
-    element: <GlobalAuthWrapper/>,
     children: [
-    {
-      path: '/Home',
-      element: <Home/>,
-      errorElement:<ErrorPage/>,
-    },
-    {
-      path: '/network',
-      element: <UserNetwork/>,
-      errorElement:<ErrorPage/>
-    },
-    {
-      path: '/messages',
-      element: <InitializeStream/>,
-      errorElement:<ErrorPage/>
-    },
-    {
-      path: '/Organizations',
-      element: <Organizations/>,
-      errorElement:<ErrorPage/>
-    },
-    {
-      path: '/profile',
-      element: <EditProfilePage/>,
-      errorElement:<ErrorPage/>
-    },
-    {
-      path: '/settings',
-      element: <SettingsPage/>,
-      errorElement:<ErrorPage/>
-    }
-]
-}
+      {
+        index: true,
+        element: <App/>
+      },
+      {
+        path: '/parent-verify',
+        element: <ParentVerificationPage />
+      },
+      {
+        path: '/Landing',
+        element: <LandingPageRevamped/>
+      },
+      {
+        path: '/about-us',
+        element: <AboutUs/>
+      },
+      {
+        path: '/faqs',
+        element: <FAQs/>
+      },
+      {
+        path: '/highschoolers',
+        element: <LandingPage/>
+      },
+      {
+        path: '/professionals',
+        element: <Professional_LandingPage/>
+      },
+      {
+        path: '/undergrads',
+        element: <Alumni_LandingPage/>
+      },
+      {
+        path: '/user-type',
+        element: <UserType/>
+      },
+      {
+        path: '/Signup',
+        element: <SignUp/>
+      },
+      {
+        path: '/Login',
+        element: <Login/>
+      },
+      {
+        path: '/privacy',
+        element: <PrivacyPolicy/>
+      },
+      {
+        path: '/terms',
+        element: <Terms/>
+      },
+      {
+        path: '/school-signup',
+        element: <PrivateKeyPage/>
+      },
+      {
+        path: '/Onboarding',
+        element: <Onboarding/>
+      },
+      {
+        element: <GlobalAuthWrapper/>,
+        children: [
+          {
+            path: '/Home',
+            element: <Home/>
+          },
+          {
+            path: '/network',
+            element: <UserNetwork/>
+          },
+          {
+            path: '/messages',
+            element: <InitializeStream/>
+          },
+          {
+            path: '/Organizations',
+            element: <Organizations/>
+          },
+          {
+            path: '/profile',
+            element: <EditProfilePage/>
+          },
+          {
+            path: '/settings',
+            element: <SettingsPage/>
+          }
+        ]
+      }
+    ]
+  }
 ]);
-
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
-      <ReportProvider>
-        <RouterProvider router={router} />
-        <ReportModal />
-      </ReportProvider>
+      <RouterProvider router={router} />
     </AuthProvider>
   </React.StrictMode>,
 )

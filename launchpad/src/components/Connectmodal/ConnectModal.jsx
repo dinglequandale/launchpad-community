@@ -118,7 +118,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
         <header>
           {!isOpportunity ? <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Contact {userData.userName} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Receive valuable opportunities, mentorship, and referrals</span></h2>
           :
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Join {userData.userName}'s {userType === "Professional" ? "Opportunity" : "Initiative"} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Send an Introductory Message</span></h2>}
+          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Learn More about {userData.userName.split(" ")[0]}'s {userType === "Professional" ? "Opportunity" : "Initiative"} <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Send an Introductory Message</span></h2>}
           <hr style={{borderColor: "var(--secondary)"}}/>
         </header>
         <main style={{ display: "flex", flexDirection: "column", gap: "7px", width: "600px", overflow: "clip"}}>

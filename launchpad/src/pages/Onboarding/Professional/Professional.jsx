@@ -61,6 +61,7 @@ const professionalQuestionsConfig = [
     id: "retiredStatus",
     text: "Are you currently retired?",
     type: "select",
+    optional: true,
     options: ["Yes", "No"].map(option => ({ value: option, label: option })),
     page: 2,
   },
@@ -203,8 +204,9 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
   };
 
   useEffect(()=>{
+    console.log("STUFF: ", professionalData);
     if(requiredQuestionsAnswered(professionalQuestionsConfig,professionalData)){
-      console.log("Can submit")
+      console.log("Can submit");
       setCanSubmit(true);
     }
     // console.log(professionalData);

@@ -31,12 +31,12 @@ export default function ProgressBar({numOfSections, currentPage, setCurrentPage,
           bottom: 'auto',
           marginRight: '-50%',
           transform: 'translate(-50%, -50%)',
-          zIndex: "5",
+          zIndex: "10",
         },
         overlay: {
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           backdropFilter: 'blur(5px)',
-          zIndex: "4",
+          zIndex: "10",
         }
       };
 

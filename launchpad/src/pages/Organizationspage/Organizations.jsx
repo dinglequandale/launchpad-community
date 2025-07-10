@@ -14,6 +14,7 @@ import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../firebase/firebaseConfig";
+import { useModal } from '../../contexts/ModalContext';
 // import jsonData from "../Onboarding/tempInitialOrgData.json";
 // import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 // import { db } from "../../firebase/firebaseConfig";
@@ -26,21 +27,16 @@ const filterContent = {
 export default function Organizations(){
 
     const {currentUser} = useAuth();
-    const [showPfpCard, setShowPfpCard] = useState(false);
+    const { openProfileModal, openConnectModal, isProfileModalOpen, isConnectModalOpen } = useModal();
     const [organizationsData, setOrganizationsData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [initLoading, setInitLoading] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    const [profileModalTop, setProfileModalTop] = useState(0);
-    const [targetUserData, setTargetUserData] = useState(null);
-    const [connectTargetUserId,setConnectTargetUserId] = useState("");
     const [tenantId, setTenantId] = useState(null);
 
     const [lastDoc, setlastDoc] = useState(null);
     const [hasMore, setHasMore] = useState(true);
     const [initLoadLength, setInitLoadLength] = useState(0);
-
-    const [connectModalVisibility, setConnectModalVisibility] = useState(false);
 
     const { chatClient } = useOutletContext();
 
@@ -51,16 +47,11 @@ export default function Organizations(){
 
     const handleConnectClick = (userData = null) => {
         if(userData){
-            setConnectTargetUserId(userData.userId);
-            setTargetUserData(userData);
-            setShowPfpCard(false);
-            setConnectModalVisibility(true);
+            openConnectModal({ userData, chat: chatClient, userId: userData.userId, isOpportunity: true });
             return;
         }
-        setConnectTargetUserId(targetUserData.userId);
-        setShowPfpCard(false);
-        setConnectModalVisibility(true);
-      }
+        // fallback: openConnectModal with last targetUserData
+    }
     
         // useEffect(() => {
         // jsonData.map(async (org, index) => {
@@ -128,7 +119,7 @@ export default function Organizations(){
     }
 
     const handleReferalClick = async (referalType, organizationData, userData) => {
-        setTargetUserData(userData);
+        handleConnectClick(userData);
  
         const referalValue = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}`];
         const methodType = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}Method`];
@@ -148,13 +139,7 @@ export default function Organizations(){
 
 
     const handleShowProfile = (userData) => {
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const modalTop = Math.max(0, scrollY + (window.innerHeight - 100) / 2 + 80);
-
-        setTargetUserData(userData);
-
-        setProfileModalTop(modalTop);
-        setShowPfpCard(true);
+        openProfileModal({ userData, onConnectClick: handleConnectClick, handleReferalClick });
     }
 
     const handleFilterChange = (filterKey, value) => {
@@ -189,12 +174,12 @@ export default function Organizations(){
     }
 
     useEffect(() => {
-        if (showPfpCard) {
+        if (isProfileModalOpen || isConnectModalOpen) {
           document.body.classList.add('modal-open');
         } else {
           document.body.classList.remove('modal-open');
         }
-      }, [showPfpCard]);
+      }, [isProfileModalOpen, isConnectModalOpen]);
 
     const loadingStyles = {
         position: 'absolute',
@@ -207,11 +192,9 @@ export default function Organizations(){
     return(
         <>
             <Toaster position={'bottom-right'} reverseOrder={false}/>
-            {connectModalVisibility && <ConnectModal onClose = {()=>setConnectModalVisibility(false)} userData={targetUserData} visibility={connectModalVisibility} chat={chatClient} userId = {connectTargetUserId} isOpportunity={true}/>}
-            {showPfpCard && <ProfileModal visibility={showPfpCard} onClose={()=>setShowPfpCard(false)} top={profileModalTop} onConnectClick={handleConnectClick} userData={targetUserData} handleReferalClick={handleReferalClick}/>}
             <TopBar/>
             <SideNav/>
-            <div className='organizationsContainer' style={{paddingTop: "4%", paddingLeft: "10%", backgroundColor: "white", paddingBottom: "2%"}}>
+            <div className='organizationsContainer' style={{paddingTop: "6%", paddingLeft: "10%", backgroundColor: "white", paddingBottom: "2%"}}>
                 <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/> 
                 
                 <main style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "20px", position: "relative"}}>

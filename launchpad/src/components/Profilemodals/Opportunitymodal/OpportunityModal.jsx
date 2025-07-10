@@ -32,6 +32,7 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
   const [showLast, setShowLast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [changesMade, setChangesMade] = useState(false);
 
   const { currentUser } = useAuth();
   // console.log("Opportunity data:", opportunityData);
@@ -114,6 +115,7 @@ const publishOpportunityData = async () => {
       timeFrame: 'One Week',
       learnMore: 'Website',
       apply: 'Email',
+      applicantRequirements: [],
       organizationLogoPreview: null,
       createdByUserName: "", createdByUserName: userName});
 
@@ -275,7 +277,7 @@ const publishOpportunityData = async () => {
     // Page 4
     {
       id: "learnMore",
-      text: "Where can students find more information on this opportunity?",
+      text: "Students can find more information via:",
       type: "link",
       placeholder: "Paste a link here!",
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
@@ -284,7 +286,7 @@ const publishOpportunityData = async () => {
     },
     {
       id: "apply",
-      text: `How should ${organizationData.organizationType === "Community Service" ? "volunteer" : "apply"} for this opportunity?`,
+      text: `Students can ${organizationData.organizationType === "Community Service" ? "volunteer" : "apply"} via:`,
       type: "link",
       placeholder: "Paste a link here!",
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
@@ -293,7 +295,7 @@ const publishOpportunityData = async () => {
     },
     {
       id: "organizationLogoPreview",
-      text: "Upload a logo that embodies your opportunity! (optional)",
+      text: "Upload a logo that embodies your opportunity: (optional)",
       type: "file",
       accept: ".jpg",
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
@@ -320,6 +322,7 @@ const publishOpportunityData = async () => {
       ...organizationData,
       [name]: value
     });
+    setChangesMade(true);
   };
 
   const handleDropdownChange = (id, label) => {
@@ -355,10 +358,14 @@ const publishOpportunityData = async () => {
     />
     <div>
       <SaveChanges visibility={makeChangesVisibility} onCancel={ ()=>{
-              saveOpportunityData();
+              // saveOpportunityData();
               setMakeChangesVisibility(false);
               onClose();
-            }} onVerify={onClose}/>
+            }} onVerify={() => {
+                saveOpportunityData();
+                setMakeChangesVisibility(false);
+                onClose();
+              }}/>
       <OpportunityContext.Provider 
       value={{
         organizationData,
@@ -383,13 +390,19 @@ const publishOpportunityData = async () => {
             {currentOpportunityPage < 5 && <div name="estimated-time" style={{position: "absolute", fontSize: "17px", fontWeight: "300"}}>
               Est. Time: {5 - currentOpportunityPage} minute{currentOpportunityPage < 4 ? "s" : ""}
             </div>}
-            <button className='btnClose' onClick={()=>setMakeChangesVisibility(true)} style={{background:"none"}}><CgClose size={25}/></button>
+            <button className='btnClose' onClick={()=>{
+              if(changesMade){
+                setMakeChangesVisibility(true);
+              }
+              else{
+                onClose();
+              }}} style={{background:"none"}}><CgClose size={25}/></button>
             <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
             <hr style={{borderColor: "var(--secondary)"}}/>
             <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
           </header>
           <main style={{paddingTop:"10px"}}>
-          <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
+          <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px", maxHeight: "500px"}}>
             {renderPage()}
           </form>
           </main>
@@ -528,70 +541,142 @@ function ApplicantionTimeline() {
 }
 
 function ApplicantInfo({handleDropdownChange}){
-  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
+  const { organizationData, setOrganizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
   const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 2 && question.includers.includes(organizationData.organizationType)));
+
+  // Requirements options
+  const defaultRequirements = [
+    { id: 'resume', label: 'Resume (as a PDF attachment)' },
+    { id: 'intro', label: 'A short intro about yourself' },
+    { id: 'why', label: 'A concise answer to the question(s): "Why are you interested in this opportunity?"' },
+  ];
+  const [customRequirement, setCustomRequirement] = useState('');
+  const requirements = organizationData.applicantRequirements || [];
+
+  const handleRequirementChange = (id, checked) => {
+    let updated = requirements.filter(r => !defaultRequirements.map(d => d.id).includes(r));
+    if (checked) {
+      updated = [...requirements, id];
+    } else {
+      updated = requirements.filter(r => r !== id);
+    }
+    setOrganizationData({ ...organizationData, applicantRequirements: updated });
+  };
+
+  const handleCustomRequirementChange = (e) => {
+    e.preventDefault();
+    setCustomRequirement(e.target.value);
+  };
+
+  const handleAddCustomRequirement = (e) => {
+    e.preventDefault();
+    if (customRequirement.trim() && !requirements.includes(customRequirement.trim())) {
+      setOrganizationData({ ...organizationData, applicantRequirements: [...requirements, customRequirement.trim()] });
+      setCustomRequirement('');
+    }
+  };
 
   return(
     <>
     <main>
       <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>Explain what you need from your applicants.</h2>
       <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center"}}>
-            {questionsForPage
-              .filter(
-                (question) =>
-                  (question.id === "organizationTags" && !question.includers.includes(question.id)) ||
-                  (question.id === "applicantPosition"  && !question.includers.includes(question.id))
-              )
-              .map((question) => (
-                <div key={question.id} style={{}}>
-                  {question.required && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "center", justifyContent: "center" }}>
-                      <label htmlFor={question.id}>{question.text}</label>
-                    {question.id === "organizationTags" ? <div style={{width: "360px", textAlign: "left"}}>
-                      <OnboardingDropdown
-                        showQuestion={false}
-                        key={question.id}
-                        question={question.text}
-                        options={question.options}
-                        selectedOption={organizationData[question.id] || (question.type === 'multi-select' ? [] : '')}
-                        onChange={(label) => handleDropdownChange(question.id, label)}
-                        type={question.type}
-                      /> 
-                    </div> : 
-                    <input
-                      style={{width: "330px"}}
-                      id={question.id}
-                      name={question.id}
-                      value={organizationData[question.id]}
-                      onChange={handleChange}
-                      maxLength={question.maxLength}
-                      placeholder={question.placeholder}
-                    />}
-                    </div>
-                  )}
-                </div>
-              ))}
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "20px", marginBottom: "20px" }}>
+        {/* Requirements checklist */}
+        <div style={{border: '1px solid var(--secondary)', borderRadius: 8, padding: 16, background: '#f8fafd'}}>
+          <div style={{fontWeight: 600, marginBottom: 8}}>What do you want applicants to submit?</div>
+          {defaultRequirements.map(req => (
+            <label key={req.id} style={{display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6}}>
+              <input
+                type="checkbox"
+                style={{marginTop: "10px"}}
+                checked={requirements.includes(req.id)}
+                onChange={e => handleRequirementChange(req.id, e.target.checked)}
+              />
+              {req.label}
+            </label>
+          ))}
+          {/* Custom requirement */}
+          <div style={{display: 'flex', alignItems: 'center', gap: 8, marginTop: 8}}>
+            <input
+              type="text"
+              placeholder="Other (add your own)"
+              value={customRequirement}
+              onChange={handleCustomRequirementChange}
+              style={{flex: 1, padding: 4}}
+              maxLength={80}
+            />
+            <button className="btnSaveChanges" style={{borderRadius: "50%"}}>
+            <GrAdd style={{padding: '2px'}} onClick={handleAddCustomRequirement} size={20}/>
+            </button>
           </div>
-
+          {/* Show added custom requirements */}
+          {requirements.filter(r => !defaultRequirements.map(d => d.id).includes(r)).length > 0 && (
+            <div style={{marginTop: 8, fontSize: 13, color: '#333'}}>
+              <div style={{fontWeight: 500}}>Custom requirements:</div>
+              <ul style={{margin: 0, paddingLeft: 18}}>
+                {requirements.filter(r => !defaultRequirements.map(d => d.id).includes(r)).map((r, i) => (
+                  <li key={i}>{r}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+        {/* ...existing code for questions... */}
+        <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center"}}>
           {questionsForPage
-            .filter((question) => question.id === "applicantExpectations")
+            .filter(
+              (question) =>
+                (question.id === "organizationTags" && !question.includers.includes(question.id)) ||
+                (question.id === "applicantPosition"  && !question.includers.includes(question.id))
+            )
             .map((question) => (
-              <div key={question.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-                <label htmlFor={question.id}>{question.text}</label>
-                <textarea
-                  className="applicantExpectations"
-                  id={question.id}
-                  name={question.id}
-                  value={organizationData[question.id]}
-                  onChange={handleChange}
-                  // maxLength={question.maxLength}
-                  placeholder={question.placeholder}
-                ></textarea>
+              <div key={question.id} style={{}}>
+                {question.required && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "center", justifyContent: "center" }}>
+                    <label htmlFor={question.id}>{question.text}</label>
+                  {question.id === "organizationTags" ? <div style={{width: "360px", textAlign: "left"}}>
+                    <OnboardingDropdown
+                      showQuestion={false}
+                      key={question.id}
+                      question={question.text}
+                      options={question.options}
+                      selectedOption={organizationData[question.id] || (question.type === 'multi-select' ? [] : '')}
+                      onChange={(label) => handleDropdownChange(question.id, label)}
+                      type={question.type}
+                    /> 
+                  </div> : 
+                  <input
+                    style={{width: "330px"}}
+                    id={question.id}
+                    name={question.id}
+                    value={organizationData[question.id]}
+                    onChange={handleChange}
+                    maxLength={question.maxLength}
+                    placeholder={question.placeholder}
+                  />}
+                  </div>
+                )}
               </div>
             ))}
         </div>
+        {questionsForPage
+          .filter((question) => question.id === "applicantExpectations")
+          .map((question) => (
+            <div key={question.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+              <label htmlFor={question.id}>{question.text}</label>
+              <textarea
+                className="applicantExpectations"
+                id={question.id}
+                name={question.id}
+                value={organizationData[question.id]}
+                onChange={handleChange}
+                // maxLength={question.maxLength}
+                placeholder={question.placeholder}
+              ></textarea>
+            </div>
+          ))}
+      </div>
     </main>
     </>
   )
