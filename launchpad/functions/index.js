@@ -13,6 +13,7 @@ const {sendReport} = require("./callableFunctions/sendReport");
 const {sendSESEmail} = require("./callableFunctions/sendSESEmail");
 const {generateVerificationLink} = require("./callableFunctions/generateVerificationLink");
 const {verifyParentToken} = require("./callableFunctions/verifyParentToken");
+const {deleteAuthUsers} = require("./callableFunctions/deleteAuthUsers");
 
 exports.createStreamToken = createStreamToken;
 exports.sendInviteEmail = sendInviteEmail;
@@ -23,3 +24,4 @@ exports.sendReport = sendReport;
 exports.sendSESEmail = sendSESEmail;
 exports.generateVerificationLink = generateVerificationLink;
 exports.verifyParentToken = verifyParentToken;
+exports.deleteAuthUsers = deleteAuthUsers;

@@ -5,6 +5,7 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 import { PiBuilding, PiGraduationCap, PiStudent, PiSuitcase } from "react-icons/pi";
 import Landing_Nav from "./Landing_Nav/Landing_Nav";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const USER_TYPES = {
   highschooler: {
