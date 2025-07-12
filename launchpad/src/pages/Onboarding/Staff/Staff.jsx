@@ -25,24 +25,24 @@ const staffQuestionsConfig = [
     optional: true,
     page: 1
   },
-  {
-    id: "schoolAttending",
-    text: "Which school are you an administrator/staff at?",
-    type: "select",
-    options: highSchools,
-    placeholder: "N/A",
-    page: 1
-  },
+  // {
+  //   id: "schoolAttending",
+  //   text: "Which school are you an administrator/staff at?",
+  //   type: "select",
+  //   options: highSchools,
+  //   placeholder: "N/A",
+  //   page: 1
+  // },
   {
     id: "schoolRole",
     text: "What is your role/position at the school?",
-    placeholder: "E.g. Principal, Counselor, IT Admin",
+    placeholder: "E.g. IB History Teacher",
     type: "text",
     page: 2
   },
   {
     id: "areasOfInterest",
-    text: "What are your main fields of interest or expertise?",
+    text: "What are your areas of expertise?",
     type: "multi-select",
     options: careerInterests,
     page: 2
@@ -127,7 +127,7 @@ export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolI
 
   // Validation: require name, school, role, work email, and areasOfInterest
   useEffect(() => {
-    const required = staffData.userName && staffData.schoolAttending && staffData.schoolRole && staffData.areasOfInterest && staffData.areasOfInterest.length > 0;
+    const required = staffData.userName && staffData.schoolRole && staffData.areasOfInterest && staffData.areasOfInterest.length > 0;
     setCanSubmit(!!required);
   }, [staffData, setCanSubmit]);
 

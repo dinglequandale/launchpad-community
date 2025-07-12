@@ -111,13 +111,13 @@ const highSchoolQuestionsConfig = [
     page: 1
   },
   // Page 2
-  {
-    id: "schoolAttending",
-    text: "What school do you go to?",
-    type: "select",
-    options: highSchools,
-    page: 2,
-  },
+  // {
+  //   id: "schoolAttending",
+  //   text: "What school do you go to?",
+  //   type: "select",
+  //   options: highSchools,
+  //   page: 2,
+  // },
   {
     id: "email",
     optional: true

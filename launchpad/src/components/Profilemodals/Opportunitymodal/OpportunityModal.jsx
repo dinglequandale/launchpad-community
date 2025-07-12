@@ -546,9 +546,9 @@ function ApplicantInfo({handleDropdownChange}){
 
   // Requirements options
   const defaultRequirements = [
-    { id: 'resume', label: 'Resume (as a PDF attachment)' },
-    { id: 'intro', label: 'A short intro about yourself' },
-    { id: 'why', label: 'A concise answer to the question(s): "Why are you interested in this opportunity?"' },
+    { id: 'resume', label: 'Resume (PDF)' },
+    { id: 'intro', label: 'Introduction' },
+    { id: 'why', label: 'A concise answer to the question: "Why are you interested in this opportunity?"' },
   ];
   const [customRequirement, setCustomRequirement] = useState('');
   const requirements = organizationData.applicantRequirements || [];

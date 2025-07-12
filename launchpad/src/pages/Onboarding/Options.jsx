@@ -55,6 +55,7 @@ const careerInterests = [
   {"value": "biology", "label": "Biology", "group": "Life Sciences"},
   {"value": "building_trades", "label": "Hands-On Building Trades (Carpentry, Welding, Plumbing, and Construction)", "group": "Hands-On Trades"},
   {"value": "business", "label": "Business Management", "group": "Business"},
+  {"value": "business_consulting", "label": "Business Consulting", "group": "Business"},
   {"value": "chemistry", "label": "Chemistry", "group": "STEM"},
   {"value": "communications", "label": "Communications Study", "group": "Arts & Humanities"},
   {"value": "computer_science", "label": "Computer Science", "group": "STEM"},

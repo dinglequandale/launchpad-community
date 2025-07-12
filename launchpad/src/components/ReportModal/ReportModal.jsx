@@ -6,7 +6,7 @@ import { useReport } from '../../contexts/report/ReportContext';
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 export default function ReportModal() {
-    const { reportVisibility, setReportVisibility, isSubmitting, setIsSubmitting, reportTarget, reportedUser, setReportedUser, showReportUserName } = useReport();
+    const { reportVisibility, setReportVisibility, isSubmitting, setIsSubmitting, reportTarget, reportedUser, setReportedUser, showReportUserName, setShowReportUserName } = useReport();
     const [reportReason, setReportReason] = useState('');
 
     const handleReport = async () => {
@@ -36,6 +36,8 @@ export default function ReportModal() {
             toast.error('Failed to submit report. Please try again.');
         } finally {
             setIsSubmitting(false);
+            setReportedUser("");
+            setShowReportUserName(true);
         }
     };
 
@@ -48,9 +50,13 @@ export default function ReportModal() {
     return (
         <div className="reportDialogContainer">
             <div className="reportDialog" style={{gap: "20px"}}>
-                <button className='btnClose' onClick={() => setReportVisibility(false)} style={{background:"none"}}><CgClose size={25}/></button>
+                <button className='btnClose' onClick={() => {
+                    setShowReportUserName(true);
+                    setReportedUser("");
+                    setReportVisibility(false);
+                    }} disabled={isSubmitting} style={{background:"none"}}><CgClose size={25}/></button>
                 <h3>Report {reportTarget}</h3>
-                {showReportUserName && <input type="text" className="onboardingInput" onChange={(e) => setReportedUser(e.target.value)} value={reportedUser} placeholder="Input the reported user's name" style={{width: "95%", padding: "10px", fontSize: "18px"}} />}
+                {showReportUserName && setReportedUser && <input type="text" className="onboardingInput" onChange={(e) => setReportedUser(e.target.value)} value={reportedUser} placeholder="Input the reported user's name" style={{width: "95%", padding: "10px", fontSize: "18px"}} />}
                 <textarea
                     className="onboardingInput"
                     placeholder="Please provide a reason for reporting..."

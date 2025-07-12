@@ -165,8 +165,8 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     return(
         <>
             {/* The ParentalConnectionModal component is now managed globally */}
-            <div className='blurOverlay'>
-                <div className='profileModalContent' style={{ top: top }} ref={menuRef}>
+            <div className='profileModalContainer'>
+                <div className='profileModalDialog' ref={menuRef}>
                     <div style={{position:"absolute", right: "10px", top: "9px"}}>
                         <div className="modal-right-header">
                             <BiFlag 
