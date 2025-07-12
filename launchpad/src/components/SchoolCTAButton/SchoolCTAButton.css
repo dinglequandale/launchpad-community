@@ -1,0 +1,212 @@
+.school-cta-button {
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  margin: 0 auto;
+}
+
+.school-cta-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s ease;
+}
+
+.school-cta-button:hover::before {
+  left: 100%;
+}
+
+/* Awty-specific CTA button */
+.awty-cta {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+  backdrop-filter: blur(10px);
+  border: 3px solid transparent;
+  padding: 1.5rem 2.5rem;
+  min-width: 400px;
+  max-width: 420px;
+  width: clamp(280px, 25vw, 420px);
+}
+
+.awty-cta:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  border-color: var(--secondary);
+  animation: glow 2s ease-in-out infinite;
+}
+
+.cta-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.mascot-container {
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, white, var(--secondaryHighlight));
+  padding: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.awty-cta:hover .mascot-container {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.mascot-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.cta-text {
+  flex: 1;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.school-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin-bottom: 0.2rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.cta-action {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--secondary);
+  letter-spacing: 0.5px;
+}
+
+/* Default CTA button - matches original cta-button styling */
+.default-cta {
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  color: var(--secondary);
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  font-weight: 600;
+  width: clamp(200px, 20%, 300px);
+  border-radius: 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border: 3px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(10px);
+}
+
+.default-cta:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  border-color: var(--secondary);
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Glow animation */
+@keyframes glow {
+  0%, 100% { 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); 
+  }
+  50% { 
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 255, 255, 0.6); 
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .awty-cta {
+    min-width: 280px;
+    padding: 1.2rem 2rem;
+  }
+  
+  .cta-content {
+    gap: 0.8rem;
+  }
+  
+  .mascot-container {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .school-name {
+    font-size: 0.8rem;
+  }
+  
+  .cta-action {
+    font-size: 1rem;
+  }
+  
+  .default-cta {
+    width: 80%;
+    font-size: 1.2rem;
+    padding: 0.75rem 1.5rem;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .awty-cta {
+    min-width: 250px;
+    padding: 1rem 1.5rem;
+  }
+  
+  .mascot-container {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .school-name {
+    font-size: 0.7rem;
+  }
+  
+  .cta-action {
+    font-size: 0.9rem;
+  }
+  
+  .default-cta {
+    width: 90%;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    margin: 0 auto;
+  }
+}
+
+/* Focus styles for accessibility */
+.school-cta-button:focus {
+  outline: 2px solid var(--secondary);
+  outline-offset: 2px;
+}
+
+/* Loading state */
+.school-cta-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.school-cta-button:disabled:hover {
+  transform: none;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+} 

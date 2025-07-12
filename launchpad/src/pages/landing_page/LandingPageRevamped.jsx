@@ -6,35 +6,25 @@ import { PiBuilding, PiGraduationCap, PiStudent, PiSuitcase } from "react-icons/
 import Landing_Nav from "./Landing_Nav/Landing_Nav";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { useSchoolConfig } from "../../utils/subdomainUtils";
+import SchoolCTAButton from "../../components/SchoolCTAButton/SchoolCTAButton";
 
-const USER_TYPES = {
+const createUserTypes = (schoolConfig) => ({
   highschooler: {
-    featureCards: [
-      {
-        title: "Make Invaluable Connections",
-        text: (
-          <>
-            <span className="highlight">Connect</span> with industry professionals, undergraduates at your dream school, and like-minded peers— all committed to helping you. With just one click, you gain access to a world of opportunities.
-          </>
-        ),
-      },
-      {
-        title: "Discover Meaningful Opportunities",
-        text: (
-          <>
-            <span className="highlight">Find</span> volunteer and leadership positions in town, in line with your interests. Discover workplace opportunities while learning from undergrads and professionals who have done what you want to do!
-          </>
-        ),
-      },
-      {
-        title: "Explore Careers & Colleges",
-        text: (
-          <>
-            <span className="highlight">Complete</span> reputed surveys to find the careers that best suit you. Connect with undergrads and professionals in your fields of interest to gain insight on college and work life. Explore shadow, intern, and job opportunities.
-          </>
-        ),
-      },
-    ],
+    featureCards: schoolConfig.featureCards.highschooler.map(card => ({
+      title: card.title,
+      text: (
+        <>
+          {card.text.split(' ').map((word, index) => {
+            const cleanWord = word.replace(/[^\w]/g, '').toLowerCase();
+            if (cleanWord === 'connect' || cleanWord === 'find' || cleanWord === 'complete') {
+              return <span key={index} className="highlight">&nbsp;{word}</span>;
+            }
+            return ' ' + word;
+          })}
+        </>
+      ),
+    })),
     heroTitle: (
       <>
         <span style={{ color: "var(--neutral)", textDecoration: "underline" }}>Empowerin</span>
@@ -43,40 +33,28 @@ const USER_TYPES = {
     ),
     subheader: (
       <>
-        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> Awty's youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
+        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> {schoolConfig.schoolShortName}s' youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
       </>
     ),
-    cta: "Get Started",
-    ctaSection: "Sign Up Now",
+    cta: schoolConfig.ctaText,
+    ctaSection: schoolConfig.ctaButtonText,
     bgClass: "landing-page",
   },
   alumni: {
-    featureCards: [
-      {
-        title: "Explore Careers & Opportunities",
-        text: (
-          <>
-            <span className="highlight">Connect</span> with professionals in your fields of interest to gain insights on work life and explore intern/job opportunities! Talk with other skilled undergrads. Complete reputed surveys to find the careers that best suit you.
-          </>
-        ),
-      },
-      {
-        title: "Discover Meaningful Opportunities",
-        text: (
-          <>
-            Many students seek to <span className="highlight">follow in your footsteps</span> and attend the same colleges. Share your experiences, offer advice, and <span className="highlight">help guide Awty's next generation</span>!
-          </>
-        ),
-      },
-      {
-        title: "Promote Your Initiatives",
-        text: (
-          <>
-            <span className="highlight">Have a growing business?</span> A budding project? Promote your initiative to professionals. Looking for help? Accelerate your project by connecting with talented undergraduates and high schoolers!
-          </>
-        ),
-      },
-    ],
+    featureCards: schoolConfig.featureCards.alumni.map(card => ({
+      title: card.title,
+      text: (
+        <>
+          {card.text.split(' ').map((word, index) => {
+            const cleanWord = word.replace(/[^\w]/g, '').toLowerCase();
+            if (cleanWord === 'connect' || cleanWord === 'follow' || cleanWord === 'help' || cleanWord === 'guide' || cleanWord === 'next' || cleanWord === 'generation' || cleanWord === 'business' || cleanWord === 'project') {
+              return <span key={index} className="highlight">&nbsp;{word}</span>;
+            }
+            return ' ' + word;
+          })}
+        </>
+      ),
+    })),
     heroTitle: (
       <>
         <span style={{ color: "var(--neutral)", textDecoration: "underline" }}>Empowerin</span>
@@ -85,40 +63,28 @@ const USER_TYPES = {
     ),
     subheader: (
       <>
-        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> Awty's youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
+        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> {schoolConfig.schoolShortName}s' youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
       </>
     ),
-    cta: "Get Started",
-    ctaSection: "Sign Up Now",
+    cta: schoolConfig.ctaText,
+    ctaSection: schoolConfig.ctaButtonText,
     bgClass: "landing-page-alumni",
   },
   professional: {
-    featureCards: [
-      {
-        title: "Guide the Next Generation",
-        text: (
-          <>
-            Our platform hosts an exceptional youth studying at Awty and <span className="highlight">top U.S colleges</span> (Princeton, Carnegie Mellon, etc ...), all eager to excel. By joining Launchpad, you are empowered to <span className="highlight">shape their future</span> by offering insights, advice, and workplace opportunities.
-          </>
-        ),
-      },
-      {
-        title: "Expand Your Professional Network",
-        text: (
-          <>
-            As a professional, you are certainly <span className="highlight">not limited</span> to networking with students. Indeed, Launchpad equips users with <span className="highlight">powerful search filters</span> to seamlessly connect with other professionals in the Awty community!
-          </>
-        ),
-      },
-      {
-        title: "Promote Opportunities",
-        text: (
-          <>
-            Have any <span className="highlight">internship positions</span> open? <span className="highlight">Looking for volunteers</span> for a certain project? Open to job applications? <span className="highlight">Promote your listings</span> to qualified undergraduates and/or motivated highschoolers!
-          </>
-        ),
-      },
-    ],
+    featureCards: schoolConfig.featureCards.professional.map(card => ({
+      title: card.title,
+      text: (
+        <>
+          {card.text.split(' ').map((word, index) => {
+            const cleanWord = word.replace(/[^\w]/g, '').toLowerCase();
+            if (cleanWord === 'exceptional' || cleanWord === 'top' || cleanWord === 'colleges' || cleanWord === 'shape' || cleanWord === 'future' || cleanWord === 'limited' || cleanWord === 'powerful' || cleanWord === 'filters' || cleanWord === 'community' || cleanWord === 'internship' || cleanWord === 'positions' || cleanWord === 'volunteers' || cleanWord === 'project' || cleanWord === 'applications' || cleanWord === 'listings') {
+              return <span key={index} className="highlight">&nbsp;{word}</span>;
+            }
+            return ' ' + word;
+          })}
+        </>
+      ),
+    })),
     heroTitle: (
       <>
         <span style={{ color: "var(--neutral)", textDecoration: "underline" }}>Empowerin</span>
@@ -127,33 +93,43 @@ const USER_TYPES = {
     ),
     subheader: (
       <>
-        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> Awty's youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
+        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> {schoolConfig.schoolShortName}s' youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
       </>
     ),
-    cta: "Get Started",
-    ctaSection: "Sign Up Now",
+    cta: schoolConfig.ctaText,
+    ctaSection: schoolConfig.ctaButtonText,
     bgClass: "landing-page-professional",
   },
-};
+});
 
-const WHO_ARE_WE = (
-  <>
-    <span style={{ fontWeight: "bolder" }}>Launchpad</span> is a <span className="highlight">free local social network</span> designed to empower Awty's youth by creating meaningful connections among:
-  </>
-);
-
-const NETWORK_GRID = [
-  { icon: <PiStudent />, label: "Motivated highschoolers" },
-  { icon: <PiGraduationCap />, label: "Qualified undergraduates" },
-  { icon: <PiSuitcase />, label: "Experienced professionals" },
-  { icon: <PiBuilding />, label: "Community organizations" },
-];
-
-const MISSION = (
-  <>
-    <span className="highlight">We act as a launchpad</span> for high school students' potential and passion, propelling them into college and beyond. By fostering a vibrant network of mentors, professionals, alumni, and high quality resources, we empower our youth to strengthen their portfolio of work experience and extracurriculars.
-  </>
-);
+const createStaticContent = (schoolConfig) => ({
+  WHO_ARE_WE: (
+    <>
+      <span style={{ fontWeight: "bolder" }}>Launchpad</span> is a <span className="highlight">free local social network</span> designed to empower {schoolConfig.schoolShortName}s' youth by creating meaningful connections among:
+    </>
+  ),
+  
+  NETWORK_GRID: [
+    { icon: <PiStudent />, label: "Motivated highschoolers" },
+    { icon: <PiGraduationCap />, label: "Qualified undergraduates" },
+    { icon: <PiSuitcase />, label: "Experienced professionals" },
+    { icon: <PiBuilding />, label: "Community organizations" },
+  ],
+  
+  MISSION: (
+    <>
+      <span className="highlight">We act as a launchpad</span> for high school students' potential and passion, propelling them into college and beyond. By fostering a vibrant network of mentors, professionals, alumni, and high quality resources, we empower our youth to strengthen their portfolio of work experience and extracurriculars.
+    </>
+  ),
+  
+  GOAL: (
+    <>
+      Our aim is to provide {schoolConfig.schoolShortName}s' youth with 
+      <br />
+      <span className="highlight">accessible learning, leadership, and workplace opportunities</span>.
+    </>
+  ),
+});
 
 function useScrollFadeIn() {
   const [isVisible, setIsVisible] = useState(false);
@@ -176,6 +152,9 @@ export default function LandingPageRevamped() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const userTypeParam = searchParams.get("userType");
+  const schoolConfig = useSchoolConfig();
+  const USER_TYPES = createUserTypes(schoolConfig);
+  const STATIC_CONTENT = createStaticContent(schoolConfig);
   const userType = USER_TYPES[userTypeParam] ? userTypeParam : "highschooler";
   const content = USER_TYPES[userType];
 
@@ -222,7 +201,7 @@ export default function LandingPageRevamped() {
             <h1 className="landing-title">{content.heroTitle}</h1>
           </div>
           <p className="subheader">{content.subheader}</p>
-          <button className="cta-button btnUnfilled" onClick={() => handleJoin()}>{content.cta}</button>
+          <SchoolCTAButton onClick={() => handleJoin()} variant="primary" />
         </header>
 
         <main className="main-content">
@@ -259,9 +238,9 @@ export default function LandingPageRevamped() {
             <div className="container">
               <h2 className="section-title">Who are we?</h2>
               <div className="content-wrapper">
-                <p className="description">{WHO_ARE_WE}</p>
+                <p className="description">{STATIC_CONTENT.WHO_ARE_WE}</p>
                 <div className="network-grid">
-                  {NETWORK_GRID.map((item, idx) => (
+                  {STATIC_CONTENT.NETWORK_GRID.map((item, idx) => (
                     <div className="network-item" key={idx}>
                       <i>{item.icon}</i>
                       <span>{item.label}</span>
@@ -269,7 +248,7 @@ export default function LandingPageRevamped() {
                   ))}
                 </div>
                 <p className="description goal">
-                  Our aim is to provide Awty's youth with <span className="highlight">accessible learning, leadership, and workplace opportunities</span>.
+                  {STATIC_CONTENT.GOAL}
                 </p>
               </div>
             </div>
@@ -285,8 +264,8 @@ export default function LandingPageRevamped() {
             }}
           >
             <h2 className="mission-title">Our Mission</h2>
-            <div className="mission-container">
-              <p className="mission-text">{MISSION}</p>
+            <div className="mission-container" style={{marginBottom: "50px"}}>
+              <p className="mission-text">{STATIC_CONTENT.MISSION}</p>
             </div>
           </section>
 
@@ -300,7 +279,7 @@ export default function LandingPageRevamped() {
             }}
           >
             <span className="next-steps-title">Ready to take the next step?</span>
-            <button className="cta-button btnUnfilled" onClick={() => handleJoin()}>{content.ctaSection}</button>
+            <SchoolCTAButton onClick={() => handleJoin()} variant="primary" />
           </section>
 
           <div style={{ display: "flex", justifyContent: "center", paddingBottom: "10px" }}>
