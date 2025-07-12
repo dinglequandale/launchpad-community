@@ -9,10 +9,10 @@ import { useAuth } from "../../../contexts/auth/AuthContext";
 export default function PrivateKeyPage() {
     let schoolId, schoolDisplayName;
     const navigate = useNavigate();
-    const {userLoggedIn} = useAuth();
+    const {userLoggedIn, currentUser} = useAuth();
     const today = (new Date()).toLocaleDateString('en-US');
 
-    console.log(localStorage.getItem("tempSchoolInfo"));
+    console.log(userLoggedIn,currentUser)
 
     const onSubmit = async (key) => {
         const loadingToast = toast.loading('Verifying your code...');

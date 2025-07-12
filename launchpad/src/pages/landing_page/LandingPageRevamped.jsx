@@ -179,13 +179,23 @@ export default function LandingPageRevamped() {
   const userType = USER_TYPES[userTypeParam] ? userTypeParam : "highschooler";
   const content = USER_TYPES[userType];
 
-  const handleJoin = () => {
+  const handleJoin = (type="Signup") => {
     if (!userLoggedIn) {
-      navigate("/Login");
+      // TODO: Remove this
+      localStorage.clear();
+      if(type === "Signup"){
+        navigate("/Signup");
+      }
+      else{
+        navigate("/Login");
+      }
+
     } else {
       navigate("/Home");
     }
   };
+
+  console.log("user logged in?: " + userLoggedIn)
 
   // Section fade-in hooks
   const [featureRef, featureVisible] = useScrollFadeIn();
@@ -203,8 +213,8 @@ export default function LandingPageRevamped() {
             <Landing_Nav />
             <div style={{ display: "flex", gap: "20px", marginRight: "10px" }}>
               <div style={{ display: "flex", gap: "10px", justifyContent: "center", alignItems: "center" }}>
-                <button className="authButtons btnUnfilled" onClick={() => navigate("/Signup")}>Signup</button>
-                <button className="authButtons" onClick={() => navigate("/Login")}>Login</button>
+                <button className="authButtons btnUnfilled" onClick={() => handleJoin("Signup")}>Signup</button>
+                <button className="authButtons" onClick={() => handleJoin("Login")}>Login</button>
               </div>
             </div>
           </nav>
@@ -212,7 +222,7 @@ export default function LandingPageRevamped() {
             <h1 className="landing-title">{content.heroTitle}</h1>
           </div>
           <p className="subheader">{content.subheader}</p>
-          <button className="cta-button btnUnfilled" onClick={handleJoin}>{content.cta}</button>
+          <button className="cta-button btnUnfilled" onClick={() => handleJoin()}>{content.cta}</button>
         </header>
 
         <main className="main-content">
@@ -290,7 +300,7 @@ export default function LandingPageRevamped() {
             }}
           >
             <span className="next-steps-title">Ready to take the next step?</span>
-            <button className="cta-button btnUnfilled" onClick={handleJoin}>{content.ctaSection}</button>
+            <button className="cta-button btnUnfilled" onClick={() => handleJoin()}>{content.ctaSection}</button>
           </section>
 
           <div style={{ display: "flex", justifyContent: "center", paddingBottom: "10px" }}>

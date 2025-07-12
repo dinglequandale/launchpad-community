@@ -60,7 +60,7 @@ const MobileBlocker = ({ children }) => {
             marginBottom: '1rem',
             color: '#1f2937'
           }}>
-            Mobile Access Not Available
+            Small Screen Access Not Available
           </h2>
           <div style={{ 
             fontSize: '1rem',
@@ -68,8 +68,8 @@ const MobileBlocker = ({ children }) => {
             marginBottom: '1rem'
           }}>
             <p style={{ marginBottom: '1rem' }}>
-              This application is currently optimized for desktop use only. 
-              Please access it from a computer for the best experience.
+              This application is currently optimized for larger screen use only. 
+              Please expand this tab, or access the app from a computer for best experience.
             </p>
             <p style={{ 
               fontSize: '0.875rem',
