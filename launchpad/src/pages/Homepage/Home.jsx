@@ -94,7 +94,8 @@ export default function Home(){
         htmlTemplate: parentVerificationResendTemplate({
           studentName: userBasicInfo.userName ? userBasicInfo.userName.split(" ")[0] : "",
           parentName: "",
-          verificationLink: verificationLink})});
+          verificationLink: verificationLink}),
+        emailType: "parent_verification"});
     };
 
     

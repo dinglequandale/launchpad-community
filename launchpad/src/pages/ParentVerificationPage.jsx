@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { capitalizeFirstLetter } from './Homepage/Home';
 import { studentAccountReminderTemplate, studentConnectionReminderTemplate } from '../utils/parentVerificationTemplates';
+import './ParentVerificationPage.css';
 
 export default function ParentVerificationPage() {
   const [searchParams] = useSearchParams();
@@ -51,7 +52,8 @@ export default function ParentVerificationPage() {
         const result = await sendSESEmail({
           recipient: [ studentEmail ], 
           subject: "Your Connection Was Approved! 🎉", 
-          htmlTemplate: studentConnectionReminderTemplate({connectionName: connectionUserName})});
+          htmlTemplate: studentConnectionReminderTemplate({connectionName: connectionUserName}),
+          emailType: "student_notification"});
       };
     }
   };
@@ -82,69 +84,133 @@ export default function ParentVerificationPage() {
         const result = await sendSESEmail({
           recipient: [ studentEmail ], 
           subject: "Your Launchpad Account Was Approved! 🎉", 
-          htmlTemplate: studentAccountReminderTemplate()});
+          htmlTemplate: studentAccountReminderTemplate(),
+          emailType: "student_notification"});
       }
     }
   };
 
-  if (submitted) {
-    return (
-      <div style={{width: "100vw", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center"}}>
-        <div style={{ maxWidth: 500, margin: '40px auto', padding: 32, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)', textAlign: 'center' }}>
-          <h2>Thank you!</h2>
-          <p>Your response has been recorded. We appreciate your involvement in keeping Launchpad safe and supportive for students.</p>
-        </div>
+  const renderSuccessContent = () => (
+    <div className="verification-content">
+      <div className="success-icon">✓</div>
+      <h2>Thank You!</h2>
+      <p>Your response has been recorded successfully.</p>
+      <p>We appreciate your involvement in keeping Launchpad safe and supportive for students.</p>
+      <div className="verification-actions">
+        <a href="https://launchpadhouston.com" className="home-link">
+          Return to Launchpad
+        </a>
       </div>
-    );
-  }
+    </div>
+  );
 
-  if (mode === 'connection') {
-    return (
-      <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "100vw", height: "100vh", backgroundImage: "url(/assets/onboarding_backdrop.png)"}}>
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column", textAlign: "center", maxWidth: 500, padding: 32, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-        <h2>Approve Connection Request</h2>
-        <p>{capitalizeFirstLetter(childName)} would like to connect with {connectionName} on Launchpad. Do you approve this connection?</p>
-        {error && <div style={{ color: 'red', marginBottom: 12 }}>{error}</div>}
-        <div style={{ display: 'flex', gap: 16, marginTop: 24 }}>
-          <button onClick={() => handleConnectionDecision('yes')} disabled={loading} style={{ padding: '10px 24px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>Yes, I Approve</button>
-          <button onClick={() => handleConnectionDecision('no')} disabled={loading} style={{ padding: '10px 24px', background: '#eee', color: '#333', border: 'none', borderRadius: 6, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>No, I Do Not Approve</button>
+  const renderConnectionContent = () => (
+    <div className="verification-content">
+      <div className="connection-icon">🤝</div>
+      <h2>Connection Request Approval</h2>
+      <p><strong>{capitalizeFirstLetter(childName)}</strong> would like to connect with <strong>{connectionName}</strong> on Launchpad.</p>
+      <p>Do you approve this connection request?</p>
+      
+      {error && (
+        <div className="error-message">
+          <div className="error-icon">⚠</div>
+          <p>{error}</p>
         </div>
-        {loading && <div style={{ marginTop: 16 }}>Submitting...</div>}
+      )}
+      
+      <div className="verification-actions">
+        <button 
+          onClick={() => handleConnectionDecision('yes')} 
+          disabled={loading} 
+          className="approve-btn"
+        >
+          {loading ? (
+            <>
+              <div className="loading-spinner-small"></div>
+              Processing...
+            </>
+          ) : (
+            'Yes, I Approve'
+          )}
+        </button>
+        <button 
+          onClick={() => handleConnectionDecision('no')} 
+          disabled={loading} 
+          className="reject-btn"
+        >
+          No, I Do Not Approve
+        </button>
       </div>
-      </div>
-    );
-  }
+    </div>
+  );
 
-  // Default: account approval
-  return (
-    <div style={{ maxWidth: 500, margin: '40px auto', padding: 32, background: '#fff', borderRadius: 12, boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
-      <h2>Parental Consent for Launchpad</h2>
-      <p>To help keep students safe, we require parental or guardian consent before allowing access to Launchpad. Please review the terms below and sign your name to approve your child's account.</p>
-      <div style={{ background: '#f8f9fa', border: '1px solid #e0e0e0', borderRadius: 8, padding: 16, margin: '18px 0', fontSize: '0.98em' }}>
-        <b>Legal Terms (Sample):</b>
+  const renderAccountContent = () => (
+    <div className="verification-content">
+      <div className="account-icon">👨‍👩‍👧‍👦</div>
+      <h2>Parental Consent Required</h2>
+      <p>To help keep students safe, we require parental or guardian consent before allowing access to Launchpad.</p>
+      
+      <div className="terms-box">
+        <h3>Legal Terms</h3>
         <ul>
-          <li>I am the parent or legal guardian of {childName}.</li>
+          <li>I am the parent or legal guardian of <strong>{childName}</strong>.</li>
           <li>I consent to their use of the Launchpad platform for educational and networking purposes.</li>
           <li>I understand that Launchpad takes steps to protect student privacy and safety, but I am responsible for monitoring my child's online activity.</li>
           <li>I may revoke this consent at any time by contacting Launchpad support.</li>
         </ul>
       </div>
-      <form onSubmit={handleAccountSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <label>
-          Your Full Name (Signature):
+
+      <form onSubmit={handleAccountSubmit} className="consent-form">
+        <div className="form-group">
+          <label htmlFor="parentName">Your Full Name (Digital Signature)</label>
           <input
+            id="parentName"
             type="text"
             value={parentName}
             onChange={e => setParentName(e.target.value)}
             required
-            style={{ width: '100%', padding: 8, borderRadius: 6, border: '1px solid #ccc', marginTop: 6 }}
+            placeholder="Enter your full name"
+            className="name-input"
           />
-        </label>
-        {error && <div style={{ color: 'red', marginBottom: 8 }}>{error}</div>}
-        <button type="submit" disabled={loading} style={{ padding: '10px 24px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}>
-          {loading ? 'Submitting...' : 'I Agree and Approve'}
+        </div>
+        
+        {error && (
+          <div className="error-message">
+            <div className="error-icon">⚠</div>
+            <p>{error}</p>
+          </div>
+        )}
+        
+        <button 
+          type="submit" 
+          disabled={loading || !parentName.trim()} 
+          className="approve-btn"
+        >
+          {loading ? (
+            <>
+              <div className="loading-spinner-small"></div>
+              Processing...
+            </>
+          ) : (
+            'I Agree and Approve'
+          )}
         </button>
       </form>
+    </div>
+  );
+
+  return (
+    <div className="verification-page">
+      <div className="verification-container">
+        <div className="verification-header">
+          <img src="/assets/launchpad_logo.png" alt="Launchpad Logo" className="logo" />
+          <h1>Parent Verification</h1>
+        </div>
+        
+        {submitted ? renderSuccessContent() : 
+         mode === 'connection' ? renderConnectionContent() : 
+         renderAccountContent()}
+      </div>
     </div>
   );
 } 

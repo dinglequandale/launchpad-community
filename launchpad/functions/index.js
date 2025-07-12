@@ -14,6 +14,7 @@ const {sendSESEmail} = require("./callableFunctions/sendSESEmail");
 const {generateVerificationLink} = require("./callableFunctions/generateVerificationLink");
 const {verifyParentToken} = require("./callableFunctions/verifyParentToken");
 const {deleteAuthUsers} = require("./callableFunctions/deleteAuthUsers");
+const {generateUnsubscribeLink, processUnsubscribe, checkUnsubscribeStatus} = require("./callableFunctions/generateUnsubscribeLink");
 
 exports.createStreamToken = createStreamToken;
 exports.sendInviteEmail = sendInviteEmail;
@@ -25,3 +26,6 @@ exports.sendSESEmail = sendSESEmail;
 exports.generateVerificationLink = generateVerificationLink;
 exports.verifyParentToken = verifyParentToken;
 exports.deleteAuthUsers = deleteAuthUsers;
+exports.generateUnsubscribeLink = generateUnsubscribeLink;
+exports.processUnsubscribe = processUnsubscribe;
+exports.checkUnsubscribeStatus = checkUnsubscribeStatus;

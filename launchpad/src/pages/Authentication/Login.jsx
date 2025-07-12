@@ -17,9 +17,9 @@ export default function Login(){
 
     // Check for school code validation
     const tempSchoolInfo = JSON.parse(localStorage.getItem("tempSchoolInfo"));
-    if (!tempSchoolInfo) {
-        return <Navigate to="/school-signup" replace={true}/>;
-    }
+    // if (!tempSchoolInfo) {
+    //     return <Navigate to="/school-signup" replace={true}/>;
+    // }
 
     const updateBasicUserData = async (user) => {
         if (!user || !user.uid) {

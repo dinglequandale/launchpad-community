@@ -383,7 +383,8 @@ const ParentEmailPage = ({ selectedOptions, handleChange, currentUser }) => {
       htmlTemplate: parentVerificationInitialTemplate({
         studentName: selectedOptions['userName'],
         parentName: "",
-        verificationLink: verificationLink})});
+        verificationLink: verificationLink}),
+      emailType: "parent_verification"});
 
     setRequesting(false);
     setRequested(true);

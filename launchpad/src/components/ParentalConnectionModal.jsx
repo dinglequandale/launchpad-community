@@ -58,7 +58,8 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
             parentName: "", 
             professionalData, 
             verificationLink: verificationLink, 
-            connectionType: professionalData.userType})
+            connectionType: professionalData.userType}),
+          emailType: "parent_verification"
         });
         console.log("result: ", result);
         toast.success('Connection request sent to parent for approval!');

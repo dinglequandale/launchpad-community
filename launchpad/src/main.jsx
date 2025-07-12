@@ -26,6 +26,7 @@ import FAQs from './components/Legality Footer/FAQs.jsx';
 import SettingsPage from './pages/Settings/SettingsPage.jsx';
 import ReportModal from './components/ReportModal/ReportModal.jsx';
 import ParentVerificationPage from './pages/ParentVerificationPage.jsx';
+import UnsubscribePage from './pages/UnsubscribePage.jsx';
 import LandingPageRevamped from './pages/landing_page/LandingPageRevamped.jsx';
 import UserType from './pages/Onboarding/UserType.jsx';
 import { ModalProvider } from './contexts/ModalContext.jsx';
@@ -119,6 +120,10 @@ const router = createBrowserRouter([
       {
         path: '/parent-verify',
         element: <ParentVerificationPage />
+      },
+      {
+        path: '/unsubscribe',
+        element: <UnsubscribePage />
       },
       {
         path: '/Landing',
