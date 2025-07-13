@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import { Outlet, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
 import { useStreamConnection } from '../Streamchat/chatFunctions/setUpUser';
@@ -6,7 +6,7 @@ import PageLoading from '../components/LoadingAnimation/PageLoading';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebaseConfig';
 import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from '../services/onboardingServices';
-import { fetchConnectionsByStatus } from '../services/userProfileServices';
+import { getConnectionsByStatus } from '../services/connectionService';
 
 function GlobalAuthWrapper() {
   const { currentUser, loading } = useAuth();
@@ -19,11 +19,25 @@ function GlobalAuthWrapper() {
 
   const user = auth.currentUser;
 
-  const getUserTokenInfo = async () => {
+  const getUserTokenInfo = useCallback(async () => {
     const idTokenResult = await user.getIdTokenResult();
     // console.log("schoolId!!!!! ", idTokenResult.claims.school_id);
     return idTokenResult.claims.school_id;
-  }
+  }, [user]);
+
+  const fetchAndStoreConnections = useCallback(async () => {
+    try {
+      const schoolId = localStorage.getItem("schoolId");
+      if (schoolId) {
+        const pending = await getConnectionsByStatus(schoolId, 'pending');
+        const approved = await getConnectionsByStatus(schoolId, 'approved');
+        localStorage.setItem('pendingConnections', JSON.stringify(pending));
+        localStorage.setItem('approvedConnections', JSON.stringify(approved));
+      }
+    } catch (error) {
+      console.error('Error fetching connections:', error);
+    }
+  }, []);
 
   useEffect(() => {
     let unsubscribe;
@@ -54,15 +68,7 @@ function GlobalAuthWrapper() {
               pushInitialProfileCompletion(doc.data());
 
               // connections population logic (single subcollection)
-              (async () => {
-                const fetchAndStoreConnections = async () => {
-                  const pending = await fetchConnectionsByStatus(currentUser, 'pending');
-                  const approved = await fetchConnectionsByStatus(currentUser, 'approved');
-                  localStorage.setItem('pendingConnections', JSON.stringify(pending));
-                  localStorage.setItem('approvedConnections', JSON.stringify(approved));
-                };
-                fetchAndStoreConnections();
-              })();
+              fetchAndStoreConnections();
             });
             
             await connectToStream(currentUser);
@@ -86,7 +92,7 @@ function GlobalAuthWrapper() {
     };
   
     fetchUserTokenInfo();
-  }, [currentUser, isConnected, connectToStream, loading]);
+  }, [currentUser, isConnected, connectToStream, loading, getUserTokenInfo, fetchAndStoreConnections, navigate]);
 
   if (loading || isInitializing) {
     return <PageLoading />;

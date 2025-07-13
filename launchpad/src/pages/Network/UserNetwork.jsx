@@ -47,6 +47,7 @@ export default function UserNetwork() {
   const [overallLoading, setOverallLoading] = useState(false);
 
   const [allVisibleUserData, setAllVisibleUserData] = useState(null);
+  const [connectionRefreshKey, setConnectionRefreshKey] = useState(0);
 
   const [isRecommended, setIsRecommended] = useState("(recommended)");
   
@@ -158,12 +159,45 @@ export default function UserNetwork() {
         return;
       }
     }
-    openConnectModal({ userData: user, chat: chatClient, userId });
+    
+    // Get connection status from localStorage to avoid redundant Firebase calls
+    const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
+    const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+    // Check both pending and approved connections, or any direct connections (not in pending list)
+    const isConnected = pendingConnections.includes(userId) || approvedConnections.includes(userId);
+    
+    openConnectModal({ 
+      userData: user, 
+      chat: chatClient, 
+      userId,
+      isConnected: isConnected,
+      onConnectionSuccess: () => {
+        // Refresh connection status for all UserCard components
+        setConnectionRefreshKey(prev => prev + 1);
+      }
+    });
   };
 
-  const handleOnProfileClick = (userId) => {
+  const handleOnProfileClick = (userId, connectionStatus) => {
     const user = allVisibleUserData.filter((user) => (user.userId === userId))[0];
-    openProfileModal({ userData: user, onConnectClick: handleConnectClick, handleReferalClick });
+    
+    // Use connection status from UserCard if provided, otherwise check localStorage
+    let isConnected = false;
+    if (connectionStatus !== undefined) {
+      // connectionStatus can be true (connected), false (not connected), or null (not checked)
+      isConnected = connectionStatus === true;
+    } else {
+      const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
+      const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+      isConnected = pendingConnections.includes(userId) || approvedConnections.includes(userId);
+    }
+    
+    openProfileModal({ 
+      userData: user, 
+      onConnectClick: handleConnectClick, 
+      handleReferalClick,
+      isConnected: isConnected
+    });
   };
 
   // All modal logic is now handled via ModalContext
@@ -266,6 +300,7 @@ export default function UserNetwork() {
                   userNetworkData={professionals}
                   onEndReached={() => loadMore('Professional')} 
                   loading={loading.professional}
+                  connectionRefreshKey={connectionRefreshKey}
                 />
                 </>}
                 {collegeStudents.length > 0 && <>
@@ -277,6 +312,7 @@ export default function UserNetwork() {
                   userNetworkData={collegeStudents}
                   onEndReached={() => loadMore('Alumni')}
                   loading={loading.college}
+                  connectionRefreshKey={connectionRefreshKey}
                 />
                 </>}
                 {highSchoolers.length > 0 && userType !== "Professional" && <>
@@ -288,6 +324,7 @@ export default function UserNetwork() {
                   userNetworkData={highSchoolers} 
                   onEndReached={() => loadMore('High Schooler')} 
                   loading={loading.highSchool}
+                  connectionRefreshKey={connectionRefreshKey}
                 />
                 </>}
                 </> : overallLoading ? <div style={{position: "absolute", left: "50%",top: "50%", transform: "translate(-50%,-50%)", width: "300px"}}> <Loading/> </div> : 
@@ -303,7 +340,7 @@ export default function UserNetwork() {
   );
 }
 
-function UserCarousel({userNetworkData, loading, onEndReached}){
+function UserCarousel({userNetworkData, loading, onEndReached, connectionRefreshKey}){
   const { handleOnProfileClick,handleConnectClick,loadLimit, filterChanged } = useContext(NetworkContext);
   const itemsPerPage = 3;
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -356,7 +393,12 @@ function UserCarousel({userNetworkData, loading, onEndReached}){
         >
           {userNetworkData.map((profile, index) => (
             <div key={index} className="carousel-item">
-              <UserCard userData={profile} onProfileClick={() => handleOnProfileClick(profile.userId)} onConnectClick={handleConnectClick}/>
+              <UserCard 
+                userData={profile} 
+                onProfileClick={() => handleOnProfileClick(profile.userId)} 
+                onConnectClick={handleConnectClick}
+                refreshKey={connectionRefreshKey}
+              />
             </div>
           ))}
         </div>

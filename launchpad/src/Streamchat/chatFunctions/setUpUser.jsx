@@ -1,5 +1,5 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { StreamChat } from 'stream-chat';
 import { useAuth } from '../../contexts/auth/AuthContext';
 
@@ -27,6 +27,7 @@ export const getStreamToken = async () => {
 
   export function useStreamConnection() {
     const [isConnected, setIsConnected] = useState(false);
+    const isConnectedRef = useRef(false);
     // const [userName, setUserName] = useState("");
     // const [userPfp, setUserPfp] = useState("");
     // const { userName, userPfpPreview } = JSON.parse(localStorage.getItem("basicUserInfo"));
@@ -44,9 +45,10 @@ export const getStreamToken = async () => {
 
       if(chatClient.userID){
         setIsConnected(true);
+        isConnectedRef.current = true;
       }
 
-      if (!isConnected && !chatClient.userID) {
+      if (!isConnectedRef.current && !chatClient.userID) {
         
         try {
           const token = await getStreamToken();
@@ -60,12 +62,17 @@ export const getStreamToken = async () => {
           );
           console.log("Connected!")
           setIsConnected(true);
+          isConnectedRef.current = true;
         } catch (error) {
           console.error('Error connecting to Stream:', error);
         }
       }
-    }, [isConnected]);
+    }, []); // Remove isConnected from dependencies to prevent infinite loops
 
+    // Update ref when state changes
+    useEffect(() => {
+      isConnectedRef.current = isConnected;
+    }, [isConnected]);
 
     // unload the user when they close their session
     useEffect(() => {

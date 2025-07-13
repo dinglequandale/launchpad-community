@@ -186,7 +186,7 @@ return(
                             <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
                                 <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
                                 <span style={{fontSize: "smaller", fontWeight: "550"}}> {organizationProfileData.organizationType} {["Club", "Initiative", "Business"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
-                                {organizationProfileData.organizationType === "Club" && userData && <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}> at {getUserHS(userData.schoolAttending)} </span>}
+                                {organizationProfileData.organizationType === "Club" && userData && <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}></span>}
                                 <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>{organizationProfileData.organizationHost ? "run by" : ""}&nbsp;</span>
                                 <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHostName}</button>
                                 <br />

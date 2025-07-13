@@ -4,7 +4,7 @@
     background-color: aliceblue;
     color: black;
     display: flex;
-    padding: 15px;
+    padding: 30px;
     border-radius: 15px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     flex-direction: column;
@@ -247,3 +247,24 @@
   .underline {
     text-decoration: underline;
   }
+
+.see-connections-btn {
+  background: linear-gradient(90deg, #667eea 0%, #1976d2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 15px;
+  font-weight: 700;
+  font-size: 1.08em;
+  box-shadow: 0 2px 12px rgba(25, 118, 210, 0.10);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.18s, transform 0.12s;
+  outline: none;
+}
+.see-connections-btn:hover, .see-connections-btn:focus {
+  background: linear-gradient(90deg, #1976d2 0%, #667eea 100%);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 18px rgba(25, 118, 210, 0.18);
+}

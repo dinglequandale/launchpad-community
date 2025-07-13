@@ -69,7 +69,36 @@
     font-weight: 500; 
 }
 
-
 .userCardBtnConnect:hover{
     background-color: rgb(120, 131, 255);
+}
+
+/* Connection button states */
+.btnConnect.pending {
+    background-color: #ffa500 !important;
+    color: white !important;
+    cursor: not-allowed !important;
+}
+
+.btnConnect.pending:hover {
+    background-color: #ffa500 !important;
+}
+
+.btnConnect.connected {
+    background-color: #28a745 !important;
+    color: white !important;
+    cursor: not-allowed !important;
+}
+
+.btnConnect.connected:hover {
+    background-color: #28a745 !important;
+}
+
+.btnConnect:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btnConnect:disabled:hover {
+    background-color: var(--secondary);
 }

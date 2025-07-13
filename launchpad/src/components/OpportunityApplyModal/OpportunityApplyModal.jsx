@@ -202,7 +202,7 @@ export default function OpportunityApplyModal({
               <div style={{marginTop: 'auto', marginBottom: 0, fontSize: '0.93rem', color: '#4a5870', opacity: 0.85, paddingTop: 24, textAlign: 'center'}}>
                 {opportunityDetails && (opportunityDetails.learnMoreType || opportunityDetails.learnMoreValue) ? (
                   <>
-                    Want to learn more about this {opportunityDetails.organizationType ? opportunityDetails.organizationType.toLowerCase() : 'opportunity'}?
+                    Want to learn more about this {opportunityDetails.organizationType ? opportunityDetails.organizationType.toLowerCase() : 'opportunity'}?&nbsp;
                     {opportunityDetails.learnMoreType === 'Website' && opportunityDetails.learnMoreValue ? (
                       <a href={opportunityDetails.learnMoreValue} target="_blank" rel="noopener noreferrer" style={{color: 'var(--secondary, #2a4b6a)', textDecoration: 'underline'}}>Visit their website</a>
                     ) : opportunityDetails.learnMoreType === 'Email' && opportunityDetails.learnMoreValue ? (

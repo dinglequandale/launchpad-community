@@ -33,7 +33,7 @@ const createUserTypes = (schoolConfig) => ({
     ),
     subheader: (
       <>
-        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> {schoolConfig.schoolShortName}s' youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
+        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> {schoolConfig.schoolShortName} youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
       </>
     ),
     cta: schoolConfig.ctaText,
@@ -63,7 +63,7 @@ const createUserTypes = (schoolConfig) => ({
     ),
     subheader: (
       <>
-        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> {schoolConfig.schoolShortName}s' youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
+        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> {schoolConfig.schoolShortName} youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
       </>
     ),
     cta: schoolConfig.ctaText,
@@ -93,7 +93,7 @@ const createUserTypes = (schoolConfig) => ({
     ),
     subheader: (
       <>
-        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> {schoolConfig.schoolShortName}s' youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
+        <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>Launching</span> {schoolConfig.schoolShortName} youth into <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>collegiate</span> and <span style={{ fontWeight: "bolder", color: "var(--neutral)", textDecoration: "underline" }}>professional</span> success
       </>
     ),
     cta: schoolConfig.ctaText,
@@ -105,7 +105,7 @@ const createUserTypes = (schoolConfig) => ({
 const createStaticContent = (schoolConfig) => ({
   WHO_ARE_WE: (
     <>
-      <span style={{ fontWeight: "bolder" }}>Launchpad</span> is a <span className="highlight">free local social network</span> designed to empower {schoolConfig.schoolShortName}s' youth by creating meaningful connections among:
+      <span style={{ fontWeight: "bolder" }}>Launchpad</span> is a <span className="highlight">free local social network</span> designed to empower {schoolConfig.schoolShortName} youth by creating meaningful connections among:
     </>
   ),
   
@@ -124,7 +124,7 @@ const createStaticContent = (schoolConfig) => ({
   
   GOAL: (
     <>
-      Our aim is to provide {schoolConfig.schoolShortName}s' youth with 
+      Our aim is to provide {schoolConfig.schoolShortName} youth with 
       <br />
       <span className="highlight">accessible learning, leadership, and workplace opportunities</span>.
     </>

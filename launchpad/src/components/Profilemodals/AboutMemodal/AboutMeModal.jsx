@@ -19,6 +19,8 @@ export default function AboutMeModal({userData, visibility, onClose}){
   const saveAboutMe = async () => {
     setIsSubmitting(true);
 
+    console.log("Running.....")
+
     const loadingToast = toast.loading('Making your changes...');
     
     try {
@@ -38,7 +40,7 @@ export default function AboutMeModal({userData, visibility, onClose}){
     finally{
       setIsSubmitting(false);
     }
-    onClose();
+    // onClose();
   }
 
   const handleAboutMeChange = (text) => {

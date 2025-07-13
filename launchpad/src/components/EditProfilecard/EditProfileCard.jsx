@@ -25,6 +25,9 @@ import SkillModal from '../SkillsModal/SkillModal';
 // import LinkedinModal from '../Profilemodals/LinkedInModal/LinkedinModal';
 import ContactInfoModal from '../Profilemodals/ContactInfoModal/ContactInfoModal';
 import { FaRegEdit } from 'react-icons/fa';
+import AllConnectionsModal from '../AllConnectionsModal';
+import { useModal } from '../../contexts/ModalContext';
+import { FaUserFriends } from "react-icons/fa";
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -37,9 +40,12 @@ export default function EditProfileCard() {
     const prevPath = location.state?.pathName;
 
     const [userData, setUserData] = useState(null);
+    const [showConnectionsModal, setShowConnectionsModal] = useState(false);
 
     const { currentUser } = useAuth();
     const [loading, setLoading] = useState(false);
+    
+    const { openProfileModal } = useModal();
     
     const [opportunitiesData, setOpportunitiesData] = useState([]);
     const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
@@ -48,6 +54,10 @@ export default function EditProfileCard() {
     const [incompleteOpportunitiesData, setIncompleteOpportunitiesData] = useState(null);
 
     const [edittingOpportunity, setEdittingOpportunity] = useState(null);
+
+    useEffect(()=>{
+        console.log(showConnectionsModal);
+    },[showConnectionsModal]);
 
     useEffect(() => {
         setIncompleteOpportunitiesData(localStorage.getItem("savedOrganizationData") ?
@@ -119,8 +129,21 @@ export default function EditProfileCard() {
                 return "";
         }
     }
+
+    // Handler to open profile modal from connections modal
+    const handleViewProfile = (user) => {
+        openProfileModal({ userData: user });
+    };
+
     return(
         <>
+        {/* Connections Modal */}
+        {showConnectionsModal && (
+            <AllConnectionsModal
+                onClose={() => setShowConnectionsModal(false)}
+                onViewProfile={handleViewProfile}
+            />
+        )}
         <div name="opportunityModal" style={{position: "relative"}}>
             {userData && userData.userType === "Professional" ? (
                 <OpportunityModal 
@@ -140,14 +163,25 @@ export default function EditProfileCard() {
         </div>
             <ProfileContext.Provider value={{currentUser, userData}}>
             <div className='editprofileCard'>
-                {(!loading && userData) ? <>
-                <div style={{borderBottomStyle: "solid", borderColor: "#C0C0C0", borderWidth: "1.7px", paddingBottom: "5px"}}>
-                    <div className='return' 
-                        style={{display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
+                <div style={{position: "relative"}}>
+                {/* Elegant See My Connections button */}
+                <div className='return' 
+                        style={{position: "absolute", display: "flex", gap: "5px", alignItems: "center", paddingBottom: "5px", cursor: "pointer", fontWeight: "bolder"}}
                         onClick={() => {prevPath ? navigate(prevPath) : navigate("/Home")}}>
-                        <RiArrowGoBackFill size={20}/>
-                        <span>Go Back</span>
+                        <RiArrowGoBackFill size={25}/>
+                        <span style={{fontSize: "17px"}}>Go Back</span>
                     </div>
+                <div style={{display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '10px'}}>
+                    <button
+                        className="see-connections-btn"
+                        onClick={() => setShowConnectionsModal(true)}
+                    >
+                        <FaUserFriends style={{marginRight: 8, fontSize: 20, verticalAlign: 'middle'}} />
+                        My Connections
+                    </button>
+                </div>
+                {(!loading && userData) ? <>
+                <div style={{ marginTop: "15px", borderBottomStyle: "solid", borderColor: "#C0C0C0", borderWidth: "1.7px", paddingBottom: "5px"}}>
                     <BasicInfoCard descType={descType()}/>
                 </div>
                 <div style={{marginBottom: "15px"}}><ContactInformation/></div>
@@ -216,6 +250,7 @@ export default function EditProfileCard() {
                 </>
                 :
                 <Loading/>}
+            </div>
             </div>
             </ProfileContext.Provider>
         </>

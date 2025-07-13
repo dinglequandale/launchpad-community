@@ -3,8 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { CgClose } from 'react-icons/cg';
 import { parentConnectionRequestTemplate } from '../utils/parentVerificationTemplates';
-import { addOrUpdateConnection } from '../services/userProfileServices';
+// import { addOrUpdateConnection } from '../services/userProfileServices';
 import { useAuth } from '../contexts/auth/AuthContext';
+import { addOrUpdateConnection } from '../services/connectionService';
 
 export default function ParentalConnectionModal({ professionalData, onClose, onApproved=()=>{} }) {
   const [requesting, setRequesting] = useState(false);
@@ -70,7 +71,7 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
     }
 
     // add to pending connections
-    await addOrUpdateConnection(currentUser, professionalData, 'pending', professionalData.userName);
+    await addOrUpdateConnection(currentUser, professionalData, 'pending', professionalData.userName, true);
   
     setRequesting(false);
     setRequested(true);

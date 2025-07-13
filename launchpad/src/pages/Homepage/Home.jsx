@@ -451,15 +451,15 @@ function ResourceCard({ title, link, description, recommendedBanner, time, userT
         <p style={{ flex: 1, overflow: "auto" }}>{description}</p>
         {time && <span>Time: {time}</span>}
         <p>For: {userType}</p>
-        <a href={link} target="_blank" rel="noopener noreferrer" style={{
+        <a href={link} target="_blank" rel="noopener noreferrer"  style={{
           display: "block",
           textAlign: "center",
-          background: "#007bff",
+          // background: "#007bff",
           color: "white",
           padding: "10px",
           borderRadius: "5px",
           textDecoration: "none"
-        }}>
+        }} className="resource-btn">
           Access Resource
         </a>
       </div>

@@ -9,6 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { saveStaff } from '../../../services/onboardingServices';
 
+// Move getEmail function creation outside component to prevent recreation on every render
+const getEmail = httpsCallable(getFunctions(), 'getEmail');
+
 // Questions for school staff/admin onboarding
 const staffQuestionsConfig = [
   {
@@ -92,7 +95,6 @@ const staffQuestionsConfig = [
 export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolInfo }) {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const getEmail = httpsCallable(getFunctions(), 'getEmail');
 
   // Pre-fill school if provided
   const [staffData, setStaffData] = useState({
@@ -112,7 +114,7 @@ export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolI
     email: '', // login email
   });
 
-  // Fetch login email for reference
+  // Fetch login email for reference - fixed dependency array
   useEffect(() => {
     const fetchEmail = async () => {
       try {
@@ -123,7 +125,7 @@ export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolI
       }
     };
     fetchEmail();
-  }, [getEmail]);
+  }, []); // Empty dependency array since getEmail is now stable
 
   // Validation: require name, school, role, work email, and areasOfInterest
   useEffect(() => {

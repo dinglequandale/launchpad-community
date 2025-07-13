@@ -355,6 +355,7 @@ const publishOpportunityData = async () => {
     <Toaster
     position="bottom-right"
     reverseOrder={false}
+    style={{zIndex: 9999}}
     />
     <div>
       <SaveChanges visibility={makeChangesVisibility} onCancel={ ()=>{
@@ -402,7 +403,7 @@ const publishOpportunityData = async () => {
             <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
           </header>
           <main style={{paddingTop:"10px"}}>
-          <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px", maxHeight: "500px"}}>
+          <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px", maxHeight: "60vh"}}>
             {renderPage()}
           </form>
           </main>

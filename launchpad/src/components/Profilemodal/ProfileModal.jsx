@@ -8,7 +8,8 @@ import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import Loading from '../LoadingAnimation/Loading';
-import { displayColleges, displayFieldsOfInterest, displaySchools, displayShortenedLinkedin, getBasicUserDescription,  addOrUpdateConnection } from '../../services/userProfileServices';
+import { displayColleges, displayFieldsOfInterest, displaySchools, displayShortenedLinkedin, getBasicUserDescription } from '../../services/userProfileServices';
+import { addOrUpdateConnection, checkConnection } from '../../services/connectionService';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import DefaultIcon from '../DefaultIcon/DefaultIcon';
@@ -17,20 +18,25 @@ import { BiFlag } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import { useReport } from '../../contexts/report/ReportContext';
 import ParentalConnectionModal from '../ParentalConnectionModal';
+import { useModal } from '../../contexts/ModalContext';
 
-export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick}) {
+export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick, isConnected: initialConnectionStatus}) {
 
     const userType = userData.userType;
-    const viewingUserType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
-    const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+    const userBasicInfo = localStorage.getItem("basicUserInfo") ? JSON.parse(localStorage.getItem("basicUserInfo")) : {};
+    const viewingUserType = userBasicInfo.userType;
     const schoolId = localStorage.getItem("schoolId");
     const disableActions = userBasicInfo && userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
 
     const hideConnectBtn = viewingUserType !== "High Schooler" && userType === "High Schooler";
 
+
+    const {openConnectModal, openParentalConnectionModal} = useModal();
+
     const userName = userData.userName;
     const [opportunitiesData, setOpportunitiesData] = useState([]);
     const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
+    const [isConnection, setIsConnection] = useState(initialConnectionStatus || false);
 
     const {currentUser} = useAuth();
 
@@ -38,6 +44,32 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     const currentPath = location.pathname;
 
     const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
+
+    const canPublishConnection = (viewingUserType !== "High Schooler") 
+    || (viewingUserType === "High Schooler" && userType === "High Schooler");
+    
+    useEffect(() => {
+      const checkConnectionStatus = async () => {
+        if(!currentUser || !userData || !visibility){
+          return;
+        }
+        
+        // If initialConnectionStatus is provided, use it and skip Firebase call
+        if (initialConnectionStatus !== undefined) {
+          setIsConnection(initialConnectionStatus);
+          return;
+        }
+        
+        try {
+          const result = await checkConnection(schoolId, userData.userId || userData.id);
+          setIsConnection(result.isConnected);
+        } catch (error) {
+          console.error('Error checking connection status:', error);
+          setIsConnection(false);
+        }
+      }
+      checkConnectionStatus();
+    },[visibility, currentUser, userData, initialConnectionStatus]);
 
     useEffect(()=>{
 
@@ -88,9 +120,8 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
 
     useEffect(() => {
         function onClickOutside(e) {
-            // If either modal is open, check if click is outside both
             const profileModal = menuRef.current;
-            const parentalModal = document.querySelector('.parental-connection-modal'); // Add a className to your ParentalConnectionModal root div
+            const parentalModal = document.querySelector('.parental-connection-modal');
             if (
                 profileModal &&
                 !profileModal.contains(e.target) &&
@@ -119,7 +150,6 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         }
     }, []);
 
-    // Check if connection is approved for high schoolers
     const isConnectionApproved = () => {
         if (userBasicInfo.userType !== 'High Schooler' || userType === 'High Schooler') {
             return true; // Not a high schooler connecting to professional
@@ -134,37 +164,23 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         return approvedConnections.includes(userData.id);
     };
 
-    const handleConnectClick = () => {
-      if (userBasicInfo.userType === 'High Schooler' && userType !== 'High Schooler') {
-        const approved = isConnectionApproved();
-        console.log("approved status: " + approved);
-        if (!approved) {
-          // Show parent verification modal
-          // setShowParentalConnectionModal(true); // This line is removed
-        //   toast.error('Parent verification required before connecting with professionals and alumni');
-          return;
+    const handleConnectClick = async () => {
+
+        if (userBasicInfo.userType === 'High Schooler' && userType !== 'High Schooler') {
+            const approved = isConnectionApproved();
+            console.log("approved status: " + approved);
+            if (!approved) {
+                openParentalConnectionModal({professionalData: userData});
+                return;
+            }
         }
         
-        // if (!isConnectionApproved()) {
-        //   // Show parental connection modal
-        //   return;
-        // }
-      }
-      
-      // normal connection logic
-      onConnectClick(currentPath === "/Organizations" ? userData : userData.id);
-    };
-
-    const handleParentalConnectionApproved = async () => {
-      // Move from pending to approved (simulate parent approval)
-      await addOrUpdateConnection(currentUser, userData, 'approved');
-      // Now proceed with connection
-      onConnectClick(currentPath === "/Organizations" ? userData : userData.id);
+        // Simply open the ConnectModal - connection creation will happen there
+        onConnectClick(currentPath === "/Organizations" ? userData : userData.id);
     };
 
     return(
         <>
-            {/* The ParentalConnectionModal component is now managed globally */}
             <div className='profileModalContainer'>
                 <div className='profileModalDialog' ref={menuRef}>
                     <div style={{position:"absolute", right: "10px", top: "9px"}}>
@@ -194,10 +210,24 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" className='pfpImage' style={
                             {width: "80px", height: "80px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <><DefaultIcon size={50} length={"70px"}/></>}
                             </div>
-                            <div className='cardNameDescription'>
+                                                    <div className='cardNameDescription'>
+                            <div style={{display: "flex", alignItems: "center", gap: "8px"}}>
                                 <span className='cardName'>{userData.userName}</span>
-                                <span className='cardDescription'>{basicInfoContent.userPreface}</span>
-                            </div>   
+                                {isConnection && (
+                                    <span style={{
+                                        fontSize: "12px",
+                                        backgroundColor: "#4CAF50",
+                                        color: "white",
+                                        padding: "2px 8px",
+                                        borderRadius: "12px",
+                                        fontWeight: "500"
+                                    }}>
+                                        Connected
+                                    </span>
+                                )}
+                            </div>
+                            <span className='cardDescription'>{basicInfoContent.userPreface}</span>
+                        </div>   
                         </div>
                         <div style={{display: "flex", marginBottom: "15px"}}>
                             <div className='userInfo' style={{fontSize: "16px"}}>
@@ -216,15 +246,44 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 )}
                             </div>
                         </div>
-                        {!hideConnectBtn && <button className='btnConnect' style={{width: "95%", borderRadius: "5px",  margin: "0 auto", cursor: disableActions ? "not-allowed" : "pointer", opacity: disableActions ? 0.6 : 1}} 
-                            disabled={disableActions}
-                            title={disableActions ? "Parent/guardian approval required" : ""}
-                            onClick={() => { if (!disableActions) handleConnectClick(); }}> 
-                            <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
-                                <FaLink size={20}/>
-                                <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>
-                            </div>
-                        </button>}
+                        {!hideConnectBtn && (
+                            isConnection ? (
+                                <button className='btnConnect' 
+                                style={{
+                                    width: "95%", 
+                                    borderRadius: "5px",  
+                                    margin: "0 auto", 
+                                    cursor: "default",
+                                    // backgroundColor: "#4CAF50",
+                                    border: "none",
+                                    color: "white"
+                                }} 
+                                // disabled={true}
+                                onClick={() => { if (!disableActions) handleConnectClick(); }}
+                                title="Already connected"> 
+                                    <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
+                                        <FaLink size={20}/>
+                                        <span style={{fontWeight: "550", fontSize: "larger"}}>Contact</span>
+                                    </div>
+                                </button>
+                            ) : (
+                                <button className='btnConnect' style={{
+                                    width: "95%", 
+                                    borderRadius: "5px",  
+                                    margin: "0 auto", 
+                                    cursor: disableActions ? "not-allowed" : "pointer", 
+                                    opacity: disableActions ? 0.6 : 1
+                                }} 
+                                disabled={disableActions}
+                                title={disableActions ? "Parent/guardian approval required" : ""}
+                                onClick={() => { if (!disableActions) handleConnectClick(); }}> 
+                                    <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
+                                        <FaLink size={20}/>
+                                        <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>
+                                    </div>
+                                </button>
+                            )
+                        )}
                     </header>
                     <hr style={{width: "95%"}}/>
                     <main style={{padding: "0px 8px"}}>
@@ -250,12 +309,12 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                         {(userData.userAboutMe || userData.linkedinLink) && <div name="userAboutMe" style={{paddingTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s About Me</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
-                            {userData.userAboutMe && <div style={{background: "var(--neutral)", borderRadius: "5px", display: "flex", alignItems: "center", padding: "10px"}}>
+                            {userData.userAboutMe && <div style={{border: "solid 2px var(--secondary)", borderRadius: "5px", display: "flex", alignItems: "center", padding: "10px"}}>
                                 <span>{userData.userAboutMe}</span>
                             </div>}
-                            {userData.linkedinLink && <div className="linkedInDisplay" style={{display: "flex", justifyContent: "center", padding: "10px"}}>
+                            {/* {userData.linkedinLink && <div className="linkedInDisplay" style={{display: "flex", justifyContent: "center", padding: "10px"}}>
                                 <span>LinkedIn Profile: <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{displayShortenedLinkedin(userData.linkedinLink)}</Link></span>
-                            </div>}
+                            </div>} */}
                         </div>}
                         {(userData.userSkills && userData.userSkills.length > 0) && 
                         <div>
@@ -291,7 +350,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px", paddingTop: "10px"}}>
                                 {userData.networkingLevel.map((availability)=>(
-                                    <div key={availability} style={{background: "var(--neutral)", padding: "6px 11px", borderRadius: "5px"}}>
+                                    <div key={availability} style={{border: "solid 2px var(--secondary)", padding: "6px 11px", borderRadius: "5px"}}>
                                         <span style={{lineHeight: "1.5", fontSize: "22px", color: "var(--secondary)"}}>{availability}</span>
                                     </div>
                                 ))}
