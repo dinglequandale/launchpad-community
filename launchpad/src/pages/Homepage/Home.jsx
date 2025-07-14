@@ -18,7 +18,7 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { parentVerificationResendTemplate } from "../../utils/parentVerificationTemplates";
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
-import { getConnectionsByStatus } from "../../services/connectionService";
+import { useConnections } from "../../contexts/ConnectionContext";
 import { useModal } from '../../contexts/ModalContext';
 
 
@@ -50,7 +50,15 @@ export default function Home(){
     const [showConnectionModal, setShowConnectionModal] = useState(false);
     const [connectedUserData, setConnectedUserData] = useState(null);
     const [showVerifedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
-    const [receivedConnections, setReceivedConnections] = useState([]);
+    const {
+      pending,
+      pending_parental_approval,
+      parent_approved,
+      approved,
+      incomingRequests,
+      loading: connectionsLoading,
+      refetchConnections,
+    } = useConnections();
     const {openProfileModal} = useModal();
 
     const { chatClient } = useOutletContext();
@@ -144,7 +152,8 @@ export default function Home(){
 
       // connection status visibility check
       console.log("Initial useEffect - calling fetchReceivedConnections");
-      fetchReceivedConnections();
+      
+      // fetchReceivedConnections(); // This function is no longer needed
 
 
     }, []);
@@ -190,68 +199,57 @@ export default function Home(){
     //   }
     // }, [receivedConnections, info]);
 
-    const fetchReceivedConnections = async () => {
+    // Replace fetchReceivedConnections with logic using context values
+    useEffect(() => {
+      console.log("Connection modal check useEffect triggered");
+      console.log("info:", info);
       
       const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
-      try {
-        if (
-          (info &&
-          info.userType === 'High Schooler' &&
-          info.parentVerified &&
-          !connectionSessionFlag) ||
-          (info.userType !== 'High Schooler' 
-            && !connectionSessionFlag)
-        ) {
-          console.log("Fetching received connections...");
-          const receivedResult = await getConnectionsByStatus(schoolId, 'pending');
-          const parentApprovedResult = await getConnectionsByStatus(schoolId, 'parent_approved');
-          
-          console.log("Received result:", receivedResult);
-          console.log("Parent approved result:", parentApprovedResult);
-          
-          // Filter to only show connections where current user is the target
-          const allReceived = [...(receivedResult.connections || []), ...(parentApprovedResult.connections || [])]
-            .filter(conn => conn.role === 'target');
-
-          console.log("All received connections:", allReceived);
-
-          // Filter based on user type and status
-          const filteredReceived = allReceived.filter(conn => {
-            const isHighSchooler = info?.userType === 'High Schooler';
-            const isParentApproved = conn.status === 'parent_approved';
+      console.log("connectionSessionFlag:", connectionSessionFlag);
+      
+      if (
+        (info &&
+        info.userType === 'High Schooler' &&
+        info.parentVerified &&
+        !connectionSessionFlag) ||
+        (info.userType !== 'High Schooler' 
+          && !connectionSessionFlag)
+      ) {
+        console.log("All conditions met for connection modal check");
+        const openConnectionModal = info.userType === "High Schooler" ? (pending.length > 0 ||
+          pending_parental_approval.length > 0 ||
+          parent_approved.length > 0 ||
+          approved.length > 0) : (pending.length > 0 ||
             
-            // Adults only see parent_approved connections
-            if (!isHighSchooler && !isParentApproved) {
-              return false;
-            }
-            
-            return true;
-          });
-          
-          console.log("Filtered received connections:", filteredReceived);
-          setReceivedConnections(filteredReceived);
-
-          const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-          const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
-          
-          console.log("pendingConnections:", pendingConnections);
-          console.log("approvedConnections:", approvedConnections);
-          // console.log("receivedConnections.length:", receivedConnections.length);
-
-          if (pendingConnections.length > 0 || approvedConnections.length > 0 || filteredReceived.length > 0) {
-            console.log("SHOWING CONNECTION MODAL!");
-            setShowConnectionModal(true);
-            sessionStorage.setItem('connectionModalShown', 'true');
-          } else {
-            console.log("No connections found, not showing modal");
-          }
-      }
+            approved.length > 0);
+        if(openConnectionModal){
+          setShowConnectionModal(true);
+          sessionStorage.setItem("connectionModalShown", true);
+        }
+        // const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
+        // const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
         
-      } catch (error) {
-        console.error("Error fetching received connections:", error);
-        setReceivedConnections([]);
+        // console.log("pendingConnections:", pendingConnections);
+        // console.log("approvedConnections:", approvedConnections);
+        // // console.log("receivedConnections.length:", receivedConnections.length);
+
+        // if (pendingConnections.length > 0 || approvedConnections.length > 0 || receivedConnections.length > 0) {
+        //   console.log("SHOWING CONNECTION MODAL!");
+        //   setShowConnectionModal(true);
+        //   sessionStorage.setItem('connectionModalShown', 'true');
+        // } else {
+        //   console.log("No connections found, not showing modal");
+        // }
+      } else {
+        console.log("Conditions not met for connection modal:");
+        console.log("- info exists:", !!info);
+        console.log("- userType is High Schooler:", info?.userType === 'High Schooler');
+        console.log("- parentVerified:", info?.parentVerified);
+        console.log("- connectionSessionFlag:", connectionSessionFlag);
       }
-    }
+    }, [info, pending,pending_parental_approval,
+      parent_approved,
+      approved,]);
 
     const handleOnConnectClick = async (connectingUserData) => {
       setConnectedUserData(connectingUserData);
@@ -259,7 +257,7 @@ export default function Home(){
     }
 
     const handleOnProfileClick = (userData) => {
-      openProfileModal({userData})
+      openProfileModal({userData, onConnectClick: handleOnConnectClick});
     } 
 
     useEffect(()=>{
@@ -407,7 +405,11 @@ export default function Home(){
                 onClose={() => setShowConnectionModal(false)}
                 onConnect={handleOnConnectClick}
                 handleProfileClick={handleOnProfileClick}
-                filteredReceived={receivedConnections}
+                pending={pending}
+                pending_parental_approval={pending_parental_approval}
+                parent_approved={parent_approved}
+                approved={approved}
+                incomingRequests={incomingRequests}
               />
             )}
             <TopBar/>
