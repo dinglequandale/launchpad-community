@@ -1,4 +1,4 @@
-import { doc, onSnapshot, updateDoc, setDoc, deleteDoc, getDocs, collection } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc, setDoc, deleteDoc, getDocs, collection, query, where } from "firebase/firestore";
 import { db, storage } from "../firebase/firebaseConfig";
 import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 // import { updateTypesense } from '../typesense/typesenseClient';
@@ -191,8 +191,8 @@ export const getBasicUserDescription = (userData, shortened=true) => {
 export const editUserData = async (newData, currentUser, origUserData) => {
     try{
         const userRef = doc(db, "tenants", localStorage.getItem("schoolId"), "users", currentUser.uid);
-    
         await updateDoc(userRef, newData);
+        console.log("Updated user data!!!");
         pushInitialProfileCompletion({... origUserData, ...newData});
 
         // await updateTypesense('users', currentUser.uid, {... origUserData, ...newData}, localStorage.getItem("schoolId"));
@@ -307,60 +307,11 @@ export const getVerificationStatus = (userData) => {
   return userData.verificationStatus || "pending";
 };
 
-
-
-export const addOrUpdateConnection = async (currentUser, targetUser, status,name=null) => {
-    const schoolId = localStorage.getItem("schoolId");
-    const connRef = doc(db, "tenants", schoolId, "users", currentUser.uid, "connections", targetUser.id);
-    try {
-        if(name){
-            await setDoc(connRef, {
-                userId: targetUser.id,
-                status,
-                userName: name,
-                createdAt: new Date()
-            }, { merge: true });
-        }
-        else{
-            await setDoc(connRef, {
-                userId: targetUser.id,
-                status,
-                createdAt: new Date()
-            }, { merge: true });
-        }
-        if(status==="pending") {
-            const pending = JSON.parse(localStorage.getItem("pendingConnections"));
-            localStorage.setItem("pendingConnections", JSON.stringify([...pending, targetUser.id]));
-        }
-    } catch (e) {
-        console.log("Error adding/updating connection: ", e);
-    }
-}
+// Connection functions have been moved to Firebase Cloud Functions
+// See connectionService.jsx for the new implementation
 
 
 
 
-export const removeConnection = async (currentUser, targetUserId) => {
-    const schoolId = localStorage.getItem("schoolId");
-    const connRef = doc(db, "tenants", schoolId, "users", currentUser.uid, "connections", targetUserId);
-    try {
-        await deleteDoc(connRef);
-    } catch (e) {
-        console.log("Error removing connection: ", e);
-    }
-}
-
-
-export const fetchConnectionsByStatus = async (currentUser, status) => {
-    const schoolId = localStorage.getItem("schoolId");
-    const colRef = collection(db, "tenants", schoolId, "users", currentUser.uid, "connections");
-    try {
-        const snapshot = await getDocs(colRef);
-        return snapshot.docs
-            .filter(doc => doc.data().status === status)
-            .map(doc => doc.id);
-    } catch (e) {
-        console.log(`Error fetching connections by status: `, e);
-        return [];
-    }
-}
+// Connection functions have been moved to Firebase Cloud Functions
+// See connectionService.jsx for the new implementation

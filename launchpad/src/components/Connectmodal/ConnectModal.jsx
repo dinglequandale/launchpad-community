@@ -7,16 +7,18 @@ import { storage } from '../../firebase/firebaseConfig';
 import toast, { Toaster } from 'react-hot-toast';
 import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
 import { CgClose } from 'react-icons/cg';
-import { displayShortenedLinkedin } from '../../services/userProfileServices';
+import {  displayShortenedLinkedin } from '../../services/userProfileServices';
+import { addOrUpdateConnection } from '../../services/connectionService';
 
 // TODO: actually implement clickedUser logic
-export default function ConnectModal({visibility, chat, onClose, userId, userData, isOpportunity=false, opportunityType=null}){
+export default function ConnectModal({visibility, chat, onClose, userId, userData, isOpportunity=false, opportunityType=null, onConnectionSuccess, isConnected: initialConnectionStatus}){
 
   const [introMessage, setIntroMessage] = useState("");
   const [sendWithResume, setSendWithResume] = useState(false);
   const [channelId, setChannelId] = useState("")
   const {currentUser} = useAuth();
   const [canSend, setCanSubmit] = useState(introMessage.length > 0);
+  const [isConnected, setIsConnected] = useState(initialConnectionStatus || false);
 
   const [sendDirectMessage, setSendDirectMessage] = useState(false);
 
@@ -24,8 +26,14 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   const userType = userData.userType;
 
   const schoolId = localStorage.getItem("schoolId");
-
   const navigate = useNavigate();
+
+  // Create connection immediately when modal opens (if not already connected)
+  useEffect(() => {
+    if (visibility && !isConnected && !initialConnectionStatus) {
+      createConnection();
+    }
+  }, [visibility]);
 
   const onSendClick = async () => {
     const loadingToast = toast.loading('Sending your message...');
@@ -33,8 +41,14 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
     console.log("sending...")
 
     try {
+      // Message is already sent, just send the message
       await verifySend();
       toast.success('Message sent!', { id: loadingToast });
+
+      // Call success callback to refresh connection status
+      if (onConnectionSuccess) {
+        onConnectionSuccess();
+      }
 
       new Promise( res => setTimeout(res, 500) );
 
@@ -45,7 +59,44 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
       console.error("Error sending your message!", error);
       setCanSubmit(true);
     }
+  }
+
+  const createConnection = async () => {
+    try {
+      // Determine connection status based on user types
+      const currentUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+      const currentUserType = currentUserInfo.userType;
+      const targetUserType = userData.userType;
+      
+      // Determine if approval is needed
+      const needsApproval = currentUserType === 'High Schooler' && targetUserType !== 'High Schooler';
+      const connectionStatus = needsApproval ? 'pending' : null;
+      
+      const result = await addOrUpdateConnection(
+        currentUser, 
+        userData, 
+        connectionStatus, 
+        userData.userName, 
+        setIsConnected
+      );
+      
+      if (result.success === false && result.message === 'Connection already exists') {
+        console.log('Connection already exists');
+        setIsConnected(true);
+        return;
+      }
+      
+      console.log('Connection created successfully:', result);
+      
+      // Call success callback to refresh connection status
+      if (onConnectionSuccess) {
+        onConnectionSuccess();
+      }
+    } catch (error) {
+      console.error('Error creating connection:', error);
+      throw error;
     }
+  };
 
   const verifySend = async () => {
 
@@ -107,7 +158,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
 
   return (
     <div>
-      <Toaster position={'bottom-right'} reverseOrder={false}/>
+      <Toaster position={'bottom-right'} reverseOrder={false} style={{zIndex: 9999}}/>
       <Modal
         isOpen={visibility}
         onRequestClose={onClose}

@@ -40,7 +40,7 @@ export default function SideNav({show}){
                     <Link to={path} style={{ color: 'inherit' }}>
                         <div className={`destinationNav ${selectedNav === label ? "selected" : ""}`} key={index} onClick={() => handleNavClick(label)}> 
                             {icon}
-                            {label}
+                            <span style={{fontWeight: "600"}}>{label}</span>
                         </div>
                     </Link>
         

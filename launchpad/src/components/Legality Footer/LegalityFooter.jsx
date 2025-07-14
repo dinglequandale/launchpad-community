@@ -47,6 +47,6 @@ export default function LegalityFooter({pathname = null}){
             </div>
           </div>
         </div>
-        <p className="copyright">&copy; 2024 Launchpad. All rights reserved.</p>
+        <p className="copyright">&copy; {(new Date()).getFullYear()} Launchpad. All rights reserved.</p>
     </>)
 }

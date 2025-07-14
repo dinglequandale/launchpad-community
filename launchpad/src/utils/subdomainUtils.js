@@ -19,7 +19,7 @@ export const getSchoolConfig = (subdomain) => {
   const configs = {
     awty: {
       schoolName: "Awty International",
-      schoolShortName: "Awty",
+      schoolShortName: "Awty's",
       networkName: "Ram Network",
       mascotImage: "/assets/awty_school.png",
       mascotName: "Ram",
@@ -76,7 +76,7 @@ export const getSchoolConfig = (subdomain) => {
     },
     default: {
       schoolName: "Your School",
-      schoolShortName: "school",
+      schoolShortName: "schools'",
       networkName: "Student Network",
       mascotImage: "/assets/launchpad_logo.png",
       mascotName: "Student",

@@ -15,6 +15,7 @@ const {generateVerificationLink} = require("./callableFunctions/generateVerifica
 const {verifyParentToken} = require("./callableFunctions/verifyParentToken");
 const {deleteAuthUsers} = require("./callableFunctions/deleteAuthUsers");
 const {generateUnsubscribeLink, processUnsubscribe, checkUnsubscribeStatus} = require("./callableFunctions/generateUnsubscribeLink");
+const {manageConnections} = require("./callableFunctions/manageConnections");
 
 exports.createStreamToken = createStreamToken;
 exports.sendInviteEmail = sendInviteEmail;
@@ -29,3 +30,4 @@ exports.deleteAuthUsers = deleteAuthUsers;
 exports.generateUnsubscribeLink = generateUnsubscribeLink;
 exports.processUnsubscribe = processUnsubscribe;
 exports.checkUnsubscribeStatus = checkUnsubscribeStatus;
+exports.manageConnections = manageConnections;

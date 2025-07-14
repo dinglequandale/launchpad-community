@@ -30,3 +30,12 @@
 .btnInviteContacts:hover{
     background: var(--highlight);
 }
+
+.resource-btn{
+    background-color: #007bff;
+    transition: background-color 0.3s ease;
+}
+
+.resource-btn:hover{
+    background-color: var(--highlight);
+}
