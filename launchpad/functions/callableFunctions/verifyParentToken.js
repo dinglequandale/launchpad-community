@@ -29,12 +29,14 @@ exports.verifyParentToken = functions.https.onCall(async (data, context) => {
             });
             console.log('Parent verified for student:', tokenData.studentId);
         } else if (tokenData.action === 'connection') {
-            await admin.firestore().collection('tenants').doc(schoolId).collection("users").doc(tokenData.studentId)
-                .collection('connections').doc(tokenData.connectionId).update({
-                    status: decision === 'yes' ? "approved" : "rejected",
-                    parentApprovedAt: admin.firestore.FieldValue.serverTimestamp()
-                });
-            console.log('Connection status updated for student:', tokenData.studentId, 'connection:', tokenData.connectionId);
+            // Update connection in the centralized connections collection
+            await admin.firestore().collection('tenants').doc(schoolId).collection("connections").doc(tokenData.connectionId).update({
+                status: decision === 'yes' ? "parent_approved" : "rejected",
+                parentApprovedAt: admin.firestore.FieldValue.serverTimestamp(),
+                parentDecision: decision,
+                parentName: parentName
+            });
+            console.log('Connection status updated for connection:', tokenData.connectionId);
         } else {
             console.warn('Unknown action:', tokenData.action);
         }
