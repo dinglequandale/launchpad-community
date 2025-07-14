@@ -153,7 +153,7 @@ export default function ConnectionStatusModal({
           border: `1px solid ${borderColor}`,
           borderRadius: '12px',
           padding: '20px',
-          marginBottom: '16px',
+          // marginBottom: '16px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -372,7 +372,7 @@ export default function ConnectionStatusModal({
 
           {(approved.filter(conn => !hiddenCards.has(conn.id)).length > 0 || (userType === "High Schooler" && parent_approved.filter(conn => !hiddenCards.has(conn.id)).length > 0)) && <h3 style={{ color: '#4caf50' }}>✅ Approved Connections</h3>}
           <div style={{display: "flex", flexDirection: "column", gap: "16px"}}>
-          {userType === "High Schooler" && <div style={{display: "flex", flexDirection: "column", gap: "16px", marginBottom: approved.filter(conn => !hiddenCards.has(conn.id)).length > 0 ? "16px" : "0px"}}>
+          {userType === "High Schooler" && parent_approved.length > 0 && <div style={{display: "flex", flexDirection: "column", gap: "16px", marginBottom: approved.filter(conn => !hiddenCards.has(conn.id)).length > 0 ? "16px" : "0px"}}>
           {parent_approved.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
             const user = getOtherUser(conn);
             if (!user) return <div key={conn.id}>Loading...</div>;
