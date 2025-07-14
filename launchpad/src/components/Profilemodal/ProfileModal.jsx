@@ -1,24 +1,19 @@
 import './profilemodal.css';
-import React from 'react';
-import { IoCloseOutline } from "react-icons/io5";
-import { FaFlag } from "react-icons/fa";
-import { useState, useEffect, useRef } from 'react';
-import { FaLink } from 'react-icons/fa6';
+import React, { useEffect, useState, useRef } from 'react';
+import { FaLink } from 'react-icons/fa';
+import { BiFlag } from 'react-icons/bi';
+import { IoCloseOutline } from 'react-icons/io5';
+import { useAuth } from '../../contexts/auth/AuthContext';
+import { useModal } from '../../contexts/ModalContext';
+import { useLocation } from 'react-router-dom';
+import { getConnectionsByStatus, checkConnection } from '../../services/connectionService';
+import { displayShortenedLinkedin, displayColleges, displayFieldsOfInterest, displaySchools, getBasicUserDescription } from '../../services/userProfileServices';
+import DefaultIcon from '../DefaultIcon/DefaultIcon';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
+import Loading from '../LoadingAnimation/Loading';
+import { useReport } from '../../contexts/report/ReportContext';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
-import Loading from '../LoadingAnimation/Loading';
-import { displayColleges, displayFieldsOfInterest, displaySchools, displayShortenedLinkedin, getBasicUserDescription } from '../../services/userProfileServices';
-import { addOrUpdateConnection, checkConnection } from '../../services/connectionService';
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/auth/AuthContext';
-import DefaultIcon from '../DefaultIcon/DefaultIcon';
-import { CgClose } from 'react-icons/cg';
-import { BiFlag } from 'react-icons/bi';
-import toast from 'react-hot-toast';
-import { useReport } from '../../contexts/report/ReportContext';
-import ParentalConnectionModal from '../ParentalConnectionModal';
-import { useModal } from '../../contexts/ModalContext';
 
 export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick, isConnected: initialConnectionStatus}) {
 
@@ -150,7 +145,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         }
     }, []);
 
-    const isConnectionApproved = () => {
+    const isConnectionApproved = async () => {
         if (userBasicInfo.userType !== 'High Schooler' || userType === 'High Schooler') {
             return true; // Not a high schooler connecting to professional
         }
@@ -159,15 +154,30 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
             return false; // Parent not verified
         }
         
-
-        const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
-        return approvedConnections.includes(userData.id);
+        try {
+            const schoolId = localStorage.getItem('schoolId');
+            const result = await getConnectionsByStatus(schoolId, 'parent_approved');
+            
+            if (result.success && result.connections) {
+                // Check if there's a parent-approved connection between these users
+                const hasApprovedConnection = result.connections.some(conn => 
+                    (conn.initiateUserId === currentUser.uid && conn.targetUserId === userData.id) ||
+                    (conn.initiateUserId === userData.id && conn.targetUserId === currentUser.uid)
+                );
+                return hasApprovedConnection;
+            }
+            
+            return false;
+        } catch (error) {
+            console.error('Error checking connection approval status:', error);
+            return false;
+        }
     };
 
     const handleConnectClick = async () => {
 
         if (userBasicInfo.userType === 'High Schooler' && userType !== 'High Schooler') {
-            const approved = isConnectionApproved();
+            const approved = await isConnectionApproved();
             console.log("approved status: " + approved);
             if (!approved) {
                 openParentalConnectionModal({professionalData: userData});
@@ -306,7 +316,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                             : opportunitiesLoading ?
                         <div style={{marginTop: "40px"}}><Loading/></div> :
                         null}
-                        {(userData.userAboutMe || userData.linkedinLink) && <div name="userAboutMe" style={{paddingTop: "20px"}}>
+                        {(userData.userAboutMe) && <div name="userAboutMe" style={{paddingTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s About Me</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             {userData.userAboutMe && <div style={{border: "solid 2px var(--secondary)", borderRadius: "5px", display: "flex", alignItems: "center", padding: "10px"}}>

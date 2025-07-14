@@ -52,7 +52,7 @@ export default function Professional_LandingPage() {
             <span className="pillarTitle">Guide the Next Generation</span>
             <div className="pillarText" style={{display: "flex", justifyContent: "center", alignItems: "center", height: "100%"}}>
             <span>
-            Our platform hosts an exceptional youth studying at Awty and <span className="highlight">top U.S colleges</span> (Princeton, Carnegie Mellon, etc ...), all eager to excel. By joining Launchpad, you are empowered to <span className="highlight">shape their future</span> by offering insights, advice, and workplace opportunities.
+            Our platform hosts an exceptional youth studying at Awty and <span className="highlight">top U.S colleges</span> (Princeton, % Mellon, etc ...), all eager to excel. By joining Launchpad, you are empowered to <span className="highlight">shape their future</span> by offering insights, advice, and workplace opportunities.
             </span>
             </div>
           </div>

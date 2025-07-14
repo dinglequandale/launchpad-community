@@ -19,6 +19,8 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   const {currentUser} = useAuth();
   const [canSend, setCanSubmit] = useState(introMessage.length > 0);
   const [isConnected, setIsConnected] = useState(initialConnectionStatus || false);
+  const [isCreatingConnection, setIsCreatingConnection] = useState(false);
+  const [connectionCreated, setConnectionCreated] = useState(false);
 
   const [sendDirectMessage, setSendDirectMessage] = useState(false);
 
@@ -28,12 +30,92 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   const schoolId = localStorage.getItem("schoolId");
   const navigate = useNavigate();
 
-  // Create connection immediately when modal opens (if not already connected)
+  // Reset connection state when modal opens/closes
   useEffect(() => {
-    if (visibility && !isConnected && !initialConnectionStatus) {
-      createConnection();
+    if (visibility) {
+      setIsConnected(initialConnectionStatus || false);
+      setConnectionCreated(false);
     }
-  }, [visibility]);
+  }, [visibility, initialConnectionStatus]);
+
+  const createConnection = async () => {
+    // Prevent duplicate connections
+    if (isCreatingConnection || connectionCreated || isConnected) {
+      console.log('Connection creation prevented - already in progress or exists');
+      return { success: true, alreadyExists: true };
+    }
+
+    try {
+      setIsCreatingConnection(true);
+      
+      // Determine connection status based on user types
+      const currentUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+      const currentUserType = currentUserInfo.userType;
+      const targetUserType = userData.userType;
+      
+      // Determine if approval is needed
+      const needsApproval = currentUserType === 'High Schooler' && targetUserType !== 'High Schooler';
+      const connectionStatus = "pending";
+      
+      const result = await addOrUpdateConnection(
+        currentUser, 
+        userData, 
+        connectionStatus, 
+        setIsConnected
+      );
+      
+      if (result.success === false && result.message === 'Connection already exists') {
+        console.log('Connection already exists');
+        setIsConnected(true);
+        setConnectionCreated(true);
+        return { success: true, alreadyExists: true };
+      }
+      
+      console.log('Connection created successfully:', result);
+      setConnectionCreated(true);
+      
+      // Call success callback to refresh connection status
+      if (onConnectionSuccess) {
+        onConnectionSuccess();
+      }
+      
+      return { success: true, alreadyExists: false };
+    } catch (error) {
+      console.error('Error creating connection:', error);
+      throw error;
+    } finally {
+      setIsCreatingConnection(false);
+    }
+  };
+
+  const handleLinkedInClick = async () => {
+    try {
+      // Create connection when LinkedIn is clicked
+      await createConnection();
+      
+      // Open LinkedIn in new tab
+      window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer');
+    } catch (error) {
+      console.error('Error handling LinkedIn click:', error);
+      toast.error('Failed to create connection');
+    }
+  };
+
+  const handleEmailCopy = async () => {
+    try {
+      // Create connection when email is copied
+      await createConnection();
+      
+      // Copy email to clipboard
+      if (userData.email) {
+        await navigator.clipboard.writeText(userData.email);
+        toast.success('Email copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Error handling email copy:', error);
+      toast.error('Failed to copy email or create connection');
+    }
+  };
 
   const onSendClick = async () => {
     const loadingToast = toast.loading('Sending your message...');
@@ -41,6 +123,9 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
     console.log("sending...")
 
     try {
+      // Create connection when message is sent
+      await createConnection();
+      
       // Message is already sent, just send the message
       await verifySend();
       toast.success('Message sent!', { id: loadingToast });
@@ -60,43 +145,6 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
       setCanSubmit(true);
     }
   }
-
-  const createConnection = async () => {
-    try {
-      // Determine connection status based on user types
-      const currentUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
-      const currentUserType = currentUserInfo.userType;
-      const targetUserType = userData.userType;
-      
-      // Determine if approval is needed
-      const needsApproval = currentUserType === 'High Schooler' && targetUserType !== 'High Schooler';
-      const connectionStatus = needsApproval ? 'pending' : null;
-      
-      const result = await addOrUpdateConnection(
-        currentUser, 
-        userData, 
-        connectionStatus, 
-        userData.userName, 
-        setIsConnected
-      );
-      
-      if (result.success === false && result.message === 'Connection already exists') {
-        console.log('Connection already exists');
-        setIsConnected(true);
-        return;
-      }
-      
-      console.log('Connection created successfully:', result);
-      
-      // Call success callback to refresh connection status
-      if (onConnectionSuccess) {
-        onConnectionSuccess();
-      }
-    } catch (error) {
-      console.error('Error creating connection:', error);
-      throw error;
-    }
-  };
 
   const verifySend = async () => {
 
@@ -141,12 +189,12 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
       bottom: 'auto',
       marginRight: '-50%',
       transform: 'translate(-50%, -50%)',
-      zIndex: "9999",
+      zIndex: "9998",
     },
     overlay: {
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       backdropFilter: 'blur(5px)',
-      zIndex: "9999",
+      zIndex: "9998",
     }
   };
 
@@ -158,7 +206,10 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
 
   return (
     <div>
-      <Toaster position={'bottom-right'} reverseOrder={false} style={{zIndex: 9999}}/>
+      <div style={{zIndex: 9999}}>
+      <Toaster position={'bottom-right'} reverseOrder={false} />
+      </div>
+      
       <Modal
         isOpen={visibility}
         onRequestClose={onClose}
@@ -176,11 +227,33 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
             <div style={{display: "flex", flexDirection: "column", gap: "5px", padding: "15px 5px"}}>
               {<span style={{fontSize: "18px"}}>
                 <span style={{fontWeight: "550", fontSize: "18px"}}>Email:</span>
-                &nbsp;{userData.email ? userData.email : "No email provided"}
+                &nbsp;{userData.email ? (
+                  <span 
+                    style={{
+                      cursor: 'pointer',
+                      color: '#1976d2',
+                      textDecoration: 'underline',
+                      userSelect: 'text'
+                    }}
+                    onClick={handleEmailCopy}
+                    title="Click to copy email"
+                  >
+                    {userData.email}
+                  </span>
+                ) : "No email provided"}
               </span>}
               {userData.linkedinLink && <span style={{fontSize: "18px"}}>
                 <span style={{textDecoration: "", color: "black", fontWeight: "550"}}>Linkedin:</span>
-                &nbsp;<Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{displayShortenedLinkedin(userData.linkedinLink)}</Link>
+                &nbsp;<Link 
+                  onClick={handleLinkedInClick}
+                  style={{
+                    cursor: 'pointer',
+                    color: '#0077b5',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  {displayShortenedLinkedin(userData.linkedinLink)}
+                </Link>
               </span>}
             </div>
             {sendDirectMessage && (<div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>

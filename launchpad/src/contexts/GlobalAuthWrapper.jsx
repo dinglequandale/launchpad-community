@@ -29,10 +29,20 @@ function GlobalAuthWrapper() {
     try {
       const schoolId = localStorage.getItem("schoolId");
       if (schoolId) {
-        const pending = await getConnectionsByStatus(schoolId, 'pending');
-        const approved = await getConnectionsByStatus(schoolId, 'approved');
-        localStorage.setItem('pendingConnections', JSON.stringify(pending));
-        localStorage.setItem('approvedConnections', JSON.stringify(approved));
+        const pendingResult = await getConnectionsByStatus(schoolId, 'pending_parental_approval');
+        const approvedResult = await getConnectionsByStatus(schoolId, 'parent_approved');
+        
+        // Extract user IDs from the connections
+        const pendingUserIds = pendingResult.connections?.map(conn => 
+          conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+        ) || [];
+        
+        const approvedUserIds = approvedResult.connections?.map(conn => 
+          conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+        ) || [];
+        
+        localStorage.setItem('pendingConnections', JSON.stringify(pendingUserIds));
+        localStorage.setItem('approvedConnections', JSON.stringify(approvedUserIds));
       }
     } catch (error) {
       console.error('Error fetching connections:', error);
