@@ -4,6 +4,7 @@ import { doCreateUserWithEmailAndPassword, doSignInWithGoogle } from "../../fire
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import emailData from "../../json_data/studentEmailData.json";
 
 export default function SignUp(){
     const { userLoggedIn } = useAuth();
@@ -11,7 +12,7 @@ export default function SignUp(){
     const [userPassword, setUserPassword] = useState("");
     const [confirmedPassword, setConfirmedPassword] = useState("");
     const [userIsSigningIn, setUserIsSigningIn] = useState(false);
-    const [emailIncorrect, setEmailIncorrect] = useState(false);
+    const [emailValid, setEmailValid] = useState(true);
     const navigate = useNavigate();
 
     const userType = localStorage.getItem("userType") || '';
@@ -26,18 +27,34 @@ export default function SignUp(){
         return <Navigate to="/school-signup" replace={true}/>;
     }
 
+    const checkSchoolEmail = (inputFrag, school="awty") => {
+        // Convert input to lowercase for case-insensitive comparison
+        const lowerCaseInputFrag = inputFrag.toLowerCase();
+
+        const foundStudent = emailData.find(student =>
+          lowerCaseInputFrag.includes(student.email_frag.toLowerCase())
+        );
+        const isEmailFound = foundStudent ? true : false;
+        setEmailValid(isEmailFound); 
+        return foundStudent;
+      };
+    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (schoolEmailCondition) {
+        const studentRecord = checkSchoolEmail(userEmail, schoolId);
+        // if (schoolEmailCondition) { TODO: bring back
+        if(userType === "High Schooler"){
             try {
-                const schoolEmailPattern = new RegExp(`^[^@]+@${schoolId}\\.org$`, 'i');
-                if (!schoolEmailPattern.test(userEmail)) {
+                // const schoolEmailPattern = new RegExp(`^[^@]+@${schoolId}\\.org$`, 'i');
+                if (!studentRecord) {
+                    console.log(userEmail);
                     toast.error(`Please use your school email (e.g. yourname@${schoolId}.org).`);
-                    setEmailIncorrect(true);
                     return;
                 }
-            } catch {
-                toast.error('School information missing. Please restart onboarding.');
+            } catch(e) {
+                console.log(e);
+                toast.error('School information missing. Please restart signup.');
                 return;
             }
         }
@@ -53,8 +70,9 @@ export default function SignUp(){
         if(!userIsSigningIn){
             setUserIsSigningIn(true);
             try {
+                localStorage.setItem("tempStudentInfo", JSON.stringify(studentRecord));
                 await toast.promise(
-                    doCreateUserWithEmailAndPassword(userEmail, userPassword),
+                    doCreateUserWithEmailAndPassword(userEmail + "@awty.org", userPassword),
                     {
                         loading: 'Creating your account ...',
                         success: "You're set!",
@@ -92,7 +110,7 @@ export default function SignUp(){
         reverseOrder={false}/>
         </div>
         
-        {/* {userLoggedIn && (<Navigate to='/Home' replace={true}/>)} */}
+        {userLoggedIn && (<Navigate to='/Home' replace={true}/>)}
         <div className="signup-container">
             <div className="signup-card">
                 <div style={{display: "flex", justifyContent: "space-around", alignItems: "center"}}>
@@ -132,42 +150,47 @@ export default function SignUp(){
                 <form onSubmit={(e)=>handleSubmit(e)}>
                     <div style={{display: "flex", justifyContent: "cemter", alignItems: "center", flexDirection: "column", gap: "10px", paddingBottom: "1rem"}}>
                         <div style={{width: "100%", display: "flex", flexDirection: "column", gap: "5px"}}>
-                        <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>{ (schoolEmailCondition) ? "School Email" : "Email"}</span>
-                        <input
-                        type="email"
-                        value={userEmail}
-                        onChange={(e) => {
-                            setEmailIncorrect(false);
-                            setUserEmail(e.target.value);
+                            <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>{ (schoolEmailCondition) ? "School Email" : "Email"}</span>
+                            <div style={{display: "flex", gap: "8px", alignItems: "center"}}>
+                                <input
+                                type="text"
+                                value={userEmail}
+                                onChange={(e) => {
+                                    setEmailValid(true);
+                                    if(!(e.target.value.includes("@") || e.target.value.includes("."))){
+                                        setUserEmail(e.target.value);
+                                    }
 
-                        }}
-                        required
-                        placeholder={`(...)@${schoolId}.org`}
-                        disabled={userIsSigningIn}
-                        className={`inputEmailAndPassword ${emailIncorrect ? "error" : ""}`}
-                        />
+                                }}
+                                required
+                                // placeholder={`(...)@${schoolId}.org`}
+                                disabled={userIsSigningIn}
+                                className={`inputEmailAndPassword ${!emailValid ? "error" : ""}`}
+                                />
+                                {schoolEmailCondition && <span style={{fontWeight: "550", fontSize: "20px", height: "100%", alignItems: "center", marginBottom: "15px", color: "var(--border)"}}>@awty.org</span>}
+                            </div>
                         </div>
 
                         <div style={{width: "100%", display: "flex", flexDirection: "column", gap: "5px"}}>
-                        <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Password</span>
-                        <input
-                        type="password"
-                        value={userPassword}
-                        onChange={(e) => setUserPassword(e.target.value)}
-                        required
-                        className="inputEmailAndPassword"
-                        />
+                            <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Password</span>
+                            <input
+                            type="password"
+                            value={userPassword}
+                            onChange={(e) => setUserPassword(e.target.value)}
+                            required
+                            className="inputEmailAndPassword"
+                            />
                         </div>
                         <div style={{width: "100%", display: "flex", flexDirection: "column", gap: "5px", position: "relative"}}>
-                        <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Confirm Password</span>
-                        <input
-                        type="password"
-                        value={confirmedPassword}
-                        onChange={(e) => setConfirmedPassword(e.target.value)}
-                        required
-                        className={`inputEmailAndPassword ${(userPassword && userPassword !== confirmedPassword) ? "error" : ""}`}
-                        />
-                        {(userPassword && userPassword !== confirmedPassword) &&<div style={{position: "absolute", color: "red", fontSize: "12px", fontWeight: "bolder", bottom: "-5px"}}>*Please retype your password.</div>}
+                            <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Confirm Password</span>
+                            <input
+                            type="password"
+                            value={confirmedPassword}
+                            onChange={(e) => setConfirmedPassword(e.target.value)}
+                            required
+                            className={`inputEmailAndPassword ${(userPassword && userPassword !== confirmedPassword) ? "error" : ""}`}
+                            />
+                            {(userPassword && userPassword !== confirmedPassword) &&<div style={{position: "absolute", color: "red", fontSize: "12px", fontWeight: "bolder", bottom: "-5px"}}>*Please retype your password.</div>}
                         </div>
                     
                     </div>

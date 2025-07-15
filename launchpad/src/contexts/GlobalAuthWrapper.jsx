@@ -87,7 +87,7 @@ function GlobalAuthWrapper() {
       };    
       } catch (error) {
         console.error("Error fetching user token info:", error);
-        // navigate("/Onboarding");
+        navigate("/Onboarding");
       }
     };
   
