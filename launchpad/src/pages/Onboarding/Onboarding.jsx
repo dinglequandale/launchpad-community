@@ -14,6 +14,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import { auth } from '../../firebase/firebaseConfig';
 import { GrOrganization } from 'react-icons/gr';
 import UserType from './UserType';
+import { useAuth } from '../../contexts/auth/AuthContext';
 
 export default function Onboarding() {
     const [numOfSections, setNumOfSections] = useState(0);
@@ -26,6 +27,7 @@ export default function Onboarding() {
 
     // localStorage.clear();
     const user = auth.currentUser;
+    const {userLoggedIn} = useAuth();
     const location = useLocation();
     const tempSchoolInfo = location.state ?? JSON.parse(localStorage.getItem("tempSchoolInfo"));
 
@@ -80,10 +82,12 @@ export default function Onboarding() {
 
     const disabledSubmitStyles = {cursor: "not-allowed", background: "gray"};
     return (<>
+
         {isSubmitting && <div style={{width: "100vw", height: "100vh", background: "rgb(0,0,0,0.1)", position: "absolute"}}></div>}
         <div className='onboarding-container'>
             <div className='background-blend'></div>
             {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
+            {!userLoggedIn && <Navigate to="/Landing" replace={true}/>}
             <div style={{position: "relative"}}>
             <div className='onboarding-body' >
                 {currentPage === 0 && <div style={{position: "absolute", top: "-50px", width: "100vw", textAlign: "center"}}><span style={{fontSize: "30px"}}>Connect with your school’s network of students, parents, and alumni</span></div>}
