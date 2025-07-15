@@ -175,12 +175,18 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
   const getEmail = httpsCallable(getFunctions(), 'getEmail');
   const [loginEmail,setLoginEmail] = useState("");
 
+  const tempStudentInfo = JSON.parse(localStorage.getItem("tempStudentInfo") || "{}");
+
+  const transformFullName = (name) => {
+    return name ? (name.split(", ")[1] + " " + name.split(", ")[0]) : "";
+  }
+
   const [highSchoolerData, setHighSchoolerData] = useState({
     userAboutMe: '',
-    userName: '',
+    userName: transformFullName(tempStudentInfo.full_name),
     schoolAttending: schoolInfo.schoolDisplayName,
     schoolId: schoolInfo.schoolId,
-    graduationYear: '',
+    graduationYear: tempStudentInfo.graduation_year,
     // sectionAttending: '',
     areasOfInterest: [],
     userSkills: [],

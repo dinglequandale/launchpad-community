@@ -161,6 +161,7 @@ export const packageBasicUserInfoToLS = (userData) => {
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));
     // localStorage.removeItem("tempSchoolInfo");
+    localStorage.removeItem("tempStudentInfo");
 }
 
 export const pushInitialProfileCompletion = (userData) => {
