@@ -53,13 +53,13 @@ export default function ConfirmationModal({
         <p className="confirmation-modal__message">{message}</p>
         <div className="confirmation-modal__actions">
           <button
-            className="btnSaveChanges confirmation-modal__button confirmation-modal__button--cancel"
+            className="btnSaveChanges confirmation-modal__button confirmation-modal__button--cancel btnUnfilled"
             onClick={onCancel}
           >
             {cancelText}
           </button>
           <button
-            className="btnSaveChanges confirmation-modal__button confirmation-modal__button--confirm"
+            className="confirmation-modal__button confirmation-modal__button--confirm btnSaveChanges"
             onClick={handleConfirm}
           >
             {confirmText}

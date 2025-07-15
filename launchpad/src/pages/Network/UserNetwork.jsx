@@ -21,6 +21,9 @@ import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 import { capitalizeFirstLetter } from "../Homepage/Home";
 import ParentalConnectionModal from "../../components/ParentalConnectionModal";
 import { useModal } from '../../contexts/ModalContext';
+import { useConnections } from "../../contexts/ConnectionContext";
+import { checkConnection, isConnectionApproved } from "../../services/connectionService";
+// import { checkConnection } from "../../services/connectionService";
 
 
 const NetworkContext = createContext();
@@ -31,7 +34,9 @@ export default function UserNetwork() {
 
   const { chatClient, isConnected } = useOutletContext();
 
-  const pageName = `The ${capitalizeFirstLetter(localStorage.getItem("schoolId"))} Network`;
+  const schoolId = localStorage.getItem("schoolId");
+
+  const pageName = `The ${capitalizeFirstLetter(schoolId)} Network`;
 
   const [tenantId, setTenantId] = useState(null);
 
@@ -48,6 +53,7 @@ export default function UserNetwork() {
 
   const [allVisibleUserData, setAllVisibleUserData] = useState(null);
   const [connectionRefreshKey, setConnectionRefreshKey] = useState(0);
+  const { approved = [], parent_approved = [], loading: connectionsLoading } = useConnections();
 
   const [isRecommended, setIsRecommended] = useState("(recommended)");
   
@@ -149,28 +155,45 @@ export default function UserNetwork() {
     setFilters(prev => ({...prev, [filterKey]: value}));
   };
 
+//   const isConnectionApproved = (user) => {
+//     if (userType !== 'High Schooler' || user.userType === 'High Schooler') {
+//         return true;
+//     }
+//     if (!parentVerified) {
+//         return false;
+//     }
+
+//     const total_approved = [...parent_approved, ...approved];
+//     // Check parent_approved connections in context
+//     return total_approved.some(conn =>
+//         (conn.initiateUserId === currentUser.uid && (conn.targetUserId === user.id || conn.targetUserId === user.userId)) ||
+//         (conn.initiateUserId === (user.id || user.userId) && conn.targetUserId === currentUser.uid)
+//     );
+// };
+
   const handleConnectClick = (userId) => {
     const user = allVisibleUserData.filter((user) => user.userId === userId)[0];
     // Parental connection logic
     if (userType === 'High Schooler' && user.userType !== 'High Schooler') {
-      const approved = isConnectionApproved(user);
-      if (!approved) {
+      const isApproved = isConnectionApproved(currentUser, user, parent_approved, approved, parentVerified);
+      if (!isApproved) {
         openParentalConnectionModal({ professionalData: user });
         return;
       }
     }
     
     // Get connection status from localStorage to avoid redundant Firebase calls
-    const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-    const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+    // const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
+    // const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
     // Check both pending and approved connections, or any direct connections (not in pending list)
-    const isConnected = pendingConnections.includes(userId) || approvedConnections.includes(userId);
+    // const isConnected = pendingConnections.includes(userId) || approvedConnections.includes(userId);
+    const connectionData = checkConnection(schoolId, userId);
     
     openConnectModal({ 
       userData: user, 
       chat: chatClient, 
       userId,
-      isConnected: isConnected,
+      isConnected: connectionData.isConnected,
       onConnectionSuccess: () => {
         // Refresh connection status for all UserCard components
         setConnectionRefreshKey(prev => prev + 1);
@@ -253,16 +276,16 @@ export default function UserNetwork() {
       }
   }
 
-  const isConnectionApproved = (targetUser) => {
-    if (userType !== 'High Schooler' || targetUser.userType === 'High Schooler') {
-      return true;
-    }
-    if (!parentVerified) {
-      return false;
-    }
-    const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
-    return approvedConnections.includes(targetUser.id);
-  };
+  // const isConnectionApproved = (targetUser) => {
+  //   if (userType !== 'High Schooler' || targetUser.userType === 'High Schooler') {
+  //     return true;
+  //   }
+  //   if (!parentVerified) {
+  //     return false;
+  //   }
+  //   const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+  //   return approvedConnections.includes(targetUser.id);
+  // };
 
   // Remove all unused modal state and related variables
   // Remove: profileModalVisibility, connectModalVisibility, showParentalConnectionModal, profileTargetData, connectTargetUser, connectTargetUserId, profileModalTop, setProfileTargetData, setConnectTargetUser, setConnectTargetUserId, setProfileModalTop
