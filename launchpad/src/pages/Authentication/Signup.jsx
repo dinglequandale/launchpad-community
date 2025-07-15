@@ -32,7 +32,9 @@ export default function SignUp(){
         const lowerCaseInputFrag = inputFrag.toLowerCase();
 
         const foundStudent = emailData.find(student =>
-          lowerCaseInputFrag.includes(student.email_frag.toLowerCase())
+          {
+            return student.email_frag ? lowerCaseInputFrag.includes(student.email_frag.toLowerCase()) : false;
+          }
         );
         const isEmailFound = foundStudent ? true : false;
         setEmailValid(isEmailFound); 
@@ -70,15 +72,16 @@ export default function SignUp(){
         if(!userIsSigningIn){
             setUserIsSigningIn(true);
             try {
+                console.log("Student record: ", studentRecord.graduation_year);
                 localStorage.setItem("tempStudentInfo", JSON.stringify(studentRecord));
-                await toast.promise(
-                    doCreateUserWithEmailAndPassword(userEmail + "@awty.org", userPassword),
-                    {
-                        loading: 'Creating your account ...',
-                        success: "You're set!",
-                        error: (err) => `Error. Please try again!`
-                    }
-                );
+                // await toast.promise(
+                //     doCreateUserWithEmailAndPassword(userEmail + emailData[0].email_hook, userPassword),
+                //     {
+                //         loading: 'Creating your account ...',
+                //         success: "You're set!",
+                //         error: (err) => `Error. Please try again!`
+                //     }
+                // );
                 
                 navigate("/Onboarding", {state: tempSchoolInfo});
             } catch (error) {
@@ -167,7 +170,7 @@ export default function SignUp(){
                                 disabled={userIsSigningIn}
                                 className={`inputEmailAndPassword ${!emailValid ? "error" : ""}`}
                                 />
-                                {schoolEmailCondition && <span style={{fontWeight: "550", fontSize: "20px", height: "100%", alignItems: "center", marginBottom: "15px", color: "var(--border)"}}>@awty.org</span>}
+                                {schoolEmailCondition && <span style={{fontWeight: "550", fontSize: "20px", height: "100%", alignItems: "center", marginBottom: "15px", color: "var(--border)"}}>{emailData[0].email_hook}</span>}
                             </div>
                         </div>
 
