@@ -30,6 +30,7 @@ import UnsubscribePage from './pages/UnsubscribePage.jsx';
 import LandingPageRevamped from './pages/landing_page/LandingPageRevamped.jsx';
 import UserType from './pages/Onboarding/UserType.jsx';
 import { ModalProvider } from './contexts/ModalContext.jsx';
+import { ConnectionProvider } from './contexts/ConnectionContext';
 
 const ErrorPage = () => {
   return (
@@ -98,12 +99,14 @@ const ErrorPage = () => {
 // Create a Root component that wraps the router content with providers
 const Root = () => {
   return (
-    <ReportProvider>
-      <ModalProvider>
-        <ReportModal />
-        <Outlet />
-      </ModalProvider>
-    </ReportProvider>
+    <ConnectionProvider>
+      <ReportProvider>
+        <ModalProvider>
+          <ReportModal />
+          <Outlet />
+        </ModalProvider>
+      </ReportProvider>
+    </ConnectionProvider>
   );
 };
 

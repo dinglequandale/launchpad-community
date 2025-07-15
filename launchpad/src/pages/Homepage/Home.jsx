@@ -18,6 +18,8 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 import { parentVerificationResendTemplate } from "../../utils/parentVerificationTemplates";
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
+import { useConnections } from "../../contexts/ConnectionContext";
+import { useModal } from '../../contexts/ModalContext';
 
 
 class ErrorBoundary extends React.Component {
@@ -45,11 +47,27 @@ export default function Home(){
 
     const [userBasicInfo, setUserBasicInfo] = useState(null);
     const [showParentModal, setShowParentModal] = useState(false);
-    const [showConnectionModal, setShowConnectionModal] = useState(true);
+    const [showConnectionModal, setShowConnectionModal] = useState(false);
     const [connectedUserData, setConnectedUserData] = useState(null);
     const [showVerifedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
+    const {
+      pending,
+      pending_parental_approval,
+      parent_approved,
+      approved,
+      incomingRequests,
+      loading: connectionsLoading,
+      refetchConnections,
+    } = useConnections();
+    const {openProfileModal} = useModal();
 
     const { chatClient } = useOutletContext();
+
+    const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
+
+    const info = JSON.parse(storedUserBasicInfo);
+    const schoolId = localStorage.getItem("schoolId");
+    console.log("SCHOOL ID: "+ schoolId);
 
     const getUserData = async () => {
       const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
@@ -113,12 +131,13 @@ export default function Home(){
     };
 
     useEffect(() => {
-      const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
       setUserBasicInfo(JSON.parse(storedUserBasicInfo));
+
+      // if(!schoolId){
       getUserTokenInfo();
+      // }
 
       const sessionFlag = sessionStorage.getItem('parentalModalShown');
-      const info = JSON.parse(storedUserBasicInfo);
       if (
         info &&
         info.userType === 'High Schooler' &&
@@ -128,41 +147,123 @@ export default function Home(){
       ) {
         setShowParentModal(true);
         sessionStorage.setItem('parentalModalShown', 'true');
+        return;
       }
 
       // connection status visibility check
+      console.log("Initial useEffect - calling fetchReceivedConnections");
+      
+      // fetchReceivedConnections(); // This function is no longer needed
 
+
+    }, []);
+
+    // Check for connection modal display after receivedConnections is updated
+    // useEffect(() => {
+    //   console.log("Connection modal check useEffect triggered");
+    //   console.log("receivedConnections:", receivedConnections);
+    //   console.log("info:", info);
+      
+    //   const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
+    //   console.log("connectionSessionFlag:", connectionSessionFlag);
+      
+    //   if (
+    //     (info &&
+    //     info.userType === 'High Schooler' &&
+    //     info.parentVerified &&
+    //     !connectionSessionFlag) ||
+    //     (info.userType !== 'High Schooler' )
+    //       // && !connectionSessionFlag) TODO: ADD BACK
+    //   ) {
+    //     console.log("All conditions met for connection modal check");
+    //   //   const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
+    //   //   const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+        
+    //   //   console.log("pendingConnections:", pendingConnections);
+    //   //   console.log("approvedConnections:", approvedConnections);
+    //   //   // console.log("receivedConnections.length:", receivedConnections.length);
+
+    //   //   if (pendingConnections.length > 0 || approvedConnections.length > 0 || receivedConnections.length > 0) {
+    //   //     console.log("SHOWING CONNECTION MODAL!");
+    //   //     setShowConnectionModal(true);
+    //   //     sessionStorage.setItem('connectionModalShown', 'true');
+    //   //   } else {
+    //   //     console.log("No connections found, not showing modal");
+    //   //   }
+    //   // } else {
+    //   //   console.log("Conditions not met for connection modal:");
+    //   //   console.log("- info exists:", !!info);
+    //   //   console.log("- userType is High Schooler:", info?.userType === 'High Schooler');
+    //   //   console.log("- parentVerified:", info?.parentVerified);
+    //   //   console.log("- connectionSessionFlag:", connectionSessionFlag);
+    //   }
+    // }, [receivedConnections, info]);
+
+    // Replace fetchReceivedConnections with logic using context values
+    useEffect(() => {
+      console.log("Connection modal check useEffect triggered");
+      console.log("info:", info);
+      
       const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
+      console.log("connectionSessionFlag:", connectionSessionFlag);
+      
       if (
-        info &&
+        (info &&
         info.userType === 'High Schooler' &&
         info.parentVerified &&
-        !connectionSessionFlag
+        !connectionSessionFlag) ||
+        (info.userType !== 'High Schooler' 
+          && !connectionSessionFlag)
       ) {
-        const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections'));
-        const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections'));
-        
-        console.log("we're in!", pendingConnections);
-
-        //TODO: check that pending / approve logic here works
-
-        if (pendingConnections.length > 0 || approvedConnections.length > 0) {
-          console.log("we're soooo in!");
+        console.log("All conditions met for connection modal check");
+        const openConnectionModal = info.userType === "High Schooler" ? (pending.length > 0 ||
+          pending_parental_approval.length > 0 ||
+          parent_approved.length > 0 ||
+          approved.length > 0) : (pending.length > 0 ||
+            
+            approved.length > 0);
+        if(openConnectionModal){
           setShowConnectionModal(true);
-          sessionStorage.setItem('connectionModalShown', 'true');
+          sessionStorage.setItem("connectionModalShown", true);
         }
+        // const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
+        // const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+        
+        // console.log("pendingConnections:", pendingConnections);
+        // console.log("approvedConnections:", approvedConnections);
+        // // console.log("receivedConnections.length:", receivedConnections.length);
+
+        // if (pendingConnections.length > 0 || approvedConnections.length > 0 || receivedConnections.length > 0) {
+        //   console.log("SHOWING CONNECTION MODAL!");
+        //   setShowConnectionModal(true);
+        //   sessionStorage.setItem('connectionModalShown', 'true');
+        // } else {
+        //   console.log("No connections found, not showing modal");
+        // }
+      } else {
+        console.log("Conditions not met for connection modal:");
+        console.log("- info exists:", !!info);
+        console.log("- userType is High Schooler:", info?.userType === 'High Schooler');
+        console.log("- parentVerified:", info?.parentVerified);
+        console.log("- connectionSessionFlag:", connectionSessionFlag);
       }
-    }, []);
+    }, [info, pending,pending_parental_approval,
+      parent_approved,
+      approved,]);
 
     const handleOnConnectClick = async (connectingUserData) => {
       setConnectedUserData(connectingUserData);
       setShowVerifiedConnectionModal(true);
     }
 
+    const handleOnProfileClick = (userData) => {
+      openProfileModal({userData, onConnectClick: handleOnConnectClick});
+    } 
+
     useEffect(()=>{
       console.log("showing: ", showConnectionModal);
       console.log("showing verification: ", showParentModal);
-    },[showConnectionModal])
+    },[showConnectionModal]);
     
     const resourceData = {
         "How To Network": [
@@ -303,6 +404,12 @@ export default function Home(){
               <ConnectionStatusModal
                 onClose={() => setShowConnectionModal(false)}
                 onConnect={handleOnConnectClick}
+                handleProfileClick={handleOnProfileClick}
+                pending={pending}
+                pending_parental_approval={pending_parental_approval}
+                parent_approved={parent_approved}
+                approved={approved}
+                incomingRequests={incomingRequests}
               />
             )}
             <TopBar/>

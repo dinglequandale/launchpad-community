@@ -29,17 +29,19 @@ export const checkConnection = async (schoolId, targetUserId) => {
  * @param {string} schoolId - The school ID
  * @param {string} targetUserId - The target user's ID
  * @param {string} status - The connection status (e.g., 'pending', 'accepted')
- * @param {string} userName - The target user's name
+ * @param {string} userType - The current user's type
+ * @param {string} targetUserType - The target user's type
  * @returns {Promise<Object>} - Object containing success status and message
  */
-export const createConnection = async (schoolId, targetUserId, status, userName) => {
+export const createConnection = async (schoolId, targetUserId, status, userType, targetUserType) => {
     try {
         const result = await manageConnections({
             action: 'create',
             schoolId,
             targetUserId,
             status,
-            userName
+            userType,
+            targetUserType
         });
         
         return result.data;
@@ -92,18 +94,44 @@ export const getConnectionsByStatus = async (schoolId, status) => {
 };
 
 /**
+ * Get all connections for the current user
+ * @param {string} schoolId - The school ID
+ * @returns {Promise<Object>} - Object containing connections array and count
+ */
+export const getAllConnections = async (schoolId) => {
+    try {
+        const result = await manageConnections({
+            action: 'getAll',
+            schoolId
+        });
+        
+        return result.data;
+    } catch (error) {
+        console.error('Error getting all connections:', error);
+        throw error;
+    }
+};
+
+/**
  * Add or update a connection with proper error handling
  * @param {Object} currentUser - The current user object
  * @param {Object} targetUser - The target user object
  * @param {string} status - The connection status
- * @param {string} userName - The target user's name
  * @param {Function} setIsConnection - Callback to update connection state
  * @returns {Promise<Object>} - Result of the connection operation
  */
-export const addOrUpdateConnection = async (currentUser, targetUser, status, userName, setIsConnection) => {
+export const addOrUpdateConnection = async (currentUser, targetUser, status, setIsConnection, isHighSchooler=false) => {
     const schoolId = localStorage.getItem("schoolId");
     const targetUserId = targetUser.userId || targetUser.id;
+    const userType = currentUser.userType || currentUser.type;
+    const targetUserType = targetUser.userType || targetUser.type;
     
+    if(isHighSchooler){
+        const pending = JSON.parse(localStorage.getItem("pendingConnections")) || [];
+        localStorage.setItem("pendingConnections", JSON.stringify([...pending, targetUserId]));
+        return;
+    }
+
     try {
         // First check if connection already exists
         const checkResult = await checkConnection(schoolId, targetUserId);
@@ -114,18 +142,19 @@ export const addOrUpdateConnection = async (currentUser, targetUser, status, use
             return {
                 success: false,
                 message: 'Connection already exists',
-                isConnected: true
+                isConnected: true,
+                connectionData: checkResult.connectionData
             };
         }
         
         // Create new connection
-        const createResult = await createConnection(schoolId, targetUserId, status, userName);
+        const createResult = await createConnection(schoolId, targetUserId, status, userType, targetUserType);
         
         // Update local state
         setIsConnection && setIsConnection(createResult.isConnected);
         
         // Handle pending connections in localStorage
-        if (status === "pending") {
+        if (status === "pending" || createResult.needsParentalApproval) {
             const pending = JSON.parse(localStorage.getItem("pendingConnections")) || [];
             localStorage.setItem("pendingConnections", JSON.stringify([...pending, targetUserId]));
         }

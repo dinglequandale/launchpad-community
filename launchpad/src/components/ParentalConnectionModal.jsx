@@ -5,7 +5,7 @@ import { CgClose } from 'react-icons/cg';
 import { parentConnectionRequestTemplate } from '../utils/parentVerificationTemplates';
 // import { addOrUpdateConnection } from '../services/userProfileServices';
 import { useAuth } from '../contexts/auth/AuthContext';
-import { addOrUpdateConnection } from '../services/connectionService';
+import { addOrUpdateConnection, getConnectionsByStatus } from '../services/connectionService';
 
 export default function ParentalConnectionModal({ professionalData, onClose, onApproved=()=>{} }) {
   const [requesting, setRequesting] = useState(false);
@@ -15,18 +15,32 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
   const {currentUser} = useAuth();
   const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
 
-  // Check if already requested
+  // Check if already requested using new connection system
   useEffect(() => {
-    const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-    // const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
+    const checkPendingConnection = async () => {
+      try {
+        const schoolId = localStorage.getItem('schoolId');
+        const result = await getConnectionsByStatus(schoolId, 'pending_parental_approval');
+        
+        if (result.success && result.connections) {
+          // Check if there's a pending parental approval connection between these users
+          const hasPendingConnection = result.connections.some(conn => 
+            (conn.initiateUserId === currentUser.uid && conn.targetUserId === professionalData.id) ||
+            (conn.initiateUserId === professionalData.id && conn.targetUserId === currentUser.uid)
+          );
+          
+          if (hasPendingConnection) {
+            console.log("Connection already requested");
+            setRequested(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking pending connections:', error);
+      }
+    };
     
-    console.log("pending shit: ", pendingConnections);
-
-    if (pendingConnections.includes(professionalData.id)) {
-      console.log("is requested");
-      setRequested(true);
-    }
-  }, [professionalData.id]);
+    checkPendingConnection();
+  }, [professionalData.id, currentUser.uid]);
 
   const handleRequestApproval = async () => {
     setRequesting(true);
@@ -38,8 +52,10 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
         uid: currentUser.uid,
         action: "connection",
         schoolId: localStorage.getItem("schoolId"),
-        connectionId: professionalData.id,
-        connectionName: professionalData.userName
+        targetUserName: professionalData.userName,
+        targetUserId: professionalData.id,
+        userType: userBasicInfo.userType,
+        targetUserType: professionalData.userType
       });
 
       // Extract the verification link from the result
@@ -71,7 +87,7 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
     }
 
     // add to pending connections
-    await addOrUpdateConnection(currentUser, professionalData, 'pending', professionalData.userName, true);
+    await addOrUpdateConnection(currentUser, professionalData, 'pending_parental_approval', null, true);
   
     setRequesting(false);
     setRequested(true);

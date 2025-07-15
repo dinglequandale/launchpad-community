@@ -29,10 +29,26 @@ function GlobalAuthWrapper() {
     try {
       const schoolId = localStorage.getItem("schoolId");
       if (schoolId) {
-        const pending = await getConnectionsByStatus(schoolId, 'pending');
-        const approved = await getConnectionsByStatus(schoolId, 'approved');
-        localStorage.setItem('pendingConnections', JSON.stringify(pending));
-        localStorage.setItem('approvedConnections', JSON.stringify(approved));
+        const parentPendingResult = await getConnectionsByStatus(schoolId, 'pending_parental_approval');
+        const parentApprovedResult = await getConnectionsByStatus(schoolId, 'parent_approved');
+        // const approvedResult = await getConnectionsByStatus(schoolId, 'approved');
+        // Extract user IDs from the connections
+        const pendingUserIds = parentPendingResult.connections?.map(conn => 
+          conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+        ) || [];
+        
+        const parentApprovedUserIds = parentApprovedResult.connections?.map(conn => 
+          conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+        ) || [];
+
+        // const approvedUserIds = approvedResult.connections?.map(conn => 
+        //   conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+        // ) || [];
+
+        
+        localStorage.setItem('pendingConnections', JSON.stringify(pendingUserIds));
+        localStorage.setItem('approvedConnections', JSON.stringify(parentApprovedUserIds));
+        // localStorage.setItem('trueApprovedConnections', JSON.stringify(approvedUserIds));
       }
     } catch (error) {
       console.error('Error fetching connections:', error);
