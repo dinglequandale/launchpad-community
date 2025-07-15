@@ -121,7 +121,7 @@ export default function Home(){
         if (currentUser) {
             const idTokenResult = await currentUser.getIdTokenResult();
             const schoolId = idTokenResult.claims.school_id;
-            console.log("School Id:", schoolId);
+            // console.log("School Id:", schoolId);
 
             setUserBasicInfo((prev) => ({
                 ...prev, 
@@ -150,60 +150,9 @@ export default function Home(){
         return;
       }
 
-      // connection status visibility check
-      console.log("Initial useEffect - calling fetchReceivedConnections");
-      
-      // fetchReceivedConnections(); // This function is no longer needed
-
-
     }, []);
 
-    // Check for connection modal display after receivedConnections is updated
-    // useEffect(() => {
-    //   console.log("Connection modal check useEffect triggered");
-    //   console.log("receivedConnections:", receivedConnections);
-    //   console.log("info:", info);
-      
-    //   const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
-    //   console.log("connectionSessionFlag:", connectionSessionFlag);
-      
-    //   if (
-    //     (info &&
-    //     info.userType === 'High Schooler' &&
-    //     info.parentVerified &&
-    //     !connectionSessionFlag) ||
-    //     (info.userType !== 'High Schooler' )
-    //       // && !connectionSessionFlag) TODO: ADD BACK
-    //   ) {
-    //     console.log("All conditions met for connection modal check");
-    //   //   const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-    //   //   const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
-        
-    //   //   console.log("pendingConnections:", pendingConnections);
-    //   //   console.log("approvedConnections:", approvedConnections);
-    //   //   // console.log("receivedConnections.length:", receivedConnections.length);
-
-    //   //   if (pendingConnections.length > 0 || approvedConnections.length > 0 || receivedConnections.length > 0) {
-    //   //     console.log("SHOWING CONNECTION MODAL!");
-    //   //     setShowConnectionModal(true);
-    //   //     sessionStorage.setItem('connectionModalShown', 'true');
-    //   //   } else {
-    //   //     console.log("No connections found, not showing modal");
-    //   //   }
-    //   // } else {
-    //   //   console.log("Conditions not met for connection modal:");
-    //   //   console.log("- info exists:", !!info);
-    //   //   console.log("- userType is High Schooler:", info?.userType === 'High Schooler');
-    //   //   console.log("- parentVerified:", info?.parentVerified);
-    //   //   console.log("- connectionSessionFlag:", connectionSessionFlag);
-    //   }
-    // }, [receivedConnections, info]);
-
-    // Replace fetchReceivedConnections with logic using context values
     useEffect(() => {
-      console.log("Connection modal check useEffect triggered");
-      console.log("info:", info);
-      
       const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
       console.log("connectionSessionFlag:", connectionSessionFlag);
       
@@ -215,7 +164,7 @@ export default function Home(){
         (info.userType !== 'High Schooler' 
           && !connectionSessionFlag)
       ) {
-        console.log("All conditions met for connection modal check");
+        // console.log("All conditions met for connection modal check");
         const openConnectionModal = info.userType === "High Schooler" ? (pending.length > 0 ||
           pending_parental_approval.length > 0 ||
           parent_approved.length > 0 ||
@@ -226,26 +175,13 @@ export default function Home(){
           setShowConnectionModal(true);
           sessionStorage.setItem("connectionModalShown", true);
         }
-        // const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-        // const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
         
-        // console.log("pendingConnections:", pendingConnections);
-        // console.log("approvedConnections:", approvedConnections);
-        // // console.log("receivedConnections.length:", receivedConnections.length);
-
-        // if (pendingConnections.length > 0 || approvedConnections.length > 0 || receivedConnections.length > 0) {
-        //   console.log("SHOWING CONNECTION MODAL!");
-        //   setShowConnectionModal(true);
-        //   sessionStorage.setItem('connectionModalShown', 'true');
-        // } else {
-        //   console.log("No connections found, not showing modal");
-        // }
       } else {
-        console.log("Conditions not met for connection modal:");
-        console.log("- info exists:", !!info);
-        console.log("- userType is High Schooler:", info?.userType === 'High Schooler');
-        console.log("- parentVerified:", info?.parentVerified);
-        console.log("- connectionSessionFlag:", connectionSessionFlag);
+        // console.log("Conditions not met for connection modal:");
+        // console.log("- info exists:", !!info);
+        // console.log("- userType is High Schooler:", info?.userType === 'High Schooler');
+        // console.log("- parentVerified:", info?.parentVerified);
+        // console.log("- connectionSessionFlag:", connectionSessionFlag);
       }
     }, [info, pending,pending_parental_approval,
       parent_approved,

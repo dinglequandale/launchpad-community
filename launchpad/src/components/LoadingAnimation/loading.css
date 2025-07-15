@@ -29,3 +29,12 @@
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
+
+.dropdown-loading-spinner {
+  min-height: 38px; /* typical react-select option height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* padding: 4px 0; */
+  padding-top: 20px;
+}

@@ -6,7 +6,7 @@ import { IoCloseOutline } from 'react-icons/io5';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import { useModal } from '../../contexts/ModalContext';
 import { useLocation } from 'react-router-dom';
-import { getConnectionsByStatus, checkConnection } from '../../services/connectionService';
+import { getConnectionsByStatus, checkConnection, isConnectionApproved } from '../../services/connectionService';
 import { displayShortenedLinkedin, displayColleges, displayFieldsOfInterest, displaySchools, getBasicUserDescription } from '../../services/userProfileServices';
 import DefaultIcon from '../DefaultIcon/DefaultIcon';
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
@@ -14,8 +14,9 @@ import Loading from '../LoadingAnimation/Loading';
 import { useReport } from '../../contexts/report/ReportContext';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
+import { useConnections } from '../../contexts/ConnectionContext';
 
-export default function ProfileCard({userData, visibility, onClose, top, onConnectClick, handleReferalClick, isConnected: initialConnectionStatus}) {
+export default function ProfileCard({userData, visibility, onClose, top, handleReferalClick, isConnected: initialConnectionStatus}) {
 
     const userType = userData.userType;
     const userBasicInfo = localStorage.getItem("basicUserInfo") ? JSON.parse(localStorage.getItem("basicUserInfo")) : {};
@@ -31,7 +32,12 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
     const userName = userData.userName;
     const [opportunitiesData, setOpportunitiesData] = useState([]);
     const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
-    const [isConnection, setIsConnection] = useState(initialConnectionStatus || false);
+    const { approved = [], parent_approved = [], loading: connectionsLoading } = useConnections();
+
+    // Determine connection status from context
+    const isConnection =
+        approved.some(conn => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId) ||
+        parent_approved.some(conn => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId);
 
     const {currentUser} = useAuth();
 
@@ -40,31 +46,31 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
 
     const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
 
-    const canPublishConnection = (viewingUserType !== "High Schooler") 
-    || (viewingUserType === "High Schooler" && userType === "High Schooler");
+    // const canPublishConnection = (viewingUserType !== "High Schooler") 
+    // || (viewingUserType === "High Schooler" && userType === "High Schooler");
     
-    useEffect(() => {
-      const checkConnectionStatus = async () => {
-        if(!currentUser || !userData || !visibility){
-          return;
-        }
+    // useEffect(() => {
+    //   const checkConnectionStatus = async () => {
+    //     if(!currentUser || !userData || !visibility){
+    //       return;
+    //     }
         
-        // If initialConnectionStatus is provided, use it and skip Firebase call
-        if (initialConnectionStatus !== undefined) {
-          setIsConnection(initialConnectionStatus);
-          return;
-        }
+    //     // If initialConnectionStatus is provided, use it and skip Firebase call
+    //     if (initialConnectionStatus !== undefined) {
+    //       // setIsConnection(initialConnectionStatus); // This line is removed as per new_code
+    //       return;
+    //     }
         
-        try {
-          const result = await checkConnection(schoolId, userData.userId || userData.id);
-          setIsConnection(result.isConnected);
-        } catch (error) {
-          console.error('Error checking connection status:', error);
-          setIsConnection(false);
-        }
-      }
-      checkConnectionStatus();
-    },[visibility, currentUser, userData, initialConnectionStatus]);
+    //     try {
+    //       const result = await checkConnection(schoolId, userData.userId || userData.id);
+    //       // setIsConnection(result.isConnected); // This line is removed as per new_code
+    //     } catch (error) {
+    //       console.error('Error checking connection status:', error);
+    //       // setIsConnection(false); // This line is removed as per new_code
+    //     }
+    //   }
+    //   // checkConnectionStatus(); // This line is removed as per new_code
+    // },[visibility, currentUser, userData, initialConnectionStatus]);
 
     useEffect(()=>{
 
@@ -145,48 +151,31 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
         }
     }, []);
 
-    const isConnectionApproved = async () => {
+    // Remove isConnectionApproved async logic and instead check parent_approved in context
+    const isConnectionApproved = () => {
         if (userBasicInfo.userType !== 'High Schooler' || userType === 'High Schooler') {
-            return true; // Not a high schooler connecting to professional
+            return true;
         }
-        
         if (!userBasicInfo.parentVerified) {
-            return false; // Parent not verified
-        }
-        
-        try {
-            const schoolId = localStorage.getItem('schoolId');
-            const result = await getConnectionsByStatus(schoolId, 'parent_approved');
-            
-            if (result.success && result.connections) {
-                // Check if there's a parent-approved connection between these users
-                const hasApprovedConnection = result.connections.some(conn => 
-                    (conn.initiateUserId === currentUser.uid && conn.targetUserId === userData.id) ||
-                    (conn.initiateUserId === userData.id && conn.targetUserId === currentUser.uid)
-                );
-                return hasApprovedConnection;
-            }
-            
-            return false;
-        } catch (error) {
-            console.error('Error checking connection approval status:', error);
             return false;
         }
+
+        const total_approved = [...parent_approved, ...approved];
+        // Check parent_approved connections in context
+        return total_approved.some(conn =>
+            (conn.initiateUserId === currentUser.uid && (conn.targetUserId === userData.id || conn.targetUserId === userData.userId)) ||
+            (conn.initiateUserId === (userData.id || userData.userId) && conn.targetUserId === currentUser.uid)
+        );
     };
 
-    const handleConnectClick = async () => {
-
-        if (userBasicInfo.userType === 'High Schooler' && userType !== 'High Schooler') {
-            const approved = await isConnectionApproved();
-            console.log("approved status: " + approved);
-            if (!approved) {
-                openParentalConnectionModal({professionalData: userData});
-                return;
-            }
+    const handleConnectClick = () => {
+        const parentVerified = userBasicInfo.parentVerified;
+        const isApproved = isConnectionApproved(viewingUserType, currentUser, userData, parent_approved, approved, parentVerified);
+        if (!isApproved) {
+            openParentalConnectionModal({ professionalData: userData });
+            return;
         }
-        
-        // Simply open the ConnectModal - connection creation will happen there
-        onConnectClick(currentPath === "/Organizations" ? userData : userData.id);
+        openConnectModal({ userData });
     };
 
     return(
@@ -244,7 +233,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userFirstDesc.desc1}</span>: {basicInfoContent.userFirstDesc.desc2}</span>
                                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>
                                 {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
-                                {userData.userType === "Professional" && userData.schoolAttending && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.affiliatedSchools.desc1}</span>: {basicInfoContent.affiliatedSchools.desc2}</span></>}
+                                {/* {userData.userType === "Professional" && userData.schoolAttending && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.affiliatedSchools.desc1}</span>: {basicInfoContent.affiliatedSchools.desc2}</span></>} */}
                                 {userData.userType === "Professional" && (
                                   <div style={{
                                     display: "flex",
@@ -351,7 +340,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 ))}
                                 </div>
                         </div>}
-                        {(userData.userResumePreview && ((userData.userResumePreview.split(" ")[0]) !== "private" || isProfessional)) && <div name="userResume" style={{marginTop: "20px"}}>
+                        {(userData.userResumePreview && ((userData.userResumePreview.split(" ")[0]) !== "private" || userType === "Professional")) && <div name="userResume" style={{marginTop: "20px"}}>
                             <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s Resume</span>
                             <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
                             <iframe src={userData.userResumePreview.split(" ")[userData.userResumePreview.split(" ").length - 1]} frameborder="0" style={{width: "100%", height: "500px"}}></iframe></div>}
