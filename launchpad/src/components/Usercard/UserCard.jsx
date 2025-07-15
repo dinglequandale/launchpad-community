@@ -5,39 +5,41 @@ import { FaLink } from "react-icons/fa6";
 import { displayColleges, displayFieldsOfInterest, displayShortenedName, getBasicUserDescription, lowerAndCapitalize } from "../../services/userProfileServices";
 import DefaultIcon from "../DefaultIcon/DefaultIcon";
 import ParentalConnectionModal from "../ParentalConnectionModal";
-import { checkConnection } from "../../services/connectionService";
+import { checkConnection, isConnectionApproved } from "../../services/connectionService";
+import { useConnections } from '../../contexts/ConnectionContext';
+import { useModal } from "../../contexts/ModalContext";
+import { useAuth } from "../../contexts/auth/AuthContext";
 
 export default function UserCard({userData, onProfileClick, onConnectClick, refreshKey = 0}) {
     // todo: actual banner
     const [bannerVisibility, setBannerVisibility] = useState(false);
-    const [connectionStatus, setConnectionStatus] = useState(false);
-    const [isCheckingConnection, setIsCheckingConnection] = useState(true);
+    const { approved = [], parent_approved = [], loading: connectionsLoading } = useConnections();
+    const {currentUser} = useAuth();
+
+    const {openParentalConnectionModal, openConnectModal} = useModal();
+    // Determine connection status from context
+    const connectionStatus =
+        approved.some(conn => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId) ||
+        parent_approved.some(conn => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId);
+    const isCheckingConnection = connectionsLoading;
 
     // TODO: currently localStorage, transition to database
     const userType = userData.userType;
 
-    const viewingUserType = JSON.parse(localStorage.getItem("basicUserInfo")).userType;
+    const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+    const viewingUserType = userBasicInfo.userType;
 
     const hideConnectBtn = (viewingUserType !== "High Schooler") && userType === "High Schooler";
-    
-    // Check connection status when component mounts or refreshKey changes
-    useEffect(() => {
-        const checkConnectionStatus = async () => {
-            try {
-                const schoolId = localStorage.getItem("schoolId");
-                if (schoolId && userData.userId) {
-                    const result = await checkConnection(schoolId, userData.userId);
-                    setConnectionStatus(result.isConnected || null);
-                }
-            } catch (error) {
-                console.error('Error checking connection status:', error);
-            } finally {
-                setIsCheckingConnection(false);
-            }
-        };
-        
-        checkConnectionStatus();
-    }, [userData.userId, refreshKey]);
+
+    const handleConnectClick = () => {
+        const parentVerified = userBasicInfo.parentVerified;
+        const isApproved = isConnectionApproved(viewingUserType, currentUser, userData, parent_approved, approved, parentVerified);
+        if (!isApproved) {
+            openParentalConnectionModal({ professionalData: userData });
+            return;
+        }
+        openConnectModal({ userData });
+    };
 
     const descType = () => {
         switch(userData.userType){
@@ -73,7 +75,6 @@ export default function UserCard({userData, onProfileClick, onConnectClick, refr
         }
     }
 
-    const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
     const disableActions = userBasicInfo && userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
     
     // Determine button text and state based on connection status
@@ -156,7 +157,7 @@ export default function UserCard({userData, onProfileClick, onConnectClick, refr
                        connectionStatus === 'pending' ? "Connection request pending" :
                        connectionStatus === 'approved' ? "Already connected" : ""}
                 onClick={() => { 
-                    if (!buttonState.disabled) onConnectClick(userData.userId); 
+                    if (!buttonState.disabled) handleConnectClick(); 
                 }}> 
                 <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
                     <FaLink size={22}/>

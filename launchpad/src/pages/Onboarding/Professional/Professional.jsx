@@ -101,7 +101,7 @@ const professionalQuestionsConfig = [
     id: "industryPosition",
     text: "What is your current position?",
     type: "text-box",
-    placeholder: "E.g. 'financial analyst'",
+    placeholder: "E.g. financial analyst",
     options: null,
     retired: false,
     page: 3

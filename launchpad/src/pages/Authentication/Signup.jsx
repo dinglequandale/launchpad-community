@@ -74,14 +74,14 @@ export default function SignUp(){
             try {
                 console.log("Student record: ", studentRecord.graduation_year);
                 localStorage.setItem("tempStudentInfo", JSON.stringify(studentRecord));
-                // await toast.promise(
-                //     doCreateUserWithEmailAndPassword(userEmail + emailData[0].email_hook, userPassword),
-                //     {
-                //         loading: 'Creating your account ...',
-                //         success: "You're set!",
-                //         error: (err) => `Error. Please try again!`
-                //     }
-                // );
+                await toast.promise(
+                    doCreateUserWithEmailAndPassword(userEmail + emailData[0].email_hook, userPassword),
+                    {
+                        loading: 'Creating your account ...',
+                        success: "You're set!",
+                        error: (err) => `Error. Please try again!`
+                    }
+                );
                 
                 navigate("/Onboarding", {state: tempSchoolInfo});
             } catch (error) {

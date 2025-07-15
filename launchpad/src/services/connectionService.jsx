@@ -166,3 +166,19 @@ export const addOrUpdateConnection = async (currentUser, targetUser, status, set
         throw error;
     }
 }; 
+
+export function isConnectionApproved(currentUserType, currentUser, targetUser, parent_approved, approved, parentVerified) {
+    // If not a high schooler connecting to a professional, always approved
+    if (!currentUser || !targetUser) return false;
+    if (currentUserType !== 'High Schooler' || targetUser.userType === 'High Schooler') {
+        return true;
+    }
+    if (!parentVerified) {
+        return false;
+    }
+    const total_approved = [...parent_approved, ...approved];
+    return total_approved.some(conn =>
+        (conn.initiateUserId === currentUser.uid && (conn.targetUserId === targetUser.id || conn.targetUserId === targetUser.userId)) ||
+        (conn.initiateUserId === (targetUser.id || targetUser.userId) && conn.targetUserId === currentUser.uid)
+    );
+} 
