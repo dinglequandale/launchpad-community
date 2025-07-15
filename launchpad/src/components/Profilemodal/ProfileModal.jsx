@@ -234,7 +234,7 @@ export default function ProfileCard({userData, visibility, onClose, top, onConne
                                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userFirstDesc.desc1}</span>: {basicInfoContent.userFirstDesc.desc2}</span>
                                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>
                                 {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
-                                {userData.userType === "Professional" && userData.schoolAttending && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.affiliatedSchools.desc1}</span>: {basicInfoContent.affiliatedSchools.desc2}</span></>}
+                                {/* {userData.userType === "Professional" && userData.schoolAttending && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.affiliatedSchools.desc1}</span>: {basicInfoContent.affiliatedSchools.desc2}</span></>} */}
                                 {userData.userType === "Professional" && (
                                   <div style={{
                                     display: "flex",

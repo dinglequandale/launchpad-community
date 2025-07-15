@@ -190,7 +190,7 @@ return(
                                 <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>{organizationProfileData.organizationHost ? "run by" : ""}&nbsp;</span>
                                 <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHostName}</button>
                                 <br />
-                                <div style={{lineHeight: "1"}}>
+                                <div style={{lineHeight: "1", whiteSpace: "pre-line"}}>
                                     {organizationProfileData.organizationDescription}
                                 </div>
                                 {(organizationProfileData.organizationDeadline || organizationProfileData.organizationStartDate) && <div style={{marginTop: "15px"}}>

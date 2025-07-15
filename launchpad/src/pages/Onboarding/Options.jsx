@@ -4,6 +4,7 @@ import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'fire
 import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
 import { algoliaClient } from '../../typesense/typesenseClient';
 // import {algoliasearch} from 'algoliasearch/lite';
+import Loading from '../../components/LoadingAnimation/Loading';
 
 const highSchools = [
     { "value": "awty_international", "label": "Awty International School" },
@@ -116,22 +117,24 @@ for (let year = 2030; year >= 1990; year--) {
     graduationYears.push({ value: year, label: year.toString() });
 }
 
+// Refactored getColleges to return both colleges and loading state
 const getColleges = (searchQuery = '') => {
   const [colleges, setColleges] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (searchQuery.length < 2) {
+    if (searchQuery.length < 1) {
       setColleges([]);
+      setLoading(false);
       return;
     }
 
+    setLoading(true);
     const searchColleges = async () => {
       try {
-
         const {results} = await client.search({
           requests: [{ indexName: 'colleges', query: searchQuery, hitsPerPage: 5 }],
         });
-        
         const hits = results[0].hits;
         setColleges(hits.map(hit => ({
           label: hit.label,
@@ -139,6 +142,8 @@ const getColleges = (searchQuery = '') => {
         })));
       } catch (error) {
         console.error('Algolia search error:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -146,14 +151,14 @@ const getColleges = (searchQuery = '') => {
     return () => clearTimeout(debouncedSearch);
   }, [searchQuery]);
 
-  return colleges;
+  return { colleges, loading };
 };
 
 const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion = true }) => {
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState('');
 
-  const searchResults = getColleges(inputValue);
+  const { colleges: searchResults, loading } = getColleges(inputValue);
 
   useEffect(() => {
     setOptions(searchResults);
@@ -173,6 +178,8 @@ const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion 
       type={type}
       onSearchQueryChange={handleInputChange}
       showQuestion={showQuestion}
+      isLoading={loading}
+      loadingMessage={() => <Loading size={24} className="dropdown-loading-spinner" />}
     />
   );
 };
