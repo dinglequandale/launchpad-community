@@ -155,22 +155,6 @@ export default function UserNetwork() {
     setFilters(prev => ({...prev, [filterKey]: value}));
   };
 
-//   const isConnectionApproved = (user) => {
-//     if (userType !== 'High Schooler' || user.userType === 'High Schooler') {
-//         return true;
-//     }
-//     if (!parentVerified) {
-//         return false;
-//     }
-
-//     const total_approved = [...parent_approved, ...approved];
-//     // Check parent_approved connections in context
-//     return total_approved.some(conn =>
-//         (conn.initiateUserId === currentUser.uid && (conn.targetUserId === user.id || conn.targetUserId === user.userId)) ||
-//         (conn.initiateUserId === (user.id || user.userId) && conn.targetUserId === currentUser.uid)
-//     );
-// };
-
   const handleConnectClick = (userId) => {
     const user = allVisibleUserData.filter((user) => user.userId === userId)[0];
     // Parental connection logic

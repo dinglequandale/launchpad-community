@@ -24,4 +24,6 @@ dist-ssr
 *.sw?
 *.env
 *.json
+!studentEmailData.json
+!tempInitialOrgData.json
 typesense-server-data/

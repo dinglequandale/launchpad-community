@@ -36,7 +36,6 @@ body.modal-open {
   flex: 0 0 calc(33.333%);    /* Adjust this value based on your itemsPerPage */
 }
 
-
 .carousel-button {
   position: absolute;
   top: 50%;

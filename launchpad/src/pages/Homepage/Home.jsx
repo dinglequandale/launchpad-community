@@ -20,6 +20,7 @@ import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
 import { useConnections } from "../../contexts/ConnectionContext";
 import { useModal } from '../../contexts/ModalContext';
+import ResourceCarousel from "./ResourceCarousel";
 
 
 class ErrorBoundary extends React.Component {
@@ -67,7 +68,7 @@ export default function Home(){
 
     const info = JSON.parse(storedUserBasicInfo);
     const schoolId = localStorage.getItem("schoolId");
-    console.log("SCHOOL ID: "+ schoolId);
+    // console.log("SCHOOL ID: "+ schoolId);
 
     const getUserData = async () => {
       const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
@@ -351,9 +352,9 @@ export default function Home(){
             <TopBar/>
             <SideNav/>
             <div className='homeContainer' style={{background: "var(--primary)", paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>
-                <div style={{paddingTop: "20px"}}>
-                    {userBasicInfo && <InviteContacts userBasicInfo={userBasicInfo} userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={capitalizeFirstLetter(userBasicInfo.schoolId)}/>}
-                </div>
+                {localStorage.getItem("schoolId") && <div style={{paddingTop: "20px"}}>
+                    {userBasicInfo && <InviteContacts userBasicInfo={userBasicInfo} userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={capitalizeFirstLetter(localStorage.getItem("schoolId"))}/>}
+                </div>}
                 <div style={{display: "flex", paddingTop: "30px", position: "relative", width: "fitParent", height: "400px"}}>
                     <div className="launchpadIntro" style={
                         {padding: "10px", backgroundColor: "white", width: "53%", borderRadius: "10px",
@@ -384,9 +385,7 @@ export default function Home(){
                 </div>
                 <div className="resourceCenter">
                     <h2>Resource Center</h2>
-                    <div style={
-                        {display:"flex", alignItems: "center", justifyContent: "center", gap: "40px",
-                        borderBottomStyle: "solid", borderColor: "#C0C0C0", paddingBottom: "20px"}}>
+                    <div style={{display:"flex", alignItems: "center", justifyContent: "center", gap: "40px", borderBottomStyle: "solid", borderColor: "#C0C0C0", paddingBottom: "20px"}}>
                         {Object.keys(resourceSections).map((sectionName, index)=>(
                             <ResourceItem 
                             resourceType={sectionName}
@@ -397,16 +396,16 @@ export default function Home(){
                     </div>
                     <div>
                         {Object.entries(resourceData).map(([sectionTitle, resources]) => (
-                        <ResourceSection 
-                        sectionRef={resourceSections[sectionTitle]}
-                        key={sectionTitle}
-                        title={sectionTitle}
-                        resources={resources}
-                        onSectionRef={handleSectionRef}/>
+                          <ResourceCarousel
+                            key={sectionTitle}
+                            title={sectionTitle}
+                            resources={resources}
+                            sectionRef={refSections.current[sectionTitle]}
+                            onSectionRef={handleSectionRef}
+                          />
                         ))}
                     </div>
                     <hr/>
-            
                     <div style={{marginTop: "25px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
                         <h2 style={{fontSize: "30px"}}>Launchpad Support</h2>
                         <div style={{width: "800px", background: "white", boxShadow: "var(--shadowColor)", padding: "19px", borderRadius: "5px", textAlign: "center", fontSize: "larger"}}>
@@ -414,7 +413,6 @@ export default function Home(){
                         </div>
                     </div>
                 </div>
-                
             </div>
             {/* <div className="landing-footer" style={{zIndex: "4"}}>
               <LegalityFooter/>
@@ -474,19 +472,7 @@ function ResourceItem({resourceType, resourceRef}){
 
 function ResourceCard({ title, link, description, recommendedBanner, time, userType }) {
     return (
-      <div style={{
-        position: "relative",
-        padding: "20px",
-        width: "320px",
-        backgroundColor: "white",
-        boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)",
-        borderRadius: "5px",
-        margin: "10px",
-        height: "320px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between"
-      }}>
+      <div className={"card"}>
         {recommendedBanner === "yes (highly recommended)" && (
             <ImportanceBanner/>
         )}
@@ -508,58 +494,6 @@ function ResourceCard({ title, link, description, recommendedBanner, time, userT
       </div>
     );
   }  
-
-function ResourceSection({ title, resources, onSectionRef }) {
-  
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    onSectionRef(title, sectionRef.current);
-  }, [title, onSectionRef]);
-
-  const settings = {
-    dots: true,
-    // infinite: true,
-    // speed: 1000,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-        }
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1
-        }
-      }
-    ]
-    };
-  
-    return (
-      <div style={{ margin: "20px 0", position: "relative" }}>
-        <div ref={sectionRef} style={{position: "absolute", marginLeft: "auto", marginRight: "auto", left: "0", right: "0", width: "5px", top: "-80px", display: "hidden"}}></div>
-        <span style={{display: "flex", justifyContent: "center", fontSize: "25px", fontWeight: "200"}}>{title}</span>
-        {(resources.length > 3) ? <Slider {...settings}>
-          {resources.map((resource, index) => (
-            <ResourceCard key={index} {...resource} />
-          ))}
-        </Slider> :
-        <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-          {resources.map((resource, index) => (
-            <ResourceCard key={index} {...resource} />
-          ))}
-        </div>}
-      </div>
-    );
-  }
-  
-  
 
 function ImportanceBanner(){
     return(

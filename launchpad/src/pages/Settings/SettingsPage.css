@@ -1,5 +1,5 @@
 .settings-holder {
-  background: linear-gradient(0deg,rgba(120, 208, 255, 0.2) 0%, rgba(84, 255, 209, 0.0) 80%);
+  background: linear-gradient(0deg,rgba(120, 208, 255, 0.15) 0%, rgba(84, 255, 209, 0.0) 100%);
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -34,6 +34,7 @@
   border-radius: 8px;
   padding: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1.5px solid rgba(0, 81, 147, 0.568);
 }
 
 .settings-nav {
@@ -77,6 +78,7 @@
   padding: 2rem;
   min-height: 600px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1.5px solid rgba(0, 81, 147, 0.568);
 }
 
 /* Section specific styles */
