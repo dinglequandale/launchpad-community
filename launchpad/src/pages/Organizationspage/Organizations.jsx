@@ -33,6 +33,7 @@ export default function Organizations(){
     const [initLoading, setInitLoading] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [tenantId, setTenantId] = useState(null);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     const [lastDoc, setlastDoc] = useState(null);
     const [hasMore, setHasMore] = useState(true);
@@ -45,13 +46,27 @@ export default function Organizations(){
         subjectMatter: 'Any Subject Matter'
     });
 
-    const handleConnectClick = (userData = null) => {
-        if(userData){
-            openConnectModal({ userData, chat: chatClient, userId: userData.userId, isOpportunity: true });
-            return;
+    // Listen for sidebar state changes
+    useEffect(() => {
+        const handleSidebarChange = () => {
+            const sidebar = document.querySelector('.v0-sidebar');
+            if (sidebar) {
+                setIsSidebarCollapsed(sidebar.classList.contains('v0-sidebar-collapsed'));
+            }
+        };
+
+        // Initial check
+        handleSidebarChange();
+
+        // Set up observer to watch for sidebar class changes
+        const observer = new MutationObserver(handleSidebarChange);
+        const sidebar = document.querySelector('.v0-sidebar');
+        if (sidebar) {
+            observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
         }
-        // fallback: openConnectModal with last targetUserData
-    }
+
+        return () => observer.disconnect();
+    }, []);
     
         // useEffect(() => {
         // jsonData.map(async (org, index) => {
@@ -194,34 +209,32 @@ export default function Organizations(){
             <Toaster position={'bottom-right'} reverseOrder={false}/>
             <TopBar/>
             <SideNav/>
-            <div className='organizationsContainer' style={{paddingTop: "6%", paddingLeft: "10%", backgroundColor: "white", paddingBottom: "2%"}}>
+            <div className={`organizationsContainer ${isSidebarCollapsed ? 'organizations-sidebar-collapsed' : 'organizations-sidebar-expanded'}`}>
                 <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/> 
                 
-                <main style={{display: "flex", margin: "0 auto", flexDirection: "column", gap: "40px", paddingTop: "20px", position: "relative"}}>
+                <div className="v0-organizations-content">
                     {initLoading ?
-                        <div style={loadingStyles}>
+                        <div className="v0-loading-container">
                             <Loading/>
                         </div>
                         : (organizationsData && organizationsData.length > 0) ?
                         
                         (<>
                         {organizationsData.map((organization, index)=>(
-                            <div key={index}>
-                                <OrganizationProfile handleReferalClick={handleReferalClick} organizationData={organization} handleShowProfile={handleShowProfile} location={"organizations_page"}/>
-                            </div>
+                            <OrganizationProfile key={index} handleReferalClick={handleReferalClick} organizationData={organization} handleShowProfile={handleShowProfile} location={"organizations_page"}/>
                             ))}
-                        {/* <div style={loadingStyles}>
-                            <Loading/>
-                        </div> */}
                         </>)
                         :
-                        <div style={{margin: "0 auto", transform: "translateY(18%)"}}>
+                        <div className="v0-no-results-container">
                             <EmptyField/>
                         </div>
                         }
                         
-                </main>
-                {((organizationsData.length % 5 === 0) && !loading) && <footer style={{display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "25px", marginTop: "15px"}}><ShowMoreButton onShowMoreClick={onShowMoreClick}/></footer>}
+                </div>
+                {((organizationsData.length % 5 === 0) && !loading) && 
+                <footer className="v0-show-more-footer">
+                    <ShowMoreButton onShowMoreClick={onShowMoreClick}/>
+                </footer>}
             </div>
         </>
         
@@ -231,6 +244,6 @@ export default function Organizations(){
 function ShowMoreButton({onShowMoreClick}){
 
     return(<>
-        <button className="btnText" style={{fontSize: "25px"}} onClick={onShowMoreClick}>Show More...</button>
+        <button className="v0-show-more-btn" onClick={onShowMoreClick}>Show More...</button>
     </>)
 }

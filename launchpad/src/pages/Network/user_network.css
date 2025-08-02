@@ -1,5 +1,10 @@
 .mainBody{
     background: white;
+    padding: 20px;
+    min-height: 67vh;
+    position: relative;
+    border-radius: 8px;
+    margin-top: 20px;
     /* background: linear-gradient(360deg, var(--neutral) 0%, rgba(52,197,227,0) 100%); */
 }
 
@@ -71,4 +76,100 @@ body.modal-open {
 
 .slide-left, .slide-right {
   transition: transform 1s ease;
+}
+
+.networkContainer {
+    margin-left: 240px;
+    margin-top: 64px;
+    padding: 24px;
+    min-height: calc(100vh - 64px);
+    background: #f9fafb;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.network-sidebar-expanded {
+    margin-left: 240px;
+}
+
+.network-sidebar-collapsed {
+    margin-left: 64px;
+}
+
+/* Adjust for collapsed sidebar */
+.v0-sidebar-collapsed ~ .networkContainer {
+    margin-left: 64px;
+}
+
+/* v0 Network Content Styling */
+.v0-network-content {
+    background: white;
+    padding: 24px;
+    min-height: 67vh;
+    position: relative;
+    border-radius: 12px;
+    margin-top: 20px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.v0-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.v0-section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.v0-section-badge {
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.v0-loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.v0-no-results-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    padding: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .networkContainer {
+        margin-left: 0;
+        padding: 16px;
+    }
+    
+    .v0-sidebar-collapsed ~ .networkContainer {
+        margin-left: 0;
+    }
+    
+    .v0-network-content {
+        padding: 16px;
+        border-radius: 8px;
+    }
+    
+    .v0-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
 }
