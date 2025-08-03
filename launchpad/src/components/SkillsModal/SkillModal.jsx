@@ -76,58 +76,76 @@ export default function SkillModal({visibility, onClose, userData}) {
   })
 
     return (
-    <>
-        <Toaster position="bottom-right" reverseOrder={false} />
-        <div className="modal-overlay">
-            <div className="modal-content" ref={modalRef}>
-            
-            <div className="close-skills" onClick={onClose}><IoCloseOutline size={30} /></div>
-            <header>
-                <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Introduce your Skill Set <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Impress professionals and secure internships</span></h2>
-                <hr style={{borderColor: "var(--secondary)"}}/>
-            </header>
-            
-            <div className="skills-modal-container">
-            {skillData.map((skill, index) => (
-                <div key={index} className="skill-item">
-                <div className="skill-header">
-                    <h3>Skill {index + 1}</h3>
-                    {index > 0 && (
-                    <button className="btnText remove-button" onClick={() => handleRemoveSkill(index)}>
-                        <BiTrash size={22} />
-                    </button>
-                    )}
+        <>
+            <Toaster position="bottom-right" reverseOrder={false} />
+            {visibility && (
+                <div className="v0-modal-overlay" onClick={onClose}>
+                    <div className="v0-modal-container" onClick={(e) => e.stopPropagation()} ref={modalRef}>
+                        <div className="v0-modal-header">
+                            <button className="v0-modal-close-btn" onClick={onClose}>
+                                <IoCloseOutline size={20} />
+                            </button>
+                            <h2 className="v0-modal-title">Introduce your Skill Set</h2>
+                            <p className="v0-modal-subtitle">Impress professionals and secure internships</p>
+                        </div>
+                        
+                        <div className="v0-modal-content">
+                            <div className="v0-skills-container">
+                                {skillData.map((skill, index) => (
+                                    <div key={index} className="v0-skill-item">
+                                        <div className="v0-skill-header">
+                                            <h3 className="v0-skill-title">Skill {index + 1}</h3>
+                                            {index > 0 && (
+                                                <button 
+                                                    className="v0-skill-remove-btn" 
+                                                    onClick={() => handleRemoveSkill(index)}
+                                                >
+                                                    <BiTrash size={18} />
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="v0-skill-inputs">
+                                            <input
+                                                type="text"
+                                                placeholder="Skill name"
+                                                value={skill.skillCategory}
+                                                onChange={(e) => handleInputChange("skillCategory", e.target.value, index)}
+                                                className="v0-form-input"
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Brief description"
+                                                value={skill.skillDescription}
+                                                onChange={(e) => handleInputChange("skillDescription", e.target.value, index)}
+                                                className="v0-form-input"
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <button className="v0-btn-secondary v0-add-skill-btn" onClick={handleAddSkill}>
+                                <BiPlus size={18} /> Add Skill
+                            </button>
+                        </div>
+                        
+                        <div className="v0-modal-footer">
+                            <button 
+                                className="v0-btn-secondary" 
+                                onClick={onClose}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                className="v0-btn-primary" 
+                                onClick={handleSubmit}
+                            >
+                                Submit
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <input
-                    type="text"
-                    placeholder="Skill"
-                    value={skill.skillCategory}
-                    onChange={(e) => handleInputChange("skillCategory", e.target.value, index)}
-                />
-                <input
-                    type="text"
-                    placeholder="Brief Description"
-                    value={skill.skillDescription}
-                    onChange={(e) => handleInputChange("skillDescription", e.target.value, index)}
-                />
-                </div>
-            ))}
-            </div>
-            
-            <button className="btnUnfilled skill-add-button" onClick={handleAddSkill}>
-            <BiPlus size={20} /> Add Skill
-            </button>
-            <footer style={{paddingTop: "20px", position: "relative"}}>
-                {/* <button className="btnText" onClick={handleAddSkill} style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", fontSize: "larger", margin: "0 auto", marginBottom: "20px"}}><GrAdd size={25}/> Add skill</button> */}
-                <div style={{display: "flex", justifyContent: "space-between",}}>
-                    <button onClick={onClose} className="btnUnfilled" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger"}}>
-                        Cancel</button>
-                    <button onClick={handleSubmit} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-                        Submit</button>
-                </div>
-            </footer>
-        </div>
-    </div>
-    </>
+            )}
+        </>
     )
 }

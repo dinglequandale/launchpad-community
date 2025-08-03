@@ -39,6 +39,7 @@ export default function UserNetwork() {
   const pageName = `The ${capitalizeFirstLetter(schoolId)} Network`;
 
   const [tenantId, setTenantId] = useState(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { openProfileModal, openConnectModal, openParentalConnectionModal } = useModal();
 
@@ -56,6 +57,28 @@ export default function UserNetwork() {
   const { approved = [], parent_approved = [], loading: connectionsLoading } = useConnections();
 
   const [isRecommended, setIsRecommended] = useState("(recommended)");
+  
+  // Listen for sidebar state changes
+  useEffect(() => {
+    const handleSidebarChange = () => {
+      const sidebar = document.querySelector('.v0-sidebar');
+      if (sidebar) {
+        setIsSidebarCollapsed(sidebar.classList.contains('v0-sidebar-collapsed'));
+      }
+    };
+
+    // Initial check
+    handleSidebarChange();
+
+    // Set up observer to watch for sidebar class changes
+    const observer = new MutationObserver(handleSidebarChange);
+    const sidebar = document.querySelector('.v0-sidebar');
+    if (sidebar) {
+      observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    return () => observer.disconnect();
+  }, []);
   
   useEffect(() => {
     document.addEventListener("keydown", onKeyPress, true)
@@ -294,14 +317,14 @@ export default function UserNetwork() {
         <div>
             <TopBar/>
             <SideNav/>
-            <div className='networkContainer' id="networkContainer" style={{paddingTop: "6%", paddingLeft: "10%"}}>
+            <div className={`networkContainer ${isSidebarCollapsed ? 'network-sidebar-collapsed' : 'network-sidebar-expanded'}`} id="networkContainer">
               <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/>
-              <div className="mainBody" style={{paddingLeft: "20px", paddingRight: "20px", paddingBottom: "20px", minHeight: "67vh", position: "relative"}}>
+              <div className="v0-network-content">
                 {allVisibleUserData && allVisibleUserData.length > 0 ? <>
                 {professionals.length > 0 && <>
-                <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
-                  <h3>Professionals</h3>
-                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>{isRecommended}</span>
+                <div className="v0-section-header">
+                  <h3 className="v0-section-title">Professionals</h3>
+                  <span className="v0-section-badge">{isRecommended}</span>
                 </div>
                 <UserCarousel 
                   userNetworkData={professionals}
@@ -311,9 +334,9 @@ export default function UserNetwork() {
                 />
                 </>}
                 {collegeStudents.length > 0 && <>
-                <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
-                  <h3>College Students</h3>
-                  <span style={{fontWeight: "lighter", fontSize: "smaller"}}>{isRecommended}</span>
+                <div className="v0-section-header">
+                  <h3 className="v0-section-title">College Students</h3>
+                  <span className="v0-section-badge">{isRecommended}</span>
                 </div>
                 <UserCarousel 
                   userNetworkData={collegeStudents}
@@ -323,9 +346,9 @@ export default function UserNetwork() {
                 />
                 </>}
                 {highSchoolers.length > 0 && userType !== "Professional" && <>
-                <div style={{display: "flex", alignItems: "center", gap: "5px"}}>
-                  <h3>High Schoolers</h3>
-                  <span style={{fontWeight: "400", fontSize: "smaller"}}>{isRecommended}</span>
+                <div className="v0-section-header">
+                  <h3 className="v0-section-title">High Schoolers</h3>
+                  <span className="v0-section-badge">{isRecommended}</span>
                 </div>
                 <UserCarousel 
                   userNetworkData={highSchoolers} 
@@ -334,8 +357,13 @@ export default function UserNetwork() {
                   connectionRefreshKey={connectionRefreshKey}
                 />
                 </>}
-                </> : overallLoading ? <div style={{position: "absolute", left: "50%",top: "50%", transform: "translate(-50%,-50%)", width: "300px"}}> <Loading/> </div> : 
-                <div style={{position: "absolute", left: "50%",top: "45%", transform: "translate(-50%,-40%)", width: "400px", height: "500px"}}><NoResults/></div>}
+                </> : overallLoading ? 
+                <div className="v0-loading-container">
+                  <Loading/>
+                </div> : 
+                <div className="v0-no-results-container">
+                  <NoResults/>
+                </div>}
               </div>
             </div>
         </div>

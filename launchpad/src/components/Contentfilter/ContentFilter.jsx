@@ -171,24 +171,19 @@ export default function ContentFilter({filterKey, filterContent, onFilterChange}
 
     return(
         <div className="filterContainer" ref={dropRef}>
-            <div style={{display: "flex", alignItems: "center", cursor: "pointer"}} className="filterTop" onClick={handleClick}>
-                <span style={{fontWeight: "550"}}>{selectedOption ? selectedOption : filterContent[0]}</span>
-                <RiArrowDropDownLine size={40}/>
+            <div className="filterTop" onClick={handleClick}>
+                <span className="filter-label">{selectedOption ? selectedOption : filterContent[0]}</span>
+                <RiArrowDropDownLine size={20} className="dropdown-icon"/>
             </div>
-            <div className={dropdownVisibility ? "dropdown open" : "dropdown "} style={{border: !dropdownVisibility ? "none" : ""}}>
+            <div className={dropdownVisibility ? "dropdown open" : "dropdown"}>
                 {Object.values(filterContent).filter((filter)=>filter !== null).map((option, index)=>(
                     <div
                         key={index}
-                        style={{
-                        padding: "7px",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                        }}
                         className={`filterOptions ${
                         selectedOption === option ? 'active' : ''
                         }`}
                         onClick={() => onClickOption(option)}>
-                        {option} <br />
+                        {option}
                     </div>
                 ))}
             </div>

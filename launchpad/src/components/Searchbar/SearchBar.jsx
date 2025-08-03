@@ -16,10 +16,10 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
     const [queryText, setQueryText] = useState('');
  
     return (
-      <div className="searchContainer" style={{background: "white"}}>
-          <h2 style={{ paddingLeft: "3%" }}>{pageName}</h2>
+      <div className="searchContainer">
+          <h2 className="search-title">{pageName}</h2>
           <div className="search">
-              <form onSubmit={(e) => handleSearch(e, queryText)} style={{ display: "flex", flex: 1, position: "relative" }}>
+              <form onSubmit={(e) => handleSearch(e, queryText)} className="search-form">
                   <CiSearch size={20} className="searchIcon" />
                   <input
                       type="text"
@@ -31,7 +31,7 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
                   />
               </form>
           </div>
-          <div style={{ display: "flex", paddingBottom: "10px", gap: "30px", marginLeft: "5%" }}>
+          <div className="search-filters">
               {Object.keys(filters)
                   .filter((filterKey) => filters[filterKey] !== null)
                   .map((filterKey) => (

@@ -54,49 +54,55 @@ export default function AboutMeModal({userData, visibility, onClose}){
     return text.trim().split(/\s+/).length;
   }
 
-  const customStyles = {
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-    },
-    overlay: {
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      backdropFilter: 'blur(5px)',
-      zIndex: "3",
-    }
-  };
-
   return (
-    <div>
+    <>
       <Toaster position="bottom-right" reverseOrder={false} />
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
-      <Modal
-        isOpen={visibility}
-        onRequestClose={onClose}
-        style={customStyles}
-        contentLabel="About Me Modal"
-        // shouldCloseOnOverlayClick={false} 
-      >
-        <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
-        <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> My About Me <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>It's your time to shine!</span></h2>
-          <hr style={{borderColor: "var(--secondary)"}}/>
-        </header>
-        <main style={{paddingTop: "20px"}}>
-          <textarea className='inputAboutMe' placeholder='Tell us more about yourself!' onChange={e => handleAboutMeChange(e.target.value)} value={aboutMeContent}></textarea>
-        </main>
-        <span style={{fontSize: "smaller"}}>Word Count: {aboutMeContent ? `${getWordCount(aboutMeContent)}` : "0"}/{wordLimit}</span>
-        <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-          <button disabled={isSubmitting} className='btnUnfilled' onClick={()=>setMakeChangesVisibility(true)} style={{borderRadius: "4px", width: "40%", padding: "8px", fontSize: "larger"}}>
-            Cancel</button>
-          <button onClick={saveAboutMe} type='submit' disabled={isSubmitting} className="btnSaveChanges" style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white"}}>
-            Save Changes</button>
-        </footer>
-      </Modal>
-    </div>
+      {visibility && (
+        <div className="v0-modal-overlay" onClick={onClose}>
+          <div className="v0-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="v0-modal-header">
+              <button className="v0-modal-close-btn" onClick={onClose}>
+                <CgClose size={20} />
+              </button>
+              <h2 className="v0-modal-title">My About Me</h2>
+              <p className="v0-modal-subtitle">It's your time to shine!</p>
+            </div>
+            
+            <div className="v0-modal-content">
+              <div className="v0-form-group">
+                <label className="v0-form-label">Tell us about yourself</label>
+                <textarea 
+                  className="v0-form-textarea" 
+                  placeholder="Share your story, interests, and what makes you unique..."
+                  value={aboutMeContent}
+                  onChange={e => handleAboutMeChange(e.target.value)}
+                />
+                <div className="v0-word-count">
+                  Word Count: {aboutMeContent ? `${getWordCount(aboutMeContent)}` : "0"}/{wordLimit}
+                </div>
+              </div>
+            </div>
+            
+            <div className="v0-modal-footer">
+              <button 
+                className="v0-btn-secondary" 
+                onClick={() => setMakeChangesVisibility(true)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button 
+                className="v0-btn-primary" 
+                onClick={saveAboutMe}
+                disabled={isSubmitting}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };

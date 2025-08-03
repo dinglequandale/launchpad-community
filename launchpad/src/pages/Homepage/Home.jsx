@@ -21,6 +21,7 @@ import { useOutletContext } from "react-router-dom";
 import { useConnections } from "../../contexts/ConnectionContext";
 import { useModal } from '../../contexts/ModalContext';
 import ResourceCarousel from "./ResourceCarousel";
+import { LuPlay, LuUsers, LuGraduationCap, LuBriefcase, LuFileText, LuBookOpen } from "react-icons/lu";
 
 
 class ErrorBoundary extends React.Component {
@@ -51,6 +52,8 @@ export default function Home(){
     const [showConnectionModal, setShowConnectionModal] = useState(false);
     const [connectedUserData, setConnectedUserData] = useState(null);
     const [showVerifedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [selectedResource, setSelectedResource] = useState(null);
     const {
       pending,
       pending_parental_approval,
@@ -67,8 +70,28 @@ export default function Home(){
     const storedUserBasicInfo = localStorage.getItem("basicUserInfo");
 
     const info = JSON.parse(storedUserBasicInfo);
-    const schoolId = localStorage.getItem("schoolId");
-    // console.log("SCHOOL ID: "+ schoolId);
+
+    // Listen for sidebar state changes
+    useEffect(() => {
+        const handleSidebarChange = () => {
+            const sidebar = document.querySelector('.v0-sidebar');
+            if (sidebar) {
+                setIsSidebarCollapsed(sidebar.classList.contains('v0-sidebar-collapsed'));
+            }
+        };
+
+        // Initial check
+        handleSidebarChange();
+
+        // Set up observer to watch for sidebar class changes
+        const observer = new MutationObserver(handleSidebarChange);
+        const sidebar = document.querySelector('.v0-sidebar');
+        if (sidebar) {
+            observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+        }
+
+        return () => observer.disconnect();
+    }, []);
 
     const getUserData = async () => {
       const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
@@ -351,72 +374,136 @@ export default function Home(){
             )}
             <TopBar/>
             <SideNav/>
-            <div className='homeContainer' style={{background: "var(--primary)", paddingTop: "5%", paddingLeft: "16%", paddingRight: "6%", paddingBottom: "40px"}}>
-                {localStorage.getItem("schoolId") && <div style={{paddingTop: "20px"}}>
+            <div className={`v0-home-container ${isSidebarCollapsed ? 'v0-home-sidebar-collapsed' : 'v0-home-sidebar-expanded'}`}>
+                {/* {localStorage.getItem("schoolId") && (
+                    <div className="v0-invite-section">
                     {userBasicInfo && <InviteContacts userBasicInfo={userBasicInfo} userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={capitalizeFirstLetter(localStorage.getItem("schoolId"))}/>}
-                </div>}
-                <div style={{display: "flex", paddingTop: "30px", position: "relative", width: "fitParent", height: "400px"}}>
-                    <div className="launchpadIntro" style={
-                        {padding: "10px", backgroundColor: "white", width: "53%", borderRadius: "10px",
-                            boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
-                    }>
-                        <span style={
-                            {fontWeight: "600", display: "flex", alignItems: "center", justifyContent: "center",
-                                 borderBottomStyle: "solid", paddingBottom: "5px", borderColor: "#C0C0C0", borderWidth: "1px"}
-                            }>
-                            Welcome to Launchpad! &nbsp; <span style={{fontSize: "smaller", fontWeight:"400"}}>(Watch Full Video)</span>
-                        </span>
-                        <div style={{paddingTop: "15px", height: "330px"}}>
+                    </div>
+                )}
+                 */}
+                <div className="v0-welcome-section">
+                    <div className="v0-welcome-banner">
+                        <h1 className="v0-welcome-title">Welcome back, {userBasicInfo?.userName?.split(" ")[0] || "User"}!</h1>
+                        <p className="v0-welcome-subtitle">Ready to connect and grow your network today?</p>
+                    </div>
+                </div>
+
+                <div className="v0-main-content">
+                    <div className="v0-content-grid">
+                        <div className="v0-video-section">
+                            <div className="v0-video-card">
+                                <div className="v0-video-header">
+                                    <LuPlay size={20} />
+                                    <span>Getting Started</span>
+                                    <span className="v0-video-subtitle">Learn how to make the most of Launchpad</span>
+                                </div>
+                                <div className="v0-video-container">
                         <ErrorBoundary>
                             <ReactPlayer
                                 url='https://www.youtube.com/watch?v=uhnxWBqVvbY'
                                 width='100%'
                                 height='100%'
-                                controls={true}/>
+                                            controls={true}
+                                        />
                         </ErrorBoundary>
+                                </div>
+                                <button className="v0-watch-btn">Watch Tutorial</button>
+                            </div>
+                        </div>
+
+                        <div className="v0-profile-section">
+                            <div className="v0-profile-card">
+                                <div className="v0-profile-header">
+                                    <h3>Profile Strength</h3>
+                                    {/* <br /> */}
+                                    {/* <p>Complete your profile to connect with more people</p> */}
+                                </div>
+                                <div className="v0-profile-content">
+                                    <ProfileStrength userData={userBasicInfo}/>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div style={
-                        {padding: "10px", backgroundColor: "white", width: "40%", marginLeft: "auto", borderRadius: "10px",
-                            boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
-                        }>
-                        <ProfileStrength userData={userBasicInfo}/>
+
+                    <div className="v0-resource-section">
+                        <div className="v0-resource-header">
+                            <h2>Resource Center</h2>
+                            <p>Explore resources to help with your academic and professional journey</p>
+                        </div>
+                        <div className="v0-resource-grid">
+                            <div 
+                                className={`v0-resource-item ${selectedResource === 'How To Network' ? 'v0-resource-item-selected' : ''}`}
+                                onClick={() => setSelectedResource(selectedResource === 'How To Network' ? null : 'How To Network')}
+                            >
+                                <LuUsers size={32} className="v0-resource-icon" />
+                                <h3>Networking Tips</h3>
+                                <p>Build meaningful connections</p>
+                            </div>
+                            <div 
+                                className={`v0-resource-item ${selectedResource === 'Find Your Ideal Career' ? 'v0-resource-item-selected' : ''}`}
+                                onClick={() => setSelectedResource(selectedResource === 'Find Your Ideal Career' ? null : 'Find Your Ideal Career')}
+                            >
+                                <LuBriefcase size={32} className="v0-resource-icon" />
+                                <h3>Career Guidance</h3>
+                                <p>Explore career paths</p>
+                            </div>
+                            <div 
+                                className={`v0-resource-item ${selectedResource === 'Find Your Dream University' ? 'v0-resource-item-selected' : ''}`}
+                                onClick={() => setSelectedResource(selectedResource === 'Find Your Dream University' ? null : 'Find Your Dream University')}
+                            >
+                                <LuGraduationCap size={32} className="v0-resource-icon" />
+                                <h3>College Prep</h3>
+                                <p>Application tips and guidance</p>
+                            </div>
+                            <div 
+                                className={`v0-resource-item ${selectedResource === 'Resume-Building' ? 'v0-resource-item-selected' : ''}`}
+                                onClick={() => setSelectedResource(selectedResource === 'Resume-Building' ? null : 'Resume-Building')}
+                            >
+                                <LuFileText size={32} className="v0-resource-icon" />
+                                <h3>Resume Building</h3>
+                                <p>Create compelling resumes</p>
+                            </div>
+                            {/* <div 
+                                className={`v0-resource-item ${selectedResource === 'SAT/ACT Hacks' ? 'v0-resource-item-selected' : ''}`}
+                                onClick={() => setSelectedResource(selectedResource === 'SAT/ACT Hacks' ? null : 'SAT/ACT Hacks')}
+                            >
+                                <LuBookOpen size={32} className="v0-resource-icon" />
+                                <h3>Test Prep</h3>
+                                <p>SAT/ACT preparation tips</p>
+                            </div> */}
+                        </div>
                     </div>
-                </div>
-                <div className="resourceCenter">
-                    <h2>Resource Center</h2>
-                    <div style={{display:"flex", alignItems: "center", justifyContent: "center", gap: "40px", borderBottomStyle: "solid", borderColor: "#C0C0C0", paddingBottom: "20px"}}>
-                        {Object.keys(resourceSections).map((sectionName, index)=>(
-                            <ResourceItem 
-                            resourceType={sectionName}
-                            resourceRef={refSections.current[sectionName]}
-                            key={index}
-                            />
-                        ))}
-                    </div>
-                    <div>
-                        {Object.entries(resourceData).map(([sectionTitle, resources]) => (
-                          <ResourceCarousel
-                            key={sectionTitle}
-                            title={sectionTitle}
-                            resources={resources}
-                            sectionRef={refSections.current[sectionTitle]}
-                            onSectionRef={handleSectionRef}
-                          />
-                        ))}
-                    </div>
-                    <hr/>
-                    <div style={{marginTop: "25px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-                        <h2 style={{fontSize: "30px"}}>Launchpad Support</h2>
-                        <div style={{width: "800px", background: "white", boxShadow: "var(--shadowColor)", padding: "19px", borderRadius: "5px", textAlign: "center", fontSize: "larger"}}>
-                            <span>If you experience any techincal bugs, errors, or issues of any sort, please contact <span className="highlight">launchpadhelpline@gmail.com</span>. Additionally, if you have any questions about networking or certain opportunities, feel free to contact us there as well!</span>
+
+                    {selectedResource && (
+                        <div className="v0-resource-details">
+                            <div className="v0-resource-header-selected">
+                                <h3>{selectedResource}</h3>
+                                <button 
+                                    className="v0-resource-close-btn"
+                                    onClick={() => setSelectedResource(null)}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <div className="v0-resource-content">
+                                <ResourceCarousel
+                                    title={selectedResource}
+                                    resources={resourceData[selectedResource]}
+                                    sectionRef={refSections.current[selectedResource]}
+                                    onSectionRef={handleSectionRef}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="v0-support-section">
+                        <h2>Launchpad Support</h2>
+                        <div className="v0-support-card">
+                            <p>If you experience any technical bugs, errors, or issues of any sort, please contact <span className="v0-highlight">launchpadhelpline@gmail.com</span>. Additionally, if you have any questions about networking or certain opportunities, feel free to contact us there as well!</p>
                         </div>
                     </div>
                 </div>
             </div>
-            {/* <div className="landing-footer" style={{zIndex: "4"}}>
-              <LegalityFooter/>
-            </div> */}
         </>
     )
 }
@@ -433,17 +520,16 @@ function InviteContacts({userName, tenantId, userBasicInfo}){
     return(
         <>
         {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} tenantId={tenantId}/>}
-        <div style={
-            {textAlign: "center", position: "relative", padding: "15px", margin: "0 auto", width: "fitParent", backgroundColor: "rgba(14, 195, 111, .3)",
-         height: "fitContent", borderRadius: "4px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.09)"}
-         }>
-            <span style={{fontSize: "18.5px", fontWeight: "350"}}><span style={{fontSize: "28px", fontWeight: "bolder"}}>Hello, {userName}!</span> <br /> Know any <span style={{fontWeight: "550"}}>{tenantId} high schoolers</span> or <span style={{fontWeight: "550"}}>{tenantId} alumni</span> who would benefit from being on the app? Know other  <span style={{fontWeight: "550"}}>professionals</span> in the {tenantId} community willing to share their expertise? Invite friends and family below!</span>
-            <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
+        <div className="v0-invite-card">
+            <div className="v0-invite-content">
+                <h2 className="v0-invite-title">Hello, {userName}!</h2>
+                <p className="v0-invite-text">
+                    Know any <strong>{tenantId} high schoolers</strong> or <strong>{tenantId} alumni</strong> who would benefit from being on the app? Know other <strong>professionals</strong> in the {tenantId} community willing to share their expertise? Invite friends and family below!
+                </p>
                 <button 
                   disabled={disableActions} 
-                  style={{cursor: disableActions ? "not-allowed" : "pointer"}} 
-                  onClick={()=>{if(!disableActions)setInviteContactsModalVisibility(true)}} 
-                  className="btnInviteContacts"
+                    className="v0-invite-btn"
+                    onClick={() => {if(!disableActions)setInviteContactsModalVisibility(true)}}
                   title={disableActions ? "Parent/guardian approval required" : ""}
                 >
                   Invite Contacts
@@ -459,12 +545,12 @@ function ResourceItem({resourceType, resourceRef}){
   const handleResourceClick = () => {
     resourceRef.scrollIntoView({ 
       behavior: 'smooth', 
-      block: 'start', // Scroll to the top of the section
+      block: 'start',
       });
   }
   return(
-      <button className="resourceItem" onClick={handleResourceClick}>
-          <span style={{padding: "3.5px", fontSize: "larger"}}>{resourceType}</span>
+      <button className="v0-resource-tab" onClick={handleResourceClick}>
+          <span>{resourceType}</span>
           <FaArrowCircleDown color="grey" size={20}/>
       </button>
   )
@@ -472,23 +558,15 @@ function ResourceItem({resourceType, resourceRef}){
 
 function ResourceCard({ title, link, description, recommendedBanner, time, userType }) {
     return (
-      <div className={"card"}>
+      <div className="v0-resource-card">
         {recommendedBanner === "yes (highly recommended)" && (
             <ImportanceBanner/>
         )}
-        <h3 style={{ margin: "0" }}>{title}</h3>
-        <p style={{ flex: 1, overflow: "auto" }}>{description}</p>
+        <h3>{title}</h3>
+        <p>{description}</p>
         {time && <span>Time: {time}</span>}
         <p>For: {userType}</p>
-        <a href={link} target="_blank" rel="noopener noreferrer"  style={{
-          display: "block",
-          textAlign: "center",
-          // background: "#007bff",
-          color: "white",
-          padding: "10px",
-          borderRadius: "5px",
-          textDecoration: "none"
-        }} className="resource-btn">
+        <a href={link} target="_blank" rel="noopener noreferrer" className="v0-resource-link">
           Access Resource
         </a>
       </div>
@@ -497,9 +575,8 @@ function ResourceCard({ title, link, description, recommendedBanner, time, userT
 
 function ImportanceBanner(){
     return(
-        <div style={{borderRadius: "20px", position: "absolute", top: "-15px", left: "10px", width: "fitContent", padding: "2px 8px", background: "rgb(47,162,52)",
-            background: "linear-gradient(90deg, rgba(47,162,52,1) 48%, rgba(18,123,22,1) 100%)", zIndex: "1"}}>
-            <span style={{color: "white", fontWeight: "600"}}>Highly Recommended!</span>
+        <div className="v0-importance-banner">
+            <span>Highly Recommended!</span>
         </div>
     )
 }

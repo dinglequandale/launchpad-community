@@ -101,54 +101,65 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
       };
     
     return(
-        <div>
+        <>
             <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
-            <Modal
-            isOpen={visibility}
-            onRequestClose={onClose}
-            style={customStyles}
-            contentLabel="Availability Modal"
-            >
-                <header>
-                    <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
-                    <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px", color: "var(--secondary)"}}> Your Commitment <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Connect. Inspire. Empower.</span></h2>
-                    <hr style={{borderColor: "var(--secondary)"}}/>
-                </header>
-                <main style={{width: "850px"}}>
-                <div style={{textAlign: "center"}}>
-                    <span style={{color: "black", fontSize: "30px", fontWeight: "450", lineHeight: "1.3"}}> {userType !== "Professional" ? "High schoolers" : "High schoolers and college students"} will have the opportunity to connect with you via Launchpad. <br /> <span style={{fontSize: "smaller", fontWeight: "350", color: "var(--secondary)"}}>What are you open to doing for these students?</span></span>
-                    <div style={{padding: "2% 5%"}}>
-                    <div style={{textAlign: "left", boxShadow: "var(--shadowColor)", padding: "13px 20px", backgroundColor: "var(--neutral)", borderRadius: "15px"}}>
-                        <div style={{display: "flex", flexDirection: "column", gap: "25px"}}>
-                        {userAvailabilityOptions.map((option)=>(
-                        <div style={{fontSize: "larger", lineHeight: ".7", display: "flex"}}>
-                            <label htmlFor={option.id}>
-                            <input 
-                                type="checkbox"
-                                value={option.value}
-                                checked={selectedOptions.includes(option.value)}
-                                onChange={handleOptionChange}
-                            />
-                            <span style={{fontSize: "22px", fontWeight: "bolder", color: "var(--secondary)"}}>{option.value}:</span> <span style={{fontWeight: "300"}}>{option.text}</span>
-                            </label>
-                        </div>))}
+            {visibility && (
+                <div className="v0-modal-overlay" onClick={onClose}>
+                    <div className="v0-modal-container" onClick={(e) => e.stopPropagation()}>
+                        <div className="v0-modal-header">
+                            <button className="v0-modal-close-btn" onClick={onClose}>
+                                <CgClose size={20} />
+                            </button>
+                            <h2 className="v0-modal-title">Your Commitment</h2>
+                            <p className="v0-modal-subtitle">Connect. Inspire. Empower.</p>
+                        </div>
+                        
+                        <div className="v0-modal-content">
+                            <div className="v0-availability-intro">
+                                <h3 className="v0-availability-title">
+                                    {userType !== "Professional" ? "High schoolers" : "High schoolers and college students"} will have the opportunity to connect with you via Launchpad.
+                                </h3>
+                                <p className="v0-availability-subtitle">What are you open to doing for these students?</p>
+                            </div>
+                            
+                            <div className="v0-availability-options">
+                                {userAvailabilityOptions.map((option) => (
+                                    <div key={option.id} className="v0-availability-option">
+                                        <label className="v0-checkbox-label">
+                                            <input 
+                                                type="checkbox"
+                                                value={option.value}
+                                                checked={selectedOptions.includes(option.value)}
+                                                onChange={handleOptionChange}
+                                                className="v0-checkbox"
+                                            />
+                                            <div className="v0-checkbox-content">
+                                                <span className="v0-option-title">{option.value}</span>
+                                                <span className="v0-option-description">{option.text}</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        <div className="v0-modal-footer">
+                            <button 
+                                className="v0-btn-secondary" 
+                                onClick={() => setMakeChangesVisibility(true)}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                className="v0-btn-primary" 
+                                onClick={saveAvailabilityData}
+                            >
+                                Save Changes
+                            </button>
                         </div>
                     </div>
-                    </div>
-                
-                    </div>
-                </main>
-                <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-                    <button onClick={
-                        ()=>setMakeChangesVisibility(true)
-                        } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger"}}>
-                        Cancel
-                    </button>
-                    <button onClick={saveAvailabilityData} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white"}}>
-                        Save Changes
-                    </button>
-                </footer>
-            </Modal>
-        </div>
+                </div>
+            )}
+        </>
     )
 }
