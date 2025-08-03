@@ -268,44 +268,61 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
         organizationQuestionsConfig,
         handleDropdownChange,
         }}> 
-        <Modal
-          isOpen={visibility}
-          onRequestClose={onClose}
-          style={customStyles}
-          contentLabel="Initiative Modal"
-          // shouldCloseOnOverlayClick={false}
-          // shouldCloseOnEsc={false}
-        >
-          
-          <header style={{position: "relative"}}>
-            {currentInitiativePage < 4 && <div name="estimated-time" style={{position: "absolute", fontSize: "17px", fontWeight: "300"}}>
-              Est. Time: {4 - currentInitiativePage} minute{currentInitiativePage < 3 ? "s" : ""}
-            </div>}
-            <button className='btnClose' onClick={()=>{
-              if(changesMade){
-                setMakeChangesVisibility(true);
-              }
-              else{
-                onClose();
-              }}} style={{background:"none"}}><CgClose size={25}/></button>
-            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Your Initiative <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Make your voice heard. Garner support from alumni and parents.</span></h2>
-            <hr style={{borderColor: "var(--secondary)"}}/>
-            <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast}/>
-          </header>
-          <main style={{paddingTop:"10px"}}>
-          <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px"}}>
-            {renderPage()}
-          </form>
-          </main>
-          <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "right"}}>
-            {/* <button onClick={
-              ()=>setMakeChangesVisibility(true)
-              } className='btnUnfilled' style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Cancel</button> */}
-            {currentInitiativePage === 4 && <button onClick={publishInitiativeData} type='submit' className="btnSaveChanges" disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Save Changes</button>}
-          </footer>
-        </Modal>
+        {visibility && (
+          <div className="v0-modal-overlay" onClick={() => {
+            if(changesMade){
+              setMakeChangesVisibility(true);
+            }
+            else{
+              onClose();
+            }
+          }}>
+            <div className="v0-modal-container" onClick={(e) => e.stopPropagation()}>
+              <div className="v0-modal-header">
+                <button className="v0-modal-close-btn" onClick={() => {
+                  if(changesMade){
+                    setMakeChangesVisibility(true);
+                  }
+                  else{
+                    onClose();
+                  }
+                }}>
+                  <CgClose size={20} />
+                </button>
+                <h2 className="v0-modal-title">Your Initiative</h2>
+                <p className="v0-modal-subtitle">Make your voice heard. Garner support from alumni and parents.</p>
+                {currentInitiativePage < 4 && (
+                  <div className="v0-estimated-time">
+                    Est. Time: {4 - currentInitiativePage} minute{currentInitiativePage < 3 ? "s" : ""}
+                  </div>
+                )}
+              </div>
+              
+              <div className="v0-modal-content">
+                <div className="v0-progress-section">
+                  <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast}/>
+                </div>
+                <div className="v0-form-section">
+                  <form className="v0-modal-form">
+                    {renderPage()}
+                  </form>
+                </div>
+              </div>
+              
+              <div className="v0-modal-footer">
+                {currentInitiativePage === 4 && (
+                  <button 
+                    className="v0-btn-primary" 
+                    onClick={publishInitiativeData}
+                    disabled={isSaving}
+                  >
+                    Save Changes
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </InitiativeContext.Provider>
     </div>
     </>
@@ -319,13 +336,13 @@ function InitiativeType(){
 
   return(
     <>
-    <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>We need some general information first.</h2>
-    <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
+    <h2 className="v0-modal-page-title">We need some general information first.</h2>
+    <hr className="v0-modal-page-divider"/>
     <main style={{ display: "flex", paddingTop: "1rem"}}>
       <div style={{ display: "flex", flexDirection: "column", gap: "25px", width: "100%" }}>
         {questionsForPage.map((question) => (
-          <div key={question.id} style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-            <label htmlFor={question.id}>
+          <div key={question.id} className="v0-modal-form-group">
+            <label htmlFor={question.id} className="v0-modal-form-label">
               {question.text}
             </label>
             {question.type === "select" ?
@@ -334,7 +351,7 @@ function InitiativeType(){
                   name={question.id}
                   value={organizationData[question.id]}
                   onChange={handleChange}
-                  style={{width: "45%"}}
+                  className="v0-modal-form-select"
                 >
                   {question.options.map((option) => (
                     <option key={option} value={option === "Select Type" ? "" : option}>
@@ -351,7 +368,7 @@ function InitiativeType(){
                   value={organizationData[question.id] ?? ''}
                   onChange={handleChange}
                   type="text"
-                  style={{width: "42.8%"}}
+                  className="v0-modal-form-input"
                   maxLength={question.maxLength}
                 />)}
           </div>
@@ -369,33 +386,37 @@ function InitiativeMission(){
 
   return(
     <>
-    <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>Time to get down to business. What sets you apart?</h2>
-    <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-    <main style={{ display: "flex", alignItems: "center", justifyContent: "space-around", paddingTop: "1rem" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
+    <h2 className="v0-modal-page-title">Time to get down to business. What sets you apart?</h2>
+    <hr className="v0-modal-page-divider"/>
+    <main className="v0-modal-form">
+      <div className="v0-modal-form-group">
         {questionsForPage.map((question) => (
-          <div style={{display: "flex", flexDirection: "column", gap: "5px", justifyContent: "center", alignItems: "center", textAlign: "center"}}>
-            <label htmlFor={question.id}>{question.text}</label>
-            {question.type !== "textarea" ? <div style={{width: "460px", textAlign: "left"}}><OnboardingDropdown
-                    showQuestion={false}
-                    key={question.id}
-                    question={question.text}
-                    options={question.options}
-                    selectedOption={organizationData[question.id] || (question.type === 'multi-select' ? [] : '')}
-                    onChange={(label) => handleDropdownChange(question.id, label)}
-                    type={question.type}
-                  /> </div> : 
-            <textarea
-            className='initiativeMission'
-            key={question.id}
-            id={question.id}
-            name={question.id}
-            value={organizationData[question.id] ?? ''}
-            onChange={handleChange}
-            type={question.type}
-            maxLength={question.maxLength}
-            placeholder={question.placeholder}
-            />}
+          <div key={question.id} className="v0-modal-form-group">
+            <label htmlFor={question.id} className="v0-modal-form-label">{question.text}</label>
+            {question.type !== "textarea" ? 
+              <div className="v0-modal-form-group">
+                <OnboardingDropdown
+                  showQuestion={false}
+                  key={question.id}
+                  question={question.text}
+                  options={question.options}
+                  selectedOption={organizationData[question.id] || (question.type === 'multi-select' ? [] : '')}
+                  onChange={(label) => handleDropdownChange(question.id, label)}
+                  type={question.type}
+                />
+              </div> : 
+              <textarea
+                className="v0-modal-textarea"
+                key={question.id}
+                id={question.id}
+                name={question.id}
+                value={organizationData[question.id] ?? ''}
+                onChange={handleChange}
+                type={question.type}
+                maxLength={question.maxLength}
+                placeholder={question.placeholder}
+              />
+            }
           </div>
         ))}
       </div>
@@ -505,80 +526,83 @@ function FinalInfo(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>You're almost done! Just a few more things.</h2>
-      <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <h2 className="v0-modal-page-title">You're almost done! Just a few more things.</h2>
+      <hr className="v0-modal-page-divider"/>
+      <div className="v0-modal-form">
           {/* First two questions (link inputs) */}
-          <div style={{ display: "flex", gap: "10px", flexDirection: "column", textAlign: "center"}}> 
+          <div className="v0-modal-form-group"> 
             {questionsForPage
               .filter(question => question.type === "link")
               .map(question => (
-                <div key={question.id} style={{position: "relative"}}>
-                  <label htmlFor={question.id}>{question.text}</label>
-                  <div style={{display: "flex", justifyContent: "center", gap: "25px", paddingTop: "10px"}}>
+                <div key={question.id} className="v0-modal-link-container">
+                  <label htmlFor={question.id} className="v0-modal-link-label">{question.text}</label>
+                  <div className="v0-modal-link-options">
                   {learnMoreAndApplyOptions.map((option)=>(
-                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: "100px"}}>
-                      <button key={option[0]} style={{padding: "10px"}}  className={`btnSaveChanges btnCircle ${(option[0] === (question.id === "learnMore" ? learnMoreType : applyType)) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
+                    <div key={option[0]} className="v0-modal-link-option">
+                      <button className={`v0-modal-link-btn ${(option[0] === (question.id === "learnMore" ? learnMoreType : applyType)) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
                         {option[1]}
                       </button>
-                      <span>{option[0] === "Messages" ? "Message Me" : option[0] === "Email" ? "Email Me" : "Website"}</span>
+                      <span className="v0-modal-link-text">{option[0] === "Messages" ? "Message Me" : option[0] === "Email" ? "Email Me" : "Website"}</span>
                     </div>)
                   )}
                   </div>
                   {learnMoreInputVisibility && question.id === "learnMore" &&
-                  <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", color: "var(--secondary)"}}>
-                    <span style={{fontWeight: "600"}} htmlFor={`${question.id} Input`}>Input your desired {learnMoreType === "Email" ? "email" : "website link"}:</span>
+                  <div className="v0-modal-link-input-container">
+                    <span className="v0-modal-link-input-label">Input your desired {learnMoreType === "Email" ? "email" : "website link"}:</span>
                     <input 
                     type={learnMoreType === "Email" ? "email" : "url"} 
                     id={question.id}
                     name={question.id}
                     value={organizationData[question.id].split(": ")[1]}
                     onChange={handleChange}
+                    className="v0-modal-link-input"
                     />
                   </div>}
                   {(applyInputVisibility && !applyDisabled && question.id === "apply") &&
-                  <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", color: "var(--secondary)"}}>
-                    <span style={{fontWeight: "600"}} htmlFor={`${question.id} Input`}>Input your desired {applyType === "Email" ? "email" : "website link"}:</span>
+                  <div className="v0-modal-link-input-container">
+                    <span className="v0-modal-link-input-label">Input your desired {applyType === "Email" ? "email" : "website link"}:</span>
                     <input
                     type={applyType === "Email" ? "email" : "url"} 
                     id={question.id}
                     name={question.id}
                     onChange={handleChange}
-                    value={organizationData[question.id].split(": ")[1]}/>
+                    value={organizationData[question.id].split(": ")[1]}
+                    className="v0-modal-link-input"
+                    />
                   </div>}
-                  <div style={{zIndex: "10", height: "100px", top: "6px", opacity: ".6", backgroundColor: "white", display: (question.id === "apply" && applyDisabled) ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}>
+                  <div className="v0-modal-date-overlay" style={{display: (question.id === "apply" && applyDisabled) ? "" : "none", height: "100px"}}>
                   </div>
                   {(question.id === "apply") && (
-                    <button className='btnText' onClick={handleNoApplyClick} style={{fontSize: "18px", opacity: ".75", marginTop: "10px", color: applyDisabled ? "var(--highlight)" : ""}}>
-                      I don’t want other students to participate.
+                    <button className="v0-modal-no-apply-btn" onClick={handleNoApplyClick}>
+                      I don't want other students to participate.
                     </button>
                   )}
                 </div>
               ))}
           </div>
           {/* Logo upload */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div className="v0-modal-file-container">
             {questionsForPage
               .filter(question => question.type === "file")
               .map(question => (
-                <div key={question.id} className="questionItem">
-                  <label htmlFor={question.id}>{question.text}</label>
-                  <div style={{display: "flex", position: "relative", alignItems: "center", justifyContent: "center", width: "40%", paddingTop: "15px"}}>
-                    <button className='btnSaveChanges' style={{borderRadius: "50%", boxShadow: "var(--shadowColor)", padding: "15px"}} onClick={(e)=>{
+                <div key={question.id} className="v0-modal-form-group">
+                  <label htmlFor={question.id} className="v0-modal-file-label">{question.text}</label>
+                  <div className="v0-modal-file-upload">
+                    <button className="v0-modal-file-btn" onClick={(e)=>{
                       logoRef.current.click();
-                      e.preventDefault();}}><GrAdd size={30}/></button>
+                      e.preventDefault();}}><GrAdd size={24}/></button>
                     <input
                         type="file"
                         id="organizationLogo"
                         name="organizationLogo"
                         onChange={handleFileChange}
-                        style={{display: "none"}}
+                        className="v0-modal-file-input"
                         ref={logoRef}
                         accept=".jpg,.png"
                     />
-                    {organizationData.organizationLogoPreview && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
-                      <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Logo Preview:</span>
-                      <img src={organizationData.organizationLogoPreview} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
+                    {organizationData.organizationLogoPreview && <div className="v0-modal-file-preview">
+                      <span className="v0-modal-file-preview-text">Logo Preview:</span>
+                      <img src={organizationData.organizationLogoPreview} alt="Logo" className="v0-modal-file-preview-img"/>
                     </div>}
                       </div>
                   </div>
@@ -596,9 +620,9 @@ function PreviewOppportunityCard(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>You're all set! Here's a preview of your card:</h2>
-      <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "10px"}}>
+      <h2 className="v0-modal-page-title">You're all set! Here's a preview of your card:</h2>
+      <hr className="v0-modal-page-divider"/>
+      <div className="v0-modal-preview-container">
         <OrganizationProfile organizationData={organizationData} location={"opportunity_popup"}/>
       </div>
     </main>

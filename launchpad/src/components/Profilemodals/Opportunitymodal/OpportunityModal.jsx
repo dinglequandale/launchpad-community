@@ -378,50 +378,61 @@ const publishOpportunityData = async () => {
         handleChange,
         organizationQuestionsConfig,
         }}> 
-        <Modal
-          isOpen={visibility}
-          onRequestClose={onClose}
-          style={customStyles}
-          contentLabel="Opportunity Modal"
-          shouldCloseOnOverlayClick={false}
-          shouldCloseOnEsc={false}
-        >
-          
-          <header style={{position: "relative"}}>
-            {currentOpportunityPage < 5 && <div name="estimated-time" style={{position: "absolute", fontSize: "17px", fontWeight: "300"}}>
-              Est. Time: {5 - currentOpportunityPage} minute{currentOpportunityPage < 4 ? "s" : ""}
-            </div>}
-            <button className='btnClose' onClick={()=>{
-              if(changesMade){
-                setMakeChangesVisibility(true);
-              }
-              else{
-                onClose();
-              }}} style={{background:"none"}}><CgClose size={25}/></button>
-            <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Your Workplace Opportunity <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Be the ember that lights a fire in young minds.</span></h2>
-            <hr style={{borderColor: "var(--secondary)"}}/>
-            <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
-          </header>
-          <main style={{paddingTop:"10px"}}>
-          <form style={{display: "flex", flexDirection: "column", justifyContent: "space-around", width: "750px", maxHeight: "60vh"}}>
-            {renderPage()}
-          </form>
-          </main>
-          <footer style={{bottom: "0px", paddingTop: "20px", display: "flex", justifyContent: "right"}}>
-            {/* <button onClick={
-              ()=>setMakeChangesVisibility(true)
-              } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Cancel</button> */}
-            {currentOpportunityPage === 5 && <button onClick={publishOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              Publish</button>
-              //  : !isPublished ?
-              // <button onClick={saveOpportunityData} type='submit' className='btnSaveChanges' disabled={isSaving} style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-              // Save</button>
-              // : 
-              // <></>
-              }
-          </footer>
-        </Modal>
+        {visibility && (
+          <div className="v0-modal-overlay" onClick={() => {
+            if(changesMade){
+              setMakeChangesVisibility(true);
+            }
+            else{
+              onClose();
+            }
+          }}>
+            <div className="v0-modal-container" onClick={(e) => e.stopPropagation()}>
+              <div className="v0-modal-header">
+                <button className="v0-modal-close-btn" onClick={() => {
+                  if(changesMade){
+                    setMakeChangesVisibility(true);
+                  }
+                  else{
+                    onClose();
+                  }
+                }}>
+                  <CgClose size={20} />
+                </button>
+                <h2 className="v0-modal-title">Your Workplace Opportunity</h2>
+                <p className="v0-modal-subtitle">Be the ember that lights a fire in young minds.</p>
+                {currentOpportunityPage < 5 && (
+                  <div className="v0-estimated-time">
+                    Est. Time: {5 - currentOpportunityPage} minute{currentOpportunityPage < 4 ? "s" : ""}
+                  </div>
+                )}
+              </div>
+              
+              <div className="v0-modal-content">
+                <div className="v0-progress-section">
+                  <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
+                </div>
+                <div className="v0-form-section">
+                  <form className="v0-modal-form">
+                    {renderPage()}
+                  </form>
+                </div>
+              </div>
+              
+              <div className="v0-modal-footer">
+                {currentOpportunityPage === 5 && (
+                  <button 
+                    className="v0-btn-primary" 
+                    onClick={publishOpportunityData}
+                    disabled={isSaving}
+                  >
+                    Publish
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </OpportunityContext.Provider>
     </div>
     </>
@@ -435,13 +446,13 @@ function OpportunityType(){
 
   return(
     <>
-    <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>We need some general information first.</h2>
-    <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
+    <h2 className="v0-modal-page-title">We need some general information first.</h2>
+    <hr className="v0-modal-page-divider"/>
     <main style={{ display: "flex", paddingTop: "1rem"}}>
       <div style={{ display: "flex", flexDirection: "column", gap: "25px", width: "100%" }}>
         {questionsForPage.map((question) => (
-          <div key={question.id} style={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
-            <label htmlFor={question.id}>
+          <div key={question.id} className="v0-modal-form-group">
+            <label htmlFor={question.id} className="v0-modal-form-label">
               {question.text}
             </label>
             {question.type === "select" ?
@@ -450,7 +461,7 @@ function OpportunityType(){
                   name={question.id}
                   value={organizationData[question.id]}
                   onChange={handleChange}
-                  style={{width: "45%"}}
+                  className="v0-modal-form-select"
                 >
                   {question.options.map((option) => (
                     <option key={option} value={option === "Select Type" ? "" : option}>
@@ -467,7 +478,7 @@ function OpportunityType(){
                   onChange={handleChange}
                   type="text"
                   placeholder={question.placeholder}
-                  style={{width: "42.8%"}}
+                  className="v0-modal-form-input"
                   maxLength={question.maxLength}
                 />)}
           </div>
@@ -506,32 +517,32 @@ function ApplicantionTimeline() {
   return(
     <>
       <div style={{display: "flex", alignItems: "center", gap: "50px", justifyContent: "center"}}>
-        <div style={{display: "flex", flexDirection: "column", position: "relative"}}>
-          <label style={{marginBottom: "2px"}}>Enter the application deadline:</label>
+        <div className="v0-modal-date-container">
+          <label className="v0-modal-date-label">Enter the application deadline:</label>
           <DatePicker 
             selected={organizationData.deadline} 
             onChange={(date)=>handleDatesChanged(date, "deadline")}
             placeholderText="Select a date"
-            customInput={<input style={{ width: '94%' }} />}
+            customInput={<input className="v0-modal-date-input" />}
           />
-          <div style={{zIndex: "10", height: "70px", top: "6px", opacity: ".6", backgroundColor: "white", display: deadlineDisabled ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}></div>
-          <div style={{paddingTop: "8px", textAlign: "center"}}>
-            <button className='btnText diff-color' onClick={handleNoDeadlineDisabled} style={{fontSize: "17px", opacity: ".75", color: deadlineDisabled ? "var(--highlight)" : ""}}>
+          <div className="v0-modal-date-overlay" style={{display: deadlineDisabled ? "" : "none"}}></div>
+          <div className="v0-modal-date-toggle">
+            <button className={`v0-modal-date-toggle-btn ${deadlineDisabled ? "active" : ""}`} onClick={handleNoDeadlineDisabled}>
               I don't have an application deadline
             </button>
           </div>
         </div>
-        <div style={{display: "flex", flexDirection: "column", position: "relative"}}>
-          <label style={{marginBottom: "2px"}}>Enter the opportunity start date:</label>
+        <div className="v0-modal-date-container">
+          <label className="v0-modal-date-label">Enter the opportunity start date:</label>
           <DatePicker 
             selected={organizationData.startDate} 
             onChange={(date)=>handleDatesChanged(date, "startDate")}
             placeholderText="Select a date"
-            customInput={<input style={{ width: '94%' }} />}
+            customInput={<input className="v0-modal-date-input" />}
           />
-          <div style={{zIndex: "10", height: "70px", top: "6px", opacity: ".6", backgroundColor: "white", display: startDateDisabled ? "" : "none", position: "absolute", left: "0", right: "0", leftMargin: "auto", rightMargin: "auto"}}></div>
-          <div style={{paddingTop: "8px", textAlign: "center"}}>
-            <button className='btnText diff-color' onClick={handleNoStartDate} style={{fontSize: "17px", opacity: ".75", color: startDateDisabled ? "var(--highlight)" : ""}}>
+          <div className="v0-modal-date-overlay" style={{display: startDateDisabled ? "" : "none"}}></div>
+          <div className="v0-modal-date-toggle">
+            <button className={`v0-modal-date-toggle-btn ${startDateDisabled ? "active" : ""}`} onClick={handleNoStartDate}>
               I don't have a set start or end date
             </button>
           </div>
@@ -580,42 +591,42 @@ function ApplicantInfo({handleDropdownChange}){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>Explain what you need from your applicants.</h2>
-      <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
+      <h2 className="v0-modal-page-title">Explain what you need from your applicants.</h2>
+      <hr className="v0-modal-page-divider"/>
       <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "20px", marginBottom: "20px" }}>
         {/* Requirements checklist */}
-        <div style={{border: '1px solid var(--secondary)', borderRadius: 8, padding: 16, background: '#f8fafd'}}>
-          <div style={{fontWeight: 600, marginBottom: 8}}>What do you want applicants to submit?</div>
+        <div className="v0-modal-requirements-container">
+          <div className="v0-modal-requirements-title">What do you want applicants to submit?</div>
           {defaultRequirements.map(req => (
-            <label key={req.id} style={{display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6}}>
+            <label key={req.id} className="v0-modal-requirement-item">
               <input
                 type="checkbox"
-                style={{marginTop: "10px"}}
+                className="v0-modal-requirement-checkbox"
                 checked={requirements.includes(req.id)}
                 onChange={e => handleRequirementChange(req.id, e.target.checked)}
               />
-              {req.label}
+              <span className="v0-modal-requirement-label">{req.label}</span>
             </label>
           ))}
           {/* Custom requirement */}
-          <div style={{display: 'flex', alignItems: 'center', gap: 8, marginTop: 8}}>
+          <div className="v0-modal-custom-requirement">
             <input
               type="text"
               placeholder="Other (add your own)"
               value={customRequirement}
               onChange={handleCustomRequirementChange}
-              style={{flex: 1, padding: 4}}
+              className="v0-modal-custom-input"
               maxLength={80}
             />
-            <button className="btnSaveChanges" style={{borderRadius: "50%"}}>
-            <GrAdd style={{padding: '2px'}} onClick={handleAddCustomRequirement} size={20}/>
+            <button className="v0-modal-add-btn" onClick={handleAddCustomRequirement}>
+              <GrAdd size={16}/>
             </button>
           </div>
           {/* Show added custom requirements */}
           {requirements.filter(r => !defaultRequirements.map(d => d.id).includes(r)).length > 0 && (
-            <div style={{marginTop: 8, fontSize: 13, color: '#333'}}>
-              <div style={{fontWeight: 500}}>Custom requirements:</div>
-              <ul style={{margin: 0, paddingLeft: 18}}>
+            <div className="v0-modal-custom-requirements">
+              <div className="v0-modal-custom-requirements-title">Custom requirements:</div>
+              <ul className="v0-modal-custom-requirements-list">
                 {requirements.filter(r => !defaultRequirements.map(d => d.id).includes(r)).map((r, i) => (
                   <li key={i}>{r}</li>
                 ))}
@@ -667,7 +678,7 @@ function ApplicantInfo({handleDropdownChange}){
             <div key={question.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
               <label htmlFor={question.id}>{question.text}</label>
               <textarea
-                className="applicantExpectations"
+                className="v0-modal-textarea"
                 id={question.id}
                 name={question.id}
                 value={organizationData[question.id]}
@@ -760,8 +771,8 @@ function FinalInfo(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>You're almost done. Just a few more details.</h2>
-      <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
+      <h2 className="v0-modal-page-title">You're almost done. Just a few more details.</h2>
+      <hr className="v0-modal-page-divider"/>
       <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
           
           {/* First two questions (link inputs) */}
@@ -769,67 +780,69 @@ function FinalInfo(){
             {questionsForPage
               .filter(question => question.type === "link")
               .map(question => (
-                <div key={question.id} style={{position: "relative"}}>
-                  <label htmlFor={question.id}>{question.text}</label>
-                  <div style={{display: "flex", justifyContent: "center", gap: "25px", paddingTop: "10px"}}>
+                <div key={question.id} className="v0-modal-link-container">
+                  <label htmlFor={question.id} className="v0-modal-link-label">{question.text}</label>
+                  <div className="v0-modal-link-options">
                   {learnMoreAndApplyOptions.map((option)=>(
-                    <div style={{display: "flex", flexDirection: "column", alignItems: "center", width: "100px"}}>
-                      <button key={option[0]} style={{padding: "10px"}} className={`btnSaveChanges btnCircle ${(option[0] === (question.id === "learnMore" ? learnMoreType : applyType)) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
+                    <div key={option[0]} className="v0-modal-link-option">
+                      <button className={`v0-modal-link-btn ${(option[0] === (question.id === "learnMore" ? learnMoreType : applyType)) ? "selected" : ""}`} onClick={(event) => handleOptionClick(event, option[0], question.id)}>
                         {option[1]}
                       </button>
-                      <span>{option[0] === "Messages" ? "Message Me" : option[0] === "Email" ? "Email Me" : "Website"}</span>
+                      <span className="v0-modal-link-text">{option[0] === "Messages" ? "Message Me" : option[0] === "Email" ? "Email Me" : "Website"}</span>
                     </div>)
                   )}
                   </div>
                   {learnMoreInputVisibility && question.id === "learnMore" &&
-                  <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", color: "var(--secondary)"}}>
-                    <span style={{fontWeight: "600"}} htmlFor={`${question.id} Input`}>Input your desired {learnMoreType === "Email" ? "email" : "website link"}:</span>
+                  <div className="v0-modal-link-input-container">
+                    <span className="v0-modal-link-input-label">Input your desired {learnMoreType === "Email" ? "email" : "website link"}:</span>
                     <input 
                     type={learnMoreType === "Email" ? "email" : "url"} 
                     id={question.id}
                     name={question.id}
                     value={organizationData[question.id].split(": ")[1]}
                     onChange={handleChange}
+                    className="v0-modal-link-input"
                     />
                   </div>}
                   {(applyInputVisibility && question.id === "apply") &&
-                  <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "20px", color: "var(--secondary)"}}>
-                    <span style={{fontWeight: "600"}} htmlFor={`${question.id} Input`}>Input your desired {applyType === "Email" ? "email" : "website link"}:</span>
+                  <div className="v0-modal-link-input-container">
+                    <span className="v0-modal-link-input-label">Input your desired {applyType === "Email" ? "email" : "website link"}:</span>
                     <input
                     type={applyType === "Email" ? "email" : "url"} 
                     id={question.id}
                     name={question.id}
                     onChange={handleChange}
-                    value={organizationData[question.id].split(": ")[1]}/>
+                    value={organizationData[question.id].split(": ")[1]}
+                    className="v0-modal-link-input"
+                    />
                   </div>}
                 </div>
               ))}
           </div>
 
           {/* Logo upload */}
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div className="v0-modal-file-container">
             {questionsForPage
               .filter(question => question.type === "file")
               .map(question => (
                 <div key={question.id} className="questionItem">
-                  <label htmlFor={question.id}>{question.text}</label>
-                  <div style={{display: "flex", position: "relative", alignItems: "center", justifyContent: "center", width: "40%", paddingTop: "15px"}}>
-                    <button className='btnSaveChanges' style={{borderRadius: "50%", boxShadow: "var(--shadowColor)", padding: "15px"}} onClick={(e)=>{
+                  <label htmlFor={question.id} className="v0-modal-file-label">{question.text}</label>
+                  <div className="v0-modal-file-upload">
+                    <button className="v0-modal-file-btn" onClick={(e)=>{
                       logoRef.current.click();
-                      e.preventDefault();}}><GrAdd size={30}/></button>
+                      e.preventDefault();}}><GrAdd size={24}/></button>
                     <input
                         type="file"
                         id="organizationLogo"
                         name="organizationLogo"
                         onChange={handleFileChange}
-                        style={{display: "none"}}
+                        className="v0-modal-file-input"
                         ref={logoRef}
                         accept=".jpg"
                     />
-                    {organizationData.organizationLogoPreview && <div style={{display: "flex", flexDirection: "column", position: "absolute", alignItems: "center", justifyContent: "center", right: "-100px"}}>
-                      <span style={{color: "var(--secondary)", fontWeight: "bolder"}}>Logo Preview:</span>
-                      <img src={organizationData.organizationLogoPreview} alt="Logo" style={{width: "70px", height: "70px", overflow: "hidden", borderRadius: "50%", objectFit: "cover"}}/>
+                    {organizationData.organizationLogoPreview && <div className="v0-modal-file-preview">
+                      <span className="v0-modal-file-preview-text">Logo Preview:</span>
+                      <img src={organizationData.organizationLogoPreview} alt="Logo" className="v0-modal-file-preview-img"/>
                     </div>}
                       </div>
                   </div>
@@ -849,17 +862,18 @@ function BasicLogistics(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "10px"}}>Tell us some basic information about your opportunity.</h2>
-      <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-evenly", alignItems: "center", paddingTop: "10px", gap: "15px" }} className='basicLogistics'>
+      <h2 className="v0-modal-page-title">Tell us some basic information about your opportunity.</h2>
+      <hr className="v0-modal-page-divider"/>
+      <div className="v0-modal-logistics-container">
           {questionsForPage.map((question) => (
-            <div key={question.id} className='logisticsQuestion' style={{ flex: "1 1 40%", textAlign: "center"}}> {/* Flexbox for responsiveness */}
-              <label htmlFor={question.id}>{question.text}</label>
+            <div key={question.id} className="v0-modal-logistics-item">
+              <label htmlFor={question.id} className="v0-modal-logistics-label">{question.text}</label>
               <select
                 id={question.id}
                 name={question.id}
                 value={organizationData[question.id]}
                 onChange={handleChange}
+                className="v0-modal-logistics-select"
               >
                 {question.options.map((option) => (
                   <option key={option} value={option}>
@@ -881,9 +895,9 @@ function PreviewOppportunityCard(){
   return(
     <>
     <main>
-      <h2 style={{display: "flex", alignItems: "center", justifyContent: "center", lineHeight: "1.2px", color: "var(--secondary)", paddingBottom: "2px"}}>You're all set! Here's a preview of your card:</h2>
-      <hr style={{width: "30%", borderColor: "var(--secondary)", borderWidth: "1.5px"}}/>
-      <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "10px"}}>
+      <h2 className="v0-modal-page-title">You're all set! Here's a preview of your card:</h2>
+      <hr className="v0-modal-page-divider"/>
+      <div className="v0-modal-preview-container">
         <OrganizationProfile organizationData={organizationData} location={"opportunity_popup"}/>
       </div>
     </main>

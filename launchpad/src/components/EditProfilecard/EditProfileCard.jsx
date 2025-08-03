@@ -113,13 +113,11 @@ export default function EditProfileCard() {
 
     }
 
-    const opportunitiesOptions = {highSchool: 
-    <span style={{color: "#006876", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead a <span style={{fontWeight: "bolder"}}>school club</span> or an <span style={{fontWeight: "bolder"}}> out-of-school student initative</span>, such as a nonprofit?</span>,
-    alum:
-    <span style={{color: "#006876", textAlign: "center", }}> <span style={{fontWeight: "bolder"}}>Do you</span> currently lead an <span style={{fontWeight: "bolder"}}>out-of-school student initative</span>, such as a nonprofit?</span>,
-    professional:
-    <span style={{color: "#006876", textAlign: "center"}}> <span style={{fontWeight: "bolder"}}>Do you</span> currently have an available <span style={{fontWeight: "bolder"}}>workplace opportunity</span> at your organization for high school or college students?</span>
-};
+    const opportunitiesOptions = {
+        highSchool: "Do you currently lead a school club or an out-of-school student initiative, such as a nonprofit?",
+        alum: "Do you currently lead an out-of-school student initiative, such as a nonprofit?",
+        professional: "Do you currently have an available workplace opportunity at your organization for high school or college students?"
+    };
     const descType = () => {
         switch(userData.userType){
             case "High Schooler":
@@ -828,7 +826,13 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
         //       <span className="underline">Add one!</span>
         //     </div>
         //     </div>}
-        <span>{getOpportunityOptions()}</span>
+        <div className="v0-empty-state">
+            <p className="v0-empty-text">{getOpportunityOptions()}</p>
+            <button className="v0-add-btn" onClick={() => setOpportunityModalVisibility(true)}>
+                <IoAdd size={16} />
+                <span>Add an Opportunity</span>
+            </button>
+        </div>
                     }
             
         </div>

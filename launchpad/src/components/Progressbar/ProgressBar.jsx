@@ -51,27 +51,49 @@ export default function ProgressBar({numOfSections, currentPage, setCurrentPage,
 
     return(
         <>
-        <Modal
-        isOpen={bufferModalVisibility}
-        onRequestClose={()=>setBuffererModalVisibility(false)}
-        style={customStyles}
-        contentLabel="Buffer Modal"
-        >
-            <CgClose className="btnClose" size={25} onClick={()=>setBuffererModalVisibility(false)}/>
-            <h1 style={{color: "var(--secondary)", lineHeight: "1px", textAlign: "center"}}>Notice:</h1>
-            <hr style={{width:"20%", borderColor: "var(--secondary)", borderWidth: "2px"}}/>
-            <p style={{fontWeight: "300", fontSize: "larger"}}>Please fill out the remainder of the form before proceeding.</p>
-        </Modal>
-        <div style={{display: "flex", alignItems: "center", justifyContent: `${showArrows ? "space-between" : "center"}`, paddingTop: "10px"}}>
-            {showArrows && <button onClick={goPrevious} className={`btnNavigate ${currentPage === 1 ? "hidden" : ""} btnUnfilled`}> <GrFormPrevious size={20}/> Previous </button>}
-            <div style={{display: "flex", gap: "4px", width: "50%", overflow: "hidden", borderRadius: "10px"}}>
+        {bufferModalVisibility && (
+          <div className="v0-modal-overlay" onClick={() => setBuffererModalVisibility(false)}>
+            <div className="v0-modal-container" onClick={(e) => e.stopPropagation()}>
+              <div className="v0-modal-header">
+                <button className="v0-modal-close-btn" onClick={() => setBuffererModalVisibility(false)}>
+                  <CgClose size={20} />
+                </button>
+                <h2 className="v0-modal-title">Notice</h2>
+              </div>
+              <div className="v0-modal-content">
+                <p className="v0-modal-text">Please fill out the remainder of the form before proceeding.</p>
+              </div>
+            </div>
+          </div>
+        )}
+        <div className="v0-progress-container">
+            {showArrows && (
+              <button 
+                onClick={goPrevious} 
+                className={`v0-progress-arrow ${currentPage === 1 ? "v0-progress-arrow-hidden" : ""}`}
+              > 
+                <GrFormPrevious size={20}/> Previous 
+              </button>
+            )}
+            <div className="v0-progress-bars">
             {emptyArray.map((num, index)=>(
-                <div key={index} onClick={()=>handleClick(num)} className={`bar ${num <= currentPage ? "filled" : "unfilled"}`} style={{width: `${sectionWidth}%`, height: "12px", cursor: "pointer"}}>
-                    <br />
+                <div 
+                  key={index} 
+                  onClick={()=>handleClick(num)} 
+                  className={`v0-progress-bar ${num <= currentPage ? "v0-progress-bar-filled" : "v0-progress-bar-unfilled"}`}
+                  style={{width: `${sectionWidth}%`}}
+                >
                 </div>
             ))}
             </div>
-            {showArrows && <button onClick={goNext} className={`btnNavigate ${currentPage === numOfSections ? "hidden" : ""} btnUnfilled`}> Next <GrFormNext size={20}/> </button>}
+            {showArrows && (
+              <button 
+                onClick={goNext} 
+                className={`v0-progress-arrow ${currentPage === numOfSections ? "v0-progress-arrow-hidden" : ""}`}
+              > 
+                Next <GrFormNext size={20}/> 
+              </button>
+            )}
         </div>
         </>
     )
