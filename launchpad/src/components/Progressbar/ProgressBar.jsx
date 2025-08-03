@@ -66,7 +66,7 @@ export default function ProgressBar({numOfSections, currentPage, setCurrentPage,
             </div>
           </div>
         )}
-        <div className="v0-progress-container">
+        <div className="v0-step-container">
             {showArrows && (
               <button 
                 onClick={goPrevious} 
@@ -75,12 +75,12 @@ export default function ProgressBar({numOfSections, currentPage, setCurrentPage,
                 <GrFormPrevious size={20}/> Previous 
               </button>
             )}
-            <div className="v0-progress-bars">
+            <div className="v0-step-bars">
             {emptyArray.map((num, index)=>(
                 <div 
                   key={index} 
                   onClick={()=>handleClick(num)} 
-                  className={`v0-progress-bar ${num <= currentPage ? "v0-progress-bar-filled" : "v0-progress-bar-unfilled"}`}
+                  className={`v0-step-bar ${num <= currentPage ? "v0-step-bar-filled" : "v0-step-bar-unfilled"}`}
                   style={{width: `${sectionWidth}%`}}
                 >
                 </div>

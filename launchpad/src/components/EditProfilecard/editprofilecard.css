@@ -31,6 +31,11 @@
     animation: v0-modal-slide-in 0.3s ease-out;
 }
 
+/* Wider modal for OpportunityModal */
+.v0-modal-container.opportunity-modal {
+    max-width: 800px;
+}
+
 @keyframes v0-modal-slide-in {
     from {
         opacity: 0;
@@ -92,7 +97,7 @@
 .v0-modal-form {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
 }
 
 .v0-form-group {
@@ -145,6 +150,23 @@
     display: flex;
     gap: 12px;
     justify-content: flex-end;
+}
+
+.v0-modal-navigation {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.v0-modal-navigation .v0-btn-secondary {
+    order: 1;
+}
+
+.v0-modal-navigation .v0-btn-primary {
+    order: 2;
+    margin-left: auto;
 }
 
 .v0-btn-secondary {
@@ -251,7 +273,7 @@
 .v0-checkbox-label {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 20px;
     cursor: pointer;
     width: 100%;
 }
@@ -342,6 +364,47 @@
     justify-content: center;
     gap: 8px;
     margin-top: 8px;
+}
+
+.complete-profile-container {
+  background: #f9fafb;
+  position: fixed;
+  top: 64px;
+  left: 240px;
+  right: 0;
+  bottom: 0;
+  transition: left 0.3s ease-in-out;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 24px;
+}
+
+.complete-profile-container-sidebar-expanded {
+  left: 240px;
+}
+
+.complete-profile-container-sidebar-collapsed {
+  left: 64px;
+}
+
+/* Adjust for collapsed sidebar */
+.v0-sidebar-collapsed ~ .complete-profile-container {
+  left: 64px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .complete-profile-container {
+    left: 0;
+    padding: 16px;
+  }
+  
+  .v0-sidebar-collapsed ~ .complete-profile-container {
+    left: 0;
+  }
 }
 
 /* v0 Profile Container Styling */
@@ -964,40 +1027,46 @@
 }
 
 /* Progress Bar Modernization */
-.v0-progress-container {
+.v0-step-container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 16px 0;
   gap: 16px;
+  width: 100%;
+  min-height: 40px;
 }
 
-.v0-progress-bars {
+.v0-step-bars {
   display: flex;
   gap: 4px;
-  flex: 1;
+  flex: 0 1 auto;
   max-width: 400px;
+  min-width: 200px;
   overflow: hidden;
   border-radius: 8px;
   padding: 2px;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
 }
 
-.v0-progress-bar {
+.v0-step-bar {
   height: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   border-radius: 4px;
+  min-width: 20px;
 }
 
-.v0-progress-bar-filled {
+.v0-step-bar-filled {
   background-color: #1157e2;
 }
 
-.v0-progress-bar-unfilled {
+.v0-step-bar-unfilled {
   background-color: #e5e7eb;
 }
 
-.v0-progress-bar:hover {
+.v0-step-bar:hover {
   transform: scaleY(1.2);
 }
 
@@ -1029,10 +1098,13 @@
 }
 
 /* Modal Form Sections */
-.v0-progress-section {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #e5e7eb;
+.v0-step-section {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: center;
+    min-height: 40px;
 }
 
 .v0-form-section {
@@ -1059,7 +1131,7 @@
 .v0-estimated-time {
   position: absolute;
   top: 16px;
-  right: 16px;
+  left: 16px;
   font-size: 14px;
   font-weight: 500;
   color: #6b7280;
@@ -1075,8 +1147,8 @@
   font-weight: 600;
   color: #1f2937;
   text-align: center;
-  margin-bottom: 8px;
-  line-height: 1.4;
+  /* margin-bottom: 8px; */
+  /* line-height: 1.4; */
 }
 
 .v0-modal-page-divider {
@@ -1087,8 +1159,9 @@
 
 .v0-modal-form-group {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+  width: 95%;
   margin-bottom: 20px;
   padding: 16px;
   background-color: #f9fafb;
@@ -1103,10 +1176,11 @@
 }
 
 .v0-modal-form-label {
-  font-weight: 500;
+  font-weight: 600;
   color: #374151;
   font-size: 14px;
-  flex: 1;
+  line-height: 1.4;
+  margin-bottom: 4px;
 }
 
 .v0-modal-form-select {
@@ -1127,14 +1201,14 @@
 }
 
 .v0-modal-form-input {
-  width: 42.8%;
-  padding: 10px 12px;
+  width: 95%;
+  max-width: 400px;
+  padding: 12px 16px;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background-color: white;
+  border-radius: 8px;
   font-size: 14px;
-  color: #374151;
   transition: all 0.2s ease;
+  background: white;
 }
 
 .v0-modal-form-input:focus {
@@ -1148,6 +1222,7 @@
 }
 
 .v0-modal-textarea {
+  margin: 0 auto;
   width: 100%;
   min-height: 120px;
   padding: 12px;
@@ -1186,32 +1261,28 @@
   font-size: 14px;
 }
 
-.v0-modal-requirement-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.v0-modal-requirements-container .v0-checkbox-label {
   margin-bottom: 8px;
   padding: 8px;
   border-radius: 4px;
   transition: background-color 0.2s ease;
 }
 
-.v0-modal-requirement-item:hover {
+.v0-modal-requirements-container .v0-checkbox-label:hover {
   background-color: #f1f5f9;
 }
 
-.v0-modal-requirement-checkbox {
-  margin: 0;
-  width: 16px;
-  height: 16px;
-  accent-color: #1157e2;
+.v0-modal-requirements-container .v0-checkbox {
+  margin-top: -5px;
 }
 
-.v0-modal-requirement-label {
+.v0-modal-requirements-container .v0-option-title {
   font-size: 14px;
   color: #374151;
-  cursor: pointer;
+  line-height: 1.4;
 }
+
+
 
 .v0-modal-custom-requirement {
   display: flex;
@@ -1274,65 +1345,117 @@
 }
 
 .v0-modal-date-container {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin-bottom: 20px;
+    flex: 1;
+    max-width: 280px;
+    gap: 8px;
 }
 
 .v0-modal-date-label {
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #374151;
-  font-size: 14px;
+    margin-bottom: 0;
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+    line-height: 1.4;
 }
 
 .v0-modal-date-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background-color: white;
-  font-size: 14px;
-  color: #374151;
-  transition: all 0.2s ease;
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background-color: white;
+    font-size: 14px;
+    color: #374151;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    font-weight: 400;
+    line-height: 1.5;
 }
 
 .v0-modal-date-input:focus {
-  outline: none;
-  border-color: #1157e2;
-  box-shadow: 0 0 0 3px rgba(17, 87, 226, 0.1);
+    outline: none;
+    border-color: #1157e2;
+    box-shadow: 0 0 0 3px rgba(17, 87, 226, 0.1);
+}
+
+.v0-modal-date-input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
 }
 
 .v0-modal-date-overlay {
-  position: absolute;
-  top: 6px;
-  left: 0;
-  right: 0;
-  height: 70px;
-  background-color: white;
-  opacity: 0.6;
-  z-index: 10;
-  border-radius: 6px;
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background-color: white;
+    opacity: 0.6;
+    z-index: 10;
+    border-radius: 6px;
 }
 
 .v0-modal-date-toggle {
-  padding-top: 8px;
-  text-align: center;
+    padding-top: 4px;
+    text-align: center;
 }
 
 .v0-modal-date-toggle-btn {
-  font-size: 17px;
-  opacity: 0.75;
-  color: #6b7280;
-  background: none;
-  border: none;
-  cursor: pointer;
-  transition: color 0.2s ease;
+    font-size: 13px;
+    color: #6b7280;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    font-family: inherit;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.v0-modal-date-toggle-btn:hover {
+    color: #1157e2;
+    text-decoration-color: #1157e2;
+    background-color: #f8fafc;
 }
 
 .v0-modal-date-toggle-btn.active {
-  color: #1157e2;
+    color: #1157e2;
+    text-decoration-color: #1157e2;
+    background-color: #f0f7ff;
+}
+
+/* Date picker layout improvements */
+.v0-modal-date-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 95%;
+}
+
+.v0-modal-date-row {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+    .v0-modal-date-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .v0-modal-date-container {
+        max-width: 100%;
+    }
 }
 
 .v0-modal-logistics-container {
@@ -1414,6 +1537,7 @@
 .v0-modal-link-btn {
   padding: 12px;
   border: 1px solid #d1d5db;
+  color: #6b7280;
   border-radius: 50%;
   background-color: white;
   cursor: pointer;
@@ -1426,11 +1550,13 @@
 
 .v0-modal-link-btn:hover {
   border-color: #1157e2;
+  color: #1157e2;
   background-color: #f8fafc;
 }
 
 .v0-modal-link-btn.selected {
   border-color: #1157e2;
+  color: #6b7280;
   background-color: #1157e2;
   color: white;
 }
@@ -1562,4 +1688,69 @@
   align-items: center;
   justify-content: center;
   padding-top: 16px;
+}
+
+.v0-modal-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 95%;
+  align-items: flex-start;
+}
+
+.v0-modal-dropdown-container {
+  width: 95%;
+  text-align: left;
+  max-width: 400px;
+}
+
+.v0-modal-form-input {
+  width: 95%;
+  max-width: 400px;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.v0-modal-form-input:focus {
+  outline: none;
+  border-color: #1157e2;
+  box-shadow: 0 0 0 3px rgba(17, 87, 226, 0.1);
+}
+
+.v0-modal-textarea-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 95%;
+}
+
+.v0-modal-form-textarea {
+  width: 95%;
+  min-height: 120px;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 14px;
+  color: #374151;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  font-weight: 400;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.v0-modal-form-textarea:focus {
+  outline: none;
+  border-color: #1157e2;
+  box-shadow: 0 0 0 3px rgba(17, 87, 226, 0.1);
+}
+
+.v0-modal-form-textarea::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
 }

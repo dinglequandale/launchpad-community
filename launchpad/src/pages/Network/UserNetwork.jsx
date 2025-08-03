@@ -321,42 +321,54 @@ export default function UserNetwork() {
               <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/>
               <div className="v0-network-content">
                 {allVisibleUserData && allVisibleUserData.length > 0 ? <>
-                {professionals.length > 0 && <>
-                <div className="v0-section-header">
-                  <h3 className="v0-section-title">Professionals</h3>
-                  <span className="v0-section-badge">{isRecommended}</span>
+                {professionals.length > 0 && (
+                <div className="v0-network-section">
+                  <div className="v0-network-section-header">
+                    <h3 className="v0-network-section-title">Professionals</h3>
+                    <span className="v0-network-section-badge">{isRecommended}</span>
+                  </div>
+                  <div className="v0-network-section-content">
+                    <UserCarousel 
+                      userNetworkData={professionals}
+                      onEndReached={() => loadMore('Professional')} 
+                      loading={loading.professional}
+                      connectionRefreshKey={connectionRefreshKey}
+                    />
+                  </div>
                 </div>
-                <UserCarousel 
-                  userNetworkData={professionals}
-                  onEndReached={() => loadMore('Professional')} 
-                  loading={loading.professional}
-                  connectionRefreshKey={connectionRefreshKey}
-                />
-                </>}
-                {collegeStudents.length > 0 && <>
-                <div className="v0-section-header">
-                  <h3 className="v0-section-title">College Students</h3>
-                  <span className="v0-section-badge">{isRecommended}</span>
+                )}
+                {collegeStudents.length > 0 && (
+                <div className="v0-network-section">
+                  <div className="v0-network-section-header">
+                    <h3 className="v0-network-section-title">College Students</h3>
+                    <span className="v0-network-section-badge">{isRecommended}</span>
+                  </div>
+                  <div className="v0-network-section-content">
+                    <UserCarousel 
+                      userNetworkData={collegeStudents}
+                      onEndReached={() => loadMore('Alumni')}
+                      loading={loading.college}
+                      connectionRefreshKey={connectionRefreshKey}
+                    />
+                  </div>
                 </div>
-                <UserCarousel 
-                  userNetworkData={collegeStudents}
-                  onEndReached={() => loadMore('Alumni')}
-                  loading={loading.college}
-                  connectionRefreshKey={connectionRefreshKey}
-                />
-                </>}
-                {highSchoolers.length > 0 && userType !== "Professional" && <>
-                <div className="v0-section-header">
-                  <h3 className="v0-section-title">High Schoolers</h3>
-                  <span className="v0-section-badge">{isRecommended}</span>
+                )}
+                {highSchoolers.length > 0 && userType !== "Professional" && (
+                <div className="v0-network-section">
+                  <div className="v0-network-section-header">
+                    <h3 className="v0-network-section-title">High Schoolers</h3>
+                    <span className="v0-network-section-badge">{isRecommended}</span>
+                  </div>
+                  <div className="v0-network-section-content">
+                    <UserCarousel 
+                      userNetworkData={highSchoolers} 
+                      onEndReached={() => loadMore('High Schooler')} 
+                      loading={loading.highSchool}
+                      connectionRefreshKey={connectionRefreshKey}
+                    />
+                  </div>
                 </div>
-                <UserCarousel 
-                  userNetworkData={highSchoolers} 
-                  onEndReached={() => loadMore('High Schooler')} 
-                  loading={loading.highSchool}
-                  connectionRefreshKey={connectionRefreshKey}
-                />
-                </>}
+                )}
                 </> : overallLoading ? 
                 <div className="v0-loading-container">
                   <Loading/>

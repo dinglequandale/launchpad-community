@@ -387,7 +387,7 @@ const publishOpportunityData = async () => {
               onClose();
             }
           }}>
-            <div className="v0-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="v0-modal-container opportunity-modal" onClick={(e) => e.stopPropagation()}>
               <div className="v0-modal-header">
                 <button className="v0-modal-close-btn" onClick={() => {
                   if(changesMade){
@@ -399,8 +399,10 @@ const publishOpportunityData = async () => {
                 }}>
                   <CgClose size={20} />
                 </button>
-                <h2 className="v0-modal-title">Your Workplace Opportunity</h2>
-                <p className="v0-modal-subtitle">Be the ember that lights a fire in young minds.</p>
+                <div style={{marginTop: "30px"}}>
+                  <h2 className="v0-modal-title">Your Workplace Opportunity</h2>
+                  <p className="v0-modal-subtitle">Be the ember that lights a fire in young minds.</p>
+                </div>
                 {currentOpportunityPage < 5 && (
                   <div className="v0-estimated-time">
                     Est. Time: {5 - currentOpportunityPage} minute{currentOpportunityPage < 4 ? "s" : ""}
@@ -409,8 +411,8 @@ const publishOpportunityData = async () => {
               </div>
               
               <div className="v0-modal-content">
-                <div className="v0-progress-section">
-                  <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast}/>
+                <div className="v0-step-section">
+                  <ProgressBar numOfSections={5} currentPage={currentOpportunityPage} setCurrentPage={setCurrentOpportuntityPage} showLast={showLast} showArrows={false}/>
                 </div>
                 <div className="v0-form-section">
                   <form className="v0-modal-form">
@@ -420,15 +422,33 @@ const publishOpportunityData = async () => {
               </div>
               
               <div className="v0-modal-footer">
-                {currentOpportunityPage === 5 && (
-                  <button 
-                    className="v0-btn-primary" 
-                    onClick={publishOpportunityData}
-                    disabled={isSaving}
-                  >
-                    Publish
-                  </button>
-                )}
+                <div className="v0-modal-navigation">
+                  {currentOpportunityPage > 1 && (
+                    <button 
+                      className="v0-btn-secondary" 
+                      onClick={() => setCurrentOpportuntityPage(currentOpportunityPage - 1)}
+                    >
+                      Previous
+                    </button>
+                  )}
+                  {currentOpportunityPage < 5 && (
+                    <button 
+                      className="v0-btn-primary" 
+                      onClick={() => setCurrentOpportuntityPage(currentOpportunityPage + 1)}
+                    >
+                      Next
+                    </button>
+                  )}
+                  {currentOpportunityPage === 5 && (
+                    <button 
+                      className="v0-btn-primary" 
+                      onClick={publishOpportunityData}
+                      disabled={isSaving}
+                    >
+                      Publish
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -446,10 +466,10 @@ function OpportunityType(){
 
   return(
     <>
-    <h2 className="v0-modal-page-title">We need some general information first.</h2>
+    <span className="v0-modal-page-title">We need some general information first.</span>
     <hr className="v0-modal-page-divider"/>
-    <main style={{ display: "flex", paddingTop: "1rem"}}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "25px", width: "100%" }}>
+    <main style={{ display: "flex"}}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
         {questionsForPage.map((question) => (
           <div key={question.id} className="v0-modal-form-group">
             <label htmlFor={question.id} className="v0-modal-form-label">
@@ -493,7 +513,6 @@ function OpportunityType(){
 function ApplicantionTimeline() {
   const { organizationData, setOrganizationData, organizationQuestionsConfig } = useContext(OpportunityContext);
 
-
   const [ startDateDisabled, setStartDateDisabled ] = useState(organizationData.startDate === null);
   const [ deadlineDisabled, setDeadlineDisabled ] = useState(organizationData.deadline === null);
   
@@ -516,35 +535,37 @@ function ApplicantionTimeline() {
 
   return(
     <>
-      <div style={{display: "flex", alignItems: "center", gap: "50px", justifyContent: "center"}}>
-        <div className="v0-modal-date-container">
-          <label className="v0-modal-date-label">Enter the application deadline:</label>
-          <DatePicker 
-            selected={organizationData.deadline} 
-            onChange={(date)=>handleDatesChanged(date, "deadline")}
-            placeholderText="Select a date"
-            customInput={<input className="v0-modal-date-input" />}
-          />
-          <div className="v0-modal-date-overlay" style={{display: deadlineDisabled ? "" : "none"}}></div>
-          <div className="v0-modal-date-toggle">
-            <button className={`v0-modal-date-toggle-btn ${deadlineDisabled ? "active" : ""}`} onClick={handleNoDeadlineDisabled}>
-              I don't have an application deadline
-            </button>
+      <div className="v0-modal-date-layout">
+        <div className="v0-modal-date-row">
+          <div className="v0-modal-date-container">
+            <label className="v0-modal-date-label">Application deadline:</label>
+            <DatePicker 
+              selected={organizationData.deadline} 
+              onChange={(date)=>handleDatesChanged(date, "deadline")}
+              placeholderText="Select a date"
+              customInput={<input className="v0-modal-date-input" />}
+            />
+            <div className="v0-modal-date-overlay" style={{display: deadlineDisabled ? "" : "none"}}></div>
+            <div className="v0-modal-date-toggle">
+              <button className={`v0-modal-date-toggle-btn ${deadlineDisabled ? "active" : ""}`} onClick={handleNoDeadlineDisabled}>
+                No deadline
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="v0-modal-date-container">
-          <label className="v0-modal-date-label">Enter the opportunity start date:</label>
-          <DatePicker 
-            selected={organizationData.startDate} 
-            onChange={(date)=>handleDatesChanged(date, "startDate")}
-            placeholderText="Select a date"
-            customInput={<input className="v0-modal-date-input" />}
-          />
-          <div className="v0-modal-date-overlay" style={{display: startDateDisabled ? "" : "none"}}></div>
-          <div className="v0-modal-date-toggle">
-            <button className={`v0-modal-date-toggle-btn ${startDateDisabled ? "active" : ""}`} onClick={handleNoStartDate}>
-              I don't have a set start or end date
-            </button>
+          <div className="v0-modal-date-container">
+            <label className="v0-modal-date-label">Start date:</label>
+            <DatePicker 
+              selected={organizationData.startDate} 
+              onChange={(date)=>handleDatesChanged(date, "startDate")}
+              placeholderText="Select a date"
+              customInput={<input className="v0-modal-date-input" />}
+            />
+            <div className="v0-modal-date-overlay" style={{display: startDateDisabled ? "" : "none"}}></div>
+            <div className="v0-modal-date-toggle">
+              <button className={`v0-modal-date-toggle-btn ${startDateDisabled ? "active" : ""}`} onClick={handleNoStartDate}>
+                No set date
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -593,19 +614,21 @@ function ApplicantInfo({handleDropdownChange}){
     <main>
       <h2 className="v0-modal-page-title">Explain what you need from your applicants.</h2>
       <hr className="v0-modal-page-divider"/>
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "20px", marginBottom: "20px" }}>
+      <div className="v0-modal-form">
         {/* Requirements checklist */}
         <div className="v0-modal-requirements-container">
           <div className="v0-modal-requirements-title">What do you want applicants to submit?</div>
           {defaultRequirements.map(req => (
-            <label key={req.id} className="v0-modal-requirement-item">
+            <label key={req.id} className="v0-checkbox-label">
               <input
                 type="checkbox"
-                className="v0-modal-requirement-checkbox"
+                className="v0-checkbox"
                 checked={requirements.includes(req.id)}
                 onChange={e => handleRequirementChange(req.id, e.target.checked)}
               />
-              <span className="v0-modal-requirement-label">{req.label}</span>
+              <div className="v0-checkbox-content">
+                <span className="v0-option-title">{req.label}</span>
+              </div>
             </label>
           ))}
           {/* Custom requirement */}
@@ -615,7 +638,7 @@ function ApplicantInfo({handleDropdownChange}){
               placeholder="Other (add your own)"
               value={customRequirement}
               onChange={handleCustomRequirementChange}
-              className="v0-modal-custom-input"
+              className="v0-modal-form-input"
               maxLength={80}
             />
             <button className="v0-modal-add-btn" onClick={handleAddCustomRequirement}>
@@ -634,8 +657,9 @@ function ApplicantInfo({handleDropdownChange}){
             </div>
           )}
         </div>
-        {/* ...existing code for questions... */}
-        <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center"}}>
+        
+        {/* Form fields */}
+        <div className="v0-modal-form-fields">
           {questionsForPage
             .filter(
               (question) =>
@@ -643,51 +667,56 @@ function ApplicantInfo({handleDropdownChange}){
                 (question.id === "applicantPosition"  && !question.includers.includes(question.id))
             )
             .map((question) => (
-              <div key={question.id} style={{}}>
+              <div key={question.id} className="v0-modal-form-group" style={{width: "100%"}}>
                 {question.required && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", alignItems: "center", justifyContent: "center" }}>
-                    <label htmlFor={question.id}>{question.text}</label>
-                  {question.id === "organizationTags" ? <div style={{width: "360px", textAlign: "left"}}>
-                    <OnboardingDropdown
-                      showQuestion={false}
-                      key={question.id}
-                      question={question.text}
-                      options={question.options}
-                      selectedOption={organizationData[question.id] || (question.type === 'multi-select' ? [] : '')}
-                      onChange={(label) => handleDropdownChange(question.id, label)}
-                      type={question.type}
-                    /> 
-                  </div> : 
-                  <input
-                    style={{width: "330px"}}
-                    id={question.id}
-                    name={question.id}
-                    value={organizationData[question.id]}
-                    onChange={handleChange}
-                    maxLength={question.maxLength}
-                    placeholder={question.placeholder}
-                  />}
-                  </div>
+                  <>
+                    <label htmlFor={question.id} className="v0-modal-form-label">{question.text}</label>
+                    {question.id === "organizationTags" ? 
+                      <div className="v0-modal-dropdown-container">
+                        <OnboardingDropdown
+                          showQuestion={false}
+                          key={question.id}
+                          question={question.text}
+                          options={question.options}
+                          selectedOption={organizationData[question.id] || (question.type === 'multi-select' ? [] : '')}
+                          onChange={(label) => handleDropdownChange(question.id, label)}
+                          type={question.type}
+                        /> 
+                      </div> : 
+                      <input
+                        className="v0-modal-form-input"
+                        id={question.id}
+                        name={question.id}
+                        value={organizationData[question.id]}
+                        onChange={handleChange}
+                        maxLength={question.maxLength}
+                        placeholder={question.placeholder}
+                      />
+                    }
+                  </>
                 )}
               </div>
             ))}
         </div>
-        {questionsForPage
-          .filter((question) => question.id === "applicantExpectations")
-          .map((question) => (
-            <div key={question.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-              <label htmlFor={question.id}>{question.text}</label>
-              <textarea
-                className="v0-modal-textarea"
-                id={question.id}
-                name={question.id}
-                value={organizationData[question.id]}
-                onChange={handleChange}
-                // maxLength={question.maxLength}
-                placeholder={question.placeholder}
-              ></textarea>
-            </div>
-          ))}
+        
+        {/* Expectations textarea */}
+        <div className="v0-modal-form-group">
+          {questionsForPage
+            .filter((question) => question.id === "applicantExpectations")
+            .map((question) => (
+              <div key={question.id} className="v0-modal-textarea-container">
+                <label htmlFor={question.id} className="v0-modal-form-label">{question.text}</label>
+                <textarea
+                  className="v0-modal-form-textarea"
+                  id={question.id}
+                  name={question.id}
+                  value={organizationData[question.id]}
+                  onChange={handleChange}
+                  placeholder={question.placeholder}
+                ></textarea>
+              </div>
+            ))}
+        </div>
       </div>
     </main>
     </>

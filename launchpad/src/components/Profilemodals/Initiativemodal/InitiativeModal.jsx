@@ -277,7 +277,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
               onClose();
             }
           }}>
-            <div className="v0-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="v0-modal-container opportunity-modal" onClick={(e) => e.stopPropagation()}>
               <div className="v0-modal-header">
                 <button className="v0-modal-close-btn" onClick={() => {
                   if(changesMade){
@@ -299,8 +299,8 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
               </div>
               
               <div className="v0-modal-content">
-                <div className="v0-progress-section">
-                  <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast}/>
+                <div className="v0-step-section">
+                  <ProgressBar numOfSections={4} currentPage={currentInitiativePage} setCurrentPage={setCurrentInitiativePage} showLast={showLast} showArrows={false}/>
                 </div>
                 <div className="v0-form-section">
                   <form className="v0-modal-form">
@@ -310,15 +310,33 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
               </div>
               
               <div className="v0-modal-footer">
-                {currentInitiativePage === 4 && (
-                  <button 
-                    className="v0-btn-primary" 
-                    onClick={publishInitiativeData}
-                    disabled={isSaving}
-                  >
-                    Save Changes
-                  </button>
-                )}
+                <div className="v0-modal-navigation">
+                  {currentInitiativePage > 1 && (
+                    <button 
+                      className="v0-btn-secondary" 
+                      onClick={() => setCurrentInitiativePage(currentInitiativePage - 1)}
+                    >
+                      Previous
+                    </button>
+                  )}
+                  {currentInitiativePage < 4 && (
+                    <button 
+                      className="v0-btn-primary" 
+                      onClick={() => setCurrentInitiativePage(currentInitiativePage + 1)}
+                    >
+                      Next
+                    </button>
+                  )}
+                  {currentInitiativePage === 4 && (
+                    <button 
+                      className="v0-btn-primary" 
+                      onClick={publishInitiativeData}
+                      disabled={isSaving}
+                    >
+                      Save Changes
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -338,8 +356,8 @@ function InitiativeType(){
     <>
     <h2 className="v0-modal-page-title">We need some general information first.</h2>
     <hr className="v0-modal-page-divider"/>
-    <main style={{ display: "flex", paddingTop: "1rem"}}>
-      <div style={{ display: "flex", flexDirection: "column", gap: "25px", width: "100%" }}>
+    <main>
+      <div className="v0-modal-form">
         {questionsForPage.map((question) => (
           <div key={question.id} className="v0-modal-form-group">
             <label htmlFor={question.id} className="v0-modal-form-label">
@@ -406,7 +424,7 @@ function InitiativeMission(){
                 />
               </div> : 
               <textarea
-                className="v0-modal-textarea"
+                className="v0-modal-form-textarea"
                 key={question.id}
                 id={question.id}
                 name={question.id}
