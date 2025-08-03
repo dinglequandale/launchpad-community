@@ -102,20 +102,64 @@ body.modal-open {
 
 /* v0 Network Content Styling */
 .v0-network-content {
-    background: white;
+    background: #f9fafb;
     padding: 24px;
     min-height: 67vh;
     position: relative;
     border-radius: 12px;
     margin-top: 20px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.v0-network-section {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.v0-network-section:hover {
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.v0-network-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.v0-network-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    text-align: left;
+}
+
+.v0-network-section-badge {
+    background: #f3f4f6;
+    color: #6b7280;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.v0-network-section-content {
+    padding: 24px;
 }
 
 .v0-section-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     padding-bottom: 12px;
     border-bottom: 1px solid #e5e7eb;
 }
@@ -167,9 +211,11 @@ body.modal-open {
         border-radius: 8px;
     }
     
-    .v0-section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+    .v0-network-section-header {
+        padding: 16px 20px;
+    }
+    
+    .v0-network-section-content {
+        padding: 20px;
     }
 }

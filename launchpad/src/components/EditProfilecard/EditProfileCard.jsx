@@ -164,6 +164,7 @@ export default function EditProfileCard() {
                     opportunityId={edittingOpportunity ? edittingOpportunity.id : ""}/>
             ) : null}
         </div>
+        <div className="complete-profile-container">
             <ProfileContext.Provider value={{currentUser, userData}}>
             <div className="v0-profile-container">
                 {/* Header */}
@@ -352,6 +353,7 @@ export default function EditProfileCard() {
                 )}
             </div>
             </ProfileContext.Provider>
+            </div>
         </>
     );
 }

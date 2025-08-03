@@ -59,14 +59,13 @@ export default function TopBar({ show }) {
     return (
         <div className={`v0-topbar ${isSidebarCollapsed ? 'v0-topbar-sidebar-collapsed' : 'v0-topbar-sidebar-expanded'}`}>
             <div className="v0-topbar-left">
-                <button className="v0-mobile-menu-btn">
+                {/* <button className="v0-mobile-menu-btn">
                     <LuMenu size={20} />
-                </button>
+                </button> */}
                 <div className="v0-logo-section">
-                    <div className="v0-logo-icon">
-                        <LuGraduationCap size={20} />
-                    </div>
-                    <span className="v0-logo-text">Launchpad</span>
+                <div style={{display: "flex", justifyContent: "center"}}>
+            <img src="assets/launchpad_logo.png" alt="" style={{width: "250px"}}/>
+          </div>
                 </div>
             </div>
             
