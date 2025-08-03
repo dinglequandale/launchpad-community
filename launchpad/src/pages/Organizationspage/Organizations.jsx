@@ -133,9 +133,11 @@ export default function Organizations(){
       
     }
 
+    const handleConnectClick = async (userData) => {
+        openConnectModal({ userData });
+    }
+
     const handleReferalClick = async (referalType, organizationData, userData) => {
-        handleConnectClick(userData);
- 
         const referalValue = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}`];
         const methodType = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}Method`];
         

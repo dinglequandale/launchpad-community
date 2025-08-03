@@ -72,51 +72,66 @@ export default function ContactInfoModal({userData, visibility, onClose}){
   };
 
   return (
-    <div>
+    <>
       <Toaster position="bottom-right" reverseOrder={false} />
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
-      <Modal
-        isOpen={visibility}
-        onRequestClose={onClose}
-        style={customStyles}
-        contentLabel="Linkedin Modal"
-      >
-        <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
-        <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Contact Information <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Connect with the School Network</span></h2>
-          <hr style={{borderColor: "var(--secondary)"}}/>
-        </header>
-        <main style={{paddingTop: "10px"}}>
-          <form style={{display: "flex", flexDirection: "column", gap: "17px"}}>
-            <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
-              <span style={{color: "var(--secondary)", fontSize: "19px"}}>Input your new email:</span>
-              <input style={{width: "500px", margin: "auto"}} placeholder='Paste your email here' defaultValue={userData.email} value={newEmail} onChange={(e) => setNewEmail(e.target.value)}/>
+      {visibility && (
+        <div className="v0-modal-overlay" onClick={onClose}>
+          <div className="v0-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="v0-modal-header">
+              <button className="v0-modal-close-btn" onClick={onClose}>
+                <CgClose size={20} />
+              </button>
+              <h2 className="v0-modal-title">Contact Information</h2>
+              <p className="v0-modal-subtitle">Connect with the School Network</p>
             </div>
-            <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
-              <span style={{color: "var(--secondary)", fontSize: "19px"}}>Paste your new LinkedIn profile:</span>
-              <input 
-                style={{
-                  width: "500px", 
-                  margin: "auto",
-                  borderColor: linkedInError ? "red" : undefined
-                }} 
-                placeholder='Paste the link here!' 
-                value={newLinkedinLink} 
-                onChange={(e) => setNewLinkedinLink(e.target.value)}
-              />
-              {linkedInError && (
-                <span style={{color: "red", fontSize: "14px", textAlign: "center"}}>{linkedInError}</span>
-              )}
+            
+            <div className="v0-modal-content">
+              <form className="v0-modal-form">
+                <div className="v0-form-group">
+                  <label className="v0-form-label">Email Address</label>
+                  <input 
+                    className="v0-form-input"
+                    placeholder="Enter your email address"
+                    value={newEmail} 
+                    onChange={(e) => setNewEmail(e.target.value)}
+                  />
+                </div>
+                
+                <div className="v0-form-group">
+                  <label className="v0-form-label">LinkedIn Profile</label>
+                  <input 
+                    className={`v0-form-input ${linkedInError ? 'v0-form-input-error' : ''}`}
+                    placeholder="https://www.linkedin.com/in/username"
+                    value={newLinkedinLink} 
+                    onChange={(e) => setNewLinkedinLink(e.target.value)}
+                  />
+                  {linkedInError && (
+                    <div className="v0-form-error">{linkedInError}</div>
+                  )}
+                </div>
+              </form>
             </div>
-          </form>
-        </main>
-        <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-          <button disabled={isSubmitting} className='btnUnfilled' onClick={()=>setMakeChangesVisibility(true)} style={{borderRadius: "4px", width: "40%", padding: "8px", fontSize: "larger"}}>
-            Cancel</button>
-          <button onClick={validateAndSaveLinkedIn} type='submit' disabled={isSubmitting || newEmail===""} className="btnSaveChanges" style={{background: (newEmail === "" || isSubmitting) ? "gray": "", borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", cursor: (newEmail === "") ? "not-allowed" : ""}}>
-            Save Changes</button>
-        </footer>
-      </Modal>
-    </div>
+            
+            <div className="v0-modal-footer">
+              <button 
+                className="v0-btn-secondary" 
+                onClick={() => setMakeChangesVisibility(true)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button 
+                className="v0-btn-primary" 
+                onClick={validateAndSaveLinkedIn}
+                disabled={isSubmitting || newEmail === ""}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };

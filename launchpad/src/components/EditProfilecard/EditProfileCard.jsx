@@ -198,7 +198,7 @@ export default function EditProfileCard() {
                                 </button>
                             </div>
                             <div className="v0-section-content">
-                                <BasicInfoCard descType={descType()}/>
+                                <BasicInfoCard descType={descType()} basicInfoModalVisibility={basicInfoModalVisibility} setBasicInfoModalVisibility={setBasicInfoModalVisibility}/>
                             </div>
                         </div>
 
@@ -607,10 +607,9 @@ function ResumeUpload(){
         </>
     );
 }
-function BasicInfoCard({descType}){
-    // const [basicInfoData, setBasicInfoData] = useState({});
-    const [basicInfoModalVisibility, setBasicInfoModalVisibility] = useState(null);
 
+function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVisibility}){
+    // const [basicInfoData, setBasicInfoData] = useState({});
     const { userData,currentUser } = useContext(ProfileContext);
 
     const userType = userData.userType;

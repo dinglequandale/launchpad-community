@@ -48,7 +48,7 @@ export default function SideNav({show}){
             <div className="v0-sidebar-header">
                 <div className="v0-logo-section">
                     <div className="v0-logo-icon">
-                        <LuGraduationCap size={24} />
+                        <LuGraduationCap size={28} />
                     </div>
                     {!isCollapsed && <span className="v0-logo-text">Launchpad</span>}
                 </div>
@@ -74,11 +74,11 @@ export default function SideNav({show}){
 
             <div className="v0-sidebar-footer">
                 <div className="v0-nav-item" title={isCollapsed ? "Settings" : ""}>
-                    <LuSettings size={24} />
+                    <LuSettings size={28} />
                     {!isCollapsed && <span className="v0-nav-label">Settings</span>}
                 </div>
                 <div className="v0-nav-item" title={isCollapsed ? "Logout" : ""}>
-                    <LuLogOut size={24} />
+                    <LuLogOut size={28} />
                     {!isCollapsed && <span className="v0-nav-label">Logout</span>}
                 </div>
             </div>

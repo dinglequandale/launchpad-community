@@ -208,76 +208,90 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   };
 
   return(
-      <div>
-      <div>
-      <Toaster
-        position="bottom-right"
-        reverseOrder={false}
-      />
-      </div>
+    <>
+      <Toaster position="bottom-right" reverseOrder={false} />
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
-      <Modal
-        isOpen={visibility}
-        onRequestClose={onClose}
-        style={customStyles}
-        contentLabel="Basic Info Modal"
-      >
-        <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
-        <header>
-          <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "10px",  lineHeight: "1.2"}}> My Introduction <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}>Enlighten us with your {userType==="Professional" ? "expertise" : "interests"} and {userType==="Professional" ? "work experience" : userType==="Alumni" ? "education" : "dream colleges"}!</span></h2>
-          <hr style={{borderColor: "var(--secondary)"}}/>
-        </header>
-        <main style={{paddingTop: "20px"}}>
-          <form style={{width: "800px", display: "flex", gap: "20px", flexDirection: "column"}}>
-            {questionsForUser.map((question,index) => (
-                <div key={question.id} style={{display: "flex", justifyContent: "space-between"}}>
-                  <div style={{position: "relative"}}>
-                    <label>{question.text}</label>
+      {visibility && (
+        <div className="v0-modal-overlay" onClick={onClose}>
+          <div className="v0-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="v0-modal-header">
+              <button className="v0-modal-close-btn" onClick={onClose}>
+                <CgClose size={20} />
+              </button>
+              <h2 className="v0-modal-title">My Introduction</h2>
+              <p className="v0-modal-subtitle">
+                Enlighten us with your {userType==="Professional" ? "expertise" : "interests"} and {userType==="Professional" ? "work experience" : userType==="Alumni" ? "education" : "dream colleges"}!
+              </p>
+            </div>
+            
+            <div className="v0-modal-content">
+              <form className="v0-modal-form">
+                {questionsForUser.map((question, index) => (
+                  <div key={question.id} className="v0-form-group">
+                    <label className="v0-form-label">
+                      {question.text}
+                      {question.required && <span className="v0-required-indicator">*</span>}
+                    </label>
                     {!question.required && <OptionalNotice/>}
+                    
+                    {(question.type !== "multi-select" && question.type !== "select") ? (
+                      <input 
+                        id={question.id}
+                        type={question.type}
+                        name={question.id}
+                        value={basicInfoContent[question.id]}
+                        placeholder={question.placeholder}
+                        onChange={handleOnChange}
+                        className="v0-form-input"
+                      />
+                    ) : question.id !== "collegeInterestsOrDecision" ? (
+                      <div className="v0-form-input">
+                        <OnboardingDropdown
+                          showQuestion={false}
+                          key={question.id}
+                          question={question.text}
+                          options={question.id.toLowerCase().includes("college") ? cachedColleges : question.options}
+                          selectedOption={basicInfoContent[question.id] || (question.type === 'multi-select' ? [] : '')}
+                          onChange={(label) => handleDropdownChange(question.id, label)}
+                          type={question.type}
+                          onSearchQueryChange={question.id.toLowerCase().includes("college") ? handleSearchQueryChange : null}
+                        />
+                      </div>
+                    ) : (
+                      <div className="v0-form-input">
+                        <CollegeSearch
+                          showQuestion={false}
+                          question={""}
+                          selectedOption={basicInfoContent['collegeInterestsOrDecision']}
+                          onChange={(label) => handleDropdownChange('collegeInterestsOrDecision', label)}
+                          type={"multi-select"}
+                        />
+                      </div>
+                    )}
                   </div>
-                  {(question.type !== "multi-select" && question.type !== "select") ? 
-                  <input 
-                  id={question.id}
-                  type={question.type}
-                  name={question.id}
-                  value={basicInfoContent[question.id]}
-                  placeholder={question.placeholder}
-                  onChange={handleOnChange}
-                  style={{width: "42.8%"}}/> 
-                  : question.id !== "collegeInterestsOrDecision" ?
-                  <div style={{width: "45%"}}><OnboardingDropdown
-                    showQuestion={false}
-                    key={question.id}
-                    question={question.text}
-                    options={question.id.toLowerCase().includes("college") ? cachedColleges : question.options}
-                    selectedOption={basicInfoContent[question.id] || (question.type === 'multi-select' ? [] : '')}
-                    onChange={(label) => handleDropdownChange(question.id, label)}
-                    type={question.type}
-                    onSearchQueryChange={question.id.toLowerCase().includes("college") ? handleSearchQueryChange : null}
-                  />
-                  </div>
-                  :
-                  <CollegeSearch
-                  showQuestion={false}
-                  question={""}
-                  selectedOption={basicInfoContent['collegeInterestsOrDecision']}
-                  onChange={(label) => handleDropdownChange('collegeInterestsOrDecision', label)}
-                  type={"multi-select"}
-                />
-                  }
-                </div>
-            ))}
-          </form>
-        </main>
-        <footer style={{paddingTop: "20px", display: "flex", justifyContent: "space-between"}}>
-          <button disabled={isSubmitting} onClick={
-            ()=>setMakeChangesVisibility(true)
-            } className="btnUnfilled" style={{borderRadius: "4px", width: "30%", padding: "8px", fontSize: "larger", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-            Cancel</button>
-          <button disabled={isSubmitting} onClick={saveBasicInfo} className="btnSaveChanges" type='submit' style={{borderRadius: "4px", width: "45%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-            Save Changes</button>
-        </footer>
-      </Modal>
-    </div>
+                ))}
+              </form>
+            </div>
+            
+            <div className="v0-modal-footer">
+              <button 
+                className="v0-btn-secondary" 
+                onClick={() => setMakeChangesVisibility(true)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button 
+                className="v0-btn-primary" 
+                onClick={saveBasicInfo}
+                disabled={isSubmitting}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }

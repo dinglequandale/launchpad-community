@@ -1,3 +1,347 @@
+/* v0 Modal Styling */
+.v0-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Ensure MakeChanges modal appears above other modals */
+.v0-modal-overlay .MakeChanges {
+    z-index: 1001;
+}
+
+.v0-modal-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: v0-modal-slide-in 0.3s ease-out;
+}
+
+@keyframes v0-modal-slide-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.v0-modal-header {
+    padding: 24px 24px 0 24px;
+    border-bottom: 1px solid #e5e7eb;
+    position: relative;
+}
+
+.v0-modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.v0-modal-close-btn:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.v0-modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+    text-align: center;
+}
+
+.v0-modal-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    text-align: center;
+    margin: 0 0 20px 0;
+    font-weight: 400;
+}
+
+.v0-modal-content {
+    padding: 24px;
+}
+
+.v0-modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.v0-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.v0-form-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+}
+
+.v0-form-input {
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.v0-form-input:focus {
+    outline: none;
+    border-color: #1157e2;
+    box-shadow: 0 0 0 3px rgba(17, 87, 226, 0.1);
+}
+
+.v0-form-textarea {
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: white;
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+}
+
+.v0-form-textarea:focus {
+    outline: none;
+    border-color: #1157e2;
+    box-shadow: 0 0 0 3px rgba(17, 87, 226, 0.1);
+}
+
+.v0-modal-footer {
+    padding: 0 24px 24px 24px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.v0-btn-secondary {
+    background: transparent;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.v0-btn-secondary:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.v0-btn-primary {
+    background: #1157e2;
+    border: 1px solid #1157e2;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.v0-btn-primary:hover {
+    background: #0d47b8;
+    border-color: #0d47b8;
+}
+
+.v0-btn-primary:disabled {
+    background: #9ca3af;
+    border-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.v0-word-count {
+    font-size: 12px;
+    color: #6b7280;
+    text-align: right;
+    margin-top: 8px;
+}
+
+.v0-required-indicator {
+    color: #ef4444;
+    margin-left: 4px;
+}
+
+/* v0 Form Error Styling */
+.v0-form-input-error {
+    border-color: #ef4444 !important;
+}
+
+.v0-form-error {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* v0 Availability Modal Styling */
+.v0-availability-intro {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.v0-availability-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 8px 0;
+    line-height: 1.4;
+}
+
+.v0-availability-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.v0-availability-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.v0-availability-option {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.v0-availability-option:hover {
+    border-color: #1157e2;
+    background: #f8fafc;
+}
+
+.v0-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.v0-checkbox {
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    accent-color: #1157e2;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.v0-checkbox-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.v0-option-title {
+    font-weight: 600;
+    color: #111827;
+    font-size: 16px;
+}
+
+.v0-option-description {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* v0 Skills Modal Styling */
+.v0-skills-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.v0-skill-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    background: #f9fafb;
+}
+
+.v0-skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.v0-skill-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.v0-skill-remove-btn {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.v0-skill-remove-btn:hover {
+    background: #fef2f2;
+}
+
+.v0-skill-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.v0-add-skill-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
 /* v0 Profile Container Styling */
 .v0-profile-container {
     max-width: 800px;
