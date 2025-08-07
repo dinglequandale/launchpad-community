@@ -160,10 +160,13 @@ export default function SignUp(){
                                 value={userEmail}
                                 onChange={(e) => {
                                     setEmailValid(true);
-                                    if(!(e.target.value.includes("@") || e.target.value.includes("."))){
+                                    if(schoolEmailCondition) {
+                                        if(!(e.target.value.includes("@") || e.target.value.includes("."))){
+                                            setUserEmail(e.target.value);
+                                        }
+                                    } else {
                                         setUserEmail(e.target.value);
                                     }
-
                                 }}
                                 required
                                 // placeholder={`(...)@${schoolId}.org`}

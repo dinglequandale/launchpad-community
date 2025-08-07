@@ -3,6 +3,7 @@ import OpportunityApplyModal from '../components/OpportunityApplyModal/Opportuni
 import ProfileModal from '../components/Profilemodal/ProfileModal';
 import ConnectModal from '../components/Connectmodal/ConnectModal';
 import ParentalConnectionModal from '../components/ParentalConnectionModal';
+import LogoutVerificationModal from '../components/Logoutbutton/LogoutVerificationModal';
 
 const ModalContext = createContext();
 
@@ -15,6 +16,7 @@ export function ModalProvider({ children }) {
   const [profileModalProps, setProfileModalProps] = useState(null);
   const [connectModalProps, setConnectModalProps] = useState(null);
   const [parentalModalProps, setParentalModalProps] = useState(null);
+  const [logoutModalProps, setLogoutModalProps] = useState(null);
 
   // Opportunity Apply Modal
   const openApplyModal = (props) => setApplyModalProps(props);
@@ -32,17 +34,23 @@ export function ModalProvider({ children }) {
   const openParentalConnectionModal = (props) => setParentalModalProps(props);
   const closeParentalConnectionModal = () => setParentalModalProps(null);
 
+  // Logout Verification Modal
+  const openLogoutModal = (props) => setLogoutModalProps(props);
+  const closeLogoutModal = () => setLogoutModalProps(null);
+
   return (
     <ModalContext.Provider value={{
       openApplyModal, closeApplyModal,
       openProfileModal, closeProfileModal,
       openConnectModal, closeConnectModal,
       openParentalConnectionModal, closeParentalConnectionModal,
+      openLogoutModal, closeLogoutModal,
       // Add modal state for checking if modals are open
       isApplyModalOpen: !!applyModalProps,
       isProfileModalOpen: !!profileModalProps,
       isConnectModalOpen: !!connectModalProps,
-      isParentalModalOpen: !!parentalModalProps
+      isParentalModalOpen: !!parentalModalProps,
+      isLogoutModalOpen: !!logoutModalProps
     }}>
       {children}
       {applyModalProps && (
@@ -70,6 +78,14 @@ export function ModalProvider({ children }) {
         <ParentalConnectionModal
           {...parentalModalProps}
           onClose={closeParentalConnectionModal}
+        />
+      )}
+      {logoutModalProps && (
+        <LogoutVerificationModal
+          {...logoutModalProps}
+          visibility={!!logoutModalProps}
+          onCancel={closeLogoutModal}
+          onVerify={logoutModalProps.onVerify}
         />
       )}
     </ModalContext.Provider>

@@ -12,3 +12,33 @@
 .str-chat__input-flat {
   background-color: var(--neutral);
 }
+
+/* Messages Container Styling */
+.v0-messages-container {
+    margin-left: 240px;
+    margin-top: 64px;
+    padding: 24px;
+    min-height: calc(100vh - 64px);
+    background: #f9fafb;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.v0-messages-sidebar-expanded {
+    margin-left: 240px;
+}
+
+.v0-messages-sidebar-collapsed {
+    margin-left: 64px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .v0-messages-container {
+        margin-left: 0;
+        padding: 16px;
+    }
+    
+    .v0-messages-sidebar-collapsed {
+        margin-left: 0;
+    }
+}

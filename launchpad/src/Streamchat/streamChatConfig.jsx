@@ -7,6 +7,7 @@ import SideNav from '../components/Sidenav/SideNav';
 import { CustomChat } from './CustomStream';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import PageLoading from '../components/LoadingAnimation/PageLoading';
+import './stream_styles.css';
 
 
 // const apiKey = import.meta.env.VITE_STREAM_API_KEY;
@@ -18,6 +19,7 @@ export default function InitializeStream() {
   const selectedConnection = location.state;
 
   const [channels, setChannels] = useState(null)
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const {currentUser} = useAuth();
 
 
@@ -29,6 +31,28 @@ export default function InitializeStream() {
 
   const filters = { type: "messaging", members: { $in: [currentUser.uid] } };
   const sort = { last_message_at: -1 };
+
+  // Listen for sidebar state changes
+  useEffect(() => {
+    const handleSidebarChange = () => {
+      const sidebar = document.querySelector('.v0-sidebar');
+      if (sidebar) {
+        setIsSidebarCollapsed(sidebar.classList.contains('v0-sidebar-collapsed'));
+      }
+    };
+
+    // Initial check
+    handleSidebarChange();
+
+    // Set up observer to watch for sidebar class changes
+    const observer = new MutationObserver(handleSidebarChange);
+    const sidebar = document.querySelector('.v0-sidebar');
+    if (sidebar) {
+      observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    return () => observer.disconnect();
+  }, []);
   useEffect(() => {
     async function initializeChat() {
       if (!currentUser || !isConnected) {
@@ -83,12 +107,12 @@ export default function InitializeStream() {
   if(!chatClient || !channels) return ( <PageLoading/> );
 
   return (
-      <div style={{maxHeight: "100%"}}>
+    <>
       <TopBar/>
       <SideNav/>
-      <div style={{paddingTop: "5%", paddingLeft: "10%"}}>
+      <div className={`v0-messages-container ${isSidebarCollapsed ? 'v0-messages-sidebar-collapsed' : 'v0-messages-sidebar-expanded'}`}>
         <CustomChat client={chatClient} channels={channels} initialActiveChannel={activeChannel} filters={filters}/>
       </div>
-      </div>
-    )
+    </>
+  )
 }
