@@ -1,10 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Loading from '../LoadingAnimation/Loading';
 
-export default function SecurityCodeInput({onSubmit}) {
-
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
+export default function SecurityCodeInput({onSubmit, isSubmitting, onCodeChange}) {
 
     const codeLength = 5;
     const [code, setCode] = useState(['', '', '', '', '']);
@@ -25,6 +22,11 @@ export default function SecurityCodeInput({onSubmit}) {
         const newCode = [...code];
         newCode[index] = sanitizedValue;
         setCode(newCode);
+        
+        // Notify parent of code change
+        if (onCodeChange) {
+            onCodeChange(newCode.join(''));
+        }
 
         if (sanitizedValue && index < codeLength - 1) {
         inputRefs[index + 1].current.focus();
@@ -42,6 +44,12 @@ export default function SecurityCodeInput({onSubmit}) {
             newCode[i] = chars[i];
         }
         setCode(newCode);
+        
+        // Notify parent of code change
+        if (onCodeChange) {
+            onCodeChange(newCode.join(''));
+        }
+        
         // Focus the last filled input
         if (chars.length > 0 && chars.length <= codeLength) {
             setTimeout(() => {
@@ -57,21 +65,23 @@ export default function SecurityCodeInput({onSubmit}) {
         const newCode = [...code];
         newCode[index - 1] = '';
         setCode(newCode);
+        
+        // Notify parent of code change
+        if (onCodeChange) {
+            onCodeChange(newCode.join(''));
+        }
         }
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setIsSubmitting(true);
         const fullCode = code.join('');
         if (fullCode.length === codeLength) {
         console.log('Security Code Submitted:', fullCode);
-
         await onSubmit(fullCode);
         } else {
         alert('Please complete the entire security code');
         }
-        setIsSubmitting(false);
     };
 
     return (

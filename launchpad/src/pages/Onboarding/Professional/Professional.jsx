@@ -251,7 +251,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
   };
 
   return (
-    <div>
+    <div className="onboarding-page">
       {renderPage()}
     </div>
   );
@@ -259,71 +259,77 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
 
 const RetiredStatus = ({ selectedOptions, handleChange }) => {
   const questionsForPage = professionalQuestionsConfig.filter((question)=>question.page === 2);
-  // These questions are identical except for the question asked (past vs present tense)
   return (
-    <div className='onboardingQuestions' style={{width: "460px", textAlign: "center"}}>
-      {questionsForPage.map((question)=>(<OnboardingDropdown
-        question={question.text}
-        options={question.options}
-        selectedOption={(selectedOptions[question.id] ? "Yes" : "No") || ''}
-        onChange={(label) => handleChange(question.id, label === "Yes")}
-        type={question.type}
-      />))}
+    <div className="form-section">
+      <h2 className="page-title">Professional Status</h2>
+      <div className="onboardingQuestions">
+        {questionsForPage.map((question) => (
+          <div className="form-group" key={question.id}>
+            <OnboardingDropdown
+              question={question.text}
+              options={question.options}
+              selectedOption={(selectedOptions[question.id] ? "Yes" : "No") || ''}
+              onChange={(label) => handleChange(question.id, label === "Yes")}
+              type={question.type}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
 const WorkDetails = ({selectedOptions, handleChange}) => {
-  // These questions are identical except for the question asked (past vs present tense)
   const isRetired = selectedOptions.retiredStatus;
   const questionsForPage = professionalQuestionsConfig.filter((question)=>(question.page === 3 && question.retired === isRetired));
   return (
-    <div className='onboardingQuestions' style={{width: "460px"}}>
-      {questionsForPage.map((question) => (
-        question.type === 'text-box' ? (
-          <div key={question.id} className="form-group">
-            <label className='onboardingQuestion'>{question.text}</label>
-            <input
-              type={`${question.id === "yearsOfExperience" ? "number" : "text"}`}
-              value={selectedOptions[question.id] || ''}
-              onChange={(e) => handleChange(question.id, e.target.value)}
-              className='onboardingInput'
-              placeholder={question.placeholder}
-            />
+    <div className="form-section">
+      <h2 className="page-title">{isRetired ? "Previous Work Experience" : "Current Work Experience"}</h2>
+      <div className="onboardingQuestions">
+        {questionsForPage.map((question) => (
+          <div className="form-group" key={question.id}>
+            {question.type === 'text-box' ? (
+              <>
+                <label className="form-label">{question.text}</label>
+                <input
+                  type={`${question.id === "yearsOfExperience" ? "number" : "text"}`}
+                  value={selectedOptions[question.id] || ''}
+                  onChange={(e) => handleChange(question.id, e.target.value)}
+                  className="form-input form-shorter-input"
+                  placeholder={question.placeholder}
+                />
+              </>
+            ) : (
+              <OnboardingDropdown
+                question={question.text}
+                options={question.options}
+                selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+                onChange={(label) => handleChange(question.id, label)}
+                type={question.type}
+              />
+            )}
           </div>
-        ) : (
-          <OnboardingDropdown
-            key={question.id}
-            question={question.text}
-            options={question.options}
-            selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-            onChange={(label) => handleChange(question.id, label)}
-            type={question.type}
-          />
-        )
-      ))}
+        ))}
+      </div>
     </div>
-    );
-  };
+  );
+};
   const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
 
     const OptionalLabel = () => (
-      <span className="optional-label" style={{fontSize: "15px"}}>(Optional)</span>
+      <span className="optional-label">(Optional)</span>
     );
-  
-    // const questionsForPage = collegeStudentQuestionsConfig.filter((question)=>question.page === 3);
   
     const handleOptionChange = (event) => {
       const value = event.target.value;
       setSelectedOptions(prevState => ({
         ...prevState,
         networkingLevel: selectedOptions.networkingLevel.includes(value)
-          ? selectedOptions.networkingLevel.filter(option => option !== value) // Remove if selected
-          : [...selectedOptions.networkingLevel, value] // Add if not selected
+          ? selectedOptions.networkingLevel.filter(option => option !== value)
+          : [...selectedOptions.networkingLevel, value]
       }));
     };
     
-  
     const availabilityOptionsConfig = [
       { 
           id: "casualConnection",
@@ -348,33 +354,44 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
     ];
   
     return (
-        <div className='onboardingQuestions'>
-          <div style={{border: "solid 1.5px var(--secondary)", textAlign: "center", padding: "8px 0px", background: "var(--neutral)"}}>
-            <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and experiences</span> <br /> are invaluable resources to the Awty community.</span></div>
-          <div style={{position: "relative"}}>
-          <label className='onboardingQuestion'>Please roughly assess your commitment:</label>
-          <div style={{position: "absolute", bottom: "-13px"}}>
-              <OptionalLabel />
+        <div className="form-section">
+          <h2 className="page-title">Your Commitment Level</h2>
+          <div className="parent-notice">
+            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+              <div className="parent-notice-content">
+                <h3>Your knowledge and experiences</h3>
+                <p>are invaluable resources to the Awty community.</p>
               </div>
+            </div>
           </div>
-          <div style={{display: "flex", flexDirection: "column", gap: "25px"}}>
-            {availabilityOptionsConfig.map((option)=>(
-            <div style={{fontSize: "larger", lineHeight: ".6", display: "flex"}}>
-                <label htmlFor={option.id}>
-                <input 
+          <div className="form-group">
+            <label className="form-label">
+              Please roughly assess your commitment:
+              <div className="onboarding-optional-label-container">
+                <OptionalLabel />
+              </div>
+            </label>
+          </div>
+          <div className="contact-sharing-container">
+            {availabilityOptionsConfig.map((option) => (
+              <div className="radio-option" key={option.id}>
+                <label className="radio-label">
+                  <input
                     type="checkbox"
                     value={option.value}
                     checked={selectedOptions.networkingLevel.includes(option.value)}
-                    onChange={(e) => {
-                      handleOptionChange(e);
-                    }}
-                />
-                <span style={{fontSize: "20px", fontWeight: "bolder", color: "var(--secondary)"}}>{option.value}:</span> <span style={{fontWeight: "300"}}>{option.text}</span>
+                    onChange={handleOptionChange}
+                    className="radio-input"
+                  />
+                  <div className="radio-custom"></div>
+                  <div className="option-text">
+                    <strong>{option.value}:</strong> {option.text}
+                  </div>
                 </label>
-            </div>))}
-            </div>
-          
-      </div>
+              </div>
+            ))}
+          </div>
+        </div>
     );
   };
   

@@ -188,47 +188,41 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
   };
 
   return (
-    <>
-    {renderPage()}
-    </>
+    <div className="onboarding-page">
+      {renderPage()}
+    </div>
   );
 };
 
 const CollegeInfo = ({ selectedOptions, handleChange, collegeStudentData }) => {
   return (
-    <div className='onboardingQuestions' style={{width: "500px"}}>
-      {collegeStudentQuestionsConfig.filter(question => question.page === 2)
-        .map((question) => (
-          question.id === 'collegeAttending' ? (
-            <CollegeSearch
-              key={question.id}
-              question={question.text}
-              selectedOption={selectedOptions['collegeAttending']}
-              onChange={(label) => handleChange('collegeAttending', label)}
-              type={question.type}
-            />
-          ) 
-          // : question.id === 'sectionAttending' ? (
-          //   (collegeStudentData.schoolAttending === "Awty International School") && <>
-          //   <OnboardingDropdown
-          //     key={question.id} // Add key for unique identification
-          //     question={question.text}
-          //     options={question.options}
-          //     selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-          //     onChange={(label) => handleChange(question.id, label)}
-          //     type={question.type}
-          //   />
-          //   </>
-          // )
-          : <OnboardingDropdown
-          key={question.id} // Add key for unique identification
-          question={question.text}
-          options={question.options}
-          selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-          onChange={(label) => handleChange(question.id, label)}
-          type={question.type}
-        />
-        ))}
+    <div className="form-section">
+      <h2 className="page-title">College Information</h2>
+      <div className="onboardingQuestions">
+        {collegeStudentQuestionsConfig.filter(question => question.page === 2)
+          .map((question) => (
+            question.id === 'collegeAttending' ? (
+              <div className="form-group" key={question.id}>
+                {/* <label className="form-label">{question.text}</label> */}
+                <CollegeSearch
+                  question={question.text}
+                  selectedOption={selectedOptions['collegeAttending']}
+                  onChange={(label) => handleChange('collegeAttending', label)}
+                  type={question.type}
+                />
+              </div>
+            ) 
+            : <div className="form-group" key={question.id}>
+                <OnboardingDropdown
+                  question={question.text}
+                  options={question.options}
+                  selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+                  onChange={(label) => handleChange(question.id, label)}
+                  type={question.type}
+                />
+              </div>
+          ))}
+      </div>
     </div>
   );
 };
@@ -310,28 +304,21 @@ const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
 const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
 
   const OptionalLabel = () => (
-    <span className="optional-label" style={{fontSize: "15px"}}>(Optional)</span>
+    <span className="optional-label">(Optional)</span>
   );
 
-
-
   const [skillData,setSkillData] = useState(selectedOptions.userSkills.length > 0 ? selectedOptions.userSkills : [{id: 0, skillCategory: "", skillDescription: ""}]);
-
 
   useEffect(() => {
     setSelectedOptions({... selectedOptions, userSkills: skillData});
   },[skillData])
 
   const handleInputChange = (key, value, index) => {
-      // setSkillData([...skillData.map((skill) => (skill.id === index ? {id: index, ... skillData[index], [key]: value} : skill))]);
-      console.log(skillData);
-      // setSelectedOptions({... selectedOptions, userSkills: [...skillData.map((skill) => (skill.id === index ? {id: index, ... skillData[index], [key]: value} : skill))]});
       setSkillData([...skillData.map((skill) => (skill.id === index ? {id: index, ... skillData[index], [key]: value} : skill))]);
     }
 
   const handleAddSkill = () => {
     setSkillData([...skillData, {id: skillData.length, skillCategory: "", skillDescription: ""}]);
-    console.log(skillData, "skilldata");
   };
   
   const handleRemoveSkill = (index) => {
@@ -340,47 +327,54 @@ const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
   };
 
   return (
-      <div className='onboardingQuestions'>
-        {/* <div style={{border: "solid 1.5px var(--secondary)", textAlign: "center", padding: "8px 0px", background: "var(--neutral)"}}>
-          <span style={{ fontSize: "20px"}}><span style={{fontSize: "25px", fontWeight: "550"}}>Your knowledge and mentorship</span> <br /> is a valuable reasource for students on this app.</span></div> */}
-        <div style={{position: "relative"}}>
-        <label className='onboardingQuestion'>Professionals in your school community may have workplace opportunities for you. List some of your skills to show them what you are about:</label>
-        <div style={{position: "absolute", bottom: "-13px"}}>
-            <OptionalLabel />
+      <div className="form-section">
+        <h2 className="page-title">Your Skills</h2>
+        <div className="form-group">
+          <label className="form-label">
+            Professionals in your school community may have workplace opportunities for you. List some of your skills to show them what you are about:
+            <div className="onboarding-optional-label-container">
+              <OptionalLabel />
             </div>
+          </label>
         </div>
-            <div className="skills-modal-container" style={{maxHeight: "300px", width: "500px"}}>
-            {selectedOptions.userSkills.map((skill, index) => (
-                <div key={index} className="skill-item">
-                <div className="skill-header">
-                    <h3>Skill {index + 1}</h3>
-                    {index > 0 && (
-                    <button className="btnText remove-button" onClick={() => handleRemoveSkill(index)}>
-                        <BiTrash size={22} />
-                    </button>
-                    )}
-                </div>
-                <input
-                    type="text"
-                    placeholder="Skill"
-                    value={skill.skillCategory}
-                    onChange={(e) => handleInputChange("skillCategory", e.target.value, index)}
-                />
-                <input
-                    type="text"
-                    placeholder="Brief Description"
-                    value={skill.skillDescription}
-                    onChange={(e) => handleInputChange("skillDescription", e.target.value, index)}
-                />
-                </div>
-            ))}
-            </div>
-            
-            <button className="btnUnfilled skill-add-button" style={{marginTop: "2px"}} onClick={handleAddSkill}>
-            <BiPlus size={20} /> Add Skill
-            </button>
         
-    </div>
+        <div className="skills-container">
+          {selectedOptions.userSkills.map((skill, index) => (
+            <div key={index} className="skill-item">
+              <div className="skill-header">
+                <h3 className="skill-title">Skill {index + 1}</h3>
+                {index > 0 && (
+                  <button className="action-button remove-button" onClick={() => handleRemoveSkill(index)}>
+                    <BiTrash size={18} />
+                  </button>
+                )}
+              </div>
+              <div className="form-group" style={{maxWidth: "470px"}}>
+                <input
+                  type="text"
+                  placeholder="Skill"
+                  value={skill.skillCategory}
+                  onChange={(e) => handleInputChange("skillCategory", e.target.value, index)}
+                  className="form-input form-shorter-input"
+                />
+              </div>
+              <div className="form-group" style={{maxWidth: "470px"}}>
+                <input
+                  type="text"
+                  placeholder="Brief Description"
+                  value={skill.skillDescription}
+                  onChange={(e) => handleInputChange("skillDescription", e.target.value, index)}
+                  className="form-input form-shorter-input"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <button className="request-btn skill-add-button" onClick={handleAddSkill}>
+          <BiPlus size={18} /> Add Skill
+        </button>
+      </div>
   );
 };
 

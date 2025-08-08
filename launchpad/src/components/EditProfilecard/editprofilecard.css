@@ -7,7 +7,7 @@
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(8px);
-    z-index: 1000;
+    z-index: 9999;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16,7 +16,7 @@
 
 /* Ensure MakeChanges modal appears above other modals */
 .v0-modal-overlay .MakeChanges {
-    z-index: 1001;
+    z-index: 9999;
 }
 
 .v0-modal-container {
@@ -27,6 +27,7 @@
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
+    z-index: 9999;
     position: relative;
     animation: v0-modal-slide-in 0.3s ease-out;
 }

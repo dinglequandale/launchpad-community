@@ -164,6 +164,14 @@ export default function EditProfileCard() {
                     opportunityId={edittingOpportunity ? edittingOpportunity.id : ""}/>
             ) : null}
         </div>
+        
+        {/* All Modals rendered at root level to avoid stacking context issues */}
+        {basicInfoModalVisibility && <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userData={userData} userType={userData?.userType}/>}
+        {contactModalVisibility && <ContactInfoModal onClose={()=>setContactModalVisibility(false)} visibility={contactModalVisibility} userData={userData}/>}
+        {aboutMeModalVisibility && <AboutMeModal onClose={()=>setAboutMeModalVisibility(false)} visibility={aboutMeModalVisibility} userData={userData}/>}
+        {skillModalVisibility && <SkillModal onClose={()=>setSkillModalVisibility(false)} visibility={skillModalVisibility} userData={userData}/>}
+        {availabilityModalVisibility && <AvailabilityModal onClose={()=>setAvailabilityModalVisibility(false)} visibility={availabilityModalVisibility} userData={userData}/>}
+        
         <div className="complete-profile-container">
             <ProfileContext.Provider value={{currentUser, userData}}>
             <div className="v0-profile-container">
@@ -447,7 +455,6 @@ function SkillBase({ skillModalVisibility, setSkillModalVisibility }) {
 
     return(
         <>
-            {skillModalVisibility && <SkillModal visibility={skillModalVisibility} userData={userData} onClose={() => setSkillModalVisibility(false)}/>}
             {(userSkills && (userSkills.length > 0)) ? (
                 <div className="v0-skills-container">
                     {Object.entries(
@@ -486,7 +493,6 @@ function ContactInformation({ contactModalVisibility, setContactModalVisibility 
 
     return(
         <>
-        {contactModalVisibility && <ContactInfoModal userData={userData} visibility={contactModalVisibility} onClose={() => setContactModalVisibility(false)}/>} 
         <div className="v0-contact-content">
             <div className="v0-contact-item">
                 <div className="v0-contact-label">
@@ -683,7 +689,6 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
 
     return(
         <>
-        {basicInfoModalVisibility && <BasicInfoModal onClose={()=>setBasicInfoModalVisibility(false)} visibility={basicInfoModalVisibility} userData={userData} userType={userType}/>}
         {basicInfoContent && <>
         <div className='basicInfo' style={{position: "relative"}}>
             {/* <div>
@@ -852,7 +857,6 @@ function AboutMeDisplay({ aboutMeModalVisibility, setAboutMeModalVisibility }){
 
     return(
         <>
-        <AboutMeModal visibility={aboutMeModalVisibility} onClose={() => setAboutMeModalVisibility(false)} userData={userData}/>
         <div className="v0-about-me-content">
             {!aboutMe ? (
                 <div className="v0-empty-state">
@@ -890,7 +894,6 @@ function ConnectionAvailability({ availabilityModalVisibility, setAvailabilityMo
 
     return(
         <>
-            {availabilityModalVisibility && <AvailabilityModal visibility={availabilityModalVisibility} availabilityData={availabilityData} onClose={()=>setAvailabilityModalVisibility(false)} userData={userData}/>}
             <div className="v0-availability-content">
                 {!availabilityData ? (
                     <div className="v0-empty-state">

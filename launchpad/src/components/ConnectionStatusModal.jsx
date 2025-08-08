@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import { useAuth } from '../contexts/auth/AuthContext';
 import DefaultIcon from './DefaultIcon/DefaultIcon';
 import { displayShortenedName, getBasicUserDescription } from '../services/userProfileServices';
 import { IoCheckmarkOutline, IoCloseOutline } from 'react-icons/io5';
-import { CgClose } from 'react-icons/cg';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import './ConnectionStatusModal.css';
 
@@ -26,7 +25,25 @@ export default function ConnectionStatusModal({
   const [loadingAction, setLoadingAction] = useState({}); // { [connId]: 'approve' | 'deny' | null }
   const [removingCards, setRemovingCards] = useState({}); // Track cards being animated out
   const [hiddenCards, setHiddenCards] = useState(new Set()); // Track cards to hide after animation
+  const modalRef = useRef(null);
   const userType = localStorage.getItem("basicUserInfo") ? JSON.parse(localStorage.getItem("basicUserInfo")).userType : "";
+
+  // Handle outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [onClose]);
 
   useEffect(() => {
     const allConnections = [
@@ -133,133 +150,59 @@ export default function ConnectionStatusModal({
   const renderConnectionCard = (conn, user, section, extra = null, showActions = false) => {
     if (!user) return <div key={conn.id}>Loading...</div>;
     const basicInfoContent = getBasicUserDescription(user);
-    let borderColor = '#9c27b0', bgColor = '#faf5ff';
-    if (section === 'pending_parental_approval') {
-      borderColor = '#ff9800'; bgColor = '#fff8f0';
-    } else if (section === 'approved' || section === 'parent_approved') {
-      borderColor = '#4caf50'; bgColor = '#f8fff8';
-    } else if (section === 'pending') {
-      borderColor = '#1976d2'; bgColor = '#f0f8ff';
-    }
-    if (section === 'incoming') {
-      borderColor = '#9c27b0'; bgColor = '#faf5ff';
-    }
     const showConnectBtn = section === 'approved' || section === 'parent_approved';
+    
     return (
       <div key={conn.id}
-        className={removingCards[conn.id] ? 'connection-card-removing' : ''}
-        style={{
-          background: bgColor,
-          border: `1px solid ${borderColor}`,
-          borderRadius: '12px',
-          padding: '20px',
-          // marginBottom: '16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          position: 'relative',
-          transition: 'all 0.2s ease-in-out',
-          boxShadow: `0 2px 8px ${borderColor}22`,
-        }}
+        className={`connection-status-modal-connection-card ${section} ${removingCards[conn.id] ? 'connection-card-removing' : ''}`}
       >
-        <div style={{ display: 'flex', flex: 1, gap: '18px', alignItems: 'center' }}>
-          <div style={{ flexShrink: 0 }}>
+        <div className="connection-status-modal-connection-info">
+          <div className="connection-status-modal-connection-avatar">
             {user.userPfpPreview ? (
               <img
                 src={user.userPfpPreview}
                 alt=""
-                style={{
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '12px',
-                  objectFit: 'cover',
-                  border: `2px solid ${borderColor}`,
-                  boxShadow: `0 2px 8px ${borderColor}22`
-                }}
               />
             ) : (
               <DefaultIcon length="60px" size={30} />
             )}
           </div>
-          <div style={{ flex: 1, minWidth: 0, maxWidth: showConnectBtn ? 'calc(100% - 180px)' : 'calc(100% - 140px)', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'center', marginRight: showConnectBtn ? 10 : 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: 4 }}>
-              <h3 style={{
-                margin: 0,
-                fontSize: '1.18em',
-                fontWeight: 700,
-                color: borderColor,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
+          <div className="connection-status-modal-connection-details">
+            <div className="connection-status-modal-connection-header">
+              <h3 className={`connection-status-modal-connection-name ${section}`}>
                 {displayShortenedName(user.userName)}
               </h3>
               <button
-                style={{
-                  background: 'linear-gradient(90deg, #667eea 0%, #1976d2 100%)',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 6,
-                  padding: '5px 14px',
-                  fontWeight: 600,
-                  fontSize: '0.98em',
-                  boxShadow: '0 2px 8px rgba(25, 118, 210, 0.10)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'background 0.2s, transform 0.2s',
-                }}
+                className="connection-status-modal-profile-button"
                 onClick={() => handleProfileClick && handleProfileClick(user)}
               >
                 <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path fill="#fff" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.418 0-8 2.239-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.761-3.582-5-8-5Z"/></svg>
                 See Profile
               </button>
             </div>
-            <div style={{ fontSize: '0.98em', color: '#666', fontStyle: 'italic', marginBottom: 6 }}>
+            <div className="connection-status-modal-connection-description">
               {basicInfoContent}
             </div>
-            {extra}
+            {extra && (
+              <div className={`connection-status-modal-connection-extra ${section}`}>
+                {extra}
+              </div>
+            )}
           </div>
         </div>
+        
         {/* Action Buttons for incomingRequests */}
         {showActions && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: 120, alignItems: 'center', justifyContent: 'center' }}>
+          <div className="connection-status-modal-connection-actions">
             <button
-              className="btnConnect"
-              style={{
-                background: '#4caf50',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 6,
-                padding: '8px 12px',
-                fontWeight: 600,
-                cursor: loadingAction[conn.id] === 'approve' ? 'not-allowed' : 'pointer',
-                fontSize: '0.95em',
-                transition: 'all 0.2s ease',
-                width: '100%',
-                opacity: loadingAction[conn.id] === 'approve' ? 0.7 : 1
-              }}
+              className="connection-status-modal-approve-button"
               onClick={() => loadingAction[conn.id] ? null : handleApprove(conn)}
               disabled={loadingAction[conn.id] === 'approve'}
             >
               {loadingAction[conn.id] === 'approve' ? 'Approving...' : (<><IoCheckmarkOutline size={14} /> Approve</>)}
             </button>
             <button
-              className="btnConnect"
-              style={{
-                background: '#f44336',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 6,
-                padding: '8px 12px',
-                fontWeight: 600,
-                cursor: loadingAction[conn.id] === 'deny' ? 'not-allowed' : 'pointer',
-                fontSize: '0.95em',
-                transition: 'all 0.2s ease',
-                width: '100%',
-                opacity: loadingAction[conn.id] === 'deny' ? 0.7 : 1
-              }}
+              className="connection-status-modal-deny-button"
               onClick={() => loadingAction[conn.id] ? null : handleDeny(conn)}
               disabled={loadingAction[conn.id] === 'deny'}
             >
@@ -267,23 +210,12 @@ export default function ConnectionStatusModal({
             </button>
           </div>
         )}
+        
         {/* Connect button for approved/parent_approved */}
         {showConnectBtn && (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 120 }}>
             <button
-              className="btnConnect"
-              style={{
-                background: 'linear-gradient(90deg, #667eea 0%, #1976d2 100%)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 6,
-                padding: '10px 24px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: '1em',
-                transition: 'all 0.2s ease',
-                marginLeft: 10
-              }}
+              className="connection-status-modal-connect-button"
               onClick={() => onConnect && onConnect(user)}
             >
               Connect
@@ -295,124 +227,88 @@ export default function ConnectionStatusModal({
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100vh',
-      background: 'rgba(0,0,0,0.32)',
-      zIndex: 9998,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}
-      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div style={{
-        background: '#fff',
-        borderRadius: '5px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-        padding: '0 28px 17px 24px',
-        minWidth: 600,
-        maxWidth: '90vw',
-        maxHeight: '88vh',
-        overflowX: 'scroll',
-        position: 'relative',
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-      }}>
-        <button className='btnClose' onClick={onClose} style={{background:"none", color: "white", position: 'absolute', right: 12, top: 12}}><CgClose size={25}/></button>
-        <div
-          style={{
-            background: 'linear-gradient(90deg, #667eea 0%, #1976d2 100%)',
-            borderTopLeftRadius: 5,
-            borderTopRightRadius: 5,
-            padding: '32px 0 20px 0',
-            margin: '0 -28px 0 -28px',
-            textAlign: 'center',
-            color: '#fff',
-            boxShadow: '0 2px 8px rgba(25, 118, 210, 0.08)'
-          }}
-        >
-          <div style={{ fontSize: 44, marginBottom: 8 }}>📬</div>
-          <h2 style={{
-            margin: 0,
-            fontWeight: 700,
-            fontSize: '2rem',
-            letterSpacing: '0.01em',
-            textShadow: '0 2px 8px rgba(25, 118, 210, 0.10)'
-          }}>
+    <div className="connection-status-modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="connection-status-modal" ref={modalRef}>
+        <div className="connection-status-modal-header">
+          <button className="connection-status-modal-close-btn" onClick={onClose} title="Close">
+            <IoCloseOutline size={20} />
+          </button>
+        </div>
+        
+        <div className="connection-status-modal-section">
+          <div className="connection-status-modal-icon">📬</div>
+          <h2 className="connection-status-modal-title">
             Connection Updates
           </h2>
         </div>
-        <hr style={{
-          border: 'none',
-          borderTop: '2px solid #e3e8f7',
-          margin: '0 0 24px 0'
-        }} />
-        <div style={{ color: '#444', marginBottom: 18, textAlign: 'left', overflowY: 'auto', minHeight: "300px" }}>
-          {incomingRequests.filter(conn => !hiddenCards.has(conn.id)).length > 0 && <h3 style={{ color: '#9c27b0' }}>📥 Incoming Connection Requests</h3>}
-          <div style={{display: "flex", flexDirection: "column", gap: "16px"}}>
-          {incomingRequests.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
-            const user = getOtherUser(conn);
-            if (!user) return <div key={conn.id}>Loading...</div>;
-            return renderConnectionCard(conn, user, 'incoming', <div style={{ fontSize: '0.85em', color: '#9c27b0', marginTop: '8px', fontStyle: 'italic' }}>Wants to connect with you</div>, true);
-          })}
+        
+        <hr className="connection-status-modal-divider" />
+        
+        <div className="connection-status-modal-content">
+          {incomingRequests.filter(conn => !hiddenCards.has(conn.id)).length > 0 && (
+            <h3 className="connection-status-modal-section-title incoming">📥 Incoming Connection Requests</h3>
+          )}
+          <div className="connection-status-modal-connections-list">
+            {incomingRequests.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
+              const user = getOtherUser(conn);
+              if (!user) return <div key={conn.id}>Loading...</div>;
+              return renderConnectionCard(conn, user, 'incoming', <div>Wants to connect with you</div>, true);
+            })}
           </div>
-          {(userType === "High Schooler") && pending_parental_approval.length > 0 && <>
-          <h3 style={{ color: '#ff9800' }}>⏳ Pending Parent Approval</h3>
-          {pending_parental_approval.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
-            const user = getOtherUser(conn);
-            if (!user) return <div key={conn.id}>Loading...</div>;
-            return renderConnectionCard(conn, user, 'pending_parental_approval', <div style={{ fontSize: '0.85em', color: '#ff9800', marginTop: '8px', fontStyle: 'italic' }}>Waiting for parent approval</div>);
-          })}
-          </>}
+          
+          {(userType === "High Schooler") && pending_parental_approval.length > 0 && (
+            <>
+              <h3 className="connection-status-modal-section-title pending-parental">⏳ Pending Parent Approval</h3>
+              <div className="connection-status-modal-connections-list">
+                {pending_parental_approval.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
+                  const user = getOtherUser(conn);
+                  if (!user) return <div key={conn.id}>Loading...</div>;
+                  return renderConnectionCard(conn, user, 'pending-parental', <div>Waiting for parent approval</div>);
+                })}
+              </div>
+            </>
+          )}
 
-          {(approved.filter(conn => !hiddenCards.has(conn.id)).length > 0 || (userType === "High Schooler" && parent_approved.filter(conn => !hiddenCards.has(conn.id)).length > 0)) && <h3 style={{ color: '#4caf50' }}>✅ Approved Connections</h3>}
-          <div style={{display: "flex", flexDirection: "column", gap: "0px"}}>
-          {userType === "High Schooler" && <div style={{display: "flex", flexDirection: "column", gap: "16px", marginBottom: parent_approved.length > 0 ? "16px" : "0px"}}>
-          {parent_approved.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
-            const user = getOtherUser(conn);
-            if (!user) return <div key={conn.id}>Loading...</div>;
-            return renderConnectionCard(conn, user, 'parent_approved');
-          })}
-          </div>}
-          {approved.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
-            const user = getOtherUser(conn);
-            if (!user) return <div key={conn.id}>Loading...</div>;
-            return renderConnectionCard(conn, user, 'approved');
-          })}
+          {(approved.filter(conn => !hiddenCards.has(conn.id)).length > 0 || (userType === "High Schooler" && parent_approved.filter(conn => !hiddenCards.has(conn.id)).length > 0)) && (
+            <h3 className="connection-status-modal-section-title approved">✅ Approved Connections</h3>
+          )}
+          
+          <div className="connection-status-modal-connections-list">
+            {userType === "High Schooler" && (
+              <div style={{display: "flex", flexDirection: "column", gap: "16px", marginBottom: parent_approved.length > 0 ? "16px" : "0px"}}>
+                {parent_approved.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
+                  const user = getOtherUser(conn);
+                  if (!user) return <div key={conn.id}>Loading...</div>;
+                  return renderConnectionCard(conn, user, 'parent_approved');
+                })}
+              </div>
+            )}
+            {approved.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
+              const user = getOtherUser(conn);
+              if (!user) return <div key={conn.id}>Loading...</div>;
+              return renderConnectionCard(conn, user, 'approved');
+            })}
           </div>
 
-          {pending.filter(conn => !hiddenCards.has(conn.id)).length > 0 && <h3 style={{ color: '#1976d2' }}>Pending Connections</h3>}
-          <div style={{display: "flex", flexDirection: "column", gap: "16px"}}>
-          {pending.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
-            const user = getOtherUser(conn);
-            if (!user) return <div key={conn.id}>Loading...</div>;
-            return renderConnectionCard(conn, user, 'pending');
-          })}
+          {pending.filter(conn => !hiddenCards.has(conn.id)).length > 0 && (
+            <h3 className="connection-status-modal-section-title pending">Pending Connections</h3>
+          )}
+          <div className="connection-status-modal-connections-list">
+            {pending.filter(conn => !hiddenCards.has(conn.id)).map(conn => {
+              const user = getOtherUser(conn);
+              if (!user) return <div key={conn.id}>Loading...</div>;
+              return renderConnectionCard(conn, user, 'pending');
+            })}
           </div>
         </div>
-        <div style={{display: "flex", justifyContent: "left"}}>
-        <button
-          onClick={onClose}
-          className="btnSaveChanges"
-          style={{
-            color: '#fff',
-            border: 'none',
-            borderRadius: 6,
-            padding: '12px 24px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            fontSize: '1em',
-            background: 'linear-gradient(90deg, #667eea 0%, #1976d2 100%)',
-            width: "100px"
-          }}
-        >
-          Got it!
-        </button>
+        
+        <div className="connection-status-modal-footer">
+          <button
+            onClick={onClose}
+            className="connection-status-modal-close-button"
+          >
+            Got it!
+          </button>
         </div>
       </div>
     </div>

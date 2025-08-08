@@ -39,7 +39,7 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
 
     return (
         <div className="dropDownContainer">
-            {showQuestion && <label>{question}</label>}
+            {showQuestion && <label>{typeof question === 'string' ? question : question?.text || ''}</label>}
             {type === 'multi-select' ? (
                 <Select
                     defaultValue={getValue()}

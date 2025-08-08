@@ -30,52 +30,82 @@ export default function UserType() {
     if (!localStorage.getItem('tempSchoolInfo')) {
         return <Navigate to="/school-signup" replace={true}/>;
     }
-    // After continue, reload or navigate to onboarding main flow
-
 
     return (
         <div className='onboarding-container'>
             <div className='background-blend'></div>
-            <div style={{position: "relative"}}>
-                <div className='onboarding-body' >
-                    <div style={{background: "var(--accent)", borderRadius: "25px",
-                        display: "flex", justifyContent: "center", alignItems: "center", height: "80px", padding: "10px 5px",  marginBottom: "5px"}}>
-                        <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
-                    </div>
-                    <div style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
-                        <span style={{fontSize: "30px", fontWeight: "bolder", marginBottom: "5px", color: "var(--secondary)"}}>Create your Account</span>
-                        <span style={{marginBottom: "15px", fontSize: "large", color: "secondary"}}>Which best describes you?</span>
-                        <div className="userType-options-container">
-                            {userTypes.map((type) => (
-                                <button
-                                    key={type.id}
-                                    className={`btnUnfilled userType-option ${selectedOption === type.label ? 'selected' : ''}`}
-                                    onClick={() => handleUserTypeSelection(type.label)}
-                                >
-                                    {type.icon}
-                                    <span className="userType-label">{type.label}</span>
-                                </button>
-                            ))}
+            <div className="onboarding-wrapper">
+                <div className='onboarding-body'>
+                    <header className="onboarding-header">
+                        <div className="onboarding-logo-container">
+                            <img 
+                                src="/assets/launchpad_logo.png" 
+                                alt="Launchpad Logo" 
+                                className="onboarding-logo"
+                            />
                         </div>
-                        <div style={{display: "flex", marginTop: "15px"}}>
-                            <input type="checkbox" checked={agreedToTerms} onChange={()=>setAgreedToTerms(!agreedToTerms)}/>
-                            <span>I accept the <a onClick={() => {
-                                navigate("/privacy", {state: "/onboarding"});
-                            }} style={{textDecoration: "underline"}}>Privacy Policy</a> and the <a onClick={() => {
-                                navigate("/terms", {state: "/onboarding"});
-                            }} style={{textDecoration: "underline"}}>Terms and Conditions</a>.</span>
+                    </header>
+                    
+                    <main className="onboarding-main">
+                        <div className="form-section">
+                            <h2 className="page-title">Create your Account</h2>
+                            <p className="form-subtitle">Which best describes you?</p>
+                            
+                            <div className="userType-options-container">
+                                {userTypes.map((type) => (
+                                    <button
+                                        key={type.id}
+                                        className={`userType-option ${selectedOption === type.label ? 'selected' : ''}`}
+                                        onClick={() => handleUserTypeSelection(type.label)}
+                                    >
+                                        <div className="userType-icon">
+                                            {type.icon}
+                                        </div>
+                                        <span className="userType-label">{type.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            <div className="terms-checkbox-container">
+                                <label className="terms-checkbox-label">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={agreedToTerms} 
+                                        onChange={() => setAgreedToTerms(!agreedToTerms)}
+                                        className="terms-checkbox"
+                                    />
+                                    <span className="terms-text">
+                                        I accept the{' '}
+                                        <a 
+                                            onClick={() => navigate("/privacy", {state: "/onboarding"})}
+                                            className="terms-link"
+                                        >
+                                            Privacy Policy
+                                        </a>
+                                        {' '}and the{' '}
+                                        <a 
+                                            onClick={() => navigate("/terms", {state: "/onboarding"})}
+                                            className="terms-link"
+                                        >
+                                            Terms and Conditions
+                                        </a>
+                                        .
+                                    </span>
+                                </label>
+                            </div>
                         </div>
-                        <div style={{display: "flex", justifyContent: "right", width: "80%"}}>
-                            <button
-                                className="continueButton"
-                                style={{marginTop: 30}}
-                                onClick={handleContinue}
-                                disabled={!selectedOption || !agreedToTerms}
-                            >
-                                Continue
-                            </button>
-                        </div>
-                    </div>
+                    </main>
+                    
+                    <footer className="onboarding-footer">
+                        <div></div>
+                        <button
+                            className={`continueButton ${(!selectedOption || !agreedToTerms) ? 'disabled' : ''}`}
+                            onClick={handleContinue}
+                            disabled={!selectedOption || !agreedToTerms}
+                        >
+                            Continue
+                        </button>
+                    </footer>
                 </div>
             </div>
         </div>

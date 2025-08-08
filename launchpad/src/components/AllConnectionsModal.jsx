@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { CgClose } from 'react-icons/cg';
+import { IoCloseOutline } from 'react-icons/io5';
 import { IoTrashOutline } from 'react-icons/io5';
 import { db } from '../firebase/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
@@ -8,6 +8,7 @@ import { getConnectionsByStatus, removeConnection } from '../services/connection
 import { displayColleges, displayFieldsOfInterest, displayShortenedName, getBasicUserDescription } from '../services/userProfileServices';
 import DefaultIcon from './DefaultIcon/DefaultIcon';
 import toast from 'react-hot-toast';
+import './AllConnectionsModal.css';
 
 export default function AllConnectionsModal({ onClose, onViewProfile }) {
   const [approvedConnections, setApprovedConnections] = useState([]);
@@ -125,36 +126,14 @@ export default function AllConnectionsModal({ onClose, onViewProfile }) {
 
   if (loading) {
     return (
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(0,0,0,0.32)',
-          zIndex: 9998,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div style={{
-          background: '#fff',
-          borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-          padding: '32px 28px 24px 28px',
-          minWidth: 350,
-          maxWidth: '90vw',
-          maxHeight: '80vh',
-          overflow: 'auto',
-          position: 'relative',
-          textAlign: 'center',
-        }}>
-          <div style={{ fontSize: 48, marginBottom: 18 }}>⏳</div>
-          <h2 style={{ margin: '0 0 8px 0', fontWeight: 700 }}>Loading Connections</h2>
-          <div style={{ color: '#888', margin: '24px 0 32px 0', fontSize: '1.1em', lineHeight: 1.6 }}>
-            Fetching your approved connections...
+      <div className="all-connections-modal-overlay">
+        <div className="all-connections-modal">
+          <div className="all-connections-modal-loading">
+            <div className="all-connections-modal-loading-icon">⏳</div>
+            <h2 className="all-connections-modal-loading-title">Loading Connections</h2>
+            <p className="all-connections-modal-loading-text">
+              Fetching your approved connections...
+            </p>
           </div>
         </div>
       </div>
@@ -163,59 +142,27 @@ export default function AllConnectionsModal({ onClose, onViewProfile }) {
 
   if (approvedConnections.length === 0) {
     return (
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(0,0,0,0.32)',
-          zIndex: 9998,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            onClose();
-          }
-        }}
-      >
-        <div style={{
-          background: '#fff',
-          borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-          padding: '32px 28px 24px 28px',
-          minWidth: 350,
-          maxWidth: '90vw',
-          maxHeight: '80vh',
-          overflow: 'auto',
-          position: 'relative',
-          textAlign: 'center',
-        }}>
-          <button className='btnClose' onClick={onClose} style={{background:"none", position: 'absolute', right: 12, top: 12}}><CgClose size={25}/></button>
-          <div style={{ fontSize: 48, marginBottom: 18 }}>🌱</div>
-          <h2 style={{ margin: '0 0 8px 0', fontWeight: 700 }}>No Connections Yet</h2>
-          <div style={{ color: '#888', margin: '24px 0 32px 0', fontSize: '1.1em', lineHeight: 1.6 }}>
-            You haven't made any connections yet.<br/>
-            <span style={{color: '#1976d2', fontWeight: 500}}>Start exploring profiles and connect with professionals, alumni, or peers!</span>
+      <div className="all-connections-modal-overlay" onClick={onClose}>
+        <div className="all-connections-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="all-connections-modal-header">
+            <button className="all-connections-modal-close-btn" onClick={onClose} title="Close">
+              <IoCloseOutline size={20} />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="btnSaveChanges"
-            style={{
-              color: '#fff',
-              border: 'none',
-              borderRadius: 6,
-              padding: '12px 24px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              fontSize: '1em',
-            }}
-          >
-            Close
-          </button>
+          <div className="all-connections-modal-empty">
+            <div className="all-connections-modal-empty-icon">🌱</div>
+            <h2 className="all-connections-modal-empty-title">No Connections Yet</h2>
+            <p className="all-connections-modal-empty-text">
+              You haven't made any connections yet.<br/>
+              <span>Start exploring profiles and connect with professionals, alumni, or peers!</span>
+            </p>
+            <button
+              onClick={onClose}
+              className="all-connections-modal-close-button"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -226,257 +173,96 @@ export default function AllConnectionsModal({ onClose, onViewProfile }) {
       <div style={{zIndex: 9999}}>
         <Toaster position="bottom-right" reverseOrder={false}/>
       </div>
-      <div 
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(0,0,0,0.32)',
-          zIndex: 9998,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            onClose();
-          }
-        }}
-      >
-        <div style={{
-          background: '#fff',
-          borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-          padding: '0 28px 24px 28px',
-          minWidth: 600,
-          maxWidth: '90vw',
-          maxHeight: '80vh',
-          overflow: 'auto',
-          position: 'relative',
-          textAlign: 'center',
-        }}>
-          <button className='btnClose' onClick={onClose} style={{background:"none", color: "white", position: 'absolute', right: 12, top: 12}}><CgClose size={25}/></button>
-          {/* Beautified header */}
-          <div
-            style={{
-              background: 'linear-gradient(90deg, #667eea 0%, #1976d2 100%)',
-              borderTopLeftRadius: 0,
-              borderTopRightRadius: 0,
-              padding: '32px 0 20px 0',
-              margin: '0 -28px 0 -28px',
-              textAlign: 'center',
-              color: '#fff',
-              boxShadow: '0 2px 8px rgba(25, 118, 210, 0.08)'
-            }}
-          >
-            <div style={{ fontSize: 44, marginBottom: 8 }}>🤝</div>
-            <h2 style={{
-              margin: 0,
-              fontWeight: 700,
-              fontSize: '2rem',
-              letterSpacing: '0.01em',
-              textShadow: '0 2px 8px rgba(25, 118, 210, 0.10)'
-            }}>
-              My Connections
-            </h2>
+      <div className="all-connections-modal-overlay" onClick={onClose}>
+        <div className="all-connections-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="all-connections-modal-header">
+            <button className="all-connections-modal-close-btn" onClick={onClose} title="Close">
+              <IoCloseOutline size={20} />
+            </button>
           </div>
-          <hr style={{
-            border: 'none',
-            borderTop: '2px solid #e3e8f7',
-            margin: '0 0 24px 0'
-          }} />
-          <div style={{ color: '#444', marginBottom: 18, textAlign: 'left' }}>
-            {approvedConnections.length > 0 && (
-              <div style={{ marginBottom: '20px' }}>
-                {approvedConnections.map((connection, index) => {
-                  const userId = connection.role === 'initiator' ? connection.targetUserId : connection.initiateUserId;
-                  const user = connectionData[userId];
-                  
-                  if (!user) return null;
-                  
-                  const basicInfoContent = getBasicInfoContent(user);
-                  
-                  return (
-                    <div 
-                      key={connection.id} 
-                      style={{ 
-                        background: '#f8fff8', 
-                        border: '1px solid #4caf50', 
-                        borderRadius: '12px', 
-                        padding: '20px', 
-                        marginBottom: '16px',
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
-                        position: 'relative',
-                        transition: 'all 0.2s ease-in-out',
-                        cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(76, 175, 80, 0.1)',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.boxShadow = '0 4px 16px rgba(76, 175, 80, 0.2)';
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.boxShadow = '0 2px 8px rgba(76, 175, 80, 0.1)';
-                        e.currentTarget.style.transform = 'translateY(0)';
-                      }}
-                    >
-                      {/* User Info Section */}
-                      <div style={{ display: 'flex', flex: 1, gap: '16px', alignItems: 'flex-start' }}>
-                        {/* Profile Picture */}
-                        <div style={{ flexShrink: 0 }}>
-                          {user.userPfpPreview ? (
-                            <img 
-                              src={user.userPfpPreview} 
-                              alt="" 
-                              style={{
-                                width: '60px',
-                                height: '60px',
-                                borderRadius: '12px',
-                                objectFit: 'cover',
-                                border: '2px solid #4caf50',
-                                boxShadow: '0 2px 8px rgba(76, 175, 80, 0.2)'
-                              }}
-                            />
-                          ) : (
-                            <DefaultIcon length="60px" size={30} />
-                          )}
-                        </div>
-                        
-                        {/* User Details */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ marginBottom: '8px' }}>
-                            <h3 style={{ 
-                              margin: '0 0 4px 0', 
-                              fontSize: '1.2em', 
-                              fontWeight: 700, 
-                              color: '#2e7d32',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis'
-                            }}>
-                              {displayShortenedName(user.userName)}
-                            </h3>
-                            <p style={{ 
-                              margin: '0', 
-                              fontSize: '0.9em', 
-                              color: '#666',
-                              fontStyle: 'italic'
-                            }}>
-                              {basicInfoContent.userPreface}
-                            </p>
-                          </div>
-                          
-                          {/* User Information */}
-                          <div style={{ fontSize: '0.9em', color: '#555' }}>
-                            <div style={{ 
-                              marginBottom: '4px',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis'
-                            }}>
-                              <strong>{basicInfoContent.userFirstDesc.label}:</strong> {basicInfoContent.userFirstDesc.content}
-                            </div>
-                            <div style={{ 
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis'
-                            }}>
-                              <strong>{basicInfoContent.userSecondDesc.label}:</strong> {basicInfoContent.userSecondDesc.content}
-                            </div>
-                          </div>
-                        </div>
+          
+          <div className="all-connections-modal-section">
+            <div className="all-connections-modal-empty-icon">🤝</div>
+            <h2 className="all-connections-modal-title">My Connections</h2>
+            <p className="all-connections-modal-subtitle">
+              {approvedConnections.length} connection{approvedConnections.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+          
+          <div className="all-connections-modal-content">
+            <div className="all-connections-modal-connections-list">
+              {approvedConnections.map((connection, index) => {
+                const userId = connection.role === 'initiator' ? connection.targetUserId : connection.initiateUserId;
+                const user = connectionData[userId];
+                
+                if (!user) return null;
+                
+                const basicInfoContent = getBasicInfoContent(user);
+                
+                return (
+                  <div 
+                    key={connection.id} 
+                    className="all-connections-modal-connection-card"
+                  >
+                    <div className="all-connections-modal-connection-info">
+                      <div className="all-connections-modal-connection-avatar">
+                        {user.userPfpPreview ? (
+                          <img 
+                            src={user.userPfpPreview} 
+                            alt="" 
+                          />
+                        ) : (
+                          <DefaultIcon length="60px" size={30} />
+                        )}
                       </div>
                       
-                      {/* Action Buttons */}
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexDirection: "column", width: "140px", height: "100%", justifyContent: "center", alignItems: "center" }}>
-                        <button
-                          className="btnConnect"
-                          style={{
-                            background: '#1976d2',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 6,
-                            padding: '8px 16px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            fontSize: '0.95em',
-                            transition: 'all 0.2s ease',
-                            width: "100%",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#1565c0';
-                            e.currentTarget.style.transform = 'scale(1.02)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = '#1976d2';
-                            e.currentTarget.style.transform = 'scale(1)';
-                          }}
-                          onClick={() => onViewProfile && onViewProfile(user)}
-                        >
-                          View Profile
-                        </button>
+                      <div className="all-connections-modal-connection-details">
+                        <h3 className="all-connections-modal-connection-name">
+                          {displayShortenedName(user.userName)}
+                        </h3>
+                        <p className="all-connections-modal-connection-description">
+                          {basicInfoContent.userPreface}
+                        </p>
                         
-                        {/* Remove Connection Button */}
-                        <button
-                          className="btnConnect"
-                          style={{
-                            background: '#f44336',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 6,
-                            padding: '8px 16px',
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            fontSize: '0.95em',
-                            transition: 'all 0.2s ease',
-                            width: "100%",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#e01e10';
-                            e.currentTarget.style.transform = 'scale(1.02)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = '#f44336';
-                            e.currentTarget.style.transform = 'scale(1)';
-                          }}
-                          onClick={() => handleRemoveConnection(connection, userId)}
-                          disabled={removingConnection === userId}
-                        >
-                          {removingConnection === userId ? (
-                            'Removing...'
-                          ) : (
-                            <>
-                              <IoTrashOutline size={14} style={{ marginRight: '4px' }} />
-                              Remove
-                            </>
-                          )}
-                        </button>
+                        <div className="all-connections-modal-connection-info-grid">
+                          <div className="all-connections-modal-connection-info-item">
+                            <strong>{basicInfoContent.userFirstDesc.label}:</strong> {basicInfoContent.userFirstDesc.content}
+                          </div>
+                          <div className="all-connections-modal-connection-info-item">
+                            <strong>{basicInfoContent.userSecondDesc.label}:</strong> {basicInfoContent.userSecondDesc.content}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                    
+                    <div className="all-connections-modal-connection-actions">
+                      <button
+                        className="all-connections-modal-view-button"
+                        onClick={() => onViewProfile && onViewProfile(user)}
+                      >
+                        View Profile
+                      </button>
+                      
+                      <button
+                        className="all-connections-modal-remove-button"
+                        onClick={() => handleRemoveConnection(connection, userId)}
+                        disabled={removingConnection === userId}
+                      >
+                        {removingConnection === userId ? (
+                          'Removing...'
+                        ) : (
+                          <>
+                            <IoTrashOutline size={14} />
+                            Remove
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <button
-            onClick={onClose}
-            className="btnSaveChanges"
-            style={{
-              color: '#fff',
-              border: 'none',
-              borderRadius: 6,
-              padding: '12px 24px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              fontSize: '1em',
-            }}
-          >
-            Close
-          </button>
         </div>
       </div>
     </>

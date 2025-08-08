@@ -1,364 +1,306 @@
-import './profilemodal.css';
-import React, { useEffect, useState, useRef } from 'react';
-import { FaLink } from 'react-icons/fa';
-import { BiFlag } from 'react-icons/bi';
-import { IoCloseOutline } from 'react-icons/io5';
-import { useAuth } from '../../contexts/auth/AuthContext';
-import { useModal } from '../../contexts/ModalContext';
-import { useLocation } from 'react-router-dom';
-import { getConnectionsByStatus, checkConnection, isConnectionApproved } from '../../services/connectionService';
-import { displayShortenedLinkedin, displayColleges, displayFieldsOfInterest, displaySchools, getBasicUserDescription } from '../../services/userProfileServices';
-import DefaultIcon from '../DefaultIcon/DefaultIcon';
-import OrganizationProfile from '../Organizationprofile/OrganizationProfile';
-import Loading from '../LoadingAnimation/Loading';
-import { useReport } from '../../contexts/report/ReportContext';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig';
-import { useConnections } from '../../contexts/ConnectionContext';
+import React, { useEffect, useRef, useState } from 'react'
+import { IoCloseOutline } from 'react-icons/io5'
+import { BiFlag } from 'react-icons/bi'
+import { FaLink } from 'react-icons/fa'
+import { LuMapPin, LuCalendar, LuBriefcase, LuGraduationCap } from 'react-icons/lu'
+import { useAuth } from '../../contexts/auth/AuthContext'
+import { useModal } from '../../contexts/ModalContext'
+import { useConnections } from '../../contexts/ConnectionContext'
+import { useReport } from '../../contexts/report/ReportContext'
+import { collection, getDocs, query, where } from 'firebase/firestore'
+import { db } from '../../firebase/firebaseConfig'
+import {
+  displayColleges,
+  displayFieldsOfInterest,
+  displaySchools,
+  getBasicUserDescription,
+} from '../../services/userProfileServices'
+import DefaultIcon from '../DefaultIcon/DefaultIcon'
+import OrganizationProfile from '../Organizationprofile/OrganizationProfile'
+import Loading from '../LoadingAnimation/Loading'
+import { isConnectionApproved } from '../../services/connectionService'
+import './profilemodal.css'
 
-export default function ProfileCard({userData, visibility, onClose, top, handleReferalClick, isConnected: initialConnectionStatus}) {
+export default function ProfileModal({
+  userData,
+  visibility,
+  onClose,
+  handleReferalClick,
+}) {
+  const { currentUser } = useAuth()
+  const { openConnectModal, openParentalConnectionModal } = useModal()
+  const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport()
+  const { approved = [], parent_approved = [] } = useConnections()
 
-    const userType = userData.userType;
-    const userBasicInfo = localStorage.getItem("basicUserInfo") ? JSON.parse(localStorage.getItem("basicUserInfo")) : {};
-    const viewingUserType = userBasicInfo.userType;
-    const schoolId = localStorage.getItem("schoolId");
-    const disableActions = userBasicInfo && userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
+  const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}')
+  const schoolId = localStorage.getItem('schoolId')
+  const disableActions = userBasicInfo?.userType === 'High Schooler' && !userBasicInfo?.parentVerified
+  const hideConnectBtn = userBasicInfo?.userType !== 'High Schooler' && userData?.userType === 'High Schooler'
 
-    const hideConnectBtn = viewingUserType !== "High Schooler" && userType === "High Schooler";
+  const isConnection =
+    approved.some(conn => conn.targetUserId === userData?.userId || conn.initiateUserId === userData?.userId) ||
+    parent_approved.some(conn => conn.targetUserId === userData?.userId || conn.initiateUserId === userData?.userId)
 
+  const [opportunitiesData, setOpportunitiesData] = useState([])
+  const [opportunitiesLoading, setOpportunitiesLoading] = useState(false)
+  const modalRef = useRef(null)
 
-    const {openConnectModal, openParentalConnectionModal} = useModal();
+  // Fetch opportunities
+  useEffect(() => {
+    if (!visibility || !schoolId || !userData?.userId) return
 
-    const userName = userData.userName;
-    const [opportunitiesData, setOpportunitiesData] = useState([]);
-    const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
-    const { approved = [], parent_approved = [], loading: connectionsLoading } = useConnections();
-
-    // Determine connection status from context
-    const isConnection =
-        approved.some(conn => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId) ||
-        parent_approved.some(conn => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId);
-
-    const {currentUser} = useAuth();
-
-    const location = useLocation();
-    const currentPath = location.pathname;
-
-    const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
-
-    // const canPublishConnection = (viewingUserType !== "High Schooler") 
-    // || (viewingUserType === "High Schooler" && userType === "High Schooler");
-    
-    // useEffect(() => {
-    //   const checkConnectionStatus = async () => {
-    //     if(!currentUser || !userData || !visibility){
-    //       return;
-    //     }
-        
-    //     // If initialConnectionStatus is provided, use it and skip Firebase call
-    //     if (initialConnectionStatus !== undefined) {
-    //       // setIsConnection(initialConnectionStatus); // This line is removed as per new_code
-    //       return;
-    //     }
-        
-    //     try {
-    //       const result = await checkConnection(schoolId, userData.userId || userData.id);
-    //       // setIsConnection(result.isConnected); // This line is removed as per new_code
-    //     } catch (error) {
-    //       console.error('Error checking connection status:', error);
-    //       // setIsConnection(false); // This line is removed as per new_code
-    //     }
-    //   }
-    //   // checkConnectionStatus(); // This line is removed as per new_code
-    // },[visibility, currentUser, userData, initialConnectionStatus]);
-
-    useEffect(()=>{
-
-        const getOpportunityData = async () => {
-            setOpportunitiesLoading(true);
-            try{
-            const opportunitiesRef = collection(db, "tenants", schoolId, "opportunities");
-            const userOpportunityQuery = query(opportunitiesRef, where("createdBy", "==", userData.userId));
-
-            const opportunitySnapshot = await getDocs(userOpportunityQuery);
-            setOpportunitiesData(opportunitySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-              })));
-            }
-            catch(error){
-                console.log("error: " + error)
-            }
-            finally{
-                setOpportunitiesLoading(false);
-            }
-        }
-
-        getOpportunityData();
-    },[visibility])
-    
-    const descType = () => {
-        switch(userData.userType){
-            case "High Schooler":
-                return userData.collegeDecision === "No" ? "Dream Colleges" : "Committed College";
-            case "Alumni":
-                return "Attending College";
-            case "Professional":
-                return "Current Position";
-            default:
-                return "";
-        }
+    const fetchOpportunities = async () => {
+      setOpportunitiesLoading(true)
+      try {
+        const opportunitiesRef = collection(db, 'tenants', schoolId, 'opportunities')
+        const userOpportunityQuery = query(opportunitiesRef, where('createdBy', '==', userData.userId))
+        const snapshot = await getDocs(userOpportunityQuery)
+        setOpportunitiesData(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+      } catch (error) {
+        console.error('Error fetching opportunities:', error)
+      } finally {
+        setOpportunitiesLoading(false)
+      }
     }
 
-    const basicInfoContent = {userPreface: getBasicUserDescription(userData, false),
-    userFirstDesc: {desc1: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}`, desc2: `${(userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : displayFieldsOfInterest(userData.areasOfInterest, "longer")}`},
-    userSecondDesc: {desc1: `${descType()}`, desc2: `${userType === "Professional" ? (userData.industryPosition + " at " + userData.companyName) : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`},
-    acceptedColleges: {desc1: `Accepted Colleges`, desc2: `${userData.acceptedColleges}`},
-    affiliatedSchools: {desc1: `Affiliated School`, desc2: userData.schoolAttending ? `${displaySchools(userData.schoolAttending)}` : ""}
-};
+    fetchOpportunities()
+  }, [visibility, schoolId, userData?.userId])
 
-    const menuRef = useRef();
+  // Handle outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        onClose()
+      }
+    }
 
-    useEffect(() => {
-        function onClickOutside(e) {
-            const profileModal = menuRef.current;
-            const parentalModal = document.querySelector('.parental-connection-modal');
-            if (
-                profileModal &&
-                !profileModal.contains(e.target) &&
-                (!parentalModal || !parentalModal.contains(e.target))
-            ) {
-                onClose();
-            }
-        }
+    if (visibility) {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.body.style.overflow = 'hidden'
+    }
 
-        document.addEventListener("mousedown", onClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.body.style.overflow = 'unset'
+    }
+  }, [visibility, onClose])
 
-        return () => {
-            document.removeEventListener("mousedown", onClickOutside);
-        };
-    }, [onClose]);
-
-    useEffect(() => {
-        const modalOverlay = document.querySelector('.blurOverlay');
-        const pageHeight = Math.max(
-          document.body.scrollHeight, document.documentElement.scrollHeight,
-          document.body.offsetHeight, document.documentElement.offsetHeight,
-          document.body.clientHeight, document.documentElement.clientHeight
-        );
-        if (modalOverlay) {
-          modalOverlay.style.height = `${pageHeight}px`;
-        }
-    }, []);
-
-    // Remove isConnectionApproved async logic and instead check parent_approved in context
-    const isConnectionApproved = () => {
-        if (userBasicInfo.userType !== 'High Schooler' || userType === 'High Schooler') {
-            return true;
-        }
-        if (!userBasicInfo.parentVerified) {
-            return false;
-        }
-
-        const total_approved = [...parent_approved, ...approved];
-        // Check parent_approved connections in context
-        return total_approved.some(conn =>
-            (conn.initiateUserId === currentUser.uid && (conn.targetUserId === userData.id || conn.targetUserId === userData.userId)) ||
-            (conn.initiateUserId === (userData.id || userData.userId) && conn.targetUserId === currentUser.uid)
-        );
-    };
-
-    const handleConnectClick = () => {
-        const parentVerified = userBasicInfo.parentVerified;
-        const isApproved = isConnectionApproved(viewingUserType, currentUser, userData, parent_approved, approved, parentVerified);
-        if (!isApproved) {
-            openParentalConnectionModal({ professionalData: userData });
-            return;
-        }
-        openConnectModal({ userData });
-    };
-
-    return(
-        <>
-            <div className='profileModalContainer'>
-                <div className='profileModalDialog' ref={menuRef}>
-                    <div style={{position:"absolute", right: "10px", top: "9px"}}>
-                        <div className="modal-right-header">
-                            <BiFlag 
-                                className='reportProfileModal' 
-                                size={25} 
-                                onClick={() => {
-                                    setReportTarget("User");
-                                    setReportVisibility(true);
-                                    setReportedUser(userData.userName);
-                                    setShowReportUserName(false);
-                                    onClose();
-                                }}
-                            />
-                            <IoCloseOutline 
-                                className='closeProfileModal' 
-                                size={30} 
-                                onClick={onClose}
-                            />
-                        </div>
-                    </div>
-                    <>
-                    <header name="userIntro" style={{paddingBottom: "10px"}}>
-                        <div className='basicInfo' style={{marginBottom: !userData.userPfpPreview ? "10px" : ""}}>
-                            <div>
-                                {userData.userPfpPreview ? <img src={userData.userPfpPreview} alt="" className='pfpImage' style={
-                            {width: "80px", height: "80px", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}/> : <><DefaultIcon size={50} length={"70px"}/></>}
-                            </div>
-                                                    <div className='cardNameDescription'>
-                            <div style={{display: "flex", alignItems: "center", gap: "8px"}}>
-                                <span className='cardName'>{userData.userName}</span>
-                                {isConnection && (
-                                    <span style={{
-                                        fontSize: "12px",
-                                        backgroundColor: "#4CAF50",
-                                        color: "white",
-                                        padding: "2px 8px",
-                                        borderRadius: "12px",
-                                        fontWeight: "500"
-                                    }}>
-                                        Connected
-                                    </span>
-                                )}
-                            </div>
-                            <span className='cardDescription'>{basicInfoContent.userPreface}</span>
-                        </div>   
-                        </div>
-                        <div style={{display: "flex", marginBottom: "15px"}}>
-                            <div className='userInfo' style={{fontSize: "16px"}}>
-                                <span><span style={{fontWeight: "500"}}>{basicInfoContent.userFirstDesc.desc1}</span>: {basicInfoContent.userFirstDesc.desc2}</span>
-                                <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>
-                                {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
-                                {/* {userData.userType === "Professional" && userData.schoolAttending && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.affiliatedSchools.desc1}</span>: {basicInfoContent.affiliatedSchools.desc2}</span></>} */}
-                                {userData.userType === "Professional" && (
-                                  <div style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "8px",
-                                    marginTop: "8px"
-                                  }}>
-                                  </div>
-                                )}
-                            </div>
-                        </div>
-                        {!hideConnectBtn && (
-                            isConnection ? (
-                                <button className='btnConnect' 
-                                style={{
-                                    width: "95%", 
-                                    borderRadius: "5px",  
-                                    margin: "0 auto", 
-                                    cursor: "default",
-                                    // backgroundColor: "#4CAF50",
-                                    border: "none",
-                                    color: "white"
-                                }} 
-                                // disabled={true}
-                                onClick={() => { if (!disableActions) handleConnectClick(); }}
-                                title="Already connected"> 
-                                    <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
-                                        <FaLink size={20}/>
-                                        <span style={{fontWeight: "550", fontSize: "larger"}}>Contact</span>
-                                    </div>
-                                </button>
-                            ) : (
-                                <button className='btnConnect' style={{
-                                    width: "95%", 
-                                    borderRadius: "5px",  
-                                    margin: "0 auto", 
-                                    cursor: disableActions ? "not-allowed" : "pointer", 
-                                    opacity: disableActions ? 0.6 : 1
-                                }} 
-                                disabled={disableActions}
-                                title={disableActions ? "Parent/guardian approval required" : ""}
-                                onClick={() => { if (!disableActions) handleConnectClick(); }}> 
-                                    <div style={{display: "flex", justifyContent: "center", alignItems: "center", gap: "6px"}}>
-                                        <FaLink size={20}/>
-                                        <span style={{fontWeight: "550", fontSize: "larger"}}>Connect</span>
-                                    </div>
-                                </button>
-                            )
-                        )}
-                    </header>
-                    <hr style={{width: "95%"}}/>
-                    <main style={{padding: "0px 8px"}}>
-                    {(!opportunitiesLoading && opportunitiesData.length > 0) ? 
-                        
-                        (
-                            <div style={{display: "flex", flexDirection: "column", gap: "10px"}}>
-                                {opportunitiesData.map((opportunityData, index)=>(
-                                    <>
-                                    <span style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)", paddingBottom: ".5rem", textAlign: "center"}}>{userName.split(" ")[0]} is {opportunityData.organizationType === "Business" ? "running" : "offering"} {opportunityData.organizationType === "Internship" ? "an" : "a"}<span style={{fontWeight: "bold"}}>&nbsp;{opportunityData.organizationType.toLowerCase()}{opportunityData.organizationType !== "Business" && " opportunity"}!</span></span>
-                                    <OrganizationProfile 
-                                        location={"user_profile_public"} 
-                                        key={index} 
-                                        organizationData={opportunityData} 
-                                        handleReferalClick={handleReferalClick}
-                                    />
-                                    </>
-                                ))}
-                            </div> )
-                            : opportunitiesLoading ?
-                        <div style={{marginTop: "40px"}}><Loading/></div> :
-                        null}
-                        {(userData.userAboutMe) && <div name="userAboutMe" style={{paddingTop: "20px"}}>
-                            <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s About Me</span>
-                            <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
-                            {userData.userAboutMe && <div style={{border: "solid 2px var(--secondary)", borderRadius: "5px", display: "flex", alignItems: "center", padding: "10px"}}>
-                                <span>{userData.userAboutMe}</span>
-                            </div>}
-                            {/* {userData.linkedinLink && <div className="linkedInDisplay" style={{display: "flex", justifyContent: "center", padding: "10px"}}>
-                                <span>LinkedIn Profile: <Link onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}>{displayShortenedLinkedin(userData.linkedinLink)}</Link></span>
-                            </div>} */}
-                        </div>}
-                        {(userData.userSkills && userData.userSkills.length > 0) && 
-                        <div>
-                            <span style={{marginTop: "20px", fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s Career-Ready Skills</span>
-                            <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
-                            <div className="skills-container" style={{position: "relative"}}>
-                                {Object.entries(
-                                    userData.userSkills.reduce((acc, skill) => {
-                                    if (!acc[skill.skillCategory]) {
-                                        acc[skill.skillCategory] = [];
-                                    }
-                                    acc[skill.skillCategory].push(skill.skillDescription);
-                                    return acc;
-                                    }, {})
-                                ).map(([category, skills]) => (
-                                    <div key={category} className="skill-category">
-                                    <span>{category}</span>
-                                    <ul>
-                                        {skills.map((skill, index) => (
-                                        <li key={index}>{skill}</li>
-                                        ))}
-                                    </ul>
-                                    </div>
-                                ))}
-                                </div>
-                        </div>}
-                        {(userData.userResumePreview && ((userData.userResumePreview.split(" ")[0]) !== "private" || userType === "Professional")) && <div name="userResume" style={{marginTop: "20px"}}>
-                            <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1"}}>{userName.split(" ")[0]}'s Resume</span>
-                            <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
-                            <iframe src={userData.userResumePreview.split(" ")[userData.userResumePreview.split(" ").length - 1]} frameborder="0" style={{width: "100%", height: "500px"}}></iframe></div>}
-                        {userData.networkingLevel && userData.networkingLevel.length > 0 && <div>
-                            <span style={{fontSize: "20px", fontWeight: "bolder", display: "flex", justifyContent: "center", color: "var(--secondary)", lineHeight: "1", paddingTop: "20px"}}>{userName.split(" ")[0]}'s Commitment</span>
-                            <hr style={{borderColor: "var(--secondary)", width: "70%"}}/>
-                            <div style={{display: "flex", flexWrap: "wrap", justifyContent: "space-around", gap: "30px", paddingTop: "10px"}}>
-                                {userData.networkingLevel.map((availability)=>(
-                                    <div key={availability} style={{border: "solid 2px var(--secondary)", padding: "6px 11px", borderRadius: "5px"}}>
-                                        <span style={{lineHeight: "1.5", fontSize: "22px", color: "var(--secondary)"}}>{availability}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>}
-                    </main>
-                    </>
-                </div>
-            </div>
-        </>   
+  const handleConnect = () => {
+    const isApproved = isConnectionApproved(
+      userBasicInfo?.userType,
+      currentUser,
+      userData,
+      parent_approved,
+      approved,
+      userBasicInfo?.parentVerified
     )
+    
+    if (!isApproved) {
+      openParentalConnectionModal({ professionalData: userData })
+    } else {
+      openConnectModal({ userData })
+    }
+  }
+
+  const handleReport = () => {
+    setReportTarget('User')
+    setReportVisibility(true)
+    setReportedUser(userData?.userName)
+    setShowReportUserName(false)
+    onClose()
+  }
+
+  if (!visibility || !userData) return null
+
+  const firstName = userData.userName?.split(' ')[0] || 'User'
+  const userDescription = getBasicUserDescription(userData, false)
+
+  return (
+    <div className="profile-modal-overlay">
+      <div className="profile-modal" ref={modalRef}>
+        {/* Header */}
+        <div className="profile-modal-header">
+          <button className="profile-modal-action-btn" onClick={handleReport} title="Report user">
+            <BiFlag size={18} />
+          </button>
+          <button className="profile-modal-close-btn" onClick={onClose} title="Close">
+            <IoCloseOutline size={20} />
+          </button>
+        </div>
+
+        {/* Profile Section */}
+        <div className="profile-modal-section">
+          <div className="profile-modal-avatar">
+            {userData.userPfpPreview ? (
+              <img src={userData.userPfpPreview || "/placeholder.svg"} alt={`${userData.userName}'s profile`} />
+            ) : (
+              <DefaultIcon size={80} />
+            )}
+          </div>
+          
+          <div className="profile-modal-info">
+            <div className="profile-modal-name-row">
+              <h1 className="profile-modal-name">{userData.userName}</h1>
+              {isConnection && (
+                <span className="profile-modal-connection-badge">Connected</span>
+              )}
+            </div>
+            <p className="profile-modal-description">{userDescription}</p>
+          </div>
+        </div>
+
+        {/* Details Grid */}
+        <div className="profile-modal-details">
+          <div className="profile-modal-detail-item">
+            <div className="profile-modal-detail-icon">
+              {userData.userType === 'Professional' ? <LuBriefcase size={16} /> : <LuGraduationCap size={16} />}
+            </div>
+            <div className="profile-modal-detail-content">
+              <span className="profile-modal-detail-label">
+                {userData.userType !== 'Professional' ? 'Interests' : 'Expertise'}
+              </span>
+              <span className="profile-modal-detail-value">
+                {displayFieldsOfInterest(userData.areasOfInterest || [], 'longer')}
+              </span>
+            </div>
+          </div>
+
+          <div className="profile-modal-detail-item">
+            <div className="profile-modal-detail-icon">
+              <LuMapPin size={16} />
+            </div>
+            <div className="profile-modal-detail-content">
+              <span className="profile-modal-detail-label">
+                {userData.userType === 'Professional' ? 'Position' : 
+                 userData.userType === 'Alumni' ? 'College' : 
+                 userData.collegeDecision === 'No' ? 'Dream Colleges' : 'Committed College'}
+              </span>
+              <span className="profile-modal-detail-value">
+                {userData.userType === 'Professional' 
+                  ? `${userData.industryPosition || 'Not specified'}${userData.companyName ? ` at ${userData.companyName}` : ''}`
+                  : userData.userType === 'Alumni'
+                  ? displayColleges([userData.collegeAttending])
+                  : displayColleges(Array.isArray(userData.collegeInterestsOrDecision) 
+                      ? userData.collegeInterestsOrDecision 
+                      : [userData.collegeInterestsOrDecision])}
+              </span>
+            </div>
+          </div>
+
+          {userData.acceptedColleges?.length > 0 && (
+            <div className="profile-modal-detail-item">
+              <div className="profile-modal-detail-icon">
+                <LuCalendar size={16} />
+              </div>
+              <div className="profile-modal-detail-content">
+                <span className="profile-modal-detail-label">Accepted Colleges</span>
+                <span className="profile-modal-detail-value">{userData.acceptedColleges}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Connect Button */}
+        {!hideConnectBtn && (
+          <button 
+            className={`profile-modal-connect-btn ${isConnection ? 'connected' : ''}`}
+            onClick={handleConnect}
+            disabled={disableActions}
+            title={disableActions ? 'Parent/guardian approval required' : ''}
+          >
+            <FaLink size={18} />
+            {isConnection ? 'Contact' : 'Connect'}
+          </button>
+        )}
+
+        {/* Content Sections */}
+        <div className="profile-modal-content">
+          {/* Opportunities */}
+          {opportunitiesLoading ? (
+            <div className="profile-modal-loading-section">
+              <Loading />
+            </div>
+          ) : opportunitiesData.length > 0 ? (
+            <div className="profile-modal-content-section">
+              <h3 className="profile-modal-section-title">Opportunities</h3>
+              <div className="profile-modal-opportunities-grid">
+                {opportunitiesData.map((opportunity) => (
+                  <div key={opportunity.id} className="profile-modal-opportunity-card">
+                    <OrganizationProfile
+                      location="user_profile_public"
+                      organizationData={opportunity}
+                      handleReferalClick={handleReferalClick}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          {/* About Me */}
+          {userData.userAboutMe && (
+            <div className="profile-modal-content-section">
+              <h3 className="profile-modal-section-title">About</h3>
+              <div className="profile-modal-about-card">
+                <p>{userData.userAboutMe}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Skills */}
+          {userData.userSkills?.length > 0 && (
+            <div className="profile-modal-content-section">
+              <h3 className="profile-modal-section-title">Skills</h3>
+              <div className="profile-modal-skills-container">
+                {Object.entries(
+                  userData.userSkills.reduce((acc, skill) => {
+                    const category = skill.skillCategory || 'Other'
+                    if (!acc[category]) acc[category] = []
+                    acc[category].push(skill.skillDescription)
+                    return acc
+                  }, {})
+                ).map(([category, skills]) => (
+                  <div key={category} className="profile-modal-skill-category">
+                    <h4 className="profile-modal-skill-category-title">{category}</h4>
+                    <div className="profile-modal-skill-tags">
+                      {skills.map((skill, index) => (
+                        <span key={index} className="profile-modal-skill-tag">{skill}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Resume */}
+          {userData.userResumePreview && 
+           (userData.userResumePreview.split(' ')[0] !== 'private' || userData.userType === 'Professional') && (
+            <div className="profile-modal-content-section">
+              <h3 className="profile-modal-section-title">Resume</h3>
+              <div className="profile-modal-resume-container">
+                <iframe
+                  src={userData.userResumePreview.split(' ').pop()}
+                  title="Resume"
+                  className="profile-modal-resume-iframe"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Commitment */}
+          {userData.networkingLevel?.length > 0 && (
+            <div className="profile-modal-content-section">
+              <h3 className="profile-modal-section-title">{firstName}'s Availability</h3>
+              <div className="profile-modal-commitment-tags">
+                {userData.networkingLevel.map((level) => (
+                  <span key={level} className="profile-modal-commitment-tag">{level}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }

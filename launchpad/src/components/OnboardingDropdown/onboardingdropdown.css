@@ -1,17 +1,18 @@
 .dropDownContainer label {
   font-size: 14px;
-  color: var(--secondary);
+  color: #374151;
   display: block;
   margin-bottom: 6px;
-  font-size: larger;
+  font-weight: 600;
 }
 
 .react-select-container.react-select__control {
-  border-color: var(--secondary);
-  border-radius: 5px;
-  padding: 5px;
+  border-color: #e5e7eb;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: all 0.2s ease;
 }
 
 .react-select-container.react-select__control:hover {
-  border-color: var(--secondary);
+  border-color: #1976d2;
 }

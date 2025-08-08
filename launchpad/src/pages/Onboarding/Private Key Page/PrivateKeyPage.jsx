@@ -3,18 +3,19 @@ import SecurityCodeInput from "../../../components/Security Key/SecurityInput";
 import { collection, doc, getDocs, query, updateDoc, where, or } from "firebase/firestore";
 import { auth, db } from "../../../firebase/firebaseConfig";
 import { Navigate, useNavigate } from "react-router-dom";
-// import { getFunctions, httpsCallable } from "firebase/functions";
 import { useAuth } from "../../../contexts/auth/AuthContext";
+import { useState } from "react";
 
 export default function PrivateKeyPage() {
     let schoolId, schoolDisplayName;
     const navigate = useNavigate();
     const {userLoggedIn, currentUser} = useAuth();
     const today = (new Date()).toLocaleDateString('en-US');
-
-    console.log(userLoggedIn,currentUser)
+    
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const onSubmit = async (key) => {
+        setIsSubmitting(true);
         const loadingToast = toast.loading('Verifying your code...');
         
         try {
@@ -41,13 +42,6 @@ export default function PrivateKeyPage() {
                 return;
             }
             
-            // if (matchedKeyType === "general") {
-            //     // TODO: Insert custom logic for general key here
-                
-            // } else if (matchedKeyType === "admin") {
-            //     // TODO: Insert custom logic for admin key here
-            // }
-
             // expiration date in timestamp on Firestore
             if (codeData.expiration_date?.toDate && new Date() > codeData.expiration_date.toDate()) {
                 toast.error("This code has expired. Please request a new one!");
@@ -85,28 +79,62 @@ export default function PrivateKeyPage() {
         } catch (error) {
             console.error('Error changing:', error);
             toast.error('An error occurred while verifying your code', { id: loadingToast });
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
     return(
-    <>
-    <Toaster position="bottom-right" reverseOrder={false} />
-    {localStorage.getItem("tempSchoolInfo") && <Navigate to="/Login"/>}
-    <div className="onboarding-container">
-        <div className="onboarding-body">
-            <div style={{textAlign: "center", paddingBottom: "8px"}}></div>
-            <div style={{background: "var(--accent)", borderRadius: "25px", boxShadow: "var(--shadowColor)",
-                display: "flex", justifyContent: "center", alignItems: "center", height: "100px"}}>
-                <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
+        <>
+            <Toaster position="bottom-right" reverseOrder={false} />
+            {localStorage.getItem("tempSchoolInfo") && <Navigate to="/Login"/>}
+            
+            <div className="onboarding-container">
+                <div className="background-blend"></div>
+                <div className="onboarding-wrapper">
+                    <div className="onboarding-body">
+                        <header className="onboarding-header">
+                            <div className="onboarding-logo-container">
+                                <img 
+                                    src="/assets/launchpad_logo.png" 
+                                    alt="Launchpad Logo" 
+                                    className="onboarding-logo"
+                                />
+                            </div>
+                        </header>
+                        
+                        <main className="onboarding-main">
+                            <div className="form-section">
+                                <h2 className="page-title">School Security Key</h2>
+                                <p className="form-subtitle">
+                                    Enter your school's security code to get started
+                                </p>
+                                
+                                <div className="security-code-container">
+                                    <SecurityCodeInput 
+                                        onSubmit={onSubmit}
+                                        isSubmitting={isSubmitting}
+                                    />
+                                </div>
+                                
+                                <div className="security-notice">
+                                    <div className="security-notice-content">
+                                        <p>
+                                            <strong>Need a code?</strong> Contact your school administrator or email us at{' '}
+                                            <a 
+                                                href="mailto:launchpadhelpline@gmail.com" 
+                                                className="security-link"
+                                            >
+                                                launchpadhelpline@gmail.com
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                </div>
             </div>
-            <div style={{textAlign: "center", fontWeight: "350"}}>
-                <h2>School Security Key</h2>
-            </div>
-            <div style={{textAlign: "center"}}>
-                <SecurityCodeInput onSubmit={onSubmit}/>
-            </div>
-        </div>
-    </div>
-    </>
+        </>
     )
 }

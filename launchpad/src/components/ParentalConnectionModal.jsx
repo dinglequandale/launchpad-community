@@ -1,19 +1,37 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
-import { CgClose } from 'react-icons/cg';
+import { IoCloseOutline } from 'react-icons/io5';
 import { parentConnectionRequestTemplate } from '../utils/parentVerificationTemplates';
-// import { addOrUpdateConnection } from '../services/userProfileServices';
 import { useAuth } from '../contexts/auth/AuthContext';
 import { addOrUpdateConnection, getConnectionsByStatus } from '../services/connectionService';
+import './ParentalConnectionModal.css';
 
 export default function ParentalConnectionModal({ professionalData, onClose, onApproved=()=>{} }) {
   const [requesting, setRequesting] = useState(false);
   const [requested, setRequested] = useState(false);
   const [error, setError] = useState('');
+  const modalRef = useRef(null);
 
   const {currentUser} = useAuth();
   const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+
+  // Handle outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   // Check if already requested using new connection system
   useEffect(() => {
@@ -94,10 +112,6 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
   };
 
   const handleClose = () => {
-    // if (requested) {
-    //   // If already requested, close and allow viewing the professional
-    //   onApproved && onApproved();
-    // }
     onClose();
   };
 
@@ -106,124 +120,91 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
       <div style={{zIndex: 9999}}>
         <Toaster position="bottom-right" reverseOrder={false}/>
       </div>
-      <div 
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          background: 'rgba(0,0,0,0.32)',
-          zIndex: 9998,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-        // onClick={(e) => {
-        //   if (e.target === e.currentTarget) {
-        //     handleClose();
-        //   }
-        // }}
-      >
-        <div style={{
-          background: '#fff',
-          borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-          padding: '32px 28px 24px 28px',
-          minWidth: 420,
-          maxWidth: '90vw',
-          position: 'relative',
-          textAlign: 'center',
-        }}>
-          <button className='btnClose' onClick={handleClose} style={{background:"none"}}><CgClose size={25}/></button>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>🤝</div>
-          <h2 style={{ margin: '0 0 8px 0', fontWeight: 700 }}>
-            {requested ? 'Connection Request Sent' : 'Parent Approval Required'}
-          </h2>
+      <div className="parental-connection-modal-overlay">
+        <div className="parental-connection-modal" ref={modalRef}>
+          <div className="parental-connection-modal-header">
+            <button className="parental-connection-modal-close-btn" onClick={handleClose} title="Close">
+              <IoCloseOutline size={20} />
+            </button>
+          </div>
           
-          <div style={{ color: '#444', marginBottom: 18 }}>
-            {!requested ? (
-              <>
-                <div style={{ 
-                  background: '#f8f9fa', 
-                  border: '1px solid #e9ecef', 
-                  borderRadius: '8px', 
-                  padding: '16px', 
-                  marginBottom: '16px',
-                  textAlign: 'left'
-                }}>
-                  {professionalData.userType === 'Professional' ? (
-                    <>
-                      <div style={{ fontWeight: 600, marginBottom: '8px' }}>Professional Details:</div>
-                      <div><strong>Name:</strong> {professionalData.userName}</div>
-                      <div><strong>Position:</strong> {professionalData.industryPosition} at {professionalData.companyName}</div>
-                      {professionalData.areasOfInterest && (
-                        <div><strong>Expertise:</strong> {professionalData.areasOfInterest.join(', ')}</div>
-                      )}
-                    </>
-                  ) : professionalData.userType === 'Alumni' ? (
-                    <>
-                      <div style={{ fontWeight: 600, marginBottom: '8px' }}>Alumni Details:</div>
-                      <div><strong>Name:</strong> {professionalData.userName}</div>
-                      <div><strong>College:</strong> {professionalData.collegeAttending || ''}</div>
-                      {professionalData.areasOfInterest && professionalData.areasOfInterest.length > 0 && (
-                        <div><strong>Fields of Study:</strong> {professionalData.areasOfInterest.join(', ')}</div>
-                      )}
-                    </>
-                  ) : null}
-                </div>
-                <p>To connect with this {professionalData.userType === 'Alumni' ? 'alumnus/alumna' : 'professional'}, we need your parent or guardian's approval for your safety.</p>
-              </>
-            ) : (
-              <>
-                <p>Your request to connect with <strong>{professionalData.userName}</strong> has been sent to your parent/guardian for approval.</p>
-                <p style={{ fontSize: '0.9em', color: '#666' }}>
-                  You'll receive a notification once they approve or decline the connection.
-                </p>
-              </>
+          <div className="parental-connection-modal-content">
+            <div className="parental-connection-modal-icon">🤝</div>
+            <h2 className="parental-connection-modal-title">
+              {requested ? 'Connection Request Sent' : 'Parent Approval Required'}
+            </h2>
+            
+            <div className="parental-connection-modal-message">
+              {!requested ? (
+                <>
+                  <div className="parental-connection-modal-details-card">
+                    {professionalData.userType === 'Professional' ? (
+                      <>
+                        <div className="parental-connection-modal-details-title">Professional Details:</div>
+                        <div className="parental-connection-modal-details-item">
+                          <strong>Name:</strong> {professionalData.userName}
+                        </div>
+                        <div className="parental-connection-modal-details-item">
+                          <strong>Position:</strong> {professionalData.industryPosition} at {professionalData.companyName}
+                        </div>
+                        {professionalData.areasOfInterest && (
+                          <div className="parental-connection-modal-details-item">
+                            <strong>Expertise:</strong> {professionalData.areasOfInterest.join(', ')}
+                          </div>
+                        )}
+                      </>
+                    ) : professionalData.userType === 'Alumni' ? (
+                      <>
+                        <div className="parental-connection-modal-details-title">Alumni Details:</div>
+                        <div className="parental-connection-modal-details-item">
+                          <strong>Name:</strong> {professionalData.userName}
+                        </div>
+                        <div className="parental-connection-modal-details-item">
+                          <strong>College:</strong> {professionalData.collegeAttending || ''}
+                        </div>
+                        {professionalData.areasOfInterest && professionalData.areasOfInterest.length > 0 && (
+                          <div className="parental-connection-modal-details-item">
+                            <strong>Fields of Study:</strong> {professionalData.areasOfInterest.join(', ')}
+                          </div>
+                        )}
+                      </>
+                    ) : null}
+                  </div>
+                  <p className="parental-connection-modal-description">
+                    To connect with this {professionalData.userType === 'Alumni' ? 'alumnus/alumna' : 'professional'}, we need your parent or guardian's approval for your safety.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="parental-connection-modal-success-message">
+                    Your request to connect with <strong>{professionalData.userName}</strong> has been sent to your parent/guardian for approval.
+                  </p>
+                  <p className="parental-connection-modal-subtitle">
+                    You'll receive a notification once they approve or decline the connection.
+                  </p>
+                </>
+              )}
+            </div>
+
+            {!requested && (
+              <button
+                onClick={handleRequestApproval}
+                disabled={requesting}
+                className="parental-connection-modal-button"
+              >
+                {requesting ? 'Sending Request...' : 'Request Parent Approval'}
+              </button>
+            )}
+
+            {requested && (
+              <button
+                onClick={handleClose}
+                className="parental-connection-modal-button"
+              >
+                Continue
+              </button>
             )}
           </div>
-
-          {!requested && (
-            <button
-              onClick={handleRequestApproval}
-              disabled={requesting}
-              className="btnSaveChanges"
-              style={{
-                background: requesting ? '#ccc' : '',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 6,
-                padding: '12px 24px',
-                fontWeight: 600,
-                cursor: requesting ? 'not-allowed' : 'pointer',
-                marginBottom: 8,
-                marginTop: 4,
-                opacity: requesting ? 0.7 : 1,
-                fontSize: '1em',
-              }}
-            >
-              {requesting ? 'Sending Request...' : 'Request Parent Approval'}
-            </button>
-          )}
-
-          {requested && (
-            <button
-              onClick={handleClose}
-              className="btnSaveChanges"
-              style={{
-                color: '#fff',
-                border: 'none',
-                borderRadius: 6,
-                padding: '12px 24px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: '1em',
-              }}
-            >
-              Continue
-            </button>
-          )}
         </div>
       </div>
     </>

@@ -25,7 +25,6 @@ export default function Onboarding() {
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     let schoolId, schoolDisplayName, userRole;
 
-    // localStorage.clear();
     const user = auth.currentUser;
     const {userLoggedIn} = useAuth();
     const location = useLocation();
@@ -36,8 +35,6 @@ export default function Onboarding() {
         schoolDisplayName = tempSchoolInfo.schoolDisplayName;
         userRole = tempSchoolInfo.userRole;
     }catch{}
-    // console.log("SCHOOLIDwewe: ", schoolId, schoolDisplayName);
-
 
     useEffect(()=>{
         const setUserToken = async () => {
@@ -80,67 +77,117 @@ export default function Onboarding() {
         setCurrentPage(currentPage-1);
     }
 
-    const disabledSubmitStyles = {cursor: "not-allowed", background: "gray"};
-    return (<>
-
-        {isSubmitting && <div style={{width: "100vw", height: "100vh", background: "rgb(0,0,0,0.1)", position: "absolute"}}></div>}
-        <div className='onboarding-container'>
-            <div className='background-blend'></div>
-            {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
-            {!userLoggedIn && <Navigate to="/Landing" replace={true}/>}
-            <div style={{position: "relative"}}>
-            <div className='onboarding-body' >
-                {currentPage === 0 && <div style={{position: "absolute", top: "-50px", width: "100vw", textAlign: "center"}}><span style={{fontSize: "30px"}}>Connect with your school’s network of students, parents, and alumni</span></div>}
-                <header style={{marginBottom: "1.5rem", position: "relative"}}>
-                    <div style={{background: "var(--accent)", borderRadius: "25px",
-                        display: "flex", justifyContent: "center", alignItems: "center", height: "80px", padding: "10px 5px",  marginBottom: "5px"}}>
-                        <img src="/assets/launchpad_logo.png" alt="Logo" style={{width: "100%"}}/>
+    return (
+        <>
+            {isSubmitting && (
+                <div className="onboarding-overlay">
+                    <div className="onboarding-loading">
+                        <Loading />
                     </div>
-                    {(currentPage !== 0) && <ProgressBar
-                        numOfSections={numOfSections}
-                        currentPage={currentPage}
-                        setCurrentPage={setCurrentPage}
-                        showArrows={false}
-                    />}
-                </header>
-                <main style={{marginBottom: "2rem"}}>
-                {/* {
-                currentPage === 0 ? (
-                    <div style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
-                        <UserType 
-                            setSelectedOption={(val) => { setSelectedOption(val); localStorage.setItem('userType', val); }}
-                            selectedOption={selectedOption}
-                            agreedToTerms={agreedToTerms}
-                            setAgreedToTerms={setAgreedToTerms}
-                            location={location}
-                        />
+                </div>
+            )}
+            
+            <div className='onboarding-container'>
+                <div className='background-blend'></div>
+                {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
+                {!userLoggedIn && <Navigate to="/Landing" replace={true}/>}
+                
+                <div className="onboarding-wrapper">
+                    <div className='onboarding-body'>
+                        {currentPage === 0 && (
+                            <div className="onboarding-hero">
+                                <h1 className="onboarding-hero-title">
+                                    Connect with your school's network of students, parents, and alumni
+                                </h1>
+                            </div>
+                        )}
+                        
+                        <header className="onboarding-header">
+                            <div className="onboarding-logo-container">
+                                <img 
+                                    src="/assets/launchpad_logo.png" 
+                                    alt="Launchpad Logo" 
+                                    className="onboarding-logo"
+                                />
+                            </div>
+                            
+                            {(currentPage !== 0) && (
+                                <ProgressBar
+                                    numOfSections={numOfSections}
+                                    currentPage={currentPage}
+                                    setCurrentPage={setCurrentPage}
+                                    showArrows={false}
+                                />
+                            )}
+                        </header>
+                        
+                        <main className="onboarding-main">
+                            {selectedOption === "High Schooler" && (
+                                <HighSchooler 
+                                    schoolInfo={tempSchoolInfo} 
+                                    currentPage={currentPage} 
+                                    isSubmitting={isSubmitting} 
+                                    setCanSubmit={setCanSubmit}
+                                />
+                            )}
+                            {selectedOption === "College Student" && (
+                                <CollegeStudent 
+                                    schoolInfo={tempSchoolInfo} 
+                                    currentPage={currentPage} 
+                                    isSubmitting={isSubmitting} 
+                                    setCanSubmit={setCanSubmit}
+                                />
+                            )}
+                            {selectedOption === "Professional" && (
+                                <Professional 
+                                    schoolInfo={tempSchoolInfo} 
+                                    currentPage={currentPage} 
+                                    isSubmitting={isSubmitting} 
+                                    setCanSubmit={setCanSubmit}
+                                />
+                            )}
+                            {userRole === "admin" && (
+                                <Staff 
+                                    schoolInfo={tempSchoolInfo} 
+                                    currentPage={currentPage} 
+                                    isSubmitting={isSubmitting} 
+                                    setCanSubmit={setCanSubmit}
+                                />
+                            )}
+                        </main>
+                        
+                        <footer className="onboarding-footer">
+                            <button 
+                                className={`prevButton ${currentPage < 2 ? 'hidden' : ''}`}
+                                onClick={handlePrev}
+                            >
+                                Previous
+                            </button>
+                            
+                            {(currentPage !== numOfSections || numOfSections === 0) ? (
+                                <button 
+                                    className="continueButton" 
+                                    onClick={handleContinue}
+                                >
+                                    Continue
+                                </button>
+                            ) : (
+                                <button 
+                                    className={`continueButton ${!canSubmit ? 'disabled' : ''}`}
+                                    onClick={() => {
+                                        if(canSubmit) {
+                                            setIsSubmitting(true);
+                                        }
+                                    }}
+                                    disabled={isSubmitting || !canSubmit}
+                                >
+                                    {!isSubmitting ? "Submit" : <Loading />}
+                                </button>
+                            )}
+                        </footer>
                     </div>
-                ) : ( */}
-                    <>
-                        {selectedOption === "High Schooler" && <HighSchooler schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                        {selectedOption === "College Student" && <CollegeStudent schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                        {selectedOption === "Professional" && <Professional schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                        {userRole === "admin" && <Staff schoolInfo={tempSchoolInfo} currentPage={currentPage} isSubmitting={isSubmitting} setCanSubmit={setCanSubmit}/>}
-                    </>
-                {/* )}     */}
-                </main>
-                <footer style={{display: "flex", justifyContent: "space-between", width: "100%"}}>
-                    <button style={{visibility: `${currentPage < 2 ? "hidden" : "visible"}`}} className="btnUnfilled prevButton" onClick={handlePrev}>
-                        Previous
-                    </button>
-                    {(currentPage !== numOfSections || numOfSections === 0) ? 
-                    <button className="continueButton" onClick={handleContinue}>
-                    Continue
-                    </button>
-                    : 
-                    <button onClick={()=>{if(canSubmit){
-                        setIsSubmitting(true);
-                    }}} className='continueButton' disabled={isSubmitting} style={!canSubmit ? disabledSubmitStyles : {}}>
-                        {!isSubmitting ? "Submit" : <Loading style={{maxWidth: "4px"}}/>}
-                    </button>}
-                </footer>
+                </div>
             </div>
-            </div>
-        </div>
-    </>);
-};
+        </>
+    );
+}

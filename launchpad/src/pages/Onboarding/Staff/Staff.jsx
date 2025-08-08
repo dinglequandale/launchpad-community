@@ -173,54 +173,60 @@ export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolI
         );
       case 2:
         return (
-          <div className='onboardingQuestions' style={{ width: "460px" }}>
-            {staffQuestionsConfig.filter(q => q.page === 2).map(question => (
-              <div key={question.id} className="form-group">
-                <label className='onboardingQuestion'>{question.id !== "areasOfInterest" && question.text}</label>
-                {question.type === 'text' ? (
-                  <input
-                    type="text"
-                    value={staffData[question.id] || ''}
-                    onChange={e => handleChange(question.id, e.target.value)}
-                    className='onboardingInput'
-                    placeholder={question.placeholder}
-                  />
-                ) : question.type === 'multi-select' ? (
-                  <OnboardingDropdown
-                    question={question.text}
-                    options={question.options}
-                    selectedOption={staffData[question.id] || []}
-                    onChange={selected => handleChange(question.id, selected)}
-                    type={question.type}
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={staffData[question.id] || ''}
-                    onChange={e => handleChange(question.id, e.target.value)}
-                    className='onboardingInput'
-                    placeholder={question.placeholder}
-                  />
-                )}
-              </div>
-            ))}
+          <div className="form-section">
+            <h2 className="page-title">School Information</h2>
+            <div className="onboardingQuestions">
+              {staffQuestionsConfig.filter(q => q.page === 2).map(question => (
+                <div key={question.id} className="form-group">
+                  <label className="form-label">{question.id !== "areasOfInterest" && question.text}</label>
+                  {question.type === 'text' ? (
+                    <input
+                      type="text"
+                      value={staffData[question.id] || ''}
+                      onChange={e => handleChange(question.id, e.target.value)}
+                      className="form-input"
+                      placeholder={question.placeholder}
+                    />
+                  ) : question.type === 'multi-select' ? (
+                    <OnboardingDropdown
+                      question={question.text}
+                      options={question.options}
+                      selectedOption={staffData[question.id] || []}
+                      onChange={selected => handleChange(question.id, selected)}
+                      type={question.type}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={staffData[question.id] || ''}
+                      onChange={e => handleChange(question.id, e.target.value)}
+                      className="form-input"
+                      placeholder={question.placeholder}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         );
       case 3:
         return (
-          <div className='onboardingQuestions' style={{ width: "460px" }}>
-            {staffQuestionsConfig.filter(q => q.page === 3).map(question => (
-              <div key={question.id} className="form-group">
-                <label className='onboardingQuestion'>{question.text}</label>
-                <textarea
-                  value={staffData[question.id] || ''}
-                  onChange={e => handleChange(question.id, e.target.value)}
-                  className='onboardingInput'
-                  placeholder={question.placeholder}
-                  style={{ minHeight: 100 }}
-                />
-              </div>
-            ))}
+          <div className="form-section">
+            <h2 className="page-title">Additional Information</h2>
+            <div className="onboardingQuestions">
+              {staffQuestionsConfig.filter(q => q.page === 3).map(question => (
+                <div key={question.id} className="form-group">
+                  <label className="form-label">{question.text}</label>
+                  <textarea
+                    value={staffData[question.id] || ''}
+                    onChange={e => handleChange(question.id, e.target.value)}
+                    className="form-input"
+                    placeholder={question.placeholder}
+                    style={{ minHeight: 100, resize: "vertical" }}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         );
       default:
@@ -228,6 +234,6 @@ export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolI
     }
   };
 
-  return <div>{renderPage()}</div>;
+  return <div className="onboarding-page">{renderPage()}</div>;
 }
 

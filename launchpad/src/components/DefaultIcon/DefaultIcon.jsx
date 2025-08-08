@@ -13,6 +13,7 @@ export default function DefaultIcon({length="44px", size=35}){
         display: "flex", 
         justifyContent: "center", 
         alignItems: "center",
+        padding: size <= 50 ? "0px" : "12px",
         background: "var(--secondaryHighlight)",
         border: "var(--border)"}}
         >
