@@ -1,254 +1,360 @@
-import "./organizationprofile.css";
-import { RiMoneyDollarBoxLine } from "react-icons/ri";
-import { RiGraduationCapLine } from "react-icons/ri";
-import { GoBriefcase } from "react-icons/go";
-import { SlCalender } from "react-icons/sl";
-import { BiFlag } from "react-icons/bi";
-import { useState, useEffect, useRef } from "react";
-import { useAuth } from "../../contexts/auth/AuthContext";
-import { useReport } from "../../contexts/report/ReportContext";
-import ReadMoreButton from "../ReadMorebutton/ReadMore";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase/firebaseConfig";
-import { displayFieldsOfInterest, getUserHS } from "../../services/userProfileServices";
-import { useModal } from '../../contexts/ModalContext';
-import { stableLinkCheck } from "../../services/opportunityServices";
+import React, { useState, useEffect, useRef } from 'react'
+import { IoCloseOutline, IoChevronDown, IoFlag, IoCalendar, IoLocation, IoTime, IoPerson } from 'react-icons/io5'
+import { LuMapPin, LuCalendar, LuBriefcase, LuGraduationCap, LuUsers, LuBuilding, LuBookOpen, LuAward, LuGlobe, LuHeart, LuTarget, LuZap, LuChevronDown, LuChevronUp } from 'react-icons/lu'
+import './organizationprofile.css'
+import { useModal } from '../../contexts/ModalContext'
+import { useReport } from '../../contexts/report/ReportContext'
+import { useAuth } from '../../contexts/auth/AuthContext'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '../../firebase/firebaseConfig'
+import { displayFieldsOfInterest } from '../../services/userProfileServices'
+import { stableLinkCheck } from '../../services/opportunityServices'
 
-export default function OrganizationProfile({organizationData, location, handleShowProfile, handleReferalClick, isPublished=true}){
-    const logisticsList = [<RiMoneyDollarBoxLine/>, <RiGraduationCapLine/>, <GoBriefcase/>, <SlCalender/>]
-    const [isDisabled, setIsDisabled] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [isLessText, setIsLessText] = useState(false);
+export default function OrganizationProfile({ organizationData, location, handleShowProfile, handleReferalClick, isPublished = true }) {
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [isContentExpanded, setIsContentExpanded] = useState(false)
+  const [userData, setUserData] = useState(null)
+  const [isDisabled, setIsDisabled] = useState(false)
+  
+  const descRef = useRef()
+  const { currentUser } = useAuth()
+  const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport()
+  const { openApplyModal } = useModal()
 
-    const { currentUser } = useAuth();
-    const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
-    const { openApplyModal } = useModal();
+  const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}')
+  const disableActions = userBasicInfo?.userType === 'High Schooler' && !userBasicInfo?.parentVerified
 
-    const descRef = useRef();
-    const [userData, setUserData] = useState(null);
+  // Process organization data to match expected structure
+  const getName = () => {
+    if (organizationData.organizationName) return organizationData.organizationName
+    return `${organizationData.applicantPosition} at ${organizationData.organizationHostCompany}`
+  }
 
-    const userBasicInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
-    const disableActions = userBasicInfo && userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
-
-    const getName = () => {
-        if (organizationData.organizationName)
-            return organizationData.organizationName;
-
-        return `${organizationData.applicantPosition} at ${organizationData.organizationHostCompany}`;
-    }
-
-    const organizationProfileData = {
-        organizationName: getName(),
-        organizationType: organizationData.organizationType,
-        organizationHost: organizationData.organizationHostCompany ?? organizationData.organizationHostStudent,
-        organizationDescription: organizationData.applicantExpectations ?? organizationData.organizationMission,
-        organizationLogistics: organizationData.isPaid ? [organizationData.isPaid,organizationData.applicants, organizationData.workLocation, organizationData.timeFrame] : null,
-        organizationRelevanceTags: (organizationData.organizationTags && organizationData.organizationTags.length > 0) ? displayFieldsOfInterest(organizationData.organizationTags) : organizationData.applicantFieldOfWork ? (organizationData.applicantFieldOfWork + ", " + organizationData.applicantPosition) : null,
-        organizationLogoPreview: organizationData.organizationLogoPreview ?? "/assets/launchpad_logo_raw.png",
-        organizationCreatedBy: organizationData.createdBy,
-        organizationHostName: organizationData.createdByUserName,
-        organizationLearnMoreMethod: organizationData.learnMore.split(": ")[0],
-        organizationApplyMethod: organizationData.apply.split(": ")[0],
-        organizationApply: (organizationData.apply.split(": ")[1] && organizationData.apply.split(": ")[0] === "Website") ?
-         stableLinkCheck(organizationData.apply.split(": ")[1]) 
-         : organizationData.apply.split(": ")[1] 
-         ? organizationData.apply.split(": ")[1] 
-         : null,
-        organizationLearnMore: (organizationData.learnMore.split(": ")[1] && organizationData.learnMore.split(": ")[0] === "Website") ?
-        stableLinkCheck(organizationData.learnMore.split(": ")[1]) 
-        : organizationData.learnMore.split(": ")[1] 
-        ? organizationData.learnMore.split(": ")[1] 
+  const organizationProfile = {
+    name: getName(),
+    type: organizationData.organizationType,
+    host: organizationData.organizationHostCompany ?? organizationData.organizationHostStudent,
+    description: organizationData.applicantExpectations ?? organizationData.organizationMission,
+    logo: organizationData.organizationLogoPreview ?? '/assets/launchpad_logo_raw.png',
+    createdBy: organizationData.createdBy,
+    hostName: organizationData.createdByUserName,
+    deadline: organizationData.deadline,
+    startDate: organizationData.startDate,
+    tags: organizationData.organizationTags?.length > 0 
+      ? displayFieldsOfInterest(organizationData.organizationTags)
+      : organizationData.applicantFieldOfWork 
+        ? `${organizationData.applicantFieldOfWork}, ${organizationData.applicantPosition}`
         : null,
-        organizationDeadline: organizationData.deadline,
-        organizationStartDate: organizationData.startDate,
+    logistics: organizationData.isPaid ? {
+      compensation: organizationData.isPaid,
+      eligibility: organizationData.applicants,
+      location: organizationData.workLocation,
+      duration: organizationData.timeFrame,
+      timeCommitment: organizationData.timeCommitment
+    } : null,
+    apply: {
+      method: organizationData.apply?.split(': ')[0],
+      value: organizationData.apply?.split(': ')[1] && organizationData.apply.split(': ')[0] === 'Website'
+        ? stableLinkCheck(organizationData.apply.split(': ')[1])
+        : organizationData.apply?.split(': ')[1]
+    },
+    learnMore: {
+      method: organizationData.learnMore?.split(': ')[0],
+      value: organizationData.learnMore?.split(': ')[1] && organizationData.learnMore.split(': ')[0] === 'Website'
+        ? stableLinkCheck(organizationData.learnMore.split(': ')[1])
+        : organizationData.learnMore?.split(': ')[1]
     }
+  }
 
-    const getUserData = async (userId) => {
-        const userSnap = await getDoc(doc(db, "tenants", localStorage.getItem("schoolId"), "users", userId));
+  // Fetch user data
+  useEffect(() => {
+    const getUserData = async () => {
+      if (!organizationProfile.createdBy) return
+      
+      try {
+        const userSnap = await getDoc(doc(db, 'tenants', localStorage.getItem('schoolId'), 'users', organizationProfile.createdBy))
         if (userSnap.exists()) {
-            setUserData({id: userSnap.id, ...userSnap.data()});
-            } else {
-                console.log("No such document!");
-            }
-    }
-
-    useEffect(()=>{
-        getUserData(organizationProfileData.organizationCreatedBy);
-        console.log(organizationProfileData, "created by");
-    },[]);
-
-    useEffect(()=>{
-        if(descRef.current.clientHeight <= 16*8){
-            setIsLessText(true);
+          setUserData({ id: userSnap.id, ...userSnap.data() })
         }
-    },[organizationProfileData.organizationDescription])
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+      }
+    }
     
-    // check if user can click on the available buttons or not
-    useEffect(()=>{
-        if(!organizationData.createdBy && (location !== "organizations_page")){
-            setIsDisabled(true);
-        }
-        else if((location !== "organizations_page") && (location !== "user_profile_public") && organizationData.createdBy === currentUser.uid){
-            setIsDisabled(true);
-            console.log("Disabled!")
-        }
-    },[])
-    const handleOnHostClick = (e) => {
-        e.preventDefault();
-        if(handleShowProfile){
-            handleShowProfile(userData);
-            return;
-        }
+    getUserData()
+  }, [organizationProfile.createdBy])
+
+  // Check if actions should be disabled
+  useEffect(() => {
+    if (!organizationData.createdBy && location !== 'organizations_page') {
+      setIsDisabled(true)
+    } else if (
+      location !== 'organizations_page' && 
+      location !== 'user_profile_public' && 
+      organizationData.createdBy === currentUser?.uid
+    ) {
+      setIsDisabled(true)
     }
+  }, [organizationData.createdBy, location, currentUser?.uid])
 
-    const connectBtnType = (orgType) => {
-        switch(orgType){
-            case "Club":
-                return "Join";
-            case "Shadowing":
-            case "Job":
-            case "Internship":
-            case "Leadership":
-                return "Apply";
-            case "Nonprofit":
-            case "Business":
-                return "Contact Us";
-            case "Community Service":
-                return "Volunteer";
-            default:
-                return "Contact Us";
+  // Check if description needs expansion
+  useEffect(() => {
+    if (descRef.current && descRef.current.clientHeight <= 16 * 8) {
+      setIsDescriptionExpanded(true)
+    }
+  }, [organizationProfile.description])
+
+  const getActionButtonText = (orgType) => {
+    switch(orgType){
+      case "Club":
+        return "Join";
+      case "Shadowing":
+      case "Job":
+      case "Internship":
+      case "Leadership":
+        return "Apply";
+      case "Nonprofit":
+      case "Business":
+        return "Contact Us";
+      case "Community Service":
+        return "Volunteer";
+      default:
+        return "Contact Us";
+    }
+  }
+
+  const getTypeIcon = (type) => {
+    const iconMap = {
+      'Internship': <LuBriefcase size={16} />,
+      'Scholarship': <LuAward size={16} />,
+      'Program': <LuBookOpen size={16} />,
+      'Event': <LuUsers size={16} />,
+      'Competition': <LuTarget size={16} />,
+      'Workshop': <LuZap size={16} />,
+      'Conference': <LuGlobe size={16} />,
+      'Mentorship': <LuHeart size={16} />,
+      'Research': <LuGraduationCap size={16} />,
+      'Other': <LuBuilding size={16} />
+    }
+    return iconMap[type] || <LuBuilding size={16} />
+  }
+
+  const handleConnect = () => {
+    if (organizationData.organizationHostCompany) {
+      openApplyModal({
+        requirements: organizationData.applicantRequirements,
+        applyType: organizationProfile.apply.method,
+        applyValue: organizationProfile.apply.value,
+        orgName: organizationProfile.host,
+        opportunityDetails: {
+          format: organizationProfile.logistics?.location,
+          eligibility: organizationProfile.logistics?.eligibility,
+          compensation: organizationProfile.logistics?.compensation,
+          duration: organizationProfile.logistics?.duration,
+          startDate: organizationProfile.startDate,
+          timeCommitment: organizationProfile.logistics?.timeCommitment,
+          deadline: organizationProfile.deadline,
+          learnMoreType: organizationProfile.learnMore.method,
+          learnMoreValue: organizationProfile.learnMore.value,
+          organizationType: organizationProfile.type,
         }
+      })
+    } else {
+      handleReferalClick?.('apply', organizationData, userData)
     }
+  }
 
-    const handleConnect = (e) => {
-        e.preventDefault();
-        if(organizationData.organizationHostCompany){
-            openApplyModal({
-                requirements: organizationData.applicantRequirements,
-                applyType: organizationProfileData.organizationApplyMethod,
-                applyValue: organizationProfileData.organizationApply,
-                orgName: organizationProfileData.organizationHost,
-                opportunityDetails: {
-                    format: organizationProfileData.organizationLogistics ? organizationProfileData.organizationLogistics[2] : undefined,
-                    eligibility: organizationProfileData.organizationLogistics ? organizationProfileData.organizationLogistics[1] : undefined,
-                    compensation: organizationProfileData.organizationLogistics ? organizationProfileData.organizationLogistics[0] : undefined,
-                    duration: organizationProfileData.organizationLogistics ? organizationProfileData.organizationLogistics[3] : undefined,
-                    startDate: organizationProfileData.organizationStartDate,
-                    timeCommitment: organizationData.timeCommitment || undefined,
-                    deadline: organizationProfileData.organizationDeadline,
-                    learnMoreType: organizationProfileData.organizationLearnMoreMethod,
-                    learnMoreValue: organizationProfileData.organizationLearnMore,
-                    organizationType: organizationProfileData.organizationType,
-                }
-            });
-            return;
-        }
-        handleReferalClick("apply", organizationProfileData, userData);
+  const handleLearnMore = () => {
+    handleReferalClick?.('learnMore', organizationData, userData)
+  }
+
+  const handleHostClick = () => {
+    if (handleShowProfile && userData) {
+      handleShowProfile(userData)
     }
+  }
 
-    const handleLearnMore = (e) => {
-        e.preventDefault();
-        handleReferalClick("learnMore", organizationProfileData, userData);
-    }
+  const handleReport = () => {
+    setReportTarget('Organization')
+    setReportedUser(organizationProfile.name)
+    setShowReportUserName(false)
+    setReportVisibility(true)
+  }
 
-    const handleReadMoreClick = (e) => {
-        e.preventDefault();
-        setIsExpanded(!isExpanded);
-    }
+  const getLayoutClass = () => {
+    if (location === 'organizations_page') return 'v0-organization-wide'
+    return 'v0-organization-popup'
+  }
 
-return(
-    <>
-        <div className={`organizationProfileContainer ${location === "organizations_page" ? "" : (location === "user_profile" || location === "user_profile_public") ? "userProfile" : "opportunityPopup"}`} style={{position: "relative"}}>
-            <div style={{display: "flex"}}>
-                {(location !== "user_profile") && <div style={{position: "absolute", right: "10px", top: "10px", zIndex: 2}}>
-                    <BiFlag 
-                        className='reportProfileModal' 
-                        size={25} 
-                        onClick={() => {
-                            setReportTarget("Organization");
-                            setReportedUser(organizationProfileData.organizationName);
-                            setShowReportUserName(false);
-                            setReportVisibility(true);
-                        }}
-                    />
-                </div>}
-                {(organizationProfileData.organizationRelevanceTags && isPublished) && <RelevanceBanner organizationType={organizationProfileData.organizationType} relevanceType={organizationProfileData.organizationRelevanceTags}/>}
-                {!isPublished && <UnpublishedBanner/>}
-                <div style={{width: "75%", borderRightStyle: "solid", borderRightColor: "#C0C0C0", borderWidth: "1.5px", overflow: "hidden"}}>
-                    <div style={{display: "flex"}}>
-                        <div style={{fontSize: "16px", position: "absolute", bottom: "7px", left: "43%"}}>
-                            {!isExpanded && <ReadMoreButton handleClick={handleReadMoreClick} isExpanded={isExpanded} isLessText={isLessText}/>}
-                        </div>
-                        <div>
-                        <img src={organizationProfileData.organizationLogoPreview} className="pfpImage" style={{width: "145px", height: "145px", borderRadius: "20px"}}/>
-                        </div>
-                        <div name="organizationContent" style={{padding: "0px 15px", paddingBottom: "11px", position: 'relative'}}>
-                            <div ref={descRef} className={`organizationInfo ${isLessText ? '' : isExpanded ? 'expanded' : 'contracted'}`} style={{position: "relative"}}>
-                                <span style={{fontWeight: "bolder", fontSize: "20px", lineHeight: "1.2"}}>{organizationProfileData.organizationName ?? organizationProfileData.organizationHost}</span> <br />
-                                <span style={{fontSize: "smaller", fontWeight: "550"}}> {organizationProfileData.organizationType} {["Club", "Initiative", "Business"].includes(organizationProfileData.organizationType) ? "" : "opportunity"} </span>
-                                {organizationProfileData.organizationType === "Club" && userData && <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}></span>}
-                                <span style={{fontWeight: "300", fontSize: "smaller", lineHeight: "1"}}>{organizationProfileData.organizationHost ? "run by" : ""}&nbsp;</span>
-                                <button className="btnText" onClick={(e) => handleOnHostClick(e)} disabled={isDisabled} style={{paddingBottom: "10px", cursor: `${isDisabled ? "not-allowed" : "pointer"}`}}>{organizationProfileData.organizationHostName}</button>
-                                <br />
-                                <div style={{lineHeight: "1", whiteSpace: "pre-line"}}>
-                                    {organizationProfileData.organizationDescription}
-                                </div>
-                                {(organizationProfileData.organizationDeadline || organizationProfileData.organizationStartDate) && <div style={{marginTop: "15px"}}>
-                                    {organizationProfileData.organizationDeadline && <span><span style={{fontWeight: "600"}}>Application Deadline</span>: {(organizationProfileData.organizationDeadline)}<br /></span>}
-                                    {organizationProfileData.organizationStartDate && <span><span style={{fontWeight: "600"}}>Start Date</span>: {(organizationProfileData.organizationStartDate)}</span>}
-                                </div>}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div style={{display: "flex", justifyContent: "center", alignItems: "center", width: "25%", flexDirection: "column", gap: "20px", marginLeft: "6px"}}>
-                    <button className="btnOrganizationLearnMore btnConnect" 
-                        onClick={e => { if (!disableActions) handleLearnMore(e); }} 
-                        disabled={disableActions}
-                        title={disableActions ? "Parent/guardian approval required" : ""}
-                        style={{cursor: disableActions ? "not-allowed" : "pointer", opacity: disableActions ? 0.6 : 1}}>
-                        Learn More 
-                    </button>
-                    {(organizationData.apply !== "NOAPPLY") && <button className="btnOrganizationConnect btnUnfilled" 
-                        onClick={e => { if (!disableActions) handleConnect(e); }} 
-                        disabled={disableActions}
-                        title={disableActions ? "Parent/guardian approval required" : ""}
-                        style={{cursor: disableActions ? "not-allowed" : "pointer", opacity: disableActions ? 0.6 : 1}}>
-                        {connectBtnType(organizationData.organizationType)} 
-                    </button>}
-                </div>
+  const formatDate = (dateString) => {
+    if (!dateString) return 'TBD'
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric', 
+      year: 'numeric' 
+    })
+  }
 
+  const hasLogistics = organizationProfile.logistics
+
+  return (
+    <div className={`v0-organization-card ${getLayoutClass()}`}>
+      {/* Status Banners */}
+      {!isPublished && (
+        <div className="v0-unpublished-banner">Unpublished</div>
+      )}
+      {organizationProfile.tags && isPublished && (
+        <div className="v0-relevance-banner">
+          {['Shadowing', 'Job', 'Internship'].includes(organizationProfile.type) && 'Target fields: '}
+          {organizationProfile.tags}
+        </div>
+      )}
+
+      {/* Report Button */}
+      {location !== 'user_profile' && (
+        <button className="v0-report-button" onClick={handleReport} aria-label="Report Organization">
+          <IoFlag size={18} />
+        </button>
+      )}
+
+      {/* Organization Logo */}
+      <div className="v0-organization-logo">
+        <img src={organizationProfile.logo} alt="Organization Logo" />
+      </div>
+
+      <div className="v0-organization-content">
+        <div className="v0-organization-title-row">
+          <div className="v0-organization-title-content">
+            <h3 className="v0-organization-name">
+              {organizationProfile.name}
+            </h3>
+            <div className="v0-organization-type-badge">
+              {getTypeIcon(organizationProfile.type)}
+              {organizationProfile.type}
+              {!['Club', 'Initiative', 'Business'].includes(organizationProfile.type) && ' opportunity'}
             </div>
-            <div>
-            {organizationProfileData.organizationLogistics && isExpanded && <div className="logisticsDisplay">
-                    {logisticsList.map((logistic, index)=>(
-                        <div key={index} className="logisticOption">
-                            {logistic}
-                            <span style={{fontWeight: "300"}}>{organizationProfileData.organizationLogistics[index]}</span>
-                        </div>
-                    ))}
-                </div>}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="v0-organization-description">
+          <div 
+            ref={descRef}
+            className={`v0-description-text ${!isDescriptionExpanded && !isExpanded ? 'contracted' : 'expanded'}`}
+            onClick={() => setIsExpanded(!isExpanded)}
+            style={{ cursor: 'pointer' }}
+          >
+            {organizationProfile.description}
+          </div>
+        </div>
+
+        {/* Content Container with Fixed Height */}
+        <div className={`v0-organization-content-container ${isContentExpanded ? 'expanded' : 'contracted'}`}>
+          {/* Dates and Organizer Info - only show in wide contexts */}
+          {(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host) && (
+            <div className="v0-organization-dates">
+              {organizationProfile.startDate && (
+                <div className="v0-date-item">
+                  <IoCalendar size={16} />
+                  <strong>Start Date:</strong> {formatDate(organizationProfile.startDate)}
+                </div>
+              )}
+              {organizationProfile.deadline && (
+                <div className="v0-date-item">
+                  <IoTime size={16} />
+                  <strong>Deadline:</strong> {formatDate(organizationProfile.deadline)}
+                </div>
+              )}
+              {organizationProfile.host && (
+                <div className="v0-organizer-item">
+                  <IoPerson size={16} />
+                  <strong>Organizer:</strong> 
+                  <button className="v0-organizer-link" onClick={handleHostClick} disabled={isDisabled}>
+                    {organizationProfile.hostName}
+                  </button>
+                </div>
+              )}
             </div>
-        </div>
-        
-    </>
-)
-}
+          )}
 
-function UnpublishedBanner(){
-    return(
-        <div style={{borderRadius: "20px", position: "absolute", top: "-16px", left: "10px", width: "fitContent", padding: "2px 8px", backgroundColor: "rgb(255,82,0,.9)", border: "solid 1px black",
-        zIndex: "1"}}>
-            <span style={{color: "var(--dark)", fontWeight: "600"}}>Unpublished</span>
+          {/* Logistics Section */}
+          {hasLogistics && isExpanded && (
+            <div className="v0-organization-logistics">
+              <h4 className="v0-logistics-title">Details</h4>
+              <div className="v0-logistics-grid">
+                {organizationProfile.logistics.compensation && (
+                  <div className="v0-logistic-item">
+                    <LuBriefcase size={16} />
+                    <span>{organizationProfile.logistics.compensation}</span>
+                  </div>
+                )}
+                {organizationProfile.logistics.eligibility && (
+                  <div className="v0-logistic-item">
+                    <LuUsers size={16} />
+                    <span>{organizationProfile.logistics.eligibility}</span>
+                  </div>
+                )}
+                {organizationProfile.logistics.location && (
+                  <div className="v0-logistic-item">
+                    <LuMapPin size={16} />
+                    <span>{organizationProfile.logistics.location}</span>
+                  </div>
+                )}
+                {organizationProfile.logistics.duration && (
+                  <div className="v0-logistic-item">
+                    <LuCalendar size={16} />
+                    <span>{organizationProfile.logistics.duration}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-    )
-}
 
-function RelevanceBanner({relevanceType, organizationType}){
-    return(
-        <div style={{display: (relevanceType === "ALL") ? "none" : "", borderRadius: "20px", position: "absolute", top: "-16px", left: "10px", width: "fitContent", padding: "2px 8px", background: "rgb(47,162,52)",
-            background: "var(--secondaryHighlight)", zIndex: "1"}}>
-            <span style={{color: "var(--dark)", fontWeight: "600"}}>{["Shadowing", "Job", "Internship"].includes(organizationType) ? "Target fields:" : ""} {relevanceType} </span>
+        {/* Expand/Collapse Button - only show if there's content to expand */}
+        {(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host || hasLogistics) && (
+          <button 
+            className={`v0-organization-expand-btn ${isContentExpanded ? 'expanded' : ''}`}
+            onClick={() => setIsContentExpanded(!isContentExpanded)}
+          >
+            {isContentExpanded ? (
+              <>
+                <LuChevronUp size={16} />
+                Show Less
+              </>
+            ) : (
+              <>
+                <LuChevronDown size={16} />
+                Show More
+              </>
+            )}
+          </button>
+        )}
+
+        {/* Action Buttons */}
+        <div className="v0-organization-actions">
+          <button 
+            className="v0-btn v0-btn-secondary" 
+            onClick={handleLearnMore}
+            disabled={disableActions}
+            title={disableActions ? 'Parent/guardian approval required' : ''}
+          >
+            Learn More
+          </button>
+          {organizationData.apply !== "NOAPPLY" && (
+            <button 
+              className="v0-btn v0-btn-primary" 
+              onClick={handleConnect}
+              disabled={disableActions}
+              title={disableActions ? 'Parent/guardian approval required' : ''}
+            >
+              {getActionButtonText(organizationProfile.type)}
+            </button>
+          )}
         </div>
-    )
+      </div>
+    </div>
+  )
 }

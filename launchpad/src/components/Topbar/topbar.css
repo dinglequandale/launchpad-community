@@ -104,6 +104,21 @@
     color: #111827;
 }
 
+.v0-report-btn {
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.v0-report-btn:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
 .v0-user-section {
     display: flex;
     align-items: center;

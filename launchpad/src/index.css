@@ -1,7 +1,7 @@
 
 :root {
   --primary: #F3F3F3;
-  --secondary: #4580a2;
+  --secondary: #2c8bff;
   --accent: #85ccd4;
   --dark: #07202F;
   --neutral: #d1e4e6;
@@ -138,7 +138,7 @@ form select{
 }
 
 textarea{
-  color: var(--secondary);
+  /* color: var(--secondary); */
   padding: 5px;
   /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
   border-radius: 10px;
@@ -151,7 +151,7 @@ textarea{
 }
 
 textarea:hover{
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(46, 178, 255, 0.19);
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(28, 29, 29, 0.116); */
 }
 
 hr {
@@ -269,8 +269,8 @@ button {
 } */
 
 button:hover {
-  background-color: var(--highlight);
-  color: #F5F5F5;
+  /* background-color: var(--highlight); */
+  /* color: #F5F5F5; */
 }
 button:focus,
 button:focus-visible {

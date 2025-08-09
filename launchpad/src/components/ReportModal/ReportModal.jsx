@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CgClose } from "react-icons/cg";
+import { IoCloseOutline } from "react-icons/io5";
 import toast from 'react-hot-toast';
 import './report_modal.css';
 import { useReport } from '../../contexts/report/ReportContext';
@@ -48,32 +48,60 @@ export default function ReportModal() {
     if (!reportVisibility) return null;
 
     return (
-        <div className="reportDialogContainer">
-            <div className="reportDialog" style={{gap: "20px"}}>
-                <button className='btnClose' onClick={() => {
-                    setShowReportUserName(true);
-                    setReportedUser("");
-                    setReportVisibility(false);
-                    }} disabled={isSubmitting} style={{background:"none"}}><CgClose size={25}/></button>
-                <h3>Report {reportTarget}</h3>
-                {showReportUserName && setReportedUser && <input type="text" className="onboardingInput" onChange={(e) => setReportedUser(e.target.value)} value={reportedUser} placeholder="Input the reported user's name" style={{width: "95%", padding: "10px", fontSize: "18px"}} />}
-                <textarea
-                    className="onboardingInput"
-                    placeholder="Please provide a reason for reporting..."
-                    value={reportReason}
-                    onChange={(e) => setReportReason(e.target.value)}
-                    disabled={isSubmitting}
-                />
-                <div className="reportActions">
+        <div className="report-modal-overlay">
+            <div className="report-modal">
+                <div className="report-modal-header">
+                    <h3 className="report-modal-title">Report {reportTarget}</h3>
                     <button 
-                        className='btnUnfilled' 
+                        className="report-modal-close-btn" 
+                        onClick={() => {
+                            setShowReportUserName(true);
+                            setReportedUser("");
+                            setReportVisibility(false);
+                        }} 
+                        disabled={isSubmitting}
+                    >
+                        <IoCloseOutline size={24} />
+                    </button>
+                </div>
+
+                <div className="report-modal-content">
+                    {showReportUserName && setReportedUser && (
+                        <div className="report-modal-field">
+                            <label className="report-modal-label">Reported User's Name</label>
+                            <input 
+                                type="text" 
+                                className="report-modal-input" 
+                                onChange={(e) => setReportedUser(e.target.value)} 
+                                value={reportedUser} 
+                                placeholder="Enter the reported user's name"
+                            />
+                        </div>
+                    )}
+
+                    <div className="report-modal-field">
+                        <label className="report-modal-label">Reason for Report</label>
+                        <textarea
+                            className="report-modal-textarea"
+                            placeholder="Please provide a detailed reason for reporting..."
+                            value={reportReason}
+                            onChange={(e) => setReportReason(e.target.value)}
+                            disabled={isSubmitting}
+                            rows={4}
+                        />
+                    </div>
+                </div>
+
+                <div className="report-modal-actions">
+                    <button 
+                        className="report-modal-btn report-modal-btn-secondary" 
                         onClick={() => setReportVisibility(false)}
                         disabled={isSubmitting}
                     >
                         Cancel
                     </button>
                     <button 
-                        className='btnSaveChanges' 
+                        className="report-modal-btn report-modal-btn-primary" 
                         onClick={handleReport}
                         disabled={isSubmitting}
                     >

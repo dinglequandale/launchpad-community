@@ -1,13 +1,17 @@
 import './topbar.css';
 import { useState, useEffect, useRef } from 'react';
 import { LuMenu, LuBell, LuGraduationCap, LuUser, LuSettings, LuLogOut, LuChevronDown } from "react-icons/lu";
+import { BiFlag } from "react-icons/bi";
 import { useAuth } from '../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { displayShortenedName } from '../../services/userProfileServices';
+import DefaultIcon from '../DefaultIcon/DefaultIcon';
+import { useReport } from '../../contexts/report/ReportContext';
 
 export default function TopBar({ show }) {
     const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
+    const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
@@ -56,6 +60,13 @@ export default function TopBar({ show }) {
         }
     };
 
+    const handleReportClick = () => {
+        setReportTarget("General");
+        setReportedUser("");
+        setShowReportUserName(true);
+        setReportVisibility(true);
+    };
+
     return (
         <div className={`v0-topbar ${isSidebarCollapsed ? 'v0-topbar-sidebar-collapsed' : 'v0-topbar-sidebar-expanded'}`}>
             <div className="v0-topbar-left">
@@ -71,7 +82,10 @@ export default function TopBar({ show }) {
             
             <div className="v0-topbar-right">
                 <button className="v0-notification-btn">
-                    <LuBell size={20} />
+                    <LuBell size={24} />
+                </button>
+                <button className="v0-report-btn" onClick={handleReportClick}>
+                    <BiFlag size={26} />
                 </button>
                 <div className="v0-user-section" ref={dropdownRef}>
                     <button 
@@ -85,8 +99,8 @@ export default function TopBar({ show }) {
                                 alt={currentUser.displayName || "User"} 
                             />
                         ) : (
-                            <div className="v0-avatar-fallback">
-                                {(currentUser?.displayName || "U").charAt(0).toUpperCase()}
+                            <div style={{color: "black", display: "flex", justifyContent: "center", alignItems: "center"}}>
+                                <DefaultIcon size={32} length="38px" />
                             </div>
                         )}
                         <LuChevronDown size={16} className="v0-dropdown-chevron" />
@@ -102,9 +116,7 @@ export default function TopBar({ show }) {
                                         alt={currentUser.displayName || "User"} 
                                     />
                                 ) : (
-                                    <div className="v0-dropdown-avatar-fallback">
-                                        {(currentUser?.displayName || "U").charAt(0).toUpperCase()}
-                                    </div>
+                                    <DefaultIcon size={40} />
                                 )}
                                 <div className="v0-dropdown-user-info">
                                     <span className="v0-dropdown-user-name">

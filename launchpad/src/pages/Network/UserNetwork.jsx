@@ -266,8 +266,9 @@ export default function UserNetwork() {
 }
 
   const handleReferalClick = async (referalType, organizationData, userData) => {
-    const referalValue = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}`];
-    const methodType = organizationData[`organization${referalType === "learnMore" ? "LearnMore" : "Apply"}Method`];
+    const referalValue = organizationData[referalType === "learnMore" ? "learnMore" : "apply"];
+    const methodType = referalValue?.split(': ')[0];
+    const value = referalValue?.split(': ')[1];
     console.log("DATA:", userData);
     
     switch(methodType){
@@ -275,10 +276,10 @@ export default function UserNetwork() {
             handleConnectClick(userData.id);
             return;
         case "Email":
-            handleEmailClick(referalValue);
+            handleEmailClick(value);
             return;
         case "Website":
-            window.open(referalValue, '_blank', 'noopener,noreferrer');
+            window.open(value, '_blank', 'noopener,noreferrer');
             return;
       }
   }

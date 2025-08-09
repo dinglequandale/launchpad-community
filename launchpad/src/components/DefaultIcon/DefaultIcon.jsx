@@ -7,14 +7,14 @@ export default function DefaultIcon({length="44px", size=35}){
     // height: 44px;
 
     return(
-        <div style={{borderRadius: "15px", 
+        <div style={{borderRadius: "50%", 
         width: length, 
         height: length, 
         display: "flex", 
         justifyContent: "center", 
         alignItems: "center",
         padding: size <= 50 ? "0px" : "12px",
-        background: "var(--secondaryHighlight)",
+        background: "#1157e262",
         border: "var(--border)"}}
         >
             <MdOutlinePersonOutline size={size}/>
