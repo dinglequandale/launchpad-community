@@ -151,6 +151,15 @@
   gap: 4px;
 }
 
+.auth-warning-message {
+  color: #d97706;
+  font-size: 14px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .auth-social-button {
   width: 100%;
   padding: 12px 24px;
@@ -266,6 +275,33 @@
   font-size: 16px;
   color: #6b7280;
   padding: 12px 0;
+}
+
+.auth-email-override {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.auth-override-button {
+  background: none;
+  border: none;
+  color: #1976d2;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.auth-override-button:hover {
+  background-color: rgba(25, 118, 210, 0.1);
+  color: #1565c0;
+}
+
+.auth-override-button:active {
+  transform: translateY(1px);
 }
 
 @keyframes slideUp {

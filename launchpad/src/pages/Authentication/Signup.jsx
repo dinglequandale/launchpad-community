@@ -15,6 +15,7 @@ export default function SignUp(){
     const [confirmedPassword, setConfirmedPassword] = useState("");
     const [userIsSigningIn, setUserIsSigningIn] = useState(false);
     const [emailValid, setEmailValid] = useState(true);
+    const [emailOverride, setEmailOverride] = useState(false);
     const navigate = useNavigate();
 
     const userType = localStorage.getItem("userType") || '';
@@ -39,9 +40,16 @@ export default function SignUp(){
           }
         );
         const isEmailFound = foundStudent ? true : false;
-        setEmailValid(isEmailFound); 
+        // If override is enabled, always set email as valid
+        setEmailValid(emailOverride || isEmailFound); 
         return foundStudent;
       };
+
+    // Function to validate email format for school emails
+    const validateSchoolEmailFormat = (email, schoolId) => {
+        const emailPattern = new RegExp(`^[^@]+@${schoolId}\\.org$`, 'i');
+        return emailPattern.test(email);
+    };
 
     // Fetch and store connections for new users
     const fetchAndStoreConnections = async () => {
@@ -90,11 +98,33 @@ export default function SignUp(){
         // if (schoolEmailCondition) { TODO: bring back
         if(schoolEmailCondition){
             try {
-                // const schoolEmailPattern = new RegExp(`^[^@]+@${schoolId}\\.org$`, 'i');
-                if (!studentRecord) {
-                    console.log(userEmail);
-                    toast.error(`Please use your school email (e.g. yourname@${schoolId}.org).`);
-                    return;
+                console.log('School email condition met. Override state:', emailOverride);
+                console.log('User email:', userEmail);
+                
+                // If override is enabled, only check basic email format (not school domain)
+                if (emailOverride) {
+                    console.log('Override enabled - checking basic email format only');
+                    // Basic email format validation when override is enabled
+                    const basicEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!basicEmailPattern.test(userEmail)) {
+                        toast.error('Please enter a valid email address.');
+                        return;
+                    }
+                    console.log('Basic email format validation passed');
+                } else {
+                    console.log('Override disabled - checking strict school domain validation');
+                    // Strict school domain validation when override is disabled
+                    if (!validateSchoolEmailFormat(userEmail, schoolId)) {
+                        toast.error(`Please use a valid school email format (e.g. yourname@${schoolId}.org).`);
+                        return;
+                    }
+                    
+                    // Check if email exists in database
+                    if (!studentRecord) {
+                        console.log(userEmail);
+                        toast.error(`Please use your school email (e.g. yourname@${schoolId}.org).`);
+                        return;
+                    }
                 }
             } catch(e) {
                 console.log(e);
@@ -243,19 +273,23 @@ export default function SignUp(){
                             <form onSubmit={(e)=>handleSubmit(e)}>
                                 <div className="auth-form-group">
                                     <label className="auth-form-label">
-                                        {schoolEmailCondition ? "School Email" : "Email"}
+                                        {schoolEmailCondition && !emailOverride ? "School Email" : "Email"}
                                     </label>
                                     <div className="auth-email-group">
                                         <input
                                             type="text"
                                             value={userEmail}
+                                            placeholder={schoolEmailCondition && !emailOverride ? "yourname" : "Enter your email"}
                                             onChange={(e) => {
                                                 setEmailValid(true);
-                                                if(schoolEmailCondition) {
+                                                // Don't reset override state when typing - let user keep their choice
+                                                if(schoolEmailCondition && !emailOverride) {
+                                                    // Only restrict input when override is disabled
                                                     if(!(e.target.value.includes("@") || e.target.value.includes("."))){
                                                         setUserEmail(e.target.value);
                                                     }
                                                 } else {
+                                                    // Allow full email input when override is enabled or for non-school users
                                                     setUserEmail(e.target.value);
                                                 }
                                             }}
@@ -263,13 +297,41 @@ export default function SignUp(){
                                             disabled={userIsSigningIn}
                                             className={`auth-form-input ${!emailValid ? "error" : ""}`}
                                         />
-                                        {schoolEmailCondition && (
+                                        {schoolEmailCondition && !emailOverride && (
                                             <span className="auth-email-suffix">{emailData[0].email_hook}</span>
                                         )}
                                     </div>
-                                    {!emailValid && (
+                                    {!emailValid && !emailOverride && (
                                         <div className="auth-error-message">
-                                            Please use your school email
+                                            ❌ Please use your school email
+                                        </div>
+                                    )}
+                                    {!emailValid && emailOverride && (
+                                        <div className="auth-warning-message">
+                                            ⚠️ Email validation bypassed - proceeding with signup
+                                        </div>
+                                    )}
+                                    {schoolEmailCondition && (
+                                        <div className="auth-email-override">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newOverrideState = !emailOverride;
+                                                    setEmailOverride(newOverrideState);
+                                                    console.log('Email override toggled:', newOverrideState);
+                                                    
+                                                    if (newOverrideState) {
+                                                        setEmailValid(true);
+                                                        setUserEmail(""); // Clear email when enabling override
+                                                    } else {
+                                                        setUserEmail(""); // Clear email when disabling override
+                                                        setEmailValid(true);
+                                                    }
+                                                }}
+                                                className="auth-override-button"
+                                            >
+                                                {emailOverride ? "✓ Use any email address" : "School email not in database? Click here"}
+                                            </button>
                                         </div>
                                     )}
                                 </div>
