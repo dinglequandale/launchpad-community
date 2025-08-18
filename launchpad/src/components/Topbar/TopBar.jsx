@@ -1,45 +1,29 @@
-import './topbar.css';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LuMenu, LuBell, LuGraduationCap, LuUser, LuSettings, LuLogOut, LuChevronDown } from "react-icons/lu";
 import { BiFlag } from "react-icons/bi";
 import { useAuth } from '../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { displayShortenedName } from '../../services/userProfileServices';
-import DefaultIcon from '../DefaultIcon/DefaultIcon';
+import { useModal } from '../../contexts/ModalContext';
 import { useReport } from '../../contexts/report/ReportContext';
+import DefaultIcon from '../DefaultIcon/DefaultIcon';
+import './topbar.css';
 
-export default function TopBar({ show }) {
+export default function TopBar({ isSidebarCollapsed }) {
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [basicUserInfo, setBasicUserInfo] = useState(null);
+    const dropdownRef = useRef(null);
     const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
+    const { openLogoutModal } = useModal();
     const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const dropdownRef = useRef(null);
 
-    const basicUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
-    // Listen for sidebar state changes
     useEffect(() => {
-        const handleSidebarChange = () => {
-            const sidebar = document.querySelector('.v0-sidebar');
-            if (sidebar) {
-                setIsSidebarCollapsed(sidebar.classList.contains('v0-sidebar-collapsed'));
-            }
-        };
-
-        // Initial check
-        handleSidebarChange();
-
-        // Set up observer to watch for sidebar class changes
-        const observer = new MutationObserver(handleSidebarChange);
-        const sidebar = document.querySelector('.v0-sidebar');
-        if (sidebar) {
-            observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+        const userInfo = localStorage.getItem('basicUserInfo');
+        if (userInfo) {
+            setBasicUserInfo(JSON.parse(userInfo));
         }
-
-        return () => observer.disconnect();
     }, []);
 
-    // Handle click outside dropdown
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -60,11 +44,24 @@ export default function TopBar({ show }) {
         }
     };
 
+    const handleLogoutClick = () => {
+        setIsDropdownOpen(false);
+        openLogoutModal({
+            onVerify: handleLogout
+        });
+    };
+
     const handleReportClick = () => {
         setReportTarget("General");
         setReportedUser("");
         setShowReportUserName(true);
         setReportVisibility(true);
+    };
+
+    const displayShortenedName = (name) => {
+        if (!name) return "User";
+        if (name.length <= 20) return name;
+        return name.substring(0, 20) + "...";
     };
 
     return (
@@ -157,10 +154,7 @@ export default function TopBar({ show }) {
                                 
                                 <button 
                                     className="v0-dropdown-item v0-dropdown-item-danger"
-                                    onClick={() => {
-                                        setIsDropdownOpen(false);
-                                        handleLogout();
-                                    }}
+                                    onClick={handleLogoutClick}
                                 >
                                     <LuLogOut size={16} />
                                     <span>Logout</span>

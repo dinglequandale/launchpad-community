@@ -102,20 +102,23 @@ const Root = () => {
   return (
     <ConnectionProvider>
       <ReportProvider>
-        <ModalProvider>
-          <ReportModal />
-          <Toaster 
-            position="bottom-right"
-            toastOptions={{
-              duration: 4000,
-              style: {
-                background: '#363636',
-                color: '#fff',
-              },
-            }}
-          />
-          <Outlet />
-        </ModalProvider>
+        <ReportModal />
+        <Toaster 
+          position="bottom-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+              zIndex: 9999999,
+            },
+          }}
+          containerStyle={{
+            zIndex: 9999999,
+          }}
+          containerClassName="toast-container"
+        />
+        <Outlet />
       </ReportProvider>
     </ConnectionProvider>
   );
@@ -192,31 +195,35 @@ const router = createBrowserRouter([
         element: <Onboarding/>
       },
       {
-        element: <GlobalAuthWrapper/>,
+        element: (
+          <ModalProvider>
+            <GlobalAuthWrapper/>
+          </ModalProvider>
+        ),
         children: [
           {
             path: '/Home',
             element: <Home/>
           },
           {
-            path: '/network',
-            element: <UserNetwork/>
-          },
-          {
-            path: '/messages',
-            element: <InitializeStream/>
-          },
-          {
-            path: '/Organizations',
-            element: <Organizations/>
-          },
-          {
             path: '/profile',
             element: <EditProfilePage/>
           },
           {
+            path: '/network',
+            element: <UserNetwork/>
+          },
+          {
+            path: '/organizations',
+            element: <Organizations/>
+          },
+          {
             path: '/settings',
             element: <SettingsPage/>
+          },
+          {
+            path: '/chat',
+            element: <InitializeStream/>
           }
         ]
       }

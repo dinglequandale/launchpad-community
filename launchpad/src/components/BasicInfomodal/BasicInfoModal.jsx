@@ -20,19 +20,22 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     setSearchQuery(query);
   };
 
+  // Add safety check for userData
+  const safeUserData = userData || {};
+
   const [basicInfoContent, setBasicInfoContent] = useState(
     {
-    areasOfInterest: userData.areasOfInterest ?? [],
+    areasOfInterest: safeUserData.areasOfInterest ?? [],
     // TODO: fix
-    collegeInterestsOrDecision: userData.collegeInterestsOrDecision ?? [],
-    acceptedColleges: userData.acceptedColleges ?? [],
-    collegeAttending: userData.collegeAttending ?? [],
-    yearsOfExperience: userData.yearsOfExperience ?? "",
-    // industryOfExperience: userData.industryOfExperience ?? "",
-    industryPosition: userData.industryPosition ?? "",
-    graduationYear: userData.graduationYear ?? "",
-    schoolRole: userData.schoolRole ?? "",
-    sponsoredClubs: userData.sponsoredClubs ?? "",
+    collegeInterestsOrDecision: safeUserData.collegeInterestsOrDecision ?? [],
+    acceptedColleges: safeUserData.acceptedColleges ?? [],
+    collegeAttending: safeUserData.collegeAttending ?? [],
+    yearsOfExperience: safeUserData.yearsOfExperience ?? "",
+    // industryOfExperience: safeUserData.industryOfExperience ?? "",
+    industryPosition: safeUserData.industryPosition ?? "",
+    graduationYear: safeUserData.graduationYear ?? "",
+    schoolRole: safeUserData.schoolRole ?? "",
+    sponsoredClubs: safeUserData.sponsoredClubs ?? "",
   });
 
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
@@ -71,8 +74,34 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     },
     {
       id: "collegeInterestsOrDecision",
-      text: userData.collegeDecision === "No" ? "What colleges are you interested in?" : "What college will you attend?",
-      type: userData.collegeDecision === "No" ? "multi-select" : "select",
+      text: (() => {
+        // Check if user already has a college decision
+        const currentValue = safeUserData.collegeInterestsOrDecision;
+        if (currentValue && typeof currentValue === 'string' && currentValue.trim() !== '') {
+          // User already committed to a college
+          return "What college will you attend?";
+        } else if (currentValue && Array.isArray(currentValue) && currentValue.length > 0) {
+          // User has college interests
+          return "What colleges are you interested in?";
+        } else {
+          // Default case - check collegeDecision field
+          return safeUserData.collegeDecision === "No" ? "What colleges are you interested in?" : "What college will you attend?";
+        }
+      })(),
+      type: (() => {
+        // Determine type based on current value and user's decision
+        const currentValue = safeUserData.collegeInterestsOrDecision;
+        if (currentValue && typeof currentValue === 'string' && currentValue.trim() !== '') {
+          // User already committed to a college - make it single select
+          return "select";
+        } else if (currentValue && Array.isArray(currentValue) && currentValue.length > 0) {
+          // User has college interests - keep as multi-select
+          return "multi-select";
+        } else {
+          // Default case - check collegeDecision field
+          return safeUserData.collegeDecision === "No" ? "multi-select" : "select";
+        }
+      })(),
       options: [],
       userTypeIncluders: ["High Schooler"],
       required: true,
@@ -138,18 +167,57 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   const colleges = getColleges(searchQuery);
   const cachedColleges = useMemo(() => colleges, [colleges]);
 
-  const questionsForUser = basicInfoQuestionsConfig.filter((question) => question.userTypeIncluders.includes(userType));
+  // Add safety check for userType
+  const safeUserType = userType || "High Schooler"; // Default fallback
+
+  const questionsForUser = basicInfoQuestionsConfig.filter((question) => question.userTypeIncluders.includes(safeUserType));
+  
+  // Debug logging for college question
+  const collegeQuestion = questionsForUser.find(q => q.id === "collegeInterestsOrDecision");
+  if (collegeQuestion) {
+    console.log("College question config:", {
+      text: collegeQuestion.text,
+      type: collegeQuestion.type,
+      currentValue: safeUserData.collegeInterestsOrDecision,
+      collegeDecision: safeUserData.collegeDecision
+    });
+  }
 
   const isEmpty = () => {
-    return (questionsForUser.filter((question)=>(question.required && (basicInfoContent[question.id] === "")))).length > 0;
+    return (questionsForUser.filter((question) => {
+      if (!question.required) return false;
+      
+      const value = basicInfoContent[question.id];
+      if (question.type === "multi-select") {
+        // For multi-select, check if array is empty
+        return !Array.isArray(value) || value.length === 0;
+      } else {
+        // For other types, check if string is empty
+        return value === "" || value === null || value === undefined;
+      }
+    })).length > 0;
   }
   const saveBasicInfo = async () => {
     setIsSubmitting(true);
     if(!isEmpty()){
       const filteredBasicInfo = Object.entries(basicInfoContent).reduce((acc, [key, value]) => {
         console.log(`Desired questions for ${key}, ${value}:`, questionsForUser.filter((question)=>question.id === key))
-        if (value !== "" && questionsForUser.filter((question)=>question.id === key).length > 0) {  // Filter out empty and unapplicable values values
-          acc[key] = value; 
+        if (questionsForUser.filter((question)=>question.id === key).length > 0) {
+          // Check if the value is meaningful based on the question type
+          const question = questionsForUser.find(q => q.id === key);
+          if (question) {
+            if (question.type === "multi-select") {
+              // For multi-select, check if array has meaningful content
+              if (Array.isArray(value) && value.length > 0 && value.some(item => item && item.trim() !== "")) {
+                acc[key] = value;
+              }
+            } else {
+              // For other types, check if string is not empty
+              if (value !== "" && value !== null && value !== undefined) {
+                acc[key] = value;
+              }
+            }
+          }
         }
         return acc;
       }, {});
@@ -220,7 +288,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
               </button>
               <h2 className="v0-modal-title">My Introduction</h2>
               <p className="v0-modal-subtitle">
-                Enlighten us with your {userType==="Professional" ? "expertise" : "interests"} and {userType==="Professional" ? "work experience" : userType==="Alumni" ? "education" : "dream colleges"}!
+                Enlighten us with your {safeUserType==="Professional" ? "expertise" : "interests"} and {safeUserType==="Professional" ? "work experience" : safeUserType==="Alumni" ? "education" : "dream colleges"}!
               </p>
             </div>
             
@@ -245,7 +313,8 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
                         className="v0-form-input"
                       />
                     ) : question.id !== "collegeInterestsOrDecision" ? (
-                      <div className="v0-form-input">
+                      // <div className="v0-form-input">
+                      <>
                         <OnboardingDropdown
                           showQuestion={false}
                           key={question.id}
@@ -256,17 +325,17 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
                           type={question.type}
                           onSearchQueryChange={question.id.toLowerCase().includes("college") ? handleSearchQueryChange : null}
                         />
-                      </div>
+                      </>
                     ) : (
-                      <div className="v0-form-input">
+                      <>
                         <CollegeSearch
                           showQuestion={false}
                           question={""}
-                          selectedOption={basicInfoContent['collegeInterestsOrDecision']}
-                          onChange={(label) => handleDropdownChange('collegeInterestsOrDecision', label)}
-                          type={"multi-select"}
+                          selectedOptions={basicInfoContent}
+                          handleChange={handleDropdownChange}
+                          isMultiSelect={question.type === "multi-select"}
                         />
-                      </div>
+                      </>
                     )}
                   </div>
                 ))}

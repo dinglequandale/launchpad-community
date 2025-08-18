@@ -233,11 +233,29 @@ const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, s
 
   // Get the current value for display
   const getCurrentValue = () => {
+    // Add safety check for selectedOptions
+    if (!selectedOptions) return isMultiSelect ? [] : '';
+    
     const currentValue = selectedOptions.collegeInterestsOrDecision;
+    
     if (isMultiSelect) {
-      return Array.isArray(currentValue) ? currentValue : [];
+      // Handle both string and array values for backward compatibility
+      if (typeof currentValue === 'string') {
+        // If it's a string (user committed to college), return as single-item array
+        return currentValue ? [currentValue] : [];
+      } else if (Array.isArray(currentValue)) {
+        return currentValue;
+      } else {
+        return [];
+      }
     } else {
-      return currentValue || '';
+      // For single select, handle both string and array
+      if (Array.isArray(currentValue)) {
+        // If it's an array, return the first item or empty string
+        return currentValue.length > 0 ? currentValue[0] : '';
+      } else {
+        return currentValue || '';
+      }
     }
   };
 

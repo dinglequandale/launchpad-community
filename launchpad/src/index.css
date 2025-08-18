@@ -293,3 +293,17 @@ button:focus-visible {
 .ul{
   list-style: none;
 }
+
+/* Toast Container - Ensure it appears above all modals */
+.toast-container {
+  z-index: 9999999 !important;
+}
+
+/* Additional toast styling to ensure visibility */
+[data-sonner-toaster] {
+  z-index: 9999999 !important;
+}
+
+[data-sonner-toast] {
+  z-index: 9999999 !important;
+}

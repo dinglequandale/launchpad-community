@@ -73,7 +73,8 @@ export default function AboutMeModal({userData, visibility, onClose}){
               <div className="v0-form-group">
                 <label className="v0-form-label">Tell us about yourself</label>
                 <textarea 
-                  className="v0-form-textarea" 
+                  className="v0-form-textarea"
+                  style={{width: "95%"}} 
                   placeholder="Share your story, interests, and what makes you unique..."
                   value={aboutMeContent}
                   onChange={e => handleAboutMeChange(e.target.value)}

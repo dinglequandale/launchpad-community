@@ -10,9 +10,15 @@ import { IoCloseOutline } from "react-icons/io5";
 
 export default function SkillModal({visibility, onClose, userData}) {
 
-    const initialUserSkills = ((userData.userSkills === null) || (userData.userSkills && userData.userSkills.length === 0)) ? [{id: 0, skillCategory: "", skillDescription: ""}] : userData.userSkills;
-    console.log(initialUserSkills);
-    const [skillData,setSkillData] = useState(initialUserSkills);
+    // Add null checks and fallback initialization
+    const safeUserData = userData || {};
+    const safeUserSkills = safeUserData.userSkills || [];
+    
+    const initialUserSkills = (safeUserSkills.length === 0) ? 
+        [{id: 0, skillCategory: "", skillDescription: ""}] : 
+        safeUserSkills;
+    
+    const [skillData, setSkillData] = useState(initialUserSkills);
     const {currentUser} = useAuth();
     console.log("tittel", skillData);
     const customStyles = {
@@ -91,7 +97,7 @@ export default function SkillModal({visibility, onClose, userData}) {
                         
                         <div className="v0-modal-content">
                             <div className="v0-skills-container">
-                                {skillData.map((skill, index) => (
+                                {(skillData || []).map((skill, index) => (
                                     <div key={index} className="v0-skill-item">
                                         <div className="v0-skill-header">
                                             <h3 className="v0-skill-title">Skill {index + 1}</h3>
