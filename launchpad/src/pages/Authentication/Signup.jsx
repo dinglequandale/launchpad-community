@@ -95,7 +95,7 @@ export default function SignUp(){
     const handleSubmit = async (e) => {
         e.preventDefault();
         const studentRecord = schoolEmailCondition ? checkSchoolEmail(userEmail, schoolId) : null;
-        // if (schoolEmailCondition) { TODO: bring back
+
         if(schoolEmailCondition){
             try {
                 console.log('School email condition met. Override state:', emailOverride);
@@ -113,18 +113,16 @@ export default function SignUp(){
                     console.log('Basic email format validation passed');
                 } else {
                     console.log('Override disabled - checking strict school domain validation');
-                    // Strict school domain validation when override is disabled
-                    if (!validateSchoolEmailFormat(userEmail, schoolId)) {
-                        toast.error(`Please use a valid school email format (e.g. yourname@${schoolId}.org).`);
+                    // For non-override mode, we need to check both format AND database existence
+                    
+                    // Then check if the email exists in the database
+                    if (!studentRecord) {
+                        console.log('Email not found in database:', userEmail);
+                        toast.error(`Email not found in school database. Please use your registered school email or enable the override option.`);
                         return;
                     }
                     
-                    // Check if email exists in database
-                    if (!studentRecord) {
-                        console.log(userEmail);
-                        toast.error(`Please use your school email (e.g. yourname@${schoolId}.org).`);
-                        return;
-                    }
+                    console.log('School email validation passed - email found in database');
                 }
             } catch(e) {
                 console.log(e);
@@ -149,7 +147,7 @@ export default function SignUp(){
             try {
                 // console.log("Student record: ", studentRecord.graduation_year);
                 localStorage.setItem("tempStudentInfo", JSON.stringify(studentRecord));
-                const emailToUse = schoolEmailCondition ? userEmail + emailData[0].email_hook : userEmail;
+                const emailToUse = (schoolEmailCondition && !emailOverride) ? userEmail + emailData[0].email_hook : userEmail;
                 const userCredential = await toast.promise(
                     doCreateUserWithEmailAndPassword(emailToUse, userPassword),
                     {
