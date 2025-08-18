@@ -86,7 +86,7 @@ export default function PrivateKeyPage() {
 
     return(
         <>
-            <Toaster position="bottom-right" reverseOrder={false} />
+            {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
             {localStorage.getItem("tempSchoolInfo") && <Navigate to="/Login"/>}
             
             <div className="onboarding-container">

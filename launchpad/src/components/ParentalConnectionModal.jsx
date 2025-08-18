@@ -117,9 +117,9 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
 
   return (
     <>
-      <div style={{zIndex: 9999}}>
+      {/* <div style={{zIndex: 9999}}>
         <Toaster position="bottom-right" reverseOrder={false}/>
-      </div>
+      </div> */}
       <div className="parental-connection-modal-overlay">
         <div className="parental-connection-modal" ref={modalRef}>
           <div className="parental-connection-modal-header">

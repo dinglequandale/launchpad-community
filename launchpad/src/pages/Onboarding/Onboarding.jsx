@@ -15,6 +15,7 @@ import { auth } from '../../firebase/firebaseConfig';
 import { GrOrganization } from 'react-icons/gr';
 import UserType from './UserType';
 import { useAuth } from '../../contexts/auth/AuthContext';
+import { saveHighSchooler, saveCollegeStudent, saveProfessional, saveStaff } from '../../services/onboardingServices';
 
 export default function Onboarding() {
     const [numOfSections, setNumOfSections] = useState(0);
@@ -23,18 +24,30 @@ export default function Onboarding() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [canSubmit, setCanSubmit] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
+    const [userData, setUserData] = useState({});
     let schoolId, schoolDisplayName, userRole;
 
     const user = auth.currentUser;
     const {userLoggedIn} = useAuth();
     const location = useLocation();
-    const tempSchoolInfo = location.state ?? JSON.parse(localStorage.getItem("tempSchoolInfo"));
+    const navigate = useNavigate();
+    const tempSchoolInfo = location.state ?? JSON.parse(localStorage.getItem("tempSchoolInfo") || '{}');
+
+    // Validate that we have the required school information
+    if (!tempSchoolInfo || !tempSchoolInfo.schoolId) {
+        console.error('Missing school information:', tempSchoolInfo);
+        // Redirect to school signup if no valid school info
+        return <Navigate to="/school-signup" replace={true}/>;
+    }
 
     try{
         schoolId = tempSchoolInfo.schoolId;
         schoolDisplayName = tempSchoolInfo.schoolDisplayName;
         userRole = tempSchoolInfo.userRole;
-    }catch{}
+    }catch(error){
+        console.error('Error extracting school info:', error);
+        return <Navigate to="/school-signup" replace={true}/>;
+    }
 
     useEffect(()=>{
         const setUserToken = async () => {
@@ -77,16 +90,52 @@ export default function Onboarding() {
         setCurrentPage(currentPage-1);
     }
 
+    const handleSubmit = async () => {
+        if (!canSubmit) return;
+        
+        setIsSubmitting(true);
+        
+        try {
+            // Get the user data from the appropriate component
+            const currentUserData = {
+                ...userData,
+                schoolId: schoolId,
+                userType: selectedOption
+            };
+
+            // Call the appropriate save function based on user type
+            switch (selectedOption) {
+                case "High Schooler":
+                    await saveHighSchooler(user, currentUserData, () => {
+                        navigate('/Home');
+                    });
+                    break;
+                case "College Student":
+                    await saveCollegeStudent(user, currentUserData, () => {
+                        navigate('/Home');
+                    });
+                    break;
+                case "Professional":
+                    await saveProfessional(user, currentUserData, () => {
+                        navigate('/Home');
+                    });
+                    break;
+                case "Staff":
+                    await saveStaff(user, currentUserData, () => {
+                        navigate('/Home');
+                    });
+                    break;
+                default:
+                    throw new Error('Invalid user type');
+            }
+        } catch (error) {
+            console.error('Error saving user data:', error);
+            setIsSubmitting(false);
+        }
+    };
+
     return (
         <>
-            {isSubmitting && (
-                <div className="onboarding-overlay">
-                    <div className="onboarding-loading">
-                        <Loading />
-                    </div>
-                </div>
-            )}
-            
             <div className='onboarding-container'>
                 <div className='background-blend'></div>
                 {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
@@ -128,6 +177,7 @@ export default function Onboarding() {
                                     currentPage={currentPage} 
                                     isSubmitting={isSubmitting} 
                                     setCanSubmit={setCanSubmit}
+                                    setUserData={setUserData}
                                 />
                             )}
                             {selectedOption === "College Student" && (
@@ -136,6 +186,7 @@ export default function Onboarding() {
                                     currentPage={currentPage} 
                                     isSubmitting={isSubmitting} 
                                     setCanSubmit={setCanSubmit}
+                                    setUserData={setUserData}
                                 />
                             )}
                             {selectedOption === "Professional" && (
@@ -144,6 +195,7 @@ export default function Onboarding() {
                                     currentPage={currentPage} 
                                     isSubmitting={isSubmitting} 
                                     setCanSubmit={setCanSubmit}
+                                    setUserData={setUserData}
                                 />
                             )}
                             {userRole === "admin" && (
@@ -152,6 +204,7 @@ export default function Onboarding() {
                                     currentPage={currentPage} 
                                     isSubmitting={isSubmitting} 
                                     setCanSubmit={setCanSubmit}
+                                    setUserData={setUserData}
                                 />
                             )}
                         </main>
@@ -174,14 +227,15 @@ export default function Onboarding() {
                             ) : (
                                 <button 
                                     className={`continueButton ${!canSubmit ? 'disabled' : ''}`}
-                                    onClick={() => {
-                                        if(canSubmit) {
-                                            setIsSubmitting(true);
-                                        }
-                                    }}
+                                    onClick={handleSubmit}
                                     disabled={isSubmitting || !canSubmit}
                                 >
-                                    {!isSubmitting ? "Submit" : <Loading />}
+                                    {!isSubmitting ? "Submit" : (
+                                        <>
+                                            <Loading />
+                                            {/* <span style={{ marginLeft: '8px' }}>Saving...</span> */}
+                                        </>
+                                    )}
                                 </button>
                             )}
                         </footer>

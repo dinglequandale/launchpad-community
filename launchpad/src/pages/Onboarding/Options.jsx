@@ -2,6 +2,7 @@ import { db } from '../../firebase/firebaseConfig';
 import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
 import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
+import CustomSelect from '../../components/CustomSelect';
 import { algoliaClient } from '../../typesense/typesenseClient';
 // import {algoliasearch} from 'algoliasearch/lite';
 import Loading from '../../components/LoadingAnimation/Loading';
@@ -117,69 +118,141 @@ for (let year = 2030; year >= 1990; year--) {
     graduationYears.push({ value: year, label: year.toString() });
 }
 
-// Refactored getColleges to return both colleges and loading state
-const getColleges = (searchQuery = '') => {
-  const [colleges, setColleges] = useState([]);
+// Refactored getColleges to be a regular async function instead of a hook
+const getColleges = async (searchQuery = '') => {
+  if (searchQuery.length < 1) {
+    // Return some popular colleges as default results when no search query
+    try {
+      const {results} = await client.search({
+        requests: [{ indexName: 'colleges', query: '', hitsPerPage: 5 }],
+      });
+      const hits = results[0].hits;
+      const colleges = hits.map(hit => ({
+        label: hit.label,
+        value: hit.value || hit.objectID, // Fallback to Algolia's ID
+      }));
+      
+      // If no results from empty search, try with a common term to get some colleges
+      if (colleges.length === 0) {
+        const fallbackResults = await client.search({
+          requests: [{ indexName: 'colleges', query: 'university', hitsPerPage: 5 }],
+        });
+        const fallbackHits = fallbackResults.results[0].hits;
+        const fallbackColleges = fallbackHits.map(hit => ({
+          label: hit.label,
+          value: hit.value || hit.objectID,
+        }));
+        return { colleges: fallbackColleges, loading: false };
+      }
+      
+      return { colleges, loading: false };
+    } catch (error) {
+      console.error('Algolia search error:', error);
+      // Fallback to empty array if search fails
+      return { colleges: [], loading: false };
+    }
+  }
+
+  try {
+    const {results} = await client.search({
+      requests: [{ indexName: 'colleges', query: searchQuery, hitsPerPage: 5 }],
+    });
+    const hits = results[0].hits;
+    const colleges = hits.map(hit => ({
+      label: hit.label,
+      value: hit.value || hit.objectID, // Fallback to Algolia's ID
+    }));
+    return { colleges, loading: false };
+  } catch (error) {
+    console.error('Algolia search error:', error);
+    return { colleges: [], loading: false };
+  }
+};
+
+const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, showQuestion = true }) => {
+  const [options, setOptions] = useState([]);
+  const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Load default colleges when component mounts
   useEffect(() => {
-    if (searchQuery.length < 1) {
-      setColleges([]);
+    const loadDefaultColleges = async () => {
+      setLoading(true);
+      const { colleges } = await getColleges('');
+      setOptions(colleges);
       setLoading(false);
+    };
+    
+    loadDefaultColleges();
+  }, []);
+
+  // Debounced search effect
+  useEffect(() => {
+    if (inputValue.length < 1) {
+      // When input is cleared, show default colleges again
+      const loadDefaultColleges = async () => {
+        setLoading(true);
+        const { colleges } = await getColleges('');
+        setOptions(colleges);
+        setLoading(false);
+      };
+      
+      loadDefaultColleges();
       return;
     }
 
     setLoading(true);
     const searchColleges = async () => {
-      try {
-        const {results} = await client.search({
-          requests: [{ indexName: 'colleges', query: searchQuery, hitsPerPage: 5 }],
-        });
-        const hits = results[0].hits;
-        setColleges(hits.map(hit => ({
-          label: hit.label,
-          value: hit.value || hit.objectID, // Fallback to Algolia's ID
-        })));
-      } catch (error) {
-        console.error('Algolia search error:', error);
-      } finally {
-        setLoading(false);
-      }
+      const { colleges } = await getColleges(inputValue);
+      setOptions(colleges);
+      setLoading(false);
     };
 
     const debouncedSearch = setTimeout(searchColleges, 300);
     return () => clearTimeout(debouncedSearch);
-  }, [searchQuery]);
-
-  return { colleges, loading };
-};
-
-const CollegeSearch = ({ question, selectedOption, onChange, type, showQuestion = true }) => {
-  const [options, setOptions] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-
-  const { colleges: searchResults, loading } = getColleges(inputValue);
-
-  useEffect(() => {
-    setOptions(searchResults);
-  }, [searchResults]);
+  }, [inputValue]);
 
   const handleInputChange = (inputValue) => {
     setInputValue(inputValue);
   };
 
+  // Create a wrapper function that knows which field to update
+  const handleCollegeChange = (selectedOption) => {
+    const fieldId = 'collegeInterestsOrDecision';
+    
+    if (isMultiSelect) {
+      // For multi-select, selectedOption is an array of college labels
+      const value = selectedOption || [];
+      handleChange(fieldId, value);
+    } else {
+      // For single select, selectedOption is a single college label
+      const value = selectedOption || '';
+      handleChange(fieldId, value);
+    }
+  };
+
+  // Get the current value for display
+  const getCurrentValue = () => {
+    const currentValue = selectedOptions.collegeInterestsOrDecision;
+    if (isMultiSelect) {
+      return Array.isArray(currentValue) ? currentValue : [];
+    } else {
+      return currentValue || '';
+    }
+  };
+
   return (
-    <OnboardingDropdown
-      question={question}
+    <CustomSelect
       options={options}
-      selectedOption={selectedOption ?? "N/A"}
-      onChange={onChange}
-      placeholder="Start typing..."
-      type={type}
+      value={getCurrentValue()}
+      onChange={handleCollegeChange}
+      placeholder="Start typing college name..."
+      isMulti={isMultiSelect}
+      isSearchable={true}
       onSearchQueryChange={handleInputChange}
-      showQuestion={showQuestion}
       isLoading={loading}
-      loadingMessage={() => <Loading size={24} className="dropdown-loading-spinner" />}
+      loadingMessage="Searching colleges..."
+      noOptionsMessage={inputValue ? `No colleges found for "${inputValue}"` : "No colleges available"}
     />
   );
 };

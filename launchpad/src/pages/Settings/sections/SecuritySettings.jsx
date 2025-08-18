@@ -84,7 +84,7 @@ const SecuritySettings = () => {
 
     return (
     <div className="settings-section">
-        <Toaster position={'bottom-right'} reverseOrder={false}/>
+        {/* <Toaster position={'bottom-right'} reverseOrder={false}/> */}
         <h2 className="settings-section-title">Security Settings</h2>
 
         <div className="settings-section-content">

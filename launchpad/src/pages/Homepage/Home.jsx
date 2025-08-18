@@ -145,7 +145,7 @@ export default function Home(){
         if (currentUser) {
             const idTokenResult = await currentUser.getIdTokenResult();
             const schoolId = idTokenResult.claims.school_id;
-            // console.log("School Id:", schoolId);
+            console.log("School Id!!!!:", schoolId);
 
             setUserBasicInfo((prev) => ({
                 ...prev, 

@@ -65,10 +65,8 @@ function GlobalAuthWrapper() {
   
       try {
         const schoolId = await getUserTokenInfo();
-        if(!localStorage.getItem("schoolId")){
-          localStorage.setItem("schoolId", schoolId);
-        }
-        console.log("School id: ", schoolId, "UID: ", currentUser.uid);
+        localStorage.setItem("schoolId", schoolId);
+        console.log("School id: ", localStorage.getItem("schoolId"), "UID: ", currentUser.uid);
         const userRef = doc(db, "tenants", schoolId, 'users', currentUser.uid);
         async function initializeApp() {
           if (currentUser && !isConnected) {

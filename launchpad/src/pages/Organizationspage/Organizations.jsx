@@ -209,7 +209,7 @@ export default function Organizations(){
 
     return(
         <>
-            <Toaster position={'bottom-right'} reverseOrder={false}/>
+            {/* <Toaster position={'bottom-right'} reverseOrder={false}/> */}
             <TopBar/>
             <SideNav/>
             <div className={`organizationsContainer ${isSidebarCollapsed ? 'organizations-sidebar-collapsed' : 'organizations-sidebar-expanded'}`}>

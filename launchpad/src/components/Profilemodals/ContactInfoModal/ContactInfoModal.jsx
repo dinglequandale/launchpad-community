@@ -73,7 +73,7 @@ export default function ContactInfoModal({userData, visibility, onClose}){
 
   return (
     <>
-      <Toaster position="bottom-right" reverseOrder={false} />
+      {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       {visibility && (
         <div className="v0-modal-overlay" onClick={onClose}>

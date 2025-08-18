@@ -170,9 +170,9 @@ export default function AllConnectionsModal({ onClose, onViewProfile }) {
 
   return (
     <>
-      <div style={{zIndex: 9999}}>
+      {/* <div style={{zIndex: 9999}}>
         <Toaster position="bottom-right" reverseOrder={false}/>
-      </div>
+      </div> */}
       <div className="all-connections-modal-overlay" onClick={onClose}>
         <div className="all-connections-modal" onClick={(e) => e.stopPropagation()}>
           <div className="all-connections-modal-header">

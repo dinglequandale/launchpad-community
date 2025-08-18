@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import "../../pages/Onboarding/onboarding.css";
 import "./basic_user_info.css";
 import OnboardingDropdown from "../OnboardingDropdown/OnboardingDropdown";
+import CustomSelect from "../CustomSelect";
 import { BiEdit, BiShield, BiTrash, BiUpload } from "react-icons/bi";
 import { FaRegFilePdf } from "react-icons/fa6";
 import { validateLinkedInUrl } from "../../services/userProfileServices";
@@ -89,67 +90,100 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
       </div>
 
       <div className="onboarding-dropdown-container-secondary">
-        <OnboardingDropdown
-          key={questionsForPage[2].id}
-          question={questionsForPage[2].text}
+        <label className="onboardingQuestion">{questionsForPage[2].text}</label>
+        <CustomSelect
           options={questionsForPage[2].options}
-          selectedOption={selectedOptions[questionsForPage[2].id] || (questionsForPage[2].type === 'multi-select' ? [] : '')}
+          value={selectedOptions[questionsForPage[2].id] || []}
           onChange={(label) => handleChange(questionsForPage[2].id, label)}
-          type={questionsForPage[2].type}
-          onSearchQueryChange={questionsForPage[2].id === 'whatCollege' ? onSearchQueryChange : null}
+          placeholder="Type to search..."
+          isMulti={true}
+          isSearchable={true}
         />
       </div>
       
       {questionsForPage[3] && (
         <>
           {selectedOptions.userType === "High Schooler" ? (
-            <div className="file-upload-container" style={{position: "relative"}}>
-              <label className="onboardingQuestion" style={{position: "relative"}}>
-                {questionsForPage[3].text}
-                {questionsForPage[3].optional && (
-                  <div className="onboarding-optional-label-container">
-                    <OptionalLabel />
-                  </div>
-                )}
-              </label>
-              <div className="file-upload-preview">
-                {selectedOptions.userResumePreview ? (
-                  <div className="btnFileUpload onboarding-upload" style={{position: "relative"}}>
-                    <FaRegFilePdf size={25} />
-                    <span className="file-name">{selectedOptions.userResume.name}</span>
-                    <div className="preview-actions" style={{top: "-15px"}}>
-                      <button onClick={() => triggerFileInput(resumeInputRef)} className="action-button">
-                        <BiEdit size={20} />
-                      </button>
-                      <button onClick={() => removeFile('resume')} className="action-button">
-                        <BiTrash size={20} />
-                      </button>
+            <>
+              <div className="file-upload-container" style={{position: "relative"}}>
+                <label className="onboardingQuestion" style={{position: "relative"}}>
+                  {questionsForPage[3].text}
+                  {/* {questionsForPage[3].optional && (
+                    <div className="onboarding-optional-label-container">
+                      <OptionalLabel />
                     </div>
-                  </div>
-                ) : (
-                  <button onClick={() => triggerFileInput(resumeInputRef)} className="btnFileUpload onboarding-upload">
-                    <BiUpload size={25} />
-                    <span>Upload Your Resume</span>
-                  </button>
-                )}
-              </div>
-              <input 
-                type="file"
-                ref={resumeInputRef}
-                onChange={(e) => handleFileChange(e, 'resume')}
-                accept=".pdf"
-                style={{ display: 'none' }}
-              />
-              <div className="onboarding-linkedin-overlay" style={{ display: linkedInOptionSelected ? "block" : "none" }}>
-                <input
-                  type="link"
-                  onChange={(e) => handleChange("linkedinLink", e.target.value)}
-                  placeholder="Paste your LinkedIn profile link here"
-                  value={selectedOptions["linkedinLink"]}
-                  className="onboardingInput onboarding-linkedin-input"
+                  )} */}
+                </label>
+                <div className="file-upload-preview">
+                  {selectedOptions.userResumePreview ? (
+                    <div className="btnFileUpload onboarding-upload" style={{position: "relative"}}>
+                      <FaRegFilePdf size={25} />
+                      <span className="file-name">{selectedOptions.userResume.name}</span>
+                      <div className="preview-actions" style={{top: "-15px"}}>
+                        <button onClick={() => triggerFileInput(resumeInputRef)} className="action-button">
+                          <BiEdit size={20} />
+                        </button>
+                        <button onClick={() => removeFile('resume')} className="action-button">
+                          <BiTrash size={20} />
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button onClick={() => triggerFileInput(resumeInputRef)} className="btnFileUpload onboarding-upload">
+                      <BiUpload size={25} />
+                      <span>Upload Your Resume</span>
+                    </button>
+                  )}
+                </div>
+                <input 
+                  type="file"
+                  ref={resumeInputRef}
+                  onChange={(e) => handleFileChange(e, 'resume')}
+                  accept=".pdf"
+                  style={{ display: 'none' }}
                 />
               </div>
-            </div>
+              
+              {/* LinkedIn Input Field - Now positioned underneath resume upload */}
+              <div className="linkedin-input-container">
+                <div className="linkedin-toggle-section">
+                  <button 
+                    className={`linkedin-toggle-btn ${linkedInOptionSelected ? 'active' : ''}`}
+                    onClick={() => setLinkedInOptionSelected(!linkedInOptionSelected)}
+                  >
+                    <span className="toggle-icon">
+                      {linkedInOptionSelected ? '−' : '+'}
+                    </span>
+                    {linkedInOptionSelected ? 'Hide LinkedIn Profile' : 'Add LinkedIn Profile'}
+                  </button>
+                </div>
+                
+                <div className={`linkedin-input-wrapper ${linkedInOptionSelected ? 'expanded' : ''}`}>
+                  <input
+                    type="url"
+                    onChange={(e) => handleChange("linkedinLink", e.target.value)}
+                    placeholder="https://www.linkedin.com/in/your-profile"
+                    value={selectedOptions["linkedinLink"] || ''}
+                    className="onboardingInput linkedin-profile-input"
+                  />
+                  {selectedOptions["linkedinLink"] && (
+                    <div className="linkedin-verification-status">
+                      {validateLinkedInUrl(selectedOptions["linkedinLink"]) ? (
+                        <div className="verification-badge verified">
+                          <BiShield size={16} />
+                          <span>Valid LinkedIn URL</span>
+                        </div>
+                      ) : (
+                        <div className="verification-badge unverified">
+                          <GoUnverified size={16} />
+                          <span>Invalid LinkedIn URL</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
           ) : (
             <div className="onboarding-linkedin-section">
               <span className="onboardingQuestion">{questionsForPage[3].text}</span>
@@ -170,25 +204,13 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
               )}
               <div>
                 <input
-                  type="link"
+                  type="url"
                   onChange={(e) => handleChange("linkedinLink", e.target.value)}
                   placeholder="https://www.linkedin.com/in/your-profile"
                   value={selectedOptions["linkedinLink"]}
                   className="onboardingInput"
                 />
               </div>
-            </div>
-          )}
-          
-          {(selectedOptions.linkedinLink !== undefined && selectedOptions.userType === "High Schooler") && (
-            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
-              <button 
-                className={`btnText ${linkedInOptionSelected ? 'active' : ''}`}
-                style={{fontSize: "19px"}}
-                onClick={() => setLinkedInOptionSelected(!linkedInOptionSelected)}
-              >
-                Or click here to link your LinkedIn profile.
-              </button>
             </div>
           )}
         </>

@@ -209,7 +209,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
 
   return(
     <>
-      <Toaster position="bottom-right" reverseOrder={false} />
+      {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
       <MakeChanges visibility={makeChangesVisibility} onCancel={()=>setMakeChangesVisibility(false)} onVerify={onClose}/>
       {visibility && (
         <div className="v0-modal-overlay" onClick={onClose}>

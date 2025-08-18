@@ -77,7 +77,7 @@ export default function SkillModal({visibility, onClose, userData}) {
 
     return (
         <>
-            <Toaster position="bottom-right" reverseOrder={false} />
+            {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
             {visibility && (
                 <div className="v0-modal-overlay" onClick={onClose}>
                     <div className="v0-modal-container" onClick={(e) => e.stopPropagation()} ref={modalRef}>

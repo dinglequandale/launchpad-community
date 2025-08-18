@@ -1,5 +1,5 @@
 import React from 'react';
-import Select from 'react-select';
+import CustomSelect from '../CustomSelect';
 import "./onboardingdropdown.css";
 
 export default function OnboardingDropdown({ question, options, selectedOption, onChange, type, onSearchQueryChange, showQuestion=true, placeholder=null, isLoading=false, loadingMessage="" }) {
@@ -40,34 +40,18 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
     return (
         <div className="dropDownContainer">
             {showQuestion && <label>{typeof question === 'string' ? question : question?.text || ''}</label>}
-            {type === 'multi-select' ? (
-                <Select
-                    defaultValue={getValue()}
-                    isMulti
-                    onChange={handleChange}
-                    onInputChange={handleInputChange}
-                    options={options}
-                    noOptionsMessage={() => null}
-                    components={{ IndicatorSeparator: null }} 
-                    closeMenuOnSelect={false}
-                    placeholder={placeholder ?? "Type..."}
-                    isLoading={isLoading}
-                    loadingMessage={loadingMessage}
-                />
-            ) : (
-                <Select
-                    // value={options.find(option => option.label === selectedOption)}
-                    value={getValue()}
-                    onChange={handleChange}
-                    placeholder={placeholder ?? "Type..."}
-                    onInputChange={handleInputChange}
-                    options={options}
-                    noOptionsMessage={() => null}
-                    components={{ IndicatorSeparator: null }}
-                    isLoading={isLoading}
-                    loadingMessage={loadingMessage}
-                />
-            )}
+            <CustomSelect
+                options={options}
+                value={type === 'multi-select' ? selectedOption : selectedOption}
+                onChange={onChange}
+                placeholder={placeholder ?? "Type..."}
+                isMulti={type === 'multi-select'}
+                isSearchable={!!onSearchQueryChange}
+                onSearchQueryChange={handleInputChange}
+                isLoading={isLoading}
+                loadingMessage={loadingMessage}
+                noOptionsMessage="No options available"
+            />
         </div>
     );
 }

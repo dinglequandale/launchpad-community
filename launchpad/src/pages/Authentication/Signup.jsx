@@ -5,6 +5,8 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import emailData from "../../json_data/studentEmailData.json";
+import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from "../../services/onboardingServices";
+import { getConnectionsByStatus } from "../../services/connectionService";
 
 export default function SignUp(){
     const { userLoggedIn } = useAuth();
@@ -27,7 +29,7 @@ export default function SignUp(){
         return <Navigate to="/school-signup" replace={true}/>;
     }
 
-    const checkSchoolEmail = (inputFrag, school="awty") => {
+    const checkSchoolEmail = (inputFrag, school) => {
         // Convert input to lowercase for case-insensitive comparison
         const lowerCaseInputFrag = inputFrag.toLowerCase();
 
@@ -40,6 +42,46 @@ export default function SignUp(){
         setEmailValid(isEmailFound); 
         return foundStudent;
       };
+
+    // Fetch and store connections for new users
+    const fetchAndStoreConnections = async () => {
+        try {
+            if (schoolId) {
+                const parentPendingResult = await getConnectionsByStatus(schoolId, 'pending_parental_approval');
+                const parentApprovedResult = await getConnectionsByStatus(schoolId, 'parent_approved');
+                
+                // Extract user IDs from the connections
+                const pendingUserIds = parentPendingResult.connections?.map(conn => 
+                    conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+                ) || [];
+                
+                const parentApprovedUserIds = parentApprovedResult.connections?.map(conn => 
+                    conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+                ) || [];
+                
+                localStorage.setItem('pendingConnections', JSON.stringify(pendingUserIds));
+                localStorage.setItem('approvedConnections', JSON.stringify(parentApprovedUserIds));
+            }
+        } catch (error) {
+            console.error('Error fetching connections:', error);
+        }
+    };
+
+    // Run profile completion logic for new users
+    const runProfileCompletionLogic = async (userData) => {
+        try {
+            // Package basic user info to localStorage
+            packageBasicUserInfoToLS(userData);
+            
+            // Push initial profile completion data
+            pushInitialProfileCompletion(userData);
+            
+            // Fetch and store connections
+            await fetchAndStoreConnections();
+        } catch (error) {
+            console.error('Error running profile completion logic:', error);
+        }
+    };
     
 
     const handleSubmit = async (e) => {
@@ -64,11 +106,11 @@ export default function SignUp(){
             setEmailValid(true);
         }
         if(userPassword.length <= 6){
-            toast.error("Sorry! Your password requires at least 7 characters.");
+            toast.error("Password must be at least 7 characters long.");
             return;
         }
         if(userPassword && userPassword !== confirmedPassword){
-            toast.error("Sorry! Your password verification does not match the original password.")
+            toast.error("Passwords do not match. Please try again.")
             return;
         }
         
@@ -78,43 +120,80 @@ export default function SignUp(){
                 // console.log("Student record: ", studentRecord.graduation_year);
                 localStorage.setItem("tempStudentInfo", JSON.stringify(studentRecord));
                 const emailToUse = schoolEmailCondition ? userEmail + emailData[0].email_hook : userEmail;
-                await toast.promise(
+                const userCredential = await toast.promise(
                     doCreateUserWithEmailAndPassword(emailToUse, userPassword),
                     {
                         loading: 'Creating your account ...',
-                        success: "You're set!",
-                        error: (err) => `Error. Please try again!`
+                        success: "Account created successfully!",
+                        error: (err) => {
+                            if (err.code === 'auth/email-already-in-use') {
+                                return 'An account with this email already exists.';
+                            } else if (err.code === 'auth/invalid-email') {
+                                return 'Please enter a valid email address.';
+                            } else if (err.code === 'auth/weak-password') {
+                                return 'Password is too weak. Please choose a stronger password.';
+                            } else if (err.code === 'auth/operation-not-allowed') {
+                                return 'Email/password accounts are not enabled.';
+                            } else {
+                                return 'Failed to create account. Please try again.';
+                            }
+                        }
                     }
                 );
                 
-                navigate("/Onboarding", {state: tempSchoolInfo});
+                // Run profile completion logic for new users
+                if (userCredential && userCredential.user) {
+                    await runProfileCompletionLogic(studentRecord || {});
+                }
+                
+                navigate("/Home");
             } catch (error) {
                 console.error("Error creating account:", error);
+                // Error is already handled by toast.promise
             } finally {
                 setUserIsSigningIn(false);
             }
         }
     }
 
-    const onContinueWithGoogle = (e) => {
+    const onContinueWithGoogle = async (e) => {
         e.preventDefault();
         if(!userIsSigningIn){
             setUserIsSigningIn(true);
-            doSignInWithGoogle().catch(error => {
+            try {
+                const userCredential = await doSignInWithGoogle();
+                
+                // Run profile completion logic for new Google users
+                if (userCredential && userCredential.user) {
+                    await runProfileCompletionLogic({});
+                }
+                
+                navigate("/Home");
+            } catch (error) {
+                console.error("Error signing in with Google:", error);
+                if (error.code === 'auth/popup-closed-by-user') {
+                    toast.error("Sign-in cancelled. Please try again.");
+                } else if (error.code === 'auth/popup-blocked') {
+                    toast.error("Pop-up blocked. Please allow pop-ups and try again.");
+                } else if (error.code === 'auth/network-request-failed') {
+                    toast.error("Network error. Please check your connection and try again.");
+                } else if (error.code === 'auth/account-exists-with-different-credential') {
+                    toast.error("An account already exists with this email. Please sign in instead.");
+                } else {
+                    toast.error("Sign-in failed. Please try again.");
+                }
+            } finally {
                 setUserIsSigningIn(false);
-                toast.error("Sorry! There was an issue signing you in. Try again!");
-            }).then(()=>{
-                navigate("/Onboarding", {state: tempSchoolInfo});
-            })
+            }
         }
     }
 
     return(
         <>
         <div>
-        <Toaster
+        {/* <Toaster
         position="bottom-right"
-        reverseOrder={false}/>
+        reverseOrder={false}/> */}
         </div>
         
         {userLoggedIn && (<Navigate to='/Home' replace={true}/>)}

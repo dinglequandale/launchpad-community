@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
+import CustomSelect from '../../../components/CustomSelect';
 import { highSchools, careerInterests, graduationYears, CollegeSearch } from './../Options';
-import { requiredQuestionsAnswered, saveHighSchooler } from '../../../services/onboardingServices';
+import { requiredQuestionsAnswered } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import EmailConfirmation from '../EmailConfirmation';
 import { FaExclamationTriangle, FaShieldAlt } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { parentVerificationInitialTemplate } from '../../../utils/parentVerificationTemplates';
+
+// Move getEmail function creation outside component to prevent recreation on every render
+const getEmail = httpsCallable(getFunctions(), 'getEmail');
 
 function SafetyWarning({isShortened = true}) {
   const [isExpanded, setIsExpanded] = useState(isShortened);
@@ -77,12 +80,15 @@ const highSchoolQuestionsConfig = [
   },
   {
     id: "linkedinLink",
+    text: "LinkedIn Profile (optional)",
     optional: true,
     page: 1
   },
   {
     id: "email",
-    optional: true
+    text: "Email (optional)",
+    optional: true,
+    page: 1
   },
   // Page 2
   {
@@ -106,6 +112,7 @@ const highSchoolQuestionsConfig = [
     type: (collegeChosen) => collegeChosen ? 'select' : 'multi-select',
     options: [],
     page: 3,
+    optional: true
   },
   // Page 4
   {
@@ -117,39 +124,44 @@ const highSchoolQuestionsConfig = [
   // Page 5
   {
     id: "parentRequested",
+    text: "Parent Verification Requested",
+    optional: true,
     page: 5
   },
 ]
 
-export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, schoolInfo}) {
-  const navigate = useNavigate();
-  const { currentUser } = useAuth();
-  const getEmail = httpsCallable(getFunctions(), 'getEmail');
-
+export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, setCanSubmit, setUserData }) {
+  
   const tempStudentInfo = JSON.parse(localStorage.getItem('tempStudentInfo') || '{}');
-
   const [highSchoolerData, setHighSchoolerData] = useState({
-    userAboutMe: '',
     userName: tempStudentInfo.full_name ? 
       tempStudentInfo.full_name.split(', ')[1] + ' ' + tempStudentInfo.full_name.split(', ')[0] : '',
-    schoolAttending: schoolInfo.schoolDisplayName,
-    schoolId: schoolInfo.schoolId,
-    graduationYear: tempStudentInfo.graduation_year,
-    areasOfInterest: [],
-    userSkills: [],
-    collegeDecision: '',
-    collegeInterestsOrDecision: [],
-    userResume: null,
-    userResumePreview: '',
-    email: '',
-    userType: 'High Schooler',
-    userPfpPreview: '',
     userPfp: null,
-    linkedinLink: '',
-    parentEmail: '',
-    parentVerified: false,
+    userPfpPreview: null,
+    areasOfInterest: [],
+    userResume: null,
+    userResumePreview: null,
+    linkedinLink: "",
+    email: "",
+    graduationYear: tempStudentInfo.graduation_year,
+    collegeDecision: "",
+    collegeInterestsOrDecision: [],
+    schoolAttending: schoolInfo?.schoolDisplayName || "",
+    schoolId: schoolInfo?.schoolId || "",
+    parentEmail: "",
     parentRequested: false,
+    parentVerified: false,
+    userType: "High Schooler",
   });
+
+  const { currentUser } = useAuth();
+
+  // const tempStudentInfo = JSON.parse(localStorage.getItem('tempStudentInfo') || '{}');
+
+  // Update parent component with user data whenever it changes
+  useEffect(() => {
+    setUserData(highSchoolerData);
+  }, [highSchoolerData, setUserData]);
 
   const transformFullName = (name) => {
     if (!name) return '';
@@ -161,18 +173,6 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
     return name;
   };
 
-  const handleSubmit = async () => {
-    try {
-      await saveHighSchooler(currentUser, highSchoolerData, () => {
-        toast.success('Profile saved successfully!');
-        navigate('/home');
-      });
-    } catch (error) {
-      console.error('Error saving high schooler data:', error);
-      toast.error('Failed to save profile');
-    }
-  };
-
   const handleChange = (id, label) => {
     setHighSchoolerData(prev => ({
       ...prev,
@@ -180,6 +180,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
     }));
   };
 
+  // Fetch user email on component mount
   useEffect(() => {
     const getUserEmail = async () => {
       try {
@@ -187,15 +188,18 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
         if (result.data) {
           setHighSchoolerData(prev => ({
             ...prev,
-            email: result.data
+            email: result.data.email
           }));
         }
       } catch (error) {
-        console.error('Error getting user email:', error);
+        console.error('Error fetching user email:', error);
       }
     };
-    getUserEmail();
-  }, [currentUser.uid, getEmail]);
+
+    if (currentUser) {
+      getUserEmail();
+    }
+  }, [currentUser]);
 
   const renderPage = () => {
     switch(currentPage) {
@@ -242,6 +246,7 @@ export default function HighSchooler({currentPage, isSubmitting, setCanSubmit, s
               selectedOptions={highSchoolerData}
               handleChange={handleChange}
               currentUser={currentUser}
+              schoolInfo={schoolInfo}
             />
           </div>
         );
@@ -298,15 +303,17 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
           Have you decided on a college yet?
         </label>
         <div className="input-group">
-          <select 
-            className="form-input"
+          <CustomSelect
+            options={[
+              { value: 'Yes', label: 'Yes' },
+              { value: 'No', label: 'No' }
+            ]}
             value={selectedOptions.collegeDecision || ''}
-            onChange={(e) => handleCollegeDecisionChange(e.target.value)}
-          >
-            <option value="">Select an option</option>
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-          </select>
+            onChange={handleCollegeDecisionChange}
+            placeholder="Select an option"
+            isMulti={false}
+            isSearchable={false}
+          />
         </div>
       </div>
 
@@ -339,7 +346,7 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
   );
 };
 
-const ParentEmailPage = ({ selectedOptions, handleChange, currentUser }) => {
+const ParentEmailPage = ({ selectedOptions, handleChange, currentUser, schoolInfo }) => {
   const [parentEmail, setParentEmail] = useState(selectedOptions.parentEmail || '');
   const [isRequesting, setIsRequesting] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
@@ -362,8 +369,26 @@ const ParentEmailPage = ({ selectedOptions, handleChange, currentUser }) => {
   const handleRequestAccess = async () => {
     if (!validateParentEmail()) return;
 
+    // Validate that we have the required school information
+    if (!schoolInfo || !schoolInfo.schoolId) {
+      toast.error('School information is missing. Please refresh the page and try again.');
+      console.error('Missing school information in handleRequestAccess:', schoolInfo);
+      return;
+    }
+
     setIsRequesting(true);
     try {
+
+      const generateVerificationLink = httpsCallable(getFunctions(), "generateVerificationLink");
+      const verificationLinkResult = await generateVerificationLink({
+        uid: currentUser.uid,
+        action: "verify_account",
+        schoolId: schoolInfo.schoolId, // Use schoolInfo prop instead of localStorage
+      });
+
+      // Extract the verification link from the result
+      const verificationLink = verificationLinkResult.data;
+
       const sendSESEmail = httpsCallable(getFunctions(), 'sendSESEmail');
       await sendSESEmail({
         recipient: [parentEmail],
@@ -371,7 +396,7 @@ const ParentEmailPage = ({ selectedOptions, handleChange, currentUser }) => {
         htmlTemplate: parentVerificationInitialTemplate({
           studentName: selectedOptions.userName ? selectedOptions.userName.split(" ")[0] : "",
           parentName: "",
-          verificationLink: "https://launchpad.com/verify", // This would be generated
+          verificationLink: verificationLink,
         }),
         emailType: "parent_verification"
       });

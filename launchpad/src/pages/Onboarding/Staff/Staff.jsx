@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { getFunctions, httpsCallable } from "firebase/functions";
+import React, { useState, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import { highSchools } from './../Options';
-import { careerInterests } from './../Options';
+import CustomSelect from '../../../components/CustomSelect';
+import { highSchools, careerInterests, graduationYears, CollegeSearch } from './../Options';
+import { requiredQuestionsAnswered } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { saveStaff } from '../../../services/onboardingServices';
+import { BiPlus, BiTrash } from 'react-icons/bi';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import EmailConfirmation from '../EmailConfirmation';
 
 // Move getEmail function creation outside component to prevent recreation on every render
 const getEmail = httpsCallable(getFunctions(), 'getEmail');
@@ -92,67 +93,58 @@ const staffQuestionsConfig = [
   },
 ];
 
-export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolInfo }) {
-  const navigate = useNavigate();
-  const { currentUser } = useAuth();
+export default function Staff({currentPage, isSubmitting, setCanSubmit, schoolInfo, setUserData}) {
 
-  // Pre-fill school if provided
+  const {currentUser} = useAuth();
+
   const [staffData, setStaffData] = useState({
-    userName: '',
-    userPfpPreview: '',
-    schoolAttending: schoolInfo?.schoolDisplayName || '',
-    schoolId: schoolInfo?.schoolId || '',
-    schoolRole: '',
-    personalEmail: '',
-    // phoneNumber: '',
-    linkedinLink: '',
-    userAboutMe: '',
-    areasOfInterest: [],
+    userName: "",
     userPfp: null,
-    userType: 'Staff',
-    sponsoredClubs: '',
-    email: '', // login email
+    userPfpPreview: null,
+    areasOfInterest: [],
+    linkedinLink: "",
+    email: "",
+    schoolRole: "",
+    personalEmail: "",
+    sponsoredClubs: "",
+    userAboutMe: "",
+    schoolId: schoolInfo?.schoolId || "",
+    userType: "Staff",
   });
 
-  // Fetch login email for reference - fixed dependency array
+  // Update parent component with user data whenever it changes
   useEffect(() => {
-    const fetchEmail = async () => {
+    setUserData(staffData);
+  }, [staffData, setUserData]);
+
+  // Fetch user email on component mount
+  useEffect(() => {
+    const getUserEmail = async () => {
       try {
-        const result = await getEmail();
-        setStaffData(prev => ({ ...prev, email: result.data.email }));
-      } catch (e) {
-        // fallback: do nothing
+        const result = await getEmail({ uid: currentUser.uid });
+        if (result.data) {
+          setStaffData(prev => ({
+            ...prev,
+            email: result.data.email
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching user email:', error);
       }
     };
-    fetchEmail();
-  }, []); // Empty dependency array since getEmail is now stable
 
-  // Validation: require name, school, role, work email, and areasOfInterest
+    if (currentUser) {
+      getUserEmail();
+    }
+  }, [currentUser]);
+
+  // Check if all required questions are answered
   useEffect(() => {
-    const required = staffData.userName && staffData.schoolRole && staffData.areasOfInterest && staffData.areasOfInterest.length > 0;
-    setCanSubmit(!!required);
+    const canSubmit = requiredQuestionsAnswered(staffQuestionsConfig, staffData);
+    setCanSubmit(canSubmit);
   }, [staffData, setCanSubmit]);
 
-  // Handle submit
-  const handleSubmit = async () => {
-    try {
-      // TODO: Replace with saveStaff service
-      await saveStaff(currentUser, staffData, () => {
-        // Success callback
-        toast.success('Information saved successfully!');
-        navigate("/Home");
-    });
-    } catch (error) {
-      toast.error('Failed to save information. Please try again.');
-    }
-  };
-
-  useEffect(() => {
-    if (isSubmitting) {
-      handleSubmit();
-    }
-    // eslint-disable-next-line
-  }, [isSubmitting]);
+  // Remove the old save logic since it's now handled by the parent
 
   // Handle field changes
   const handleChange = (id, value) => {
@@ -188,12 +180,13 @@ export default function Staff({ currentPage, isSubmitting, setCanSubmit, schoolI
                       placeholder={question.placeholder}
                     />
                   ) : question.type === 'multi-select' ? (
-                    <OnboardingDropdown
-                      question={question.text}
+                    <CustomSelect
                       options={question.options}
-                      selectedOption={staffData[question.id] || []}
+                      value={staffData[question.id] || []}
                       onChange={selected => handleChange(question.id, selected)}
-                      type={question.type}
+                      placeholder="Type to search..."
+                      isMulti={true}
+                      isSearchable={true}
                     />
                   ) : (
                     <input

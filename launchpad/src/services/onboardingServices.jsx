@@ -110,7 +110,7 @@ export const saveStaff = async (currentUser, staffData, onSuccess) => {
 export const requiredQuestionsAnswered = (questionConfig, userData) => {
     const requiredQuestions = questionConfig.filter((question)=>!question.optional);
     const emptyRequiredQuestions = requiredQuestions.filter((question)=>(userData[question.id] === "" || userData[question.id] === null || (Array.isArray(userData[question.id]) && userData[question.id].length===0) || userData[question.id] === false));
-    console.log("EMPTY STUFF: ", emptyRequiredQuestions);
+    // console.log("EMPTY STUFF: ", emptyRequiredQuestions);
     return emptyRequiredQuestions.length === 0;
 }
 

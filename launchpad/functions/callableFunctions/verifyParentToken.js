@@ -5,6 +5,17 @@ exports.verifyParentToken = functions.https.onCall(async (data, context) => {
     console.log('verifyParentToken called with data:', data);
     const { token, decision, schoolId, parentName="" } = data;
 
+    // Validate required parameters
+    if (!token || !schoolId) {
+        console.error('Missing required parameters:', { token, schoolId });
+        throw new functions.https.HttpsError('invalid-argument', 'Missing required parameters: token and schoolId are required.');
+    }
+
+    if (schoolId === 'undefined' || schoolId === 'null' || schoolId === '') {
+        console.error('Invalid schoolId:', schoolId);
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid school ID provided.');
+    }
+
     try {
         const tokenDoc = await admin.firestore().collection('tenants').doc(schoolId).collection('parent_verification_tokens').doc(token).get();
         console.log('tokenDoc.exists:', tokenDoc.exists);

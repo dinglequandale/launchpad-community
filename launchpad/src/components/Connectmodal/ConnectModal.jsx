@@ -289,10 +289,10 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
           </footer>
         </div>
       </div>
-      
+{/*       
       <div style={{zIndex: 9999}}>
         <Toaster position={'bottom-right'} reverseOrder={false} />
-      </div>
+      </div> */}
     </div>
   );
 }

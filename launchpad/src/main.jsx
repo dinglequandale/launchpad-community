@@ -31,6 +31,7 @@ import LandingPageRevamped from './pages/landing_page/LandingPageRevamped.jsx';
 import UserType from './pages/Onboarding/UserType.jsx';
 import { ModalProvider } from './contexts/ModalContext.jsx';
 import { ConnectionProvider } from './contexts/ConnectionContext';
+import { Toaster } from 'react-hot-toast';
 
 const ErrorPage = () => {
   return (
@@ -103,6 +104,16 @@ const Root = () => {
       <ReportProvider>
         <ModalProvider>
           <ReportModal />
+          <Toaster 
+            position="bottom-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+            }}
+          />
           <Outlet />
         </ModalProvider>
       </ReportProvider>

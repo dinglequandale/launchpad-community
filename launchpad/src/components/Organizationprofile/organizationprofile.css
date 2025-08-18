@@ -11,6 +11,10 @@
   flex-direction: column;
   gap: 20px;
   animation: slideIn 0.4s ease-out;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  /* overflow: hidden; */
 }
 
 .v0-organization-card:hover {
@@ -189,6 +193,10 @@
 
 .v0-organization-description {
   position: relative;
+  width: 100%;
+  max-width: 70%;
+  box-sizing: border-box;
+  /* overflow-wrap: break-word; Prevent horizontal overflow */
 }
 
 .v0-description-text {
@@ -196,6 +204,11 @@
   line-height: 1.6;
   color: #374151;
   white-space: pre-line;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .v0-description-text.contracted {
@@ -734,6 +747,11 @@
     font-size: 14px;
     line-height: 1.4;
     word-break: break-word;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .v0-organization-dates {
@@ -825,6 +843,11 @@
   .v0-description-text {
     font-size: 13px;
     word-break: break-word;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .v0-date-item,
@@ -861,6 +884,15 @@
   .v0-organization-card {
     padding: 8px;
     gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .v0-organization-wide {
+    min-width: auto;
+    width: 100%;
+    max-width: 100%;
   }
   
   .v0-organization-logo img {
@@ -870,15 +902,26 @@
   
   .v0-organization-name {
     font-size: 14px;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
   
   .v0-organization-type-badge {
     font-size: 9px;
     padding: 1px 3px;
+    white-space: normal;
+    word-break: break-word;
   }
   
   .v0-description-text {
     font-size: 12px;
+    word-break: break-word;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: normal; /* Override pre-line for very narrow widths */
   }
   
   .v0-date-item,

@@ -71,7 +71,10 @@ export default function FAQs() {
         <div className='legality-holder'>
             <LegalityGoBack />
             <div className="faq-container">
-                <h2>FAQs</h2>
+                <div className="faq-header">
+                    <h2 className="faq-title">Frequently Asked Questions</h2>
+                    <p className="faq-subtitle">Everything you need to know about Launchpad</p>
+                </div>
                 <div className="faq-list">
                     {faqData.map((faq, index) => (
                         <div key={index} className="faq-item">
@@ -79,13 +82,15 @@ export default function FAQs() {
                                 className="faq-question" 
                                 onClick={() => toggleFAQ(index)}
                             >
-                                <h3>{faq.question}</h3>
-                                <span className={`plus-icon ${openFAQs[index] ? 'open' : ''}`}>+</span>
+                                <h3 className="faq-question-text">{faq.question}</h3>
+                                <span className={`faq-icon ${openFAQs[index] ? 'open' : ''}`}>
+                                    {openFAQs[index] ? '−' : '+'}
+                                </span>
                             </div>
                             {openFAQs[index] && (
                                 <div className="faq-answer">
                                     {faq.answer.map((paragraph, pIndex) => (
-                                        <p key={pIndex}>{paragraph}</p>
+                                        <p key={pIndex} className="faq-answer-text">{paragraph}</p>
                                     ))}
                                 </div>
                             )}

@@ -10,11 +10,37 @@ export default function ParentVerificationPage() {
   const mode = searchParams.get('mode') || 'verify_account'; // 'account' or 'connection'
   const token = searchParams.get('token');
   const schoolId = searchParams.get('school');
+  
+  // Validate that we have the required parameters
+  if (!token || !schoolId) {
+    return (
+      <div className="verification-page">
+        <div className="verification-container">
+          <div className="verification-header">
+            <img src="/assets/launchpad_logo.png" alt="Launchpad Logo" className="logo" />
+            <h1>Invalid Verification Link</h1>
+          </div>
+          <div className="verification-content">
+            <div className="error-icon">⚠</div>
+            <h2>Invalid or Missing Information</h2>
+            <p>This verification link is missing required information. Please request a new verification link from your student.</p>
+            <div className="verification-actions">
+              <a href="https://launchpadhouston.com" className="home-link">
+                Return to Launchpad
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const [parentName, setParentName] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [connectionDecision, setConnectionDecision] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errorType, setErrorType] = useState(''); // 'general', 'student_setup', 'token_expired', 'connection_issue'
 
   const [studentEmail, setStudentEmail] = useState("");
   const [connectionUserName, setConnectionUserName] = useState("");
@@ -24,11 +50,54 @@ export default function ParentVerificationPage() {
   const childName = searchParams.get('child') || 'your child';
   const connectionName = searchParams.get('connection') || 'the professional';
 
+  const getErrorMessage = (error, errorType) => {
+    if (errorType === 'student_setup') {
+      return {
+        title: 'Student Account Setup Required',
+        message: 'Your student needs to complete their Launchpad account setup before you can verify their account. Please ask them to finish setting up their profile and try again.',
+        action: 'Contact your student to complete their account setup'
+      };
+    } else if (errorType === 'token_expired') {
+      return {
+        title: 'Verification Link Expired',
+        message: 'This verification link has expired. Please request a new one from your student or contact Launchpad support.',
+        action: 'Request a new verification link'
+      };
+    } else if (errorType === 'connection_issue') {
+      return {
+        title: 'Connection Request Issue',
+        message: 'There was an issue processing the connection request. This might be because the student hasn\'t completed their profile setup yet.',
+        action: 'Ask your student to complete their profile and try again'
+      };
+    } else {
+      return {
+        title: 'Something went wrong',
+        message: 'We encountered an unexpected error. This might be because your student\'s account isn\'t fully set up yet.',
+        action: 'Please try again or contact Launchpad support if the issue persists'
+      };
+    }
+  };
+
+  const analyzeError = (errorMessage) => {
+    const message = errorMessage.toLowerCase();
+    
+    if (message.includes('student') || message.includes('account') || message.includes('setup') || message.includes('profile')) {
+      return 'student_setup';
+    } else if (message.includes('token') || message.includes('expired') || message.includes('invalid')) {
+      return 'token_expired';
+    } else if (message.includes('connection') || message.includes('request')) {
+      return 'connection_issue';
+    } else {
+      return 'general';
+    }
+  };
+
   const handleAccountSubmit = async (e) => {
     e.preventDefault();
     if (!parentName.trim()) return;
     setLoading(true);
     setError('');
+    setErrorType('');
     try {
       const verifyParentToken = httpsCallable(getFunctions(), 'verifyParentToken');
       const {email, connectionName, success} = await verifyParentToken({
@@ -44,6 +113,8 @@ export default function ParentVerificationPage() {
       setVerificationSuccess(success);
 
     } catch (err) {
+      const errorType = analyzeError(err.message || '');
+      setErrorType(errorType);
       setError(err.message || 'An error occurred.');
     } finally {
       setLoading(false);
@@ -62,6 +133,7 @@ export default function ParentVerificationPage() {
     setConnectionDecision(decision);
     setLoading(true);
     setError('');
+    setErrorType('');
     try {
       const verifyParentToken = httpsCallable(getFunctions(), 'verifyParentToken');
       const {email, success} = await verifyParentToken({
@@ -76,6 +148,8 @@ export default function ParentVerificationPage() {
       setVerificationSuccess(success);
 
     } catch (err) {
+      const errorType = analyzeError(err.message || '');
+      setErrorType(errorType);
       setError(err.message || 'An error occurred.');
     } finally {
       setLoading(false);
@@ -114,7 +188,11 @@ export default function ParentVerificationPage() {
       {error && (
         <div className="error-message">
           <div className="error-icon">⚠</div>
-          <p>{error}</p>
+          <div className="error-content">
+            <h4 className="error-title">{getErrorMessage(error, errorType).title}</h4>
+            <p className="error-description">{getErrorMessage(error, errorType).message}</p>
+            <p className="error-action">{getErrorMessage(error, errorType).action}</p>
+          </div>
         </div>
       )}
       
@@ -177,7 +255,11 @@ export default function ParentVerificationPage() {
         {error && (
           <div className="error-message">
             <div className="error-icon">⚠</div>
-            <p>{error}</p>
+            <div className="error-content">
+              <h4 className="error-title">{getErrorMessage(error, errorType).title}</h4>
+              <p className="error-description">{getErrorMessage(error, errorType).message}</p>
+              <p className="error-action">{getErrorMessage(error, errorType).action}</p>
+            </div>
           </div>
         )}
         

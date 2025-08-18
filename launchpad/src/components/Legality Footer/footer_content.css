@@ -1,28 +1,38 @@
 .legality-holder {
-    background: linear-gradient(0deg,rgba(120, 208, 255, 0.2) 0%, rgba(84, 255, 209, 0.0) 80%);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: 100vh;
+    margin-top: 70px;
 }
 
 .faq-container,
 .about-us-container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
-    padding: 2rem;
-    /* background: #1fecff; */
+    padding: 2rem 1rem;
 }
 
-.faq-container h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    color: #333;
+/* FAQ Header Styles */
+.faq-header {
+    text-align: center;
+    margin-bottom: 3rem;
 }
 
-.about-us-container h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-    color: #333;
+.faq-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    color: var(--dark);
+    line-height: 1.2;
 }
 
-/* FAQ styles */
+.faq-subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* FAQ List Styles */
 .faq-list {
     display: flex;
     flex-direction: column;
@@ -30,81 +40,141 @@
 }
 
 .faq-item {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
+    background: white;
+    border: 1px solid rgba(0, 123, 255, 0.15);
+    border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.faq-item:hover {
+    border-color: rgba(0, 123, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .faq-question {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
+    padding: 1.5rem;
     cursor: pointer;
-    background-color: #f8f8f8;
-    transition: background-color 0.3s ease;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(0, 123, 255, 0.1);
 }
 
 .faq-question:hover {
-    background-color: #f0f0f0;
+    background: rgba(0, 123, 255, 0.05);
 }
 
-.faq-question h3 {
+.faq-question-text {
     margin: 0;
     font-size: 1.1rem;
-    color: #333;
+    font-weight: 600;
+    color: var(--dark);
+    line-height: 1.4;
+    flex: 1;
+    padding-right: 1rem;
 }
 
-.plus-icon {
+.faq-icon {
     font-size: 1.5rem;
-    color: #666;
-    transition: transform 0.3s ease;
+    font-weight: 700;
+    color: #007bff;
+    transition: all 0.3s ease;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 123, 255, 0.1);
 }
 
-.plus-icon.open {
-    transform: rotate(45deg);
+.faq-icon.open {
+    transform: rotate(180deg);
+    background: #007bff;
+    color: white;
 }
 
 .faq-answer {
-    padding: 1rem;
-    background-color: white;
+    padding: 1.5rem;
+    background: white;
+    border-top: 1px solid rgba(0, 123, 255, 0.1);
 }
 
-.faq-answer p {
-    margin: 0.5rem 0;
-    color: #666;
-    line-height: 1.6;
+.faq-answer-text {
+    margin: 0 0 1rem 0;
+    color: #374151;
+    line-height: 1.7;
+    font-size: 1rem;
 }
 
-/* About Us styles */
+.faq-answer-text:last-child {
+    margin-bottom: 0;
+}
+
+/* About Us Header Styles */
+.about-us-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.about-us-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    color: var(--dark);
+    line-height: 1.2;
+}
+
+.about-us-subtitle {
+    font-size: 1.1rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* About Us Content Styles */
 .about-us-content {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid rgba(0, 123, 255, 0.15);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.about-us-content p {
+.about-us-text {
     font-size: 1.1rem;
     line-height: 1.8;
-    color: #444;
+    color: #374151;
     margin: 0;
 }
 
-.emphasis {
-    font-size: 1.3rem !important;
-    font-weight: 600;
-    color: #333 !important;
+.about-us-emphasis {
+    font-size: 1.4rem !important;
+    font-weight: 700;
+    color: #007bff !important;
+    text-align: center;
+    margin: 0;
 }
 
-.mission-statement {
+.about-us-mission {
     font-size: 1.2rem !important;
     font-style: italic;
-    color: #2c5282 !important;
-    padding: 1rem;
-    border-left: 4px solid #2c5282;
-    background-color: #f8f9fa;
+    color: var(--dark) !important;
+    padding: 1.5rem;
+    border-left: 4px solid #007bff;
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, rgba(0, 123, 255, 0.02) 100%);
+    border-radius: 0 8px 8px 0;
+    margin: 0;
 }
 
+/* Back Button Styles */
 .legality-back-button {
     position: absolute;
     top: 20px;
@@ -113,15 +183,73 @@
     left: 20px;
     padding: 8px 16px;
     background-color: transparent;
-    border: 2px solid var(--secondary);
-    border-radius: 4px;
-    color: var(--secondary);
+    border: 1.5px solid #007bff;
+    border-radius: 8px;
+    color: #007bff;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .legality-back-button:hover {
-    background-color: var(--highlight);
+    background-color: #007bff;
     color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .faq-container,
+    .about-us-container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .faq-title,
+    .about-us-title {
+        font-size: 2rem;
+    }
+    
+    .faq-subtitle,
+    .about-us-subtitle {
+        font-size: 1rem;
+    }
+    
+    .faq-question,
+    .about-us-content {
+        padding: 1.25rem;
+    }
+    
+    .faq-answer {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .faq-container,
+    .about-us-container {
+        padding: 1rem;
+    }
+    
+    .faq-title,
+    .about-us-title {
+        font-size: 1.75rem;
+    }
+    
+    .faq-question,
+    .about-us-content {
+        padding: 1rem;
+    }
+    
+    .faq-answer {
+        padding: 1rem;
+    }
+    
+    .faq-question-text {
+        font-size: 1rem;
+    }
+    
+    .about-us-text {
+        font-size: 1rem;
+    }
 }

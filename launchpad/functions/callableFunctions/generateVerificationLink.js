@@ -7,6 +7,17 @@ const functions = require('firebase-functions');
 exports.generateVerificationLink = functions.https.onCall(async (data, context) => {
     const { uid, action, schoolId, targetUserId="", targetUserName="", userType="", targetUserType="" } = data;
 
+    // Validate required parameters
+    if (!uid || !action || !schoolId) {
+        console.error('Missing required parameters:', { uid, action, schoolId });
+        throw new functions.https.HttpsError('invalid-argument', 'Missing required parameters: uid, action, and schoolId are required.');
+    }
+
+    if (schoolId === 'undefined' || schoolId === 'null' || schoolId === '') {
+        console.error('Invalid schoolId:', schoolId);
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid school ID provided.');
+    }
+
     const token = crypto.randomUUID();
     const expiresAt = Date.now() + 24 * 60 * 60 * 1000 * 2;
     const email = context.auth.token.email;

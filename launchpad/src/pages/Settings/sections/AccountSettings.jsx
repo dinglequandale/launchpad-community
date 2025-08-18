@@ -16,7 +16,7 @@ const AccountSettings = () => {
   const handleExportData = async () => {
     try {
       const loadingToast = toast.loading('Preparing your data export...');
-      e
+      
       const userDoc = await getDoc(doc(db, "tenants", localStorage.getItem("schoolId"), "users", currentUser.uid));
       
       if (!userDoc.exists()) {
@@ -141,15 +141,17 @@ const AccountSettings = () => {
       {/* Delete Account Dialog */}
       {deleteDialogOpen && (
         <div className="settings-dialog-overlay" onClick={() => setDeleteDialogOpen(false)}>
-          <div className="settings-dialog" style={{position: "relative"}} onClick={(e) => e.stopPropagation()}>
-          <button className='btnClose' onClick={() => setDeleteDialogOpen(false)} style={{background:"none"}}><CgClose size={25}/></button>
+          <div className="settings-dialog" onClick={(e) => e.stopPropagation()}>
             <div className="settings-dialog-header">
               <h3 className="settings-dialog-title settings-text-error">Delete Account</h3>
+              <button 
+                className="settings-dialog-close" 
+                onClick={() => setDeleteDialogOpen(false)}
+              >
+                <CgClose size={25}/>
+              </button>
             </div>
             <div className="settings-dialog-content">
-              {/* <div className="settings-alert settings-alert-warning">
-                This action cannot be undone. All your data will be permanently deleted.
-              </div> */}
               <p className="settings-dialog-text">Please type "DELETE" to confirm:</p>
               <input
                 type="text"

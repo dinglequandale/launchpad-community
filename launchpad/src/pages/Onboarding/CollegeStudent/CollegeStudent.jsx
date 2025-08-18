@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
+import CustomSelect from '../../../components/CustomSelect';
 import { highSchools, careerInterests, graduationYears, CollegeSearch } from './../Options';
-import { requiredQuestionsAnswered, saveCollegeStudent } from '../../../services/onboardingServices';
+import { requiredQuestionsAnswered } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { BiPlus, BiTrash } from 'react-icons/bi';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import EmailConfirmation from '../EmailConfirmation';
+
+// Move getEmail function creation outside component to prevent recreation on every render
+const getEmail = httpsCallable(getFunctions(), 'getEmail');
 
 const collegeStudentQuestionsConfig = [
   {
@@ -47,6 +50,13 @@ const collegeStudentQuestionsConfig = [
     page: 1
   },
 
+  {
+    id: "email",
+    text: "Email (optional)",
+    optional: true,
+    page: 1
+  },
+
   // Page 2
   {
     id: "collegeAttending",
@@ -74,7 +84,7 @@ const collegeStudentQuestionsConfig = [
   //   text: "Were you part of the French or International Section?",
   //   type: "select",
   //   optional: true,
-  //   options: ["French", "International"].map(option => ({ value: option, label: option })),
+  //   options: ["French", "International"].map(option => ({ value: option, label: o })),
   //   page: 2,
   // },
 
@@ -88,62 +98,59 @@ const collegeStudentQuestionsConfig = [
 ];
 
 
-export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit, schoolInfo}) {
-
-  const navigate = useNavigate();
+export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit, schoolInfo, setUserData}) {
 
   const {currentUser} = useAuth();
 
-  const getEmail = httpsCallable(getFunctions(), 'getEmail');
-
   const [collegeStudentData, setCollegeStudentData] = useState({
-    userAboutMe: '',
-    userName: '',
-    collegeAttending: '',
-    schoolAttending: schoolInfo.schoolDisplayName,
-    schoolId: schoolInfo.schoolId,
-    graduationYear: '',
-    // sectionAttending: '',
+    userName: "",
+    userPfp: null,
+    userPfpPreview: null,
     areasOfInterest: [],
-    userSkills: [],
-    networkingLevel: [],
-    userResume: null,
-    userResumePreview: "",
     linkedinLink: "",
     email: "",
-    // isPublic: false,
-    userType: "Alumni",
-    userPfpPreview: "",
-    userPfp: null,
+    collegeAttending: "",
+    schoolAttending: schoolInfo?.schoolDisplayName || "",
+    schoolId: schoolInfo?.schoolId || "",
+    graduationYear: "",
+    userSkills: [],
+    userType: "College Student",
   });
 
-  const handleSubmit = async () => {
-    
-    // const loadingToast = toast.loading('Saving your information...');
+  // Update parent component with user data whenever it changes
+  useEffect(() => {
+    setUserData(collegeStudentData);
+  }, [collegeStudentData, setUserData]);
 
-    try {
-      await saveCollegeStudent(
-        currentUser, 
-        collegeStudentData,
-        () => {
-          // Success callback
-          toast.success('Information saved successfully!');
-          navigate("/Home");
+  // Fetch user email on component mount
+  useEffect(() => {
+    const getUserEmail = async () => {
+      try {
+        const result = await getEmail({ uid: currentUser.uid });
+        if (result.data) {
+          setCollegeStudentData(prev => ({
+            ...prev,
+            email: result.data.email
+          }));
         }
-      );
-    } catch (error) {
-      // Error callback
-      toast.error('Failed to save information. Please try again.', {
-        id: loadingToast,
-      });
-    } finally {
-      // setIsSubmitting(false);
-    }
-  };
+      } catch (error) {
+        console.error('Error fetching user email:', error);
+      }
+    };
 
-  if(isSubmitting){
-    handleSubmit();
-  }
+    if (currentUser) {
+      getUserEmail();
+    }
+  }, [currentUser]);
+
+  // Check if all required questions are answered
+  useEffect(() => {
+    const canSubmit = requiredQuestionsAnswered(collegeStudentQuestionsConfig, collegeStudentData);
+    setCanSubmit(canSubmit);
+  }, [collegeStudentData, setCanSubmit]);
+
+  // Remove the old handleSubmit function since it's now handled by the parent
+  // Remove the old save logic and navigation
 
   const handleChange = (id, label) => {
     setCollegeStudentData(prevState => ({
@@ -151,23 +158,6 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
       [id]: label,
     }));
   };
-
-  useEffect(()=>{
-    if(requiredQuestionsAnswered(collegeStudentQuestionsConfig,collegeStudentData)){
-      // if(collegeStudentData.userSkills[0] && collegeStudentData.userSkills[0].skillDescription === "" && collegeStudentData.userSkills[0].skillCategory === ""){setCollegeStudentData({...collegeStudentData, userSkills: []})};
-      console.log("Can submit")
-      setCanSubmit(true);
-    }
-  },[collegeStudentData]);
-
-  const getUserEmail = async () => {
-    const result = await getEmail();
-    console.log("result:", result);
-    handleChange("email", result.data.email);
-  }
-  useEffect(()=>{
-    getUserEmail();
-  },[]);
 
   const renderPage = () => {
     switch (currentPage) {

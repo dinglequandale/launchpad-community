@@ -65,7 +65,7 @@ export default function InviteContactsModal({visibility, onClose,tenantId}){
     
       return (
         <div>
-           <Toaster position="bottom-right" reverseOrder={false} />
+           {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
           <Modal
             isOpen={visibility}
             onRequestClose={onClose}

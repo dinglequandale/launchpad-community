@@ -1,13 +1,17 @@
-import React, { createContext, useEffect, useState } from 'react';
-import { getFunctions, httpsCallable } from "firebase/functions";
+import React, { useState, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
-import { careerInterests, highSchools } from './../Options';
-import { requiredQuestionsAnswered, saveProfessional } from '../../../services/onboardingServices';
+import CustomSelect from '../../../components/CustomSelect';
+import { highSchools, careerInterests, graduationYears, CollegeSearch } from './../Options';
+import { requiredQuestionsAnswered } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { BiPlus, BiTrash } from 'react-icons/bi';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import EmailConfirmation from '../EmailConfirmation';
+
+// Move getEmail function creation outside component to prevent recreation on every render
+const getEmail = httpsCallable(getFunctions(), 'getEmail');
 
 const professionalQuestionsConfig = [
   // Page 1
@@ -45,6 +49,13 @@ const professionalQuestionsConfig = [
     text: "Link your LinkedIn profile:",
     placeholder: "https://www.linkedin.com/in/your-profile",
     type: "text",
+    optional: true,
+    page: 1
+  },
+  {
+    id: "email",
+    text: "Email (optional)",
+    optional: true,
     page: 1
   },
   {
@@ -148,72 +159,62 @@ const professionalQuestionsConfig = [
   },
 ];
 
-export default function Professional({currentPage, isSubmitting, setCanSubmit, schoolInfo}) {
-
-  const navigate = useNavigate();
+export default function Professional({currentPage, isSubmitting, setCanSubmit, schoolInfo, setUserData}) {
 
   const {currentUser} = useAuth();
 
-  const getEmail = httpsCallable(getFunctions(), 'getEmail');
   const [loginEmail,setLoginEmail] = useState("");
 
   const [professionalData, setProfessionalData] = useState({
-    retiredStatus: false,
-    industryPosition: '',
-    companyName: '',
-    areasOfInterest: [],
-    networkingLevel: [],
-    schoolAttending: schoolInfo.schoolDisplayName,
-    linkedinLink: "",
-    userType: "Professional",
-    userPfpPreview: "",
-    yearsOfExperience: "",
     userName: "",
-    email: loginEmail,
-    // isPublic: false,
-    // userAboutMe: "",
     userPfp: null,
-    schoolId: schoolInfo.schoolId
+    userPfpPreview: null,
+    areasOfInterest: [],
+    linkedinLink: "",
+    email: "",
+    company: "",
+    jobTitle: "",
+    userSkills: [],
+    schoolId: schoolInfo?.schoolId || "",
+    userType: "Professional",
   });
 
-  const handleSubmit = async () => {
-    
-    // const loadingToast = toast.loading('Saving your information...');
+  // Update parent component with user data whenever it changes
+  useEffect(() => {
+    setUserData(professionalData);
+  }, [professionalData, setUserData]);
 
-    try {
-      await saveProfessional(
-        currentUser, 
-        professionalData,
-        () => {
-          // Success callback
-          // toast.success('Information saved successfully!', {
-          //   id: loadingToast,
-          // });
-          toast.success('Information saved successfully!')
-          navigate("/Home");
+  // Fetch user email on component mount
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      try {
+        const result = await getEmail({ uid: currentUser.uid });
+        if (result.data) {
+          setProfessionalData(prev => ({
+            ...prev,
+            email: result.data
+          }));
         }
-      );
-    } catch (error) {
-      // Error callback
-      toast.error('Failed to save information. Please try again.', {
-        id: loadingToast,
-      });
-    } finally {
-      // setIsSubmitting(false);
-    }
-  };
+      } catch (error) {
+        console.error('Error fetching user email:', error);
+      }
+    };
 
-  useEffect(()=>{
-    console.log("STUFF: ", professionalData);
-    if(requiredQuestionsAnswered(professionalQuestionsConfig,professionalData)){
-      console.log("Can submit");
-      setCanSubmit(true);
+    if (currentUser) {
+      fetchUserEmail();
     }
-    // console.log(professionalData);
-  },[professionalData])
+  }, [currentUser]);
+
+  // Check if all required questions are answered
+  useEffect(() => {
+    const canSubmit = requiredQuestionsAnswered(professionalQuestionsConfig, professionalData);
+    setCanSubmit(canSubmit);
+  }, [professionalData, setCanSubmit]);
+
+  // Remove the old save logic since it's now handled by the parent
 
   if(isSubmitting){
-    handleSubmit();
+    // handleSubmit(); // This line is removed as per the edit hint
   }
 
   const handleChange = (id, label) => {
@@ -265,12 +266,13 @@ const RetiredStatus = ({ selectedOptions, handleChange }) => {
       <div className="onboardingQuestions">
         {questionsForPage.map((question) => (
           <div className="form-group" key={question.id}>
-            <OnboardingDropdown
-              question={question.text}
+            <CustomSelect
               options={question.options}
-              selectedOption={(selectedOptions[question.id] ? "Yes" : "No") || ''}
+              value={(selectedOptions[question.id] ? "Yes" : "No") || ''}
               onChange={(label) => handleChange(question.id, label === "Yes")}
-              type={question.type}
+              placeholder="Select an option"
+              isMulti={false}
+              isSearchable={false}
             />
           </div>
         ))}
@@ -300,12 +302,13 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
                 />
               </>
             ) : (
-              <OnboardingDropdown
-                question={question.text}
+              <CustomSelect
                 options={question.options}
-                selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+                value={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
                 onChange={(label) => handleChange(question.id, label)}
-                type={question.type}
+                placeholder="Select an option"
+                isMulti={question.type === 'multi-select'}
+                isSearchable={false}
               />
             )}
           </div>

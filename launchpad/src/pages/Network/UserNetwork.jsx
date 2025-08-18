@@ -313,7 +313,7 @@ export default function UserNetwork() {
   return (
     <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick, loadLimit, filterChanged}}>
       <>
-        <Toaster position={'bottom-right'} reverseOrder={false}/>
+        {/* <Toaster position={'bottom-right'} reverseOrder={false}/> */}
         {/* All modals are now handled globally via ModalContext */}
         <div>
             <TopBar/>

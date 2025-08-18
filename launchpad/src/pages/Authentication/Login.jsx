@@ -5,7 +5,10 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { loadUserData } from "../../services/userProfileServices";
-import { packageBasicUserInfoToLS } from "../../services/onboardingServices";
+import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from "../../services/onboardingServices";
+import { doc, getDoc } from "firebase/firestore";
+import { db, auth } from "../../firebase/firebaseConfig";
+import { getConnectionsByStatus } from "../../services/connectionService";
 
 export default function Login(){
     const { userLoggedIn, currentUser } = useAuth();
@@ -42,6 +45,63 @@ export default function Login(){
         packageBasicUserInfoToLS(newUserData);
     };
 
+    // Check if user exists in Firebase collection
+    const checkUserExists = async (uid) => {
+        try {
+            const schoolId = localStorage.getItem("schoolId");
+            if (!schoolId) {
+                console.error("School ID not found in localStorage");
+                return false;
+            }
+            const userDoc = await getDoc(doc(db, "tenants", schoolId, "users", uid));
+            return userDoc.exists();
+        } catch (error) {
+            console.error("Error checking user existence:", error);
+            return false;
+        }
+    };
+
+    // Fetch and store connections for existing users
+    const fetchAndStoreConnections = async () => {
+        try {
+            const schoolId = localStorage.getItem("schoolId");
+            if (schoolId) {
+                const parentPendingResult = await getConnectionsByStatus(schoolId, 'pending_parental_approval');
+                const parentApprovedResult = await getConnectionsByStatus(schoolId, 'parent_approved');
+                
+                // Extract user IDs from the connections
+                const pendingUserIds = parentPendingResult.connections?.map(conn => 
+                    conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+                ) || [];
+                
+                const parentApprovedUserIds = parentApprovedResult.connections?.map(conn => 
+                    conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+                ) || [];
+                
+                localStorage.setItem('pendingConnections', JSON.stringify(pendingUserIds));
+                localStorage.setItem('approvedConnections', JSON.stringify(parentApprovedUserIds));
+            }
+        } catch (error) {
+            console.error('Error fetching connections:', error);
+        }
+    };
+
+    // Run profile completion logic for existing users
+    const runProfileCompletionLogic = async (userData) => {
+        try {
+            // Package basic user info to localStorage
+            packageBasicUserInfoToLS(userData);
+            
+            // Push initial profile completion data
+            pushInitialProfileCompletion(userData);
+            
+            // Fetch and store connections
+            await fetchAndStoreConnections();
+        } catch (error) {
+            console.error('Error running profile completion logic:', error);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!userIsSigningIn) {
@@ -51,18 +111,33 @@ export default function Login(){
                     doSignInWithEmailAndPassword(userEmail, userPassword),
                     {
                         loading: 'Logging you in ...',
-                        success: "You're set!",
-                        error: (err) => `Error! ${err.message}`
+                        success: "Welcome back!",
+                        error: (err) => {
+                            if (err.code === 'auth/user-not-found') {
+                                return 'Account not found. Please check your email or sign up.';
+                            } else if (err.code === 'auth/wrong-password') {
+                                return 'Incorrect password. Please try again.';
+                            } else if (err.code === 'auth/invalid-email') {
+                                return 'Please enter a valid email address.';
+                            } else if (err.code === 'auth/too-many-requests') {
+                                return 'Too many failed attempts. Please try again later.';
+                            } else {
+                                return 'Login failed. Please try again.';
+                            }
+                        }
                     }
                 );
     
                 const user = userCredential.user;
                 await updateBasicUserData(user);
+                
+                // Run profile completion logic for existing users
+                await runProfileCompletionLogic(userData);
     
-                navigate('/Onboarding', {state: tempSchoolInfo});
+                navigate('/Home');
             } catch (error) {
                 console.error("Error logging in:", error);
-                toast.error(`Login failed: ${error.message}`);
+                // Error is already handled by toast.promise
             } finally {
                 setUserIsSigningIn(false);
             }
@@ -77,11 +152,20 @@ export default function Login(){
                 {
                     loading: 'Sending password reset email ...',
                     success: "Password reset email sent. Check your email!",
-                    error: (err) => `Error! ${err.message}`
+                    error: (err) => {
+                        if (err.code === 'auth/user-not-found') {
+                            return 'No account found with this email.';
+                        } else if (err.code === 'auth/invalid-email') {
+                            return 'Please enter a valid email address.';
+                        } else {
+                            return 'Failed to send reset email. Please try again.';
+                        }
+                    }
                 }
             );
         } catch (error) {
-            console.error("Error logging in:", error);
+            console.error("Error sending password reset:", error);
+            // Error is already handled by toast.promise
         }
     }
 
@@ -93,12 +177,32 @@ export default function Login(){
                 const userCredential = await doSignInWithGoogle();
                 const user = userCredential.user;
     
-                await updateBasicUserData(user);
+                // Check if user exists in Firebase collection
+                const userExists = await checkUserExists(user.uid);
+                if (!userExists) {
+                    toast.error("Account not found. Please contact your administrator to set up your account.");
+                    // Sign out the user since they don't have access
+                    await auth.signOut();
+                    return;
+                }
     
-                navigate('/Onboarding', {state: tempSchoolInfo});
+                await updateBasicUserData(user);
+                
+                // Run profile completion logic for existing users
+                await runProfileCompletionLogic(userData);
+    
+                navigate('/Home');
             } catch (error) {
                 console.error("Error signing in with Google:", error);
-                toast.error("Sorry! There was an issue signing you in. Try again!");
+                if (error.code === 'auth/popup-closed-by-user') {
+                    toast.error("Sign-in cancelled. Please try again.");
+                } else if (error.code === 'auth/popup-blocked') {
+                    toast.error("Pop-up blocked. Please allow pop-ups and try again.");
+                } else if (error.code === 'auth/network-request-failed') {
+                    toast.error("Network error. Please check your connection and try again.");
+                } else {
+                    toast.error("Sign-in failed. Please try again.");
+                }
             } finally {
                 setUserIsSigningIn(false);
             }
@@ -108,9 +212,9 @@ export default function Login(){
     return(
         <>
         <div>
-        <Toaster
+        {/* <Toaster
         position="bottom-right"
-        reverseOrder={false}/>
+        reverseOrder={false}/> */}
         </div>
         
         {userLoggedIn && (<Navigate to='/Home' replace={true}/>)}
