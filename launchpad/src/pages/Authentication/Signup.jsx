@@ -146,7 +146,7 @@ export default function SignUp(){
             setUserIsSigningIn(true);
             try {
                 // console.log("Student record: ", studentRecord.graduation_year);
-                localStorage.setItem("tempStudentInfo", JSON.stringify(studentRecord));
+                if(studentRecord) localStorage.setItem("tempStudentInfo", JSON.stringify(studentRecord));
                 const emailToUse = (schoolEmailCondition && !emailOverride) ? userEmail + emailData[0].email_hook : userEmail;
                 const userCredential = await toast.promise(
                     doCreateUserWithEmailAndPassword(emailToUse, userPassword),

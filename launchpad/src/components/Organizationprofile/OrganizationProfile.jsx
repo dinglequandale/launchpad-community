@@ -9,6 +9,7 @@ import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase/firebaseConfig'
 import { displayFieldsOfInterest } from '../../services/userProfileServices'
 import { stableLinkCheck } from '../../services/opportunityServices'
+import toast from 'react-hot-toast'
 
 export default function OrganizationProfile({ organizationData, location, handleShowProfile, handleReferalClick, isPublished = true }) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
@@ -16,6 +17,7 @@ export default function OrganizationProfile({ organizationData, location, handle
   const [isContentExpanded, setIsContentExpanded] = useState(false)
   const [userData, setUserData] = useState(null)
   const [isDisabled, setIsDisabled] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(false)
   
   const descRef = useRef()
   const { currentUser } = useAuth()
@@ -84,6 +86,52 @@ export default function OrganizationProfile({ organizationData, location, handle
     
     getUserData()
   }, [organizationProfile.createdBy])
+
+  // Check if this opportunity is already favorited
+  useEffect(() => {
+    const savedFavorites = JSON.parse(localStorage.getItem('launchpadOrganizationFavorites') || '[]');
+    const isAlreadyFavorite = savedFavorites.some(fav => 
+      fav.id === organizationData.id || 
+      (fav.name === getName() && fav.type === organizationData.organizationType)
+    );
+    setIsFavorite(isAlreadyFavorite);
+  }, [organizationData]);
+
+  const handleToggleFavorite = () => {
+    const savedFavorites = JSON.parse(localStorage.getItem('launchpadOrganizationFavorites') || '[]');
+    
+    if (isFavorite) {
+      // Remove from favorites
+      const newFavorites = savedFavorites.filter(fav => 
+        !(fav.id === organizationData.id || 
+          (fav.name === getName() && fav.type === organizationData.organizationType))
+      );
+      localStorage.setItem('launchpadOrganizationFavorites', JSON.stringify(newFavorites));
+      setIsFavorite(false);
+      toast.success('Removed from favorites');
+    } else {
+      // Add to favorites
+      const newFavorite = {
+        id: organizationData.id,
+        name: getName(),
+        type: organizationData.organizationType,
+        description: organizationData.applicantExpectations ?? organizationData.organizationMission,
+        host: organizationData.organizationHostCompany ?? organizationData.organizationHostStudent,
+        position: organizationData.applicantPosition,
+        fieldOfWork: organizationData.applicantFieldOfWork,
+        isPaid: organizationData.isPaid,
+        deadline: organizationData.deadline,
+        startDate: organizationData.startDate,
+        location: organizationData.workLocation,
+        timeFrame: organizationData.timeFrame,
+        logo: organizationData.organizationLogoPreview ?? '/assets/launchpad_logo_raw.png'
+      };
+      const newFavorites = [...savedFavorites, newFavorite];
+      localStorage.setItem('launchpadOrganizationFavorites', JSON.stringify(newFavorites));
+      setIsFavorite(true);
+      toast.success('Added to favorites!');
+    }
+  };
 
   // Check if actions should be disabled
   useEffect(() => {
@@ -218,6 +266,15 @@ export default function OrganizationProfile({ organizationData, location, handle
           <IoFlag size={18} />
         </button>
       )}
+
+      {/* Favorite Button */}
+      <button 
+        className={`v0-favorite-button ${isFavorite ? 'favorited' : ''}`} 
+        onClick={handleToggleFavorite} 
+        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+      >
+        <LuHeart size={18} />
+      </button>
 
       {/* Organization Logo */}
       <div className="v0-organization-logo">

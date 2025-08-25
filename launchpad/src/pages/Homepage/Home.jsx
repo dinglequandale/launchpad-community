@@ -21,7 +21,9 @@ import { useOutletContext } from "react-router-dom";
 import { useConnections } from "../../contexts/ConnectionContext";
 import { useModal } from '../../contexts/ModalContext';
 import ResourceCarousel from "./ResourceCarousel";
-import { LuPlay, LuUsers, LuGraduationCap, LuBriefcase, LuFileText, LuBookOpen } from "react-icons/lu";
+import { LuPlay, LuUsers, LuGraduationCap, LuBriefcase, LuFileText, LuBookOpen, LuMapPin, LuCalendar, LuTarget, LuAward } from "react-icons/lu";
+import toast from "react-hot-toast";
+import OrganizationProfileModal from "../../components/Organizationprofile/OrganizationProfileModal";
 
 
 class ErrorBoundary extends React.Component {
@@ -54,6 +56,12 @@ export default function Home(){
     const [showVerifedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [selectedResource, setSelectedResource] = useState(null);
+    const [favorites, setFavorites] = useState(() => {
+        const saved = localStorage.getItem('launchpadOrganizationFavorites');
+        return saved ? JSON.parse(saved) : [];
+    });
+    const [selectedFavorite, setSelectedFavorite] = useState(null);
+    const [showFavoriteModal, setShowFavoriteModal] = useState(false);
     const {
       pending,
       pending_parental_approval,
@@ -63,7 +71,7 @@ export default function Home(){
       loading: connectionsLoading,
       refetchConnections,
     } = useConnections();
-    const {openProfileModal} = useModal();
+    const {openProfileModal, openApplyModal, openConnectModal} = useModal();
 
     const { chatClient } = useOutletContext();
 
@@ -343,9 +351,105 @@ export default function Home(){
 
     const resourceSections = { "How To Network": "howToNetwork", "Find Your Ideal Career": "discoverYourCareer", "Find Your Dream University":"findDreamUniversity", "Resume-Building": "buildResume", "SAT/ACT Hacks":"satTips"}
     
-    const handleSectionRef = (sectionTitle, ref) => {
-      refSections.current[sectionTitle] = ref;
+    const handleSectionRef = (title, ref) => {
+        if (refSections.current) {
+            refSections.current[title] = ref;
+        }
     };
+
+    const removeFavorite = (index) => {
+        const newFavorites = favorites.filter((_, i) => i !== index);
+        setFavorites(newFavorites);
+        localStorage.setItem('launchpadOrganizationFavorites', JSON.stringify(newFavorites));
+        toast.success('Removed from favorites');
+    };
+
+    const openFavoriteModal = (favorite) => {
+        setSelectedFavorite(favorite);
+        setShowFavoriteModal(true);
+    };
+
+    const handleReferalClick = (action, organizationData, userData) => {
+        if (action === 'learnMore') {
+            // Handle learn more action based on the organization data
+            const learnMoreMethod = organizationData.learnMore?.split(': ')[0] || 'Messages'
+            const learnMoreValue = organizationData.learnMore?.split(': ')[1]
+            
+            if (learnMoreMethod === 'Website' && learnMoreValue) {
+                // Open website in new tab
+                window.open(learnMoreValue, '_blank', 'noopener,noreferrer')
+            } else if (learnMoreMethod === 'Email' && learnMoreValue) {
+                // Open email client
+                window.location.href = `mailto:${learnMoreValue}`
+            } else if (learnMoreMethod === 'Messages' && userData) {
+                // Open connect modal for messaging
+                openConnectModal({
+                    userData: userData,
+                    isOpportunity: true,
+                    opportunityType: organizationData.type || organizationData.organizationType,
+                    onClose: () => {},
+                    visibility: true
+                })
+            } else {
+                // Fallback
+                toast.success('Learn more functionality coming soon!')
+            }
+        } else if (action === 'apply') {
+            // Handle apply action by opening the apply modal
+            
+            // Process organization data to match expected structure
+            const orgName = organizationData.organizationHostCompany || organizationData.host || 'Organization'
+            const applyMethod = organizationData.apply?.split(': ')[0] || 'Messages'
+            const applyValue = organizationData.apply?.split(': ')[1] && organizationData.apply.split(': ')[0] === 'Website'
+                ? organizationData.apply.split(': ')[1]
+                : organizationData.apply?.split(': ')[1] || ''
+            
+            openApplyModal({
+                requirements: organizationData.applicantRequirements || organizationData.requirements || [],
+                applyType: applyMethod,
+                applyValue: applyValue,
+                orgName: orgName,
+                opportunityDetails: {
+                    format: organizationData.workLocation || organizationData.location,
+                    eligibility: organizationData.applicants || organizationData.eligibility,
+                    compensation: organizationData.isPaid,
+                    duration: organizationData.timeFrame || organizationData.duration,
+                    startDate: organizationData.startDate,
+                    timeCommitment: organizationData.timeCommitment,
+                    deadline: organizationData.deadline || organizationData.applicationDeadline,
+                    learnMoreType: organizationData.learnMore?.split(': ')[0] || 'Messages',
+                    learnMoreValue: organizationData.learnMore?.split(': ')[1] || '',
+                    organizationType: organizationData.type || organizationData.organizationType,
+                }
+            })
+        }
+    };
+
+    // Auto-scroll to resource details when selected
+    useEffect(() => {
+        if (selectedResource) {
+            const resourceDetails = document.querySelector('.v0-resource-details');
+            if (resourceDetails) {
+                resourceDetails.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+            }
+        }
+    }, [selectedResource]);
+
+    // Listen for storage changes to update favorites
+    useEffect(() => {
+        const handleStorageChange = (e) => {
+            if (e.key === 'launchpadOrganizationFavorites') {
+                const newFavorites = e.newValue ? JSON.parse(e.newValue) : [];
+                setFavorites(newFavorites);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
 
     return(
         <>
@@ -370,6 +474,20 @@ export default function Home(){
                 parent_approved={parent_approved}
                 approved={approved}
                 incomingRequests={incomingRequests}
+              />
+            )}
+            
+            {/* Organization Profile Modal for Favorites */}
+            {showFavoriteModal && selectedFavorite && (
+              <OrganizationProfileModal
+                organization={selectedFavorite}
+                isVisible={showFavoriteModal}
+                onClose={() => {
+                  setShowFavoriteModal(false);
+                  setSelectedFavorite(null);
+                }}
+                location="modal"
+                handleReferalClick={handleReferalClick}
               />
             )}
             <TopBar/>
@@ -424,6 +542,101 @@ export default function Home(){
                             </div>
                         </div>
                     </div>
+
+                    {/* Favorites Section - Only show when there are favorites */}
+                    {favorites && favorites.length > 0 && (
+                        <div className="v0-favorites-section">
+                            <div className="v0-favorites-header">
+                                <h2>My Favorite Opportunities</h2>
+                                <p>Save opportunities you're interested in to come back to later</p>
+                            </div>
+                            <div className="v0-favorites-content">
+                                <div className="v0-favorites-grid">
+                                    {favorites.map((favorite, index) => (
+                                        <div key={index} className="v0-favorite-item">
+                                            <div className="v0-favorite-header">
+                                                <div className="v0-favorite-org-info">
+                                                    <div className="v0-favorite-org-avatar">
+                                                        <img 
+                                                            src={favorite.logo || favorite.profilePictureUrl || favorite.pfp || '/src/public/assets/placeholder_pfp.png'} 
+                                                            alt={favorite.name || 'Organization'}
+                                                            onError={(e) => {
+                                                                e.target.src = '/src/public/assets/placeholder_pfp.png';
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="v0-favorite-title-section">
+                                                        <h3>{favorite.name || 'Organization'}</h3>
+                                                        <div className="v0-favorite-type-badge">
+                                                            <LuTarget size={14} />
+                                                            <span>{favorite.type || 'Opportunity'}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button 
+                                                    className="v0-favorite-remove-btn"
+                                                    onClick={() => removeFavorite(index)}
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                            
+                                            {favorite.position && (
+                                                <div className="v0-favorite-opportunity-title">
+                                                    {favorite.position}
+                                                </div>
+                                            )}
+                                            
+                                            <div className="v0-favorite-info-grid">
+                                                {favorite.location && (
+                                                    <div className="v0-favorite-info-item">
+                                                        <LuMapPin size={16} />
+                                                        <span>{favorite.location}</span>
+                                                    </div>
+                                                )}
+                                                {favorite.startDate && (
+                                                    <div className="v0-favorite-info-item">
+                                                        <LuCalendar size={16} />
+                                                        <span>{favorite.startDate}</span>
+                                                    </div>
+                                                )}
+                                                {favorite.timeFrame && (
+                                                    <div className="v0-favorite-info-item">
+                                                        <LuCalendar size={16} />
+                                                        <span>{favorite.timeFrame}</span>
+                                                    </div>
+                                                )}
+                                                {favorite.isPaid !== undefined && favorite.isPaid !== null && (
+                                                    <div className="v0-favorite-info-item">
+                                                        <LuAward size={16} />
+                                                        <span>{favorite.isPaid ? 'Paid' : 'Unpaid'}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            
+                                            {favorite.description && (
+                                                <p className="v0-favorite-description">
+                                                    {favorite.description.length > 120 
+                                                        ? `${favorite.description.substring(0, 120)}...` 
+                                                        : favorite.description
+                                                    }
+                                                </p>
+                                            )}
+                                            
+                                            <div className="v0-favorite-actions">
+                                                <button 
+                                                    className="v0-favorite-view-btn"
+                                                    onClick={() => openFavoriteModal(favorite)}
+                                                >
+                                                    View Details
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="v0-resource-section">
                         <div className="v0-resource-header">

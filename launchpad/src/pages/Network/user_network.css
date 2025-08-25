@@ -68,11 +68,11 @@ body.modal-open {
 }
 
 .carousel-button.prev {
-  left: -50px;
+  left: 10px;
 }
 
 .carousel-button.next {
-  right: -43px;
+  right: 10px;
 }
 
 .slide-left, .slide-right {

@@ -132,7 +132,16 @@ const highSchoolQuestionsConfig = [
 
 export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, setCanSubmit, setUserData }) {
   
-  const tempStudentInfo = JSON.parse(localStorage.getItem('tempStudentInfo') || '{}');
+  const tempStudentInfo = (() => {
+    const stored = localStorage.getItem('tempStudentInfo');
+    if (!stored) return {};
+    try {
+      return JSON.parse(stored);
+    } catch (error) {
+      console.warn('Failed to parse tempStudentInfo from localStorage:', error);
+      return {};
+    }
+  })();
   const [highSchoolerData, setHighSchoolerData] = useState({
     userName: tempStudentInfo.full_name ? 
       tempStudentInfo.full_name.split(', ')[1] + ' ' + tempStudentInfo.full_name.split(', ')[0] : '',

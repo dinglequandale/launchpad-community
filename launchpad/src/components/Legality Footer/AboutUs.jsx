@@ -14,33 +14,32 @@ export default function AboutUs() {
                 </div>
                 <div className="about-us-content">
                     <p className="about-us-text">
-                        We're a team of high school and college students who grew tired of watching 
+                        We're a group of high school and college students who got tired of seeing 
                         the education system fall short—not because it doesn't try, but because it 
-                        forgets what students really need: connection.
+                        forgets what students actually need: real connections.
                     </p>
                     
                     <p className="about-us-text">
-                        The truth is, schools today have been reduced to curriculums instead of 
-                        communities. Even the best institutions overlook the most powerful learning 
-                        tool sitting right in front of them—networks of alumni, parents, and 
-                        professionals who are willing to help, but have no way to reach the 
-                        students who need it most.
+                        The reality is, schools today have become more about curriculums than 
+                        communities. Even the best schools miss the most powerful learning tool 
+                        right in front of them—networks of alumni, parents, and professionals 
+                        who want to help but have no way to reach the students who need it most.
                     </p>
 
                     <p className="about-us-emphasis">That's why we built Launchpad.</p>
 
                     <p className="about-us-text">
-                        Launchpad was born from one problem we all experienced firsthand: it's 
-                        incredibly hard to find the right connection or opportunity to further 
-                        your career—especially as a high schooler. But beneath that was a deeper 
-                        issue: the system wasn't designed to make that easy.
+                        Launchpad came from a problem we all experienced: it's really hard to find 
+                        the right connection or opportunity to move your career forward—especially 
+                        as a high schooler. But underneath that was a bigger issue: the system 
+                        wasn't built to make that easy.
                     </p>
                     
                     <p className="about-us-text">So we're changing that.</p>
 
                     <p className="about-us-mission">
-                        Our platform transforms every school into a living, breathing network—where 
-                        opportunity is just one message away. Because we believe schools should do 
+                        Our platform turns every school into a living, breathing network—where 
+                        opportunity is just one message away. Because we think schools should do 
                         more than test students. They should launch them into their futures.
                     </p>
                 </div>
