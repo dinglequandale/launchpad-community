@@ -29,9 +29,9 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
     approved.some((conn) => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId) ||
     parent_approved.some((conn) => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId);
 
-  const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}');
+  const [userBasicInfo, setUserBasicInfo] = useState(JSON.parse(localStorage.getItem('basicUserInfo') || '{}'));
   const viewingUserType = userBasicInfo.userType;
-  const hideConnectBtn = viewingUserType !== 'High Schooler' && userData.userType === 'High Schooler';
+  const hideConnectBtn = false; // Always show connect button
   const disableActions = userBasicInfo && userBasicInfo.userType === 'High Schooler' && !userBasicInfo.parentVerified;
 
   const handleConnectClick = () => {
@@ -88,6 +88,15 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
   };
 
   const getButtonState = () => {
+    console.log('getButtonState debug:', { 
+      connectionsLoading, 
+      connectionStatus, 
+      disableActions, 
+      viewingUserType, 
+      userDataUserType: userData.userType,
+      condition: viewingUserType === 'Alumni' && userData.userType === 'High Schooler'
+    });
+    
     if (connectionsLoading) {
       return { text: 'Loading...', disabled: true };
     }
@@ -95,6 +104,11 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
       return { text: 'Contact', disabled: false };
     }
     if (disableActions) {
+      return { text: 'Connect', disabled: true };
+    }
+    // For Alumni viewing High Schoolers, show connect button but disabled
+    if (viewingUserType === 'Alumni' && userData.userType === 'High Schooler') {
+      console.log('Alumni viewing High Schooler - button should be disabled');
       return { text: 'Connect', disabled: true };
     }
     return { text: 'Connect', disabled: false };
@@ -107,7 +121,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
   };
 
   return (
-    <div className="v0-user-card" style={{ height: hideConnectBtn ? 120 : 172 }}>
+    <div className="v0-user-card" style={{ height: Math.max(hideConnectBtn ? 120 : 172, 200) }}>
       {bannerVisibility && <ConnectionBanner />}
       <button className="v0-link-ghost" onClick={handleSeeProfile} aria-label="See Profile">
         See Profile
@@ -134,19 +148,6 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
         <div className="v0-ellipsed">
           <strong>{basicInfoContent.userSecondDesc.label}:</strong> {basicInfoContent.userSecondDesc.content}
         </div>
-        {userData.linkedinLink && (
-          <div className="v0-ellipsed" style={{ marginTop: '8px' }}>
-            <strong>LinkedIn:</strong> 
-            <a 
-              href={userData.linkedinLink} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              style={{ color: '#0077b5', textDecoration: 'underline', marginLeft: '4px' }}
-            >
-              View Profile
-            </a>
-          </div>
-        )}
       </div>
 
       {!hideConnectBtn && (
@@ -156,12 +157,18 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
           title={
             disableActions
               ? 'Parent/guardian approval required'
+              : viewingUserType === 'Alumni' && userData.userType === 'High Schooler'
+              ? 'High Schoolers cannot connect with Alumni'
               : connectionStatus
               ? 'Contact'
               : 'Connect'
           }
           onClick={() => {
             if (!buttonState.disabled) handleConnectClick();
+          }}
+          style={{ 
+            opacity: buttonState.disabled ? 0.6 : 1,
+            cursor: buttonState.disabled ? 'not-allowed' : 'pointer'
           }}
         >
           <FaLink size={18} />

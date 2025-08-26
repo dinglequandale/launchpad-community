@@ -36,6 +36,18 @@ export const displayShortenedLinkedin = (linkedInLink) => {
 }
 
 export const displayFieldsOfInterest = (fieldsOfInterest, length = "shorter") => {
+    // Handle null/undefined cases
+    if (!fieldsOfInterest || !Array.isArray(fieldsOfInterest) || fieldsOfInterest.length === 0) {
+        return "Not specified";
+    }
+    
+    // Filter out any undefined/null values
+    const validFields = fieldsOfInterest.filter(field => field && typeof field === 'string');
+    
+    if (validFields.length === 0) {
+        return "Not specified";
+    }
+    
     const abbreviations = {
         "Mathematics": "Math",
         "Business Management": "Business",
@@ -75,8 +87,8 @@ export const displayFieldsOfInterest = (fieldsOfInterest, length = "shorter") =>
         return abbreviations[field] || field;
     };
 
-    const listLength = length === "shorter" ? 2 : fieldsOfInterest.length;
-    const currentList = (length === "shorter") ? fieldsOfInterest.slice(0, listLength).map(shortenFieldName) : fieldsOfInterest.slice(0, listLength);
+    const listLength = length === "shorter" ? 2 : validFields.length;
+    const currentList = (length === "shorter") ? validFields.slice(0, listLength).map(shortenFieldName) : validFields.slice(0, listLength);
 
     if (currentList.length === 1) {
         return currentList[0];
@@ -90,6 +102,18 @@ export const displayFieldsOfInterest = (fieldsOfInterest, length = "shorter") =>
 };
 
 export const displayColleges = (colleges, length = "longer") => {
+    // Handle null/undefined cases
+    if (!colleges || !Array.isArray(colleges) || colleges.length === 0) {
+        return "Not specified";
+    }
+    
+    // Filter out any undefined/null values
+    const validColleges = colleges.filter(college => college && typeof college === 'string');
+    
+    if (validColleges.length === 0) {
+        return "Not specified";
+    }
+    
     const abbreviations = {
         "University of Pennsylvania": "UPenn",
         "Massachusetts Institute of Technology": "MIT",
@@ -136,8 +160,8 @@ export const displayColleges = (colleges, length = "longer") => {
         return name;
     };
 
-    const listLength = length === "shorter" ? 2 : colleges.length;
-    const currentList = colleges.slice(0, listLength).map(shortenCollegeName);
+    const listLength = length === "shorter" ? 2 : validColleges.length;
+    const currentList = validColleges.slice(0, listLength).map(shortenCollegeName);
 
     if (currentList.length === 1) {
         return currentList[0];
@@ -151,6 +175,10 @@ export const displayColleges = (colleges, length = "longer") => {
 };
 
 export const getUserHS = (schoolName) => {
+    if (!schoolName || typeof schoolName !== 'string') {
+        return 'Unknown School';
+    }
+    
     const hsAbbreviations = {
         "Awty International School":"Awty"
     }
@@ -181,11 +209,11 @@ export const displaySchools = (schools) => {
 
 export const getBasicUserDescription = (userData, shortened=true) => {
     return userData.userType === "High Schooler" ?
-     `Class of ${userData.graduationYear}, ${getUserHS(userData.schoolAttending)}` 
-     : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear}, ${getUserHS(userData.schoolAttending)}` 
-     : userData.userType === "Professional" ? `${userData.yearsOfExperience}+ Years of Experience in ${shortened ? userData.areasOfInterest[0] 
-        : displayFieldsOfInterest(userData.areasOfInterest)}`
-    : `${userData.schoolRole} at ${getUserHS(userData.schoolAttending)}`;
+     `Class of ${userData.graduationYear || 'N/A'}, ${getUserHS(userData.schoolAttending || 'Unknown School')}` 
+     : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear || 'N/A'}, ${getUserHS(userData.schoolAttending || 'Unknown School')}` 
+     : userData.userType === "Professional" ? `${userData.yearsOfExperience || 'N/A'}+ Years of Experience in ${shortened ? (userData.areasOfInterest && userData.areasOfInterest.length > 0 ? userData.areasOfInterest[0] : 'General Field') 
+        : displayFieldsOfInterest(userData.areasOfInterest || [])}`
+    : `${userData.schoolRole || 'Staff Member'} at ${getUserHS(userData.schoolAttending || 'Unknown School')}`;
 }
 
 export const editUserData = async (newData, currentUser, origUserData) => {

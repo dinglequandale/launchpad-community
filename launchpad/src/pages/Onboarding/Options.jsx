@@ -169,7 +169,7 @@ const getColleges = async (searchQuery = '') => {
   }
 };
 
-const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, showQuestion = true }) => {
+const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, showQuestion = true, field = "collegeInterestsOrDecision" }) => {
   const [options, setOptions] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);
@@ -218,7 +218,7 @@ const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, s
 
   // Create a wrapper function that knows which field to update
   const handleCollegeChange = (selectedOption) => {
-    const fieldId = 'collegeInterestsOrDecision';
+    const fieldId = field;
     
     if (isMultiSelect) {
       // For multi-select, selectedOption is an array of college labels
@@ -235,8 +235,7 @@ const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, s
   const getCurrentValue = () => {
     // Add safety check for selectedOptions
     if (!selectedOptions) return isMultiSelect ? [] : '';
-    
-    const currentValue = selectedOptions.collegeInterestsOrDecision;
+    const currentValue = field === "collegeAttending" ? selectedOptions.collegeAttending : selectedOptions.collegeInterestsOrDecision;
     
     if (isMultiSelect) {
       // Handle both string and array values for backward compatibility

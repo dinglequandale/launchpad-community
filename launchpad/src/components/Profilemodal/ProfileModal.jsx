@@ -35,7 +35,7 @@ export default function ProfileModal({
   const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}')
   const schoolId = localStorage.getItem('schoolId')
   const disableActions = userBasicInfo?.userType === 'High Schooler' && !userBasicInfo?.parentVerified
-  const hideConnectBtn = userBasicInfo?.userType !== 'High Schooler' && userData?.userType === 'High Schooler'
+  const hideConnectBtn = false // Always show connect button
 
   const isConnection =
     approved.some(conn => conn.targetUserId === userData?.userId || conn.initiateUserId === userData?.userId) ||
@@ -198,6 +198,27 @@ export default function ProfileModal({
               </div>
             </div>
           )}
+
+          {userData.linkedinLink && (
+            <div className="profile-modal-detail-item">
+              <div className="profile-modal-detail-icon">
+                <FaLink size={16} />
+              </div>
+              <div className="profile-modal-detail-content">
+                <span className="profile-modal-detail-label">LinkedIn</span>
+                <span className="profile-modal-detail-value">
+                  <a 
+                    href={userData.linkedinLink} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="profile-modal-linkedin-link"
+                  >
+                    View Profile
+                  </a>
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Connect Button */}
@@ -205,8 +226,14 @@ export default function ProfileModal({
           <button 
             className={`profile-modal-connect-btn ${isConnection ? 'connected' : ''}`}
             onClick={handleConnect}
-            disabled={disableActions}
-            title={disableActions ? 'Parent/guardian approval required' : ''}
+            disabled={disableActions || (userBasicInfo?.userType === 'Alumni' && userData?.userType === 'High Schooler')}
+            title={
+              disableActions 
+                ? 'Parent/guardian approval required' 
+                : userBasicInfo?.userType === 'Alumni' && userData?.userType === 'High Schooler'
+                ? 'High Schoolers cannot connect with Alumni'
+                : ''
+            }
           >
             <FaLink size={18} />
             {isConnection ? 'Contact' : 'Connect'}

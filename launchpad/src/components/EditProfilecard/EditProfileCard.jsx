@@ -677,7 +677,7 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
             sponsoredClubs = {desc1: "Sponsored Clubs", desc2: userData.sponsoredClubs}
         } else {
             userFirstDesc = {desc1: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}`, desc2: (userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : ""};
-            userSecondDesc = {desc1: `${descType}`, desc2: `${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? displayColleges([userData.collegeAttending]) : Array.isArray(userData.collegeInterestsOrDecision) ? displayColleges([...userData.collegeInterestsOrDecision]) : displayColleges([userData.collegeInterestsOrDecision])}`};
+            userSecondDesc = {desc1: `${descType}`, desc2: `${userType === "Professional" ? userData.industryPosition : userType === "Alumni" ? (userData.collegeAttending ? displayColleges([userData.collegeAttending]) : "Not specified") : Array.isArray(userData.collegeInterestsOrDecision) ? (userData.collegeInterestsOrDecision && userData.collegeInterestsOrDecision.length > 0 ? displayColleges([...userData.collegeInterestsOrDecision]) : "Not specified") : (userData.collegeInterestsOrDecision ? displayColleges([userData.collegeInterestsOrDecision]) : "Not specified")}`};
         }
         setBasicInfoContent({
             userPreface: getBasicUserDescription(userData, false),

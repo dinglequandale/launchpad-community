@@ -170,9 +170,22 @@ export const addOrUpdateConnection = async (currentUser, targetUser, status, set
 export function isConnectionApproved(currentUserType, currentUser, targetUser, parent_approved, approved, parentVerified) {
     // If not a high schooler connecting to a professional, always approved
     if (!currentUser || !targetUser) return false;
+    
+    // High Schoolers cannot connect with Alumni
+    if (currentUserType === 'High Schooler' && targetUser.userType === 'Alumni') {
+        return false;
+    }
+    
+    // Alumni cannot connect with High Schoolers
+    if (currentUserType === 'Alumni' && targetUser.userType === 'High Schooler') {
+        return false;
+    }
+    
+    // If not a high schooler connecting to a professional, always approved
     if (currentUserType !== 'High Schooler' || targetUser.userType === 'High Schooler') {
         return true;
     }
+    
     if (!parentVerified) {
         return false;
     }

@@ -109,12 +109,13 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
     areasOfInterest: [],
     linkedinLink: "",
     email: "",
-    collegeAttending: "",
+    // collegeInterestsOrDecision: "",
     schoolAttending: schoolInfo?.schoolDisplayName || "",
+    collegeAttending: "",
     schoolId: schoolInfo?.schoolId || "",
     graduationYear: "",
     userSkills: [],
-    userType: "College Student",
+    userType: "Alumni",
   });
 
   // Update parent component with user data whenever it changes
@@ -127,7 +128,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
     const getUserEmail = async () => {
       try {
         const result = await getEmail({ uid: currentUser.uid });
-        if (result.data) {
+        if (result.data && result.data.email) {
           setCollegeStudentData(prev => ({
             ...prev,
             email: result.data.email
@@ -193,12 +194,12 @@ const CollegeInfo = ({ selectedOptions, handleChange, collegeStudentData }) => {
           .map((question) => (
             question.id === 'collegeAttending' ? (
               <div className="form-group" key={question.id}>
-                {/* <label className="form-label">{question.text}</label> */}
+                <label className="form-label">{question.text}</label>
                 <CollegeSearch
-                  question={question.text}
-                  selectedOption={selectedOptions['collegeAttending']}
-                  onChange={(label) => handleChange('collegeAttending', label)}
-                  type={question.type}
+                  selectedOptions={selectedOptions}
+                  handleChange={handleChange}
+                  field="collegeAttending"
+                  isMultiSelect={false}
                 />
               </div>
             ) 
