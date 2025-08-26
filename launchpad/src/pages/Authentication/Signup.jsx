@@ -311,6 +311,19 @@ export default function SignUp(){
                                     )}
                                     {schoolEmailCondition && (
                                         <div className="auth-email-override">
+                                            <div style={{ 
+                                                background: '#f8f9fa', 
+                                                border: '1px solid #dee2e6', 
+                                                borderRadius: '8px', 
+                                                padding: '12px', 
+                                                marginBottom: '16px',
+                                                fontSize: '14px',
+                                                color: '#6c757d'
+                                            }}>
+                                                <strong>Having trouble with school email?</strong>
+                                                <br />
+                                                If your email isn't in our database or you're using a different email, you can still sign up.
+                                            </div>
                                             <button
                                                 type="button"
                                                 onClick={() => {
@@ -327,8 +340,18 @@ export default function SignUp(){
                                                     }
                                                 }}
                                                 className="auth-override-button"
+                                                style={{
+                                                    background: emailOverride ? '#28a745' : '#007bff',
+                                                    color: 'white',
+                                                    border: 'none',
+                                                    padding: '10px 16px',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    fontSize: '14px',
+                                                    fontWeight: '500'
+                                                }}
                                             >
-                                                {emailOverride ? "✓ Use any email address" : "School email not in database? Click here"}
+                                                {emailOverride ? "✓ Using any email address" : "Use Different Email Address"}
                                             </button>
                                         </div>
                                     )}

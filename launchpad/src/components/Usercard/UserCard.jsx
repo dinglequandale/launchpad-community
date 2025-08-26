@@ -134,6 +134,19 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
         <div className="v0-ellipsed">
           <strong>{basicInfoContent.userSecondDesc.label}:</strong> {basicInfoContent.userSecondDesc.content}
         </div>
+        {userData.linkedinLink && (
+          <div className="v0-ellipsed" style={{ marginTop: '8px' }}>
+            <strong>LinkedIn:</strong> 
+            <a 
+              href={userData.linkedinLink} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ color: '#0077b5', textDecoration: 'underline', marginLeft: '4px' }}
+            >
+              View Profile
+            </a>
+          </div>
+        )}
       </div>
 
       {!hideConnectBtn && (

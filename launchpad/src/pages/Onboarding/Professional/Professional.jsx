@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import CustomSelect from '../../../components/CustomSelect';
 import { highSchools, careerInterests, graduationYears, CollegeSearch } from './../Options';
-import { requiredQuestionsAnswered } from '../../../services/onboardingServices';
+import { requiredQuestionsAnswered, saveProfessional } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { BiPlus, BiTrash } from 'react-icons/bi';
 import { getFunctions, httpsCallable } from 'firebase/functions';
@@ -70,20 +71,56 @@ const professionalQuestionsConfig = [
   // Page 2
   {
     id: "retiredStatus",
-    text: "Are you currently retired?",
+    text: "What is your current professional status?",
     type: "select",
-    optional: true,
-    options: ["Yes", "No"].map(option => ({ value: option, label: option })),
+    options: [
+      "Currently employed full-time",
+      "Currently employed part-time", 
+      "Self-employed/Entrepreneur",
+      "Freelancer/Consultant",
+      "Retired but active",
+      "Retired and not working",
+      "Student pursuing advanced degree",
+      "Other"
+    ].map(option => ({ value: option, label: option })),
     page: 2,
   },
 
   // Page 3
-  // If yes
+  // For currently employed or active professionals
   {
     id: "industryPosition",
-    text: "What was the last position you held?",
+    text: "What is your current position or role?",
     type: "text-box",
-    placeholder: "E.g. financial analyst",
+    placeholder: "E.g. Senior Software Engineer, Marketing Director, Financial Analyst",
+    retired: false,
+    options: null,
+    page: 3,
+  },
+  {
+    id: "companyName",
+    text: "Where do you currently work?",
+    placeholder: "E.g. ExxonMobil, Self-employed, University of Houston",
+    type: "text-box",
+    options: null,
+    retired: false,
+    page: 3
+  },
+  {
+    id: "yearsOfExperience",
+    text: "How many years of professional experience do you have?",
+    type: "text-box",
+    placeholder: "E.g. 15",
+    retired: false,
+    options: null,
+    page: 3,
+  },
+  // For retired professionals
+  {
+    id: "industryPosition",
+    text: "What was your last position or role?",
+    type: "text-box",
+    placeholder: "E.g. CEO, Professor, Senior Manager",
     retired: true,
     options: null,
     page: 3,
@@ -91,7 +128,7 @@ const professionalQuestionsConfig = [
   {
     id: "companyName",
     text: "Where did you work last?",
-    placeholder: "Company name ...",
+    placeholder: "E.g. ExxonMobil, University of Houston, Self-employed",
     type: "text-box",
     options: null,
     retired: true,
@@ -99,62 +136,26 @@ const professionalQuestionsConfig = [
   },
   {
     id: "yearsOfExperience",
-    text: "How many years of experience do you have?",
-    type: "text-box",
-    placeholder: "E.g. 10",
+    text: "How many years of professional experience did you have?",
+    placeholder: "E.g. 25",
     retired: true,
     options: null,
-    retired: true,
     page: 3,
-  },
-  // If no
-  {
-    id: "industryPosition",
-    text: "What is your current position?",
-    type: "text-box",
-    placeholder: "E.g. financial analyst",
-    options: null,
-    retired: false,
-    page: 3
-  },
-  {
-    id: "companyName",
-    text: "Where do you currently work?",
-    placeholder: "E.g ExxonMobil",
-    type: "text-box",
-    retired: false,
-    options: null,
-    page: 3
-  },
-  {
-    id: "yearsOfExperience",
-    text: "How many years of experience do you have?",
-    type: "text-box",
-    placeholder: "E.g. 10",
-    retired: false,
-    options: null,
-    page: 3,
-  },
-  {
-    id: "email",
-    page: 4,
   },
   // Page 4
-  // TODO: add descriptions to the options
   {
     id: "networkingLevel",
-    text: "You're knowledge and mentorship is a valuable reasource for students on this app.  \
-          Roughly assess your level of commitment:",
+    text: "Your knowledge and mentorship are valuable resources for students on this platform. Please select the types of support you're willing to provide:",
     type: "multi-select",
     options: [
-        "Casual Connections",
-        "General Inquires",
-        "Short Interviews / Coffee Chats",
-        "Guest Speaking",
-        "Project Support",
-        "Mentorship",
-        "Workplace Opportunities"
-    ].map(option => ({ value: option, label: option })),
+        "Casual Connections - General networking and introductions",
+        "General Inquiries - Answering questions about your field",
+        "Short Interviews / Coffee Chats - Brief conversations about careers",
+        "Guest Speaking - Speaking at events or classes",
+        "Project Support - Helping with specific student projects",
+        "Mentorship - Ongoing guidance and support",
+        "Workplace Opportunities - Internships, job shadowing, or entry-level positions"
+    ].map(option => ({ value: option.split(' - ')[0], label: option })),
     page: 4
   },
 ];
@@ -172,12 +173,23 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
     areasOfInterest: [],
     linkedinLink: "",
     email: "",
-    company: "",
-    jobTitle: "",
-    userSkills: [],
+    schoolAttending: schoolInfo?.schoolDisplayName || "",
     schoolId: schoolInfo?.schoolId || "",
     userType: "Professional",
+    // Professional status and work details
+    retiredStatus: "",
+    // Work experience (current or previous based on retired status)
+    industryPosition: "",
+    companyName: "",
+    yearsOfExperience: "",
+    // Networking commitment
+    networkingLevel: [],
   });
+
+  // Helper function to determine if user is retired based on status
+  const isRetired = (status) => {
+    return status === "Retired but active" || status === "Retired and not working";
+  };
 
   // Update parent component with user data whenever it changes
   useEffect(() => {
@@ -205,17 +217,45 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
     }
   }, [currentUser]);
 
+  // Check if required questions are answered
+  useEffect(() => {
+    console.log("STUFF: ", professionalData);
+    if (requiredQuestionsAnswered(professionalQuestionsConfig, professionalData)) {
+      console.log("Can submit");
+      setCanSubmit(true);
+    } else {
+      setCanSubmit(false);
+    }
+  }, [professionalData, setCanSubmit]);
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    try {
+      await saveProfessional(
+        currentUser, 
+        professionalData,
+        () => {
+          // Success callback
+          toast.success('Information saved successfully!');
+          navigate("/Home");
+        }
+      );
+    } catch (error) {
+      // Error callback
+      toast.error('Failed to save information. Please try again.');
+    }
+  };
+
+  // Auto-submit when isSubmitting is true
+  if (isSubmitting) {
+    handleSubmit();
+  }
+
   // Check if all required questions are answered
   useEffect(() => {
     const canSubmit = requiredQuestionsAnswered(professionalQuestionsConfig, professionalData);
     setCanSubmit(canSubmit);
   }, [professionalData, setCanSubmit]);
-
-  // Remove the old save logic since it's now handled by the parent
-
-  if(isSubmitting){
-    // handleSubmit(); // This line is removed as per the edit hint
-  }
 
   const handleChange = (id, label) => {
     setProfessionalData(prevState => ({
@@ -225,13 +265,21 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
   };
 
   const getUserEmail = async () => {
-    const result = await getEmail();
-    console.log("result:", result);
-    handleChange("email", result.data.email);
+    try {
+      const result = await getEmail({ uid: currentUser.uid });
+      console.log("result:", result);
+      if (result.data && result.data.email) {
+        handleChange("email", result.data.email);
+      }
+    } catch (error) {
+      console.error('Error fetching user email:', error);
+    }
   }
   useEffect(()=>{
-    getUserEmail();
-  },[]);
+    if (currentUser) {
+      getUserEmail();
+    }
+  },[currentUser]);
   
 
   const renderPage = () => {
@@ -268,8 +316,8 @@ const RetiredStatus = ({ selectedOptions, handleChange }) => {
           <div className="form-group" key={question.id}>
             <CustomSelect
               options={question.options}
-              value={(selectedOptions[question.id] ? "Yes" : "No") || ''}
-              onChange={(label) => handleChange(question.id, label === "Yes")}
+              value={selectedOptions[question.id] || ''}
+              onChange={(label) => handleChange(question.id, label)}
               placeholder="Select an option"
               isMulti={false}
               isSearchable={false}
@@ -282,7 +330,7 @@ const RetiredStatus = ({ selectedOptions, handleChange }) => {
 };
 
 const WorkDetails = ({selectedOptions, handleChange}) => {
-  const isRetired = selectedOptions.retiredStatus;
+  const isRetired = selectedOptions.retiredStatus === "Retired but active" || selectedOptions.retiredStatus === "Retired and not working";
   const questionsForPage = professionalQuestionsConfig.filter((question)=>(question.page === 3 && question.retired === isRetired));
   return (
     <div className="form-section">
@@ -318,11 +366,8 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
   );
 };
   const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
-
-    const OptionalLabel = () => (
-      <span className="optional-label">(Optional)</span>
-    );
-  
+    const questionsForPage = professionalQuestionsConfig.filter((question) => question.page === 4);
+    
     const handleOptionChange = (event) => {
       const value = event.target.value;
       setSelectedOptions(prevState => ({
@@ -332,29 +377,6 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
           : [...selectedOptions.networkingLevel, value]
       }));
     };
-    
-    const availabilityOptionsConfig = [
-      { 
-          id: "casualConnection",
-          text: "Answer occasional messages and questions regarding your career field",
-          value: "Casual Connection",
-      },
-      { 
-          id: "generalInquiries",
-          text: "Entertain student inquiries about any opportunities you know of in your field",
-          value: "General Inquiries",
-      },
-      { 
-          id: "informationalInterview",
-          text: "Discuss your career path with high schoolers or undergrads over a short interview",
-          value: "Short Interview",
-      },
-      { 
-          id: "workplaceOpportunities",
-          text: "Occasionally offer shadowing / internship / volunteer opportunities",
-          value: "Workplace Opportunities",
-      },
-    ];
   
     return (
         <div className="form-section">
@@ -367,33 +389,45 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
               </div>
             </div>
           </div>
-          <div className="form-group">
-            <label className="form-label">
-              Please roughly assess your commitment:
-              <div className="onboarding-optional-label-container">
-                <OptionalLabel />
-              </div>
-            </label>
-          </div>
-          <div className="contact-sharing-container">
-            {availabilityOptionsConfig.map((option) => (
-              <div className="radio-option" key={option.id}>
-                <label className="radio-label">
-                  <input
-                    type="checkbox"
-                    value={option.value}
-                    checked={selectedOptions.networkingLevel.includes(option.value)}
-                    onChange={handleOptionChange}
-                    className="radio-input"
-                  />
-                  <div className="radio-custom"></div>
-                  <div className="option-text">
-                    <strong>{option.value}:</strong> {option.text}
-                  </div>
-                </label>
-              </div>
-            ))}
-          </div>
+          
+          {questionsForPage.map((question) => (
+            <div key={question.id} className="form-group">
+              <label className="form-label">
+                {question.text}
+                <div className="onboarding-optional-label-container">
+                  <span className="optional-label">(Optional)</span>
+                </div>
+              </label>
+              
+              {question.type === 'multi-select' && (
+                <div className="contact-sharing-container">
+                  {question.options.map((option) => (
+                    <div className="radio-option" key={option.value}>
+                      <label className="radio-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                        <input
+                          type="checkbox"
+                          value={option.value}
+                          checked={selectedOptions.networkingLevel.includes(option.value)}
+                          onChange={handleOptionChange}
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '50%',
+                            accentColor: '#1976d2',
+                            margin: '0',
+                            cursor: 'pointer'
+                          }}
+                        />
+                        <div className="option-text" style={{ flex: 1, lineHeight: '1.4' }}>
+                          <strong>{option.value}:</strong> {option.label.split(' - ')[1] || option.label}
+                        </div>
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
     );
   };

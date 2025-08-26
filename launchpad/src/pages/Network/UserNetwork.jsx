@@ -95,6 +95,7 @@ export default function UserNetwork() {
     userType: 'Any User',
     collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
     areasOfInterestOrExpertise: `My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`,
+    networkingCommitment: 'Any Commitment Level',
     // schoolAttending: 'Any High School',
   });
   const [filterChanged, setFilterChanged] = useState(false);
@@ -103,6 +104,16 @@ export default function UserNetwork() {
     userType: ["Any User", "Professionals", "College Students", "High Schoolers"],
     collegeInterestsOrDecision: userType === "High Schooler" ? (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]) : null,
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+    networkingCommitment: [
+      "Any Commitment Level",
+      "Casual Connections",
+      "General Inquires", 
+      "Short Interviews / Coffee Chats",
+      "Guest Speaking",
+      "Project Support",
+      "Mentorship",
+      "Workplace Opportunities"
+    ],
     // schoolAttending: ["Any High School", "My High School"]
     // schoolAttending: ["Any High School", "My High School"],
   };

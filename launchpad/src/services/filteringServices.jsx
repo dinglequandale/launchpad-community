@@ -33,6 +33,8 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
                 operation: "in",
                 value: [...userColleges],
             };
+        } else if(key === "networkingCommitment"){
+            return { key, operation: 'array-contains-any', value };
         } else if (Array.isArray(value)) {
             return { key, operation: 'in', value };
         } else {

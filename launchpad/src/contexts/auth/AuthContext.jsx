@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { auth } from "../../firebase/firebaseConfig";
 // import { GoogleAuthProvider } from "firebase/auth";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 const AuthContext = React.createContext();
 
@@ -47,12 +47,24 @@ export function AuthProvider({ children }) {
     setLoading(false);
   }
 
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      // Clear any local storage or state
+      localStorage.clear();
+    } catch (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
+  };
+
   const value = {
     loading,
     userLoggedIn,
     isEmailUser,
     isGoogleUser,
     currentUser,
+    logout,
   };
 
   return (
