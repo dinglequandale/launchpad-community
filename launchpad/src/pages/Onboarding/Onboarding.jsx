@@ -100,7 +100,7 @@ export default function Onboarding() {
             const currentUserData = {
                 ...userData,
                 schoolId: schoolId,
-                userType: selectedOption
+                userType: selectedOption === "College Student" ? "Alumni" : selectedOption
             };
 
             // Call the appropriate save function based on user type
