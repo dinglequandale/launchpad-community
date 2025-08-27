@@ -61,7 +61,6 @@
 .search-form:focus-within .searchIcon {
     color: #1157e2;
 }
-
 .search-filters {
     display: flex;
     padding-top: 16px;

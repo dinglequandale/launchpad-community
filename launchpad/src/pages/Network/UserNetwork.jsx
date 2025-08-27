@@ -46,10 +46,11 @@ export default function UserNetwork() {
   const [highSchoolers, setHighSchoolers] = useState([]);
   const [collegeStudents, setCollegeStudents] = useState([]);
   const [professionals, setProfessionals] = useState([]);
+  const [staff, setStaff] = useState([]);
 
   const loadLimit = 6;
-  const [lastDocs, setLastDocs] = useState({ highSchool: null, college: null, professional: null });
-  const [loading, setLoading] = useState({ highSchool: false, college: false, professional: false });
+  const [lastDocs, setLastDocs] = useState({ highSchool: null, college: null, professional: null, staff: null });
+  const [loading, setLoading] = useState({ highSchool: false, college: false, professional: false, staff: false });
   const [overallLoading, setOverallLoading] = useState(false);
 
   const [allVisibleUserData, setAllVisibleUserData] = useState(null);
@@ -94,26 +95,15 @@ export default function UserNetwork() {
   const [filters, setFilters] = useState({
     userType: 'Any User',
     collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
-    areasOfInterestOrExpertise: `My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`,
-    networkingCommitment: 'Any Commitment Level',
+    areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
     // schoolAttending: 'Any High School',
   });
   const [filterChanged, setFilterChanged] = useState(false);
 
   const filterContent = {
-    userType: ["Any User", "Professionals", "College Students", "High Schoolers"],
+    userType: ["Any User", "Professionals", "College Students", "High Schoolers", "Staff"],
     collegeInterestsOrDecision: userType === "High Schooler" ? (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]) : null,
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
-    networkingCommitment: [
-      "Any Commitment Level",
-      "Casual Connections",
-      "General Inquires", 
-      "Short Interviews / Coffee Chats",
-      "Guest Speaking",
-      "Project Support",
-      "Mentorship",
-      "Workplace Opportunities"
-    ],
     // schoolAttending: ["Any High School", "My High School"]
     // schoolAttending: ["Any High School", "My High School"],
   };
@@ -121,26 +111,57 @@ export default function UserNetwork() {
   useEffect(()=>{
     setOverallLoading(true);
     fetchAllUserTypes();
-    if(filters.areasOfInterestOrExpertise.substring(0,3) === "Any"){
-      setIsRecommended("");
-    }
-    else{
+    
+    // Check if any interests are selected (not just "Any")
+    const hasSpecificInterests = Array.isArray(filters.areasOfInterestOrExpertise) && 
+      filters.areasOfInterestOrExpertise.some(interest => !interest.includes('Any'));
+    
+    if(hasSpecificInterests){
       setIsRecommended("(recommended)");
+    } else {
+      setIsRecommended("");
     }
   },[filters]);
 
   useEffect(() => {
-    setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals]);
+    setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals, ...staff]);
 
     console.log("All data:", allVisibleUserData)
-  },[collegeStudents, highSchoolers, professionals]);
+  },[collegeStudents, highSchoolers, professionals, staff]);
 
   const fetchAllUserTypes = async () => {
-      await Promise.all([
-          fetchUserType('High Schooler'),
-          fetchUserType('Alumni'),
-          fetchUserType('Professional')
-      ]);
+      console.log('fetchAllUserTypes called with filters:', filters);
+      // Only fetch user types based on the userType filter
+      if (filters.userType === 'Any User') {
+          console.log('Fetching all user types');
+          await Promise.all([
+              fetchUserType('High Schooler'),
+              fetchUserType('Alumni'),
+              fetchUserType('Professional'),
+              fetchUserType('Staff')
+          ]);
+      } else {
+          console.log('Fetching specific user type:', filters.userType);
+          // Map filter values to actual user types
+          const userTypeMap = {
+              'High Schoolers': 'High Schooler',
+              'College Students': 'Alumni',
+              'Professionals': 'Professional',
+              'Staff': 'Staff'
+          };
+          
+          const targetUserType = userTypeMap[filters.userType];
+          if (targetUserType) {
+              console.log('Target user type:', targetUserType);
+              // Clear other user type arrays when filtering to specific type
+              if (targetUserType !== 'High Schooler') setHighSchoolers([]);
+              if (targetUserType !== 'Alumni') setCollegeStudents([]);
+              if (targetUserType !== 'Professional') setProfessionals([]);
+              if (targetUserType !== 'Staff') setStaff([]);
+              
+              await fetchUserType(targetUserType);
+          }
+      }
   };
 
   const fetchUserType = async (category, isLoadMore = false) => {
@@ -167,6 +188,9 @@ export default function UserNetwork() {
               case 'Professional':
                   setProfessionals(prev => isLoadMore ? [...prev, ...results] : results);
                   break;
+              case 'Staff':
+                  setStaff(prev => isLoadMore ? [...prev, ...results] : results);
+                  break;
           }
       } catch (error) {
           console.error(`Error fetching ${category} data:`, error);
@@ -185,8 +209,13 @@ export default function UserNetwork() {
   };
 
   const handleFilterChange = (filterKey, value) => {
+    console.log('Filter changed:', filterKey, value);
     setFilterChanged(true);
-    setFilters(prev => ({...prev, [filterKey]: value}));
+    setFilters(prev => {
+      const newFilters = {...prev, [filterKey]: value};
+      console.log('New filters:', newFilters);
+      return newFilters;
+    });
   };
 
   const handleConnectClick = (userId) => {
@@ -332,62 +361,126 @@ export default function UserNetwork() {
             <div className={`networkContainer ${isSidebarCollapsed ? 'network-sidebar-collapsed' : 'network-sidebar-expanded'}`} id="networkContainer">
               <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/>
               <div className="v0-network-content">
-                {allVisibleUserData && allVisibleUserData.length > 0 ? <>
-                {professionals.length > 0 && (
-                <div className="v0-network-section">
-                  <div className="v0-network-section-header">
-                    <h3 className="v0-network-section-title">Professionals</h3>
-                    <span className="v0-network-section-badge">{isRecommended}</span>
+                {allVisibleUserData && allVisibleUserData.length > 0 ? (
+                  // Show grid view when filtering by specific user type
+                  filters.userType !== 'Any User' ? (
+                    <div className="v0-filtered-results">
+                      {filters.userType === 'Professionals' && professionals.length > 0 && (
+                        <UserGrid 
+                          userNetworkData={professionals}
+                          onEndReached={() => loadMore('Professional')}
+                          loading={loading.professional}
+                          connectionRefreshKey={connectionRefreshKey}
+                          title="Professionals"
+                        />
+                      )}
+                      {filters.userType === 'College Students' && collegeStudents.length > 0 && (
+                        <UserGrid 
+                          userNetworkData={collegeStudents}
+                          onEndReached={() => loadMore('Alumni')}
+                          loading={loading.college}
+                          connectionRefreshKey={connectionRefreshKey}
+                          title="College Students"
+                        />
+                      )}
+                      {filters.userType === 'High Schoolers' && highSchoolers.length > 0 && (
+                        <UserGrid 
+                          userNetworkData={highSchoolers}
+                          onEndReached={() => loadMore('High Schooler')}
+                          loading={loading.highSchool}
+                          connectionRefreshKey={connectionRefreshKey}
+                          title="High Schoolers"
+                        />
+                      )}
+                      {filters.userType === 'Staff' && staff.length > 0 && (
+                        <UserGrid 
+                          userNetworkData={staff}
+                          onEndReached={() => loadMore('Staff')}
+                          loading={loading.staff}
+                          connectionRefreshKey={connectionRefreshKey}
+                          title="Staff"
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    // Show carousel view when showing all user types
+                    <>
+                      {professionals.length > 0 && (
+                        <div className="v0-network-section">
+                          <div className="v0-network-section-header">
+                            <h3 className="v0-network-section-title">Professionals</h3>
+                            <span className="v0-network-section-badge">{isRecommended}</span>
+                          </div>
+                          <div className="v0-network-section-content">
+                            <UserCarousel 
+                              userNetworkData={professionals}
+                              onEndReached={() => loadMore('Professional')} 
+                              loading={loading.professional}
+                              connectionRefreshKey={connectionRefreshKey}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {collegeStudents.length > 0 && (
+                        <div className="v0-network-section">
+                          <div className="v0-network-section-header">
+                            <h3 className="v0-network-section-title">College Students</h3>
+                            <span className="v0-network-section-badge">{isRecommended}</span>
+                          </div>
+                          <div className="v0-network-section-content">
+                            <UserCarousel 
+                              userNetworkData={collegeStudents}
+                              onEndReached={() => loadMore('Alumni')}
+                              loading={loading.college}
+                              connectionRefreshKey={connectionRefreshKey}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {highSchoolers.length > 0 && userType !== "Professional" && (
+                        <div className="v0-network-section">
+                          <div className="v0-network-section-header">
+                            <h3 className="v0-network-section-title">High Schoolers</h3>
+                            <span className="v0-network-section-badge">{isRecommended}</span>
+                          </div>
+                          <div className="v0-network-section-content">
+                            <UserCarousel 
+                              userNetworkData={highSchoolers} 
+                              onEndReached={() => loadMore('High Schooler')} 
+                              loading={loading.highSchool}
+                              connectionRefreshKey={connectionRefreshKey}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {staff.length > 0 && (
+                        <div className="v0-network-section">
+                          <div className="v0-network-section-header">
+                            <h3 className="v0-network-section-title">Staff</h3>
+                            <span className="v0-network-section-badge">{isRecommended}</span>
+                          </div>
+                          <div className="v0-network-section-content">
+                            <UserGrid 
+                              userNetworkData={staff}
+                              onEndReached={() => loadMore('Staff')}
+                              loading={loading.staff}
+                              connectionRefreshKey={connectionRefreshKey}
+                              title="Staff"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )
+                ) : overallLoading ? (
+                  <div className="v0-loading-container">
+                    <Loading/>
                   </div>
-                  <div className="v0-network-section-content">
-                    <UserCarousel 
-                      userNetworkData={professionals}
-                      onEndReached={() => loadMore('Professional')} 
-                      loading={loading.professional}
-                      connectionRefreshKey={connectionRefreshKey}
-                    />
+                ) : (
+                  <div className="v0-no-results-container">
+                    <NoResults/>
                   </div>
-                </div>
                 )}
-                {collegeStudents.length > 0 && (
-                <div className="v0-network-section">
-                  <div className="v0-network-section-header">
-                    <h3 className="v0-network-section-title">College Students</h3>
-                    <span className="v0-network-section-badge">{isRecommended}</span>
-                  </div>
-                  <div className="v0-network-section-content">
-                    <UserCarousel 
-                      userNetworkData={collegeStudents}
-                      onEndReached={() => loadMore('Alumni')}
-                      loading={loading.college}
-                      connectionRefreshKey={connectionRefreshKey}
-                    />
-                  </div>
-                </div>
-                )}
-                {highSchoolers.length > 0 && userType !== "Professional" && (
-                <div className="v0-network-section">
-                  <div className="v0-network-section-header">
-                    <h3 className="v0-network-section-title">High Schoolers</h3>
-                    <span className="v0-network-section-badge">{isRecommended}</span>
-                  </div>
-                  <div className="v0-network-section-content">
-                    <UserCarousel 
-                      userNetworkData={highSchoolers} 
-                      onEndReached={() => loadMore('High Schooler')} 
-                      loading={loading.highSchool}
-                      connectionRefreshKey={connectionRefreshKey}
-                    />
-                  </div>
-                </div>
-                )}
-                </> : overallLoading ? 
-                <div className="v0-loading-container">
-                  <Loading/>
-                </div> : 
-                <div className="v0-no-results-container">
-                  <NoResults/>
-                </div>}
               </div>
             </div>
         </div>
@@ -481,4 +574,69 @@ function UserCarousel({userNetworkData, loading, onEndReached, connectionRefresh
       </button>
     </div>
   )
+}
+
+function UserGrid({userNetworkData, loading, onEndReached, connectionRefreshKey, title}){
+  const { handleOnProfileClick, handleConnectClick, loadLimit, filterChanged } = useContext(NetworkContext);
+  const [hasMore, setHasMore] = useState(true);
+
+  // Check if we need to load more when scrolling
+  useEffect(() => {
+    if (userNetworkData.length > 0 && userNetworkData.length % loadLimit === 0) {
+      setHasMore(true);
+    } else {
+      setHasMore(false);
+    }
+  }, [userNetworkData.length, loadLimit]);
+
+  // Load more when user scrolls near the bottom
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (scrollTop + clientHeight >= scrollHeight - 100 && hasMore && !loading) {
+      onEndReached();
+    }
+  };
+
+  return (
+    <div className="user-grid-container">
+      <div className="user-grid-header">
+        <h3 className="user-grid-title">{title}</h3>
+        <span className="user-grid-count">{userNetworkData.length} users</span>
+      </div>
+      
+      <div className="user-grid" onScroll={handleScroll}>
+        {!loading ? (
+          <>
+            <div className="user-grid-content">
+              {userNetworkData.map((profile, index) => (
+                <div key={index} className="user-grid-item">
+                  <UserCard 
+                    userData={profile} 
+                    onProfileClick={() => handleOnProfileClick(profile.userId)} 
+                    onConnectClick={handleConnectClick}
+                    refreshKey={connectionRefreshKey}
+                  />
+                </div>
+              ))}
+            </div>
+            {hasMore && (
+              <div className="user-grid-load-more">
+                <button 
+                  className="load-more-button" 
+                  onClick={onEndReached}
+                  disabled={loading}
+                >
+                  {loading ? 'Loading...' : 'Load More'}
+                </button>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="user-grid-loading">
+            <Loading/>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

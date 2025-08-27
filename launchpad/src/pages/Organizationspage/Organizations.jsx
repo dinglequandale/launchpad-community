@@ -42,8 +42,8 @@ export default function Organizations(){
     const { chatClient } = useOutletContext();
 
     const [filters, setFilters] = useState({
-        category: 'Any Category',
-        subjectMatter: 'Any Subject Matter'
+        organizationType: 'Any Category',
+        areasOfInterestOrExpertise: 'Any Subject Matter'
     });
 
     // Listen for sidebar state changes

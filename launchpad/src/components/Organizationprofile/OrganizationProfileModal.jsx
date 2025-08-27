@@ -237,13 +237,13 @@ export default function OrganizationProfileModal({
           </div>
           
           {/* Action Buttons */}
-          <div className="v0-organization-actions">
+          {/* <div className="v0-organization-actions">
             {location !== 'user_profile' && (
               <button className="v0-report-button" onClick={handleReport} aria-label="Report Organization">
                 <IoFlag size={18} />
               </button>
             )}
-          </div>
+          </div> */}
         </div>
 
         {/* Opportunity Details */}
