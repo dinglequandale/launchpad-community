@@ -76,7 +76,7 @@ async function sendEmailNotification(userEmail, senderName, messagePreview) {
         <h2>You have an unread message</h2>
         <p>${senderName} sent you a message:</p>
         <p><em>${messagePreview}</em></p>
-        <p>Click here to view the message: <a href="${process.env.APP_URL}/messages">View Message</a></p>
+        <p>Click here to view the message: <a href="${process.env.APP_URL}/chat">View Message</a></p>
         `
     };
 

@@ -5,23 +5,32 @@ const pushNotifPreference = localStorage.getItem("userNotificationPreferences")
     : true;
 
 export async function sendConnectMessageWithoutResume(message, currentUserId, connectingUserId, setChannelId, chat, schoolId){
-    if (!chat || !connectingUserId) return;
+    if (!chat || !connectingUserId) {
+        console.log('sendConnectMessageWithoutResume: Missing chat or connectingUserId');
+        return;
+    }
 
-    // also need the user data for the conenctUserId (target)
+    console.log('sendConnectMessageWithoutResume: Creating channel...');
+    console.log('Members:', [currentUserId, connectingUserId]);
 
     const newChannel = chat.channel("messaging", {
         members: [currentUserId, connectingUserId],
     })
 
+    console.log('Channel created, now creating on Stream...');
     await newChannel.create();
+    console.log('Channel created successfully with ID:', newChannel.id);
 
+    console.log('Sending message...');
     await newChannel.sendMessage({
         text: message,
         user: {
             id: currentUserId,
         }
     });
+    console.log('Message sent successfully');
 
+    console.log('Setting channel ID:', newChannel.id);
     setChannelId(newChannel.id);
 
     // console.log("schoolId", schoolId);
@@ -35,21 +44,32 @@ export async function sendConnectMessageWithoutResume(message, currentUserId, co
         const sendEmailNotifications = httpsCallable(getFunctions(), "sendEmailNotifications");
         try{
             const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: currentUserId, messagePreview: message, schoolId: schoolId});
+            console.log('Email notification sent:', result);
         }catch(error){
-            console.log(error);
+            console.log('Email notification error:', error);
         }
     }
 }
 
 export async function sendConnectMessageWithResume(message, resumeURL, metaData, currentUserId, connectingUserId, setChannelId, chat, schoolId){
-    if (!chat || !connectingUserId) return;
+    if (!chat || !connectingUserId) {
+        console.log('sendConnectMessageWithResume: Missing chat or connectingUserId');
+        return;
+    }
     
+    console.log('sendConnectMessageWithResume: Creating channel with resume...');
+    console.log('Members:', [currentUserId, connectingUserId]);
+    console.log('Resume URL:', resumeURL);
+
     const newChannel = chat.channel("messaging", {
         members: [currentUserId, connectingUserId]
     })
 
+    console.log('Channel created, now creating on Stream...');
     await newChannel.create();
+    console.log('Channel created successfully with ID:', newChannel.id);
 
+    console.log('Sending message with resume attachment...');
     await newChannel.sendMessage({
         text: message,
         attachments: [
@@ -65,14 +85,18 @@ export async function sendConnectMessageWithResume(message, resumeURL, metaData,
             id: currentUserId,
         }
     })
+    console.log('Message with resume sent successfully');
+
+    console.log('Setting channel ID:', newChannel.id);
     setChannelId(newChannel.id);
 
     if(pushNotifPreference){
         const sendInitEmailNotification = httpsCallable(getFunctions(), "sendInitEmailNotification");
         try{
             const result = await sendInitEmailNotification({receiverId: connectingUserId, senderName: currentUserId, messagePreview: message, schoolId: schoolId});
+            console.log('Email notification sent:', result);
         }catch(error){
-            console.log(error);
+            console.log('Email notification error:', error);
         }
     }
 }

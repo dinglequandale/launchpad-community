@@ -88,14 +88,14 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
   };
 
   const getButtonState = () => {
-    console.log('getButtonState debug:', { 
-      connectionsLoading, 
-      connectionStatus, 
-      disableActions, 
-      viewingUserType, 
-      userDataUserType: userData.userType,
-      condition: viewingUserType === 'Alumni' && userData.userType === 'High Schooler'
-    });
+    // console.log('getButtonState debug:', { 
+    //   connectionsLoading, 
+    //   connectionStatus, 
+    //   disableActions, 
+    //   viewingUserType, 
+    //   userDataUserType: userData.userType,
+    //   condition: viewingUserType === 'Alumni' && userData.userType === 'High Schooler'
+    // });
     
     if (connectionsLoading) {
       return { text: 'Loading...', disabled: true };

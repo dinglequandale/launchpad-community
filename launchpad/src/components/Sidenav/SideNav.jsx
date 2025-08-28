@@ -20,7 +20,7 @@ export default function SideNav({show}){
         [<IoHomeOutline size={24}/>, "Home", "/Home"], 
         [<TbUserHexagon size={24}/>, "Network", "/network"],
         [<GoOrganization size={24}/>, "Organizations", "/Organizations"], 
-        [<LuMessagesSquare size={24}/>, "Messages", "/messages"]
+        [<LuMessagesSquare size={24}/>, "Messages", "/chat"]
     ];
 
     const [selectedNav, setSelectedNav] = useState(null);

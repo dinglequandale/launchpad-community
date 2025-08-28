@@ -27,6 +27,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   const userType = userData.userType;
   const schoolId = localStorage.getItem("schoolId");
   const navigate = useNavigate();
+  const targetUserId = userId || userData?.userId || userData?.id; // Use userId if provided, otherwise extract from userData
 
   // Handle outside click
   useEffect(() => {
@@ -139,16 +140,15 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
       
       if (connectionResult.success) {
         // Send message
-        const messageResult = sendWithResume 
-          ? await sendConnectMessageWithResume(userId, introMessage, schoolId)
-          : await sendConnectMessageWithoutResume(userId, introMessage, schoolId);
-        
-        if (messageResult.success) {
-          toast.success('Message sent successfully!');
-          onClose();
+        if (sendWithResume) {
+          await sendConnectMessageWithResume(introMessage, currentUser.uid, targetUserId, setChannelId, chat, schoolId);
         } else {
-          toast.error('Failed to send message');
+          await sendConnectMessageWithoutResume(introMessage, currentUser.uid, targetUserId, setChannelId, chat, schoolId);
         }
+        
+        toast.success('Message sent successfully!');
+        navigate('/chat');
+        onClose();
       }
     } catch (error) {
       console.error('Error sending message:', error);
