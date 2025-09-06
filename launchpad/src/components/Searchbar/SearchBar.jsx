@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import ContentFilter from "../Contentfilter/ContentFilter";
+import CollegeSearchFilter from "../Contentfilter/CollegeSearchFilter";
 import "./searchbar.css";
 import { CiSearch } from "react-icons/ci";
 import { capitalizeFirstLetter } from '../../pages/Homepage/Home';
 import { careerInterests } from '../../pages/Onboarding/Options';
 
-export default function SearchBar({filters, pageName, handleFilterChange, handleSearch}) {
+export default function SearchBar({filters, pageName, handleFilterChange, handleSearch, clearAllFilters}) {
     const searchType = () => {
         switch(pageName){
             case `The ${capitalizeFirstLetter(localStorage.getItem("schoolId"))} Network`: 
@@ -39,7 +40,7 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
                 };
             case 'areasOfInterestOrExpertise':
                 return {
-                    title: "Interests",
+                    title: "Any Interests",
                     isMultiSelect: true,
                     showSearch: true,
                     maxSelections: 8,
@@ -52,6 +53,14 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
                     showSearch: false,
                     allowAnyOption: true
                 };
+            case 'networkingLevel':
+                return {
+                    title: "Networking Commitment",
+                    isMultiSelect: true,
+                    showSearch: false,
+                    maxSelections: 3,
+                    allowAnyOption: true
+                };
             default:
                 return {
                     title: filterKey,
@@ -62,7 +71,7 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
         }
     };
 
-    // Enhanced filter content with specific interests
+    // Enhanced filter content with specific interests and colleges
     const getEnhancedFilterContent = (filterKey, currentContent) => {
         if (filterKey === 'areasOfInterestOrExpertise') {
             // Add specific career interests from Options.jsx
@@ -71,6 +80,10 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
                 ...currentContent,
                 ...specificInterests
             ];
+        } else if (filterKey === 'collegeInterestsOrDecision') {
+            // For college search, we'll use the existing college search functionality
+            // This will be populated dynamically when user types
+            return currentContent;
         }
         return currentContent;
     };
@@ -98,6 +111,23 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
                         const config = getFilterConfig(filterKey);
                         const enhancedContent = getEnhancedFilterContent(filterKey, filters[filterKey]);
                         
+                        // Use CollegeSearchFilter for college searches
+                        if (filterKey === 'collegeInterestsOrDecision') {
+                            return (
+                                <CollegeSearchFilter 
+                                    key={filterKey}
+                                    title={config.title}
+                                    filterKey={filterKey} 
+                                    filterContent={enhancedContent} 
+                                    onFilterChange={handleFilterChange}
+                                    isMultiSelect={config.isMultiSelect}
+                                    showSearch={config.showSearch}
+                                    maxSelections={config.maxSelections}
+                                    allowAnyOption={config.allowAnyOption}
+                                />
+                            );
+                        }
+                        
                         return (
                             <ContentFilter 
                                 key={filterKey}
@@ -112,6 +142,14 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
                             />
                         );
                     })}
+                {clearAllFilters && (
+                    <button 
+                        className="v0-clear-filters-btn"
+                        onClick={clearAllFilters}
+                    >
+                        Clear All Filters
+                    </button>
+                )}
             </div>
         </div>
     );

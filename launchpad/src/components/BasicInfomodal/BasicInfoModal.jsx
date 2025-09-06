@@ -4,7 +4,7 @@ import Modal from "react-modal"
 import MakeChanges from "../Makechanges/MakeChanges";
 import toast, { Toaster } from "react-hot-toast";
 import OptionalNotice from "../Optionalnotice/OptionalNotice";
-import { careerInterests, CollegeSearch, getColleges } from "../../pages/Onboarding/Options";
+import { careerInterests, CollegeSearch } from "../../pages/Onboarding/Options";
 import OnboardingDropdown from "../OnboardingDropdown/OnboardingDropdown";
 import { editUserData } from "../../services/userProfileServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
@@ -16,9 +16,6 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSearchQueryChange = (query) => {
-    setSearchQuery(query);
-  };
 
   // Add safety check for userData
   const safeUserData = userData || {};
@@ -37,6 +34,8 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     schoolRole: safeUserData.schoolRole ?? "",
     sponsoredClubs: safeUserData.sponsoredClubs ?? "",
   });
+
+  // console.log("userData.collegeInterestsOrDecision", userData.collegeInterestsOrDecision)
 
   const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const basicInfoQuestionsConfig = [
@@ -163,9 +162,6 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     },
   ]
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const colleges = getColleges(searchQuery);
-  const cachedColleges = useMemo(() => colleges, [colleges]);
 
   // Add safety check for userType
   const safeUserType = userType || "High Schooler"; // Default fallback
@@ -313,19 +309,43 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
                         className="v0-form-input"
                       />
                     ) : question.id !== "collegeInterestsOrDecision" ? (
-                      // <div className="v0-form-input">
-                      <>
-                        <OnboardingDropdown
+                      question.id.toLowerCase().includes("college") ? (
+                        <CollegeSearch
                           showQuestion={false}
-                          key={question.id}
                           question={question.text}
-                          options={question.id.toLowerCase().includes("college") ? cachedColleges : question.options}
-                          selectedOption={basicInfoContent[question.id] || (question.type === 'multi-select' ? [] : '')}
-                          onChange={(label) => handleDropdownChange(question.id, label)}
-                          type={question.type}
-                          onSearchQueryChange={question.id.toLowerCase().includes("college") ? handleSearchQueryChange : null}
+                          selectedOptions={basicInfoContent}
+                          handleChange={handleDropdownChange}
+                          isMultiSelect={question.type === "multi-select"}
+                          field={question.id}
                         />
-                      </>
+                      ) : (
+                        <>
+                          <OnboardingDropdown
+                            showQuestion={false}
+                            key={question.id}
+                            question={question.text}
+                            options={question.options}
+                            selectedOption={basicInfoContent[question.id] || (question.type === 'multi-select' ? [] : '')}
+                            onChange={(label) => handleDropdownChange(question.id, label)}
+                            type={question.type}
+                          />
+                          {question.id === "areasOfInterest" && (
+                            <div className="v0-field-suggestion">
+                              <p className="v0-field-suggestion-text">
+                                Can't find a field of interest? 
+                                <a 
+                                  href="https://forms.gle/your-google-form-link" 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="v0-field-suggestion-link"
+                                >
+                                  Let us know how to add it here
+                                </a>
+                              </p>
+                            </div>
+                          )}
+                        </>
+                      )
                     ) : (
                       <>
                         <CollegeSearch

@@ -8,11 +8,13 @@ import { GrAdd } from 'react-icons/gr';
 import { LuMessagesSquare } from 'react-icons/lu';
 import { MdEmail } from 'react-icons/md';
 import { CgClose, CgWebsite } from 'react-icons/cg';
+import { BiEdit, BiTrash } from 'react-icons/bi';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { saveOpportunity } from '../../../services/opportunityServices';
 import { careerInterests } from '../../../pages/Onboarding/Options';
 import OnboardingDropdown from '../../OnboardingDropdown/OnboardingDropdown';
+import CustomSelect from '../../CustomSelect/CustomSelect';
 import SaveChanges from '../../Makechanges/SaveChanges';
 
 
@@ -26,6 +28,7 @@ const InitiativeContext = createContext({
   handleChange: () => {},
   handleDropdownChange: () => {},
   organizationQuestionsConfig: {},
+  currentUser: null,
 });
 
 export default function InitiativeModal({visibility, onClose, opportunityData, isEditing, opportunityId}){
@@ -83,8 +86,8 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     organizationHostStudent: "",
     organizationMission: "",
     organizationTags: [],
-    learnMore: 'Messages',
-    apply: 'Messages',
+    learnMore: 'Email',
+    apply: 'Email',
     organizationLogoPreview: null,
     createdByUserName: "",
   });
@@ -267,6 +270,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
         handleChange,
         organizationQuestionsConfig,
         handleDropdownChange,
+        currentUser,
         }}> 
         {visibility && (
           <div className="v0-modal-overlay" onClick={() => {
@@ -364,19 +368,13 @@ function InitiativeType(){
               {question.text}
             </label>
             {question.type === "select" ?
-                (<select
-                  id={question.id}
-                  name={question.id}
-                  value={organizationData[question.id]}
-                  onChange={handleChange}
-                  className="v0-modal-form-select"
-                >
-                  {question.options.map((option) => (
-                    <option key={option} value={option === "Select Type" ? "" : option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>)
+                (<CustomSelect
+                  options={Array.isArray(question.options) ? question.options.filter(option => option !== "Select Type") : []}
+                  value={organizationData[question.id] || ""}
+                  onChange={(value) => handleChange({ target: { name: question.id, value } })}
+                  placeholder="Select Type"
+                  className="v0-modal-form-select-custom"
+                />)
             :
                 (<input
                   key={question.id}
@@ -407,37 +405,33 @@ function InitiativeMission(){
     <h2 className="v0-modal-page-title">Time to get down to business. What sets you apart?</h2>
     <hr className="v0-modal-page-divider"/>
     <main className="v0-modal-form">
-      <div className="v0-modal-form-group">
-        {questionsForPage.map((question) => (
-          <div key={question.id} className="v0-modal-form-group">
-            <label htmlFor={question.id} className="v0-modal-form-label">{question.text}</label>
-            {question.type !== "textarea" ? 
-              <div className="v0-modal-form-group">
-                <OnboardingDropdown
-                  showQuestion={false}
-                  key={question.id}
-                  question={question.text}
-                  options={question.options}
-                  selectedOption={organizationData[question.id] || (question.type === 'multi-select' ? [] : '')}
-                  onChange={(label) => handleDropdownChange(question.id, label)}
-                  type={question.type}
-                />
-              </div> : 
-              <textarea
-                className="v0-modal-form-textarea"
-                key={question.id}
-                id={question.id}
-                name={question.id}
-                value={organizationData[question.id] ?? ''}
-                onChange={handleChange}
-                type={question.type}
-                maxLength={question.maxLength}
-                placeholder={question.placeholder}
-              />
-            }
-          </div>
-        ))}
-      </div>
+      {questionsForPage.map((question) => (
+        <div key={question.id} className="v0-modal-form-group">
+          <label htmlFor={question.id} className="v0-modal-form-label">{question.text}</label>
+          {question.type !== "textarea" ? 
+            <OnboardingDropdown
+              showQuestion={false}
+              key={question.id}
+              question={question.text}
+              options={question.options}
+              selectedOption={organizationData[question.id] || (question.type === 'multi-select' ? [] : '')}
+              onChange={(label) => handleDropdownChange(question.id, label)}
+              type={question.type}
+            /> : 
+            <textarea
+              className="v0-modal-form-textarea"
+              key={question.id}
+              id={question.id}
+              name={question.id}
+              value={organizationData[question.id] ?? ''}
+              onChange={handleChange}
+              type={question.type}
+              maxLength={question.maxLength}
+              placeholder={question.placeholder}
+            />
+          }
+        </div>
+      ))}
     </main>
     </>
   )
@@ -445,7 +439,7 @@ function InitiativeMission(){
 
 
 function FinalInfo(){
-  const { organizationData, setOrganizationData, organizationQuestionsConfig, setOrganizationLogo } = useContext(InitiativeContext);
+  const { organizationData, setOrganizationData, organizationQuestionsConfig, setOrganizationLogo, currentUser } = useContext(InitiativeContext);
   const logoRef = useRef();
   
   const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
@@ -465,6 +459,22 @@ function FinalInfo(){
     }
 
     setApplyType(organizationData.apply.split(": ")[0]);
+    
+    // Auto-populate email inputs with current user's email
+    if (currentUser?.email) {
+      if (organizationData.learnMore.split(": ")[0] === "Email" && !organizationData.learnMore.split(": ")[1]) {
+        setOrganizationData(prev => ({
+          ...prev,
+          learnMore: `Email: ${currentUser.email}`
+        }));
+      }
+      if (organizationData.apply.split(": ")[0] === "Email" && !organizationData.apply.split(": ")[1]) {
+        setOrganizationData(prev => ({
+          ...prev,
+          apply: `Email: ${currentUser.email}`
+        }));
+      }
+    }
   },[]);
   useEffect(()=>{
     setApplyInputVisibility(applyType !== "Messages");
@@ -606,22 +616,66 @@ function FinalInfo(){
                 <div key={question.id} className="v0-modal-form-group">
                   <label htmlFor={question.id} className="v0-modal-file-label">{question.text}</label>
                   <div className="v0-modal-file-upload">
-                    <button className="v0-modal-file-btn" onClick={(e)=>{
-                      logoRef.current.click();
-                      e.preventDefault();}}><GrAdd size={24}/></button>
+                    {organizationData.organizationLogoPreview ? (
+                      <div className="v0-modal-file-preview-container">
+                        <img src={organizationData.organizationLogoPreview} alt="Logo" className="v0-modal-file-preview-img"/>
+                        <div className="v0-modal-file-preview-actions">
+                          <button 
+                            className="v0-modal-file-edit-btn" 
+                            onClick={(e) => {
+                              logoRef.current.click();
+                              e.preventDefault();
+                            }}
+                            title="Change logo"
+                          >
+                            <BiEdit size={16}/>
+                          </button>
+                          <button 
+                            className="v0-modal-file-remove-btn" 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setOrganizationData(prev => ({
+                                ...prev,
+                                organizationLogoPreview: null
+                              }));
+                              setOrganizationLogo(null);
+                            }}
+                            title="Remove logo"
+                          >
+                            <BiTrash size={16}/>
+                          </button>
+                        </div>
+                        <input
+                          type="file"
+                          id="organizationLogo"
+                          name="organizationLogo"
+                          onChange={handleFileChange}
+                          className="v0-modal-file-input"
+                          ref={logoRef}
+                          accept=".jpg,.png"
+                        />
+                      </div>
+                    ) : (
+                      <button 
+                        className="v0-modal-file-btn" 
+                        onClick={(e) => {
+                          logoRef.current.click();
+                          e.preventDefault();
+                        }}
+                      >
+                        <GrAdd size={24}/>
+                        <span>Upload Logo</span>
+                      </button>
+                    )}
                     <input
-                        type="file"
-                        id="organizationLogo"
-                        name="organizationLogo"
-                        onChange={handleFileChange}
-                        className="v0-modal-file-input"
-                        ref={logoRef}
-                        accept=".jpg,.png"
+                      type="file"
+                      id="organizationLogo"
+                      name="organizationLogo"
+                      onChange={handleFileChange}
+                      className="v0-modal-file-input"
+                      ref={logoRef}
+                      accept=".jpg,.png"
                     />
-                    {organizationData.organizationLogoPreview && <div className="v0-modal-file-preview">
-                      <span className="v0-modal-file-preview-text">Logo Preview:</span>
-                      <img src={organizationData.organizationLogoPreview} alt="Logo" className="v0-modal-file-preview-img"/>
-                    </div>}
                       </div>
                   </div>
               ))}
@@ -641,7 +695,7 @@ function PreviewOppportunityCard(){
       <h2 className="v0-modal-page-title">You're all set! Here's a preview of your card:</h2>
       <hr className="v0-modal-page-divider"/>
       <div className="v0-modal-preview-container">
-        <OrganizationProfile organizationData={organizationData} location={"opportunity_popup"}/>
+        <OrganizationProfile organizationData={organizationData} location={"opportunity_popup"} isPreview={true}/>
       </div>
     </main>
     </>

@@ -400,7 +400,7 @@
   position: relative;
 }
 
-.v0-organization-content-container.contracted::after {
+.v0-organization-content-container.contracted.has-expand-button::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -623,7 +623,7 @@
 }
 
 .reportProfileModal {
-    color: var(--secondary);
+    color: #000000;
     cursor: pointer;
     transition: transform 0.2s ease;
 }
@@ -840,6 +840,10 @@
     max-height: 80px;
   }
   
+  .v0-organization-content-container.contracted.has-expand-button::after {
+    height: 30px;
+  }
+  
   .v0-organization-expand-btn {
     padding: 4px 8px;
     font-size: 12px;
@@ -901,6 +905,10 @@
   
   .v0-organization-content-container.contracted {
     max-height: 60px;
+  }
+  
+  .v0-organization-content-container.contracted.has-expand-button::after {
+    height: 25px;
   }
   
   .v0-organization-expand-btn {
@@ -975,6 +983,10 @@
     max-height: 50px;
   }
   
+  .v0-organization-content-container.contracted.has-expand-button::after {
+    height: 20px;
+  }
+  
   .v0-organization-expand-btn {
     padding: 2px 4px;
     font-size: 10px;
@@ -982,51 +994,102 @@
 }
 
 /* ProfileModal specific styling to prevent overflow */
+.profile-modal-opportunity-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
 .profile-modal-opportunity-card .v0-organization-card {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  margin: 0;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Additional responsive styling for small spaces */
+.v0-organization-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.v0-organization-actions .v0-btn {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
+}
+
+/* Ensure buttons don't overflow in very small spaces */
+@media (max-width: 400px) {
+  .v0-organization-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .v0-organization-actions .v0-btn {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
 }
 
 .profile-modal-opportunity-card .v0-organization-content {
-  width: 100%;
-  max-width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
 .profile-modal-opportunity-card .v0-organization-title-row {
-  width: 100%;
-  max-width: 100%;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
 .profile-modal-opportunity-card .v0-organization-name {
-  word-break: break-word;
-  overflow-wrap: break-word;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .profile-modal-opportunity-card .v0-organization-type-badge {
-  white-space: normal;
-  word-break: break-word;
+  white-space: normal !important;
+  word-break: break-word !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 /* ProfileModal inner sections: prevent overflow and stack actions */
 .profile-modal-opportunity-card .v0-organization-dates,
 .profile-modal-opportunity-card .v0-organization-actions,
 .profile-modal-opportunity-card .v0-organization-logistics {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
 .profile-modal-opportunity-card .v0-organization-actions {
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: column !important;
+  gap: 8px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .profile-modal-opportunity-card .v0-organization-actions .v0-btn {
-  min-width: 0;
-  width: 90%; /* shorter than full width */
-  max-width: 320px; /* cap width so it doesn't look too wide */
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  flex: none !important;
+  box-sizing: border-box !important;
 }
 
 /* ProfileModal: ensure dates section fits and wraps content */

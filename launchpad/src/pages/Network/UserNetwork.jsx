@@ -96,14 +96,16 @@ export default function UserNetwork() {
     userType: 'Any User',
     collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+    networkingLevel: 'Any Availability',
     // schoolAttending: 'Any High School',
   });
   const [filterChanged, setFilterChanged] = useState(false);
 
   const filterContent = {
     userType: ["Any User", "Professionals", "College Students", "High Schoolers", "Staff"],
-    collegeInterestsOrDecision: userType === "High Schooler" ? (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]) : null,
+    collegeInterestsOrDecision:  (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]),
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+    networkingLevel: ["Any Availability", "Casual Connection", "General Inquiries", "Short Interview", "Project Support", "Mock Interview", "Workplace Opportunities"],
     // schoolAttending: ["Any High School", "My High School"]
     // schoolAttending: ["Any High School", "My High School"],
   };
@@ -216,6 +218,16 @@ export default function UserNetwork() {
       console.log('New filters:', newFilters);
       return newFilters;
     });
+  };
+
+  const clearAllFilters = () => {
+    setFilters({
+      userType: 'Any User',
+      collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
+      areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+      networkingLevel: 'Any Availability',
+    });
+    setFilterChanged(true);
   };
 
   const handleConnectClick = (userId) => {
@@ -359,7 +371,13 @@ export default function UserNetwork() {
             <TopBar/>
             <SideNav/>
             <div className={`networkContainer ${isSidebarCollapsed ? 'network-sidebar-collapsed' : 'network-sidebar-expanded'}`} id="networkContainer">
-              <SearchBar filters = {filterContent} pageName={pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/>
+              <SearchBar 
+  filters={filterContent} 
+  pageName={pageName} 
+  handleFilterChange={handleFilterChange} 
+  handleSearch={handleSearch}
+  clearAllFilters={clearAllFilters}
+/>
               <div className="v0-network-content">
                 {allVisibleUserData && allVisibleUserData.length > 0 ? (
                   // Show grid view when filtering by specific user type

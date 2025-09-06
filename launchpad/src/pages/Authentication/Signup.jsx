@@ -230,15 +230,18 @@ export default function SignUp(){
             <div className="auth-wrapper">
                 <div className="auth-body">
                     <header className="auth-header">
-                        <div className="auth-logo-container">
+                        <div className="auth-school-branding">
                             <img 
                                 src="/assets/launchpad_logo.png" 
                                 alt="Launchpad Logo" 
-                                className="auth-logo"
+                                className="auth-school-logo"
                             />
+                            <h1 className="auth-title">The {tempSchoolInfo?.schoolDisplayName || "School"} Network</h1>
+                            <p className="auth-subtitle">Your journey beyond the classroom starts here</p>
                         </div>
-                        <h1 className="auth-title">Welcome to Launchpad</h1>
-                        <p className="auth-subtitle">Your journey starts here!</p>
+                        <div className="auth-powered-by">
+                            <span>Powered by Launchpad Networks</span>
+                        </div>
                     </header>
                     
                     <main className="auth-main">
@@ -382,6 +385,19 @@ export default function SignUp(){
                                             Passwords do not match
                                         </div>
                                     )}
+                                </div>
+
+                                <div className="auth-agreement-section">
+                                    <label className="auth-agreement-checkbox">
+                                        <input 
+                                            type="checkbox" 
+                                            required
+                                            className="auth-checkbox-input"
+                                        />
+                                        <span className="auth-checkbox-text">
+                                            By signing up, I agree to be contacted via email by, and only by, {tempSchoolInfo?.schoolDisplayName || "school"} students, alumni, parents, and staff. I understand that the email address I provided above will be the one they use to reach me.
+                                        </span>
+                                    </label>
                                 </div>
                                 
                                 <button 

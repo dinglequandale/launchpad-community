@@ -44,7 +44,7 @@ form input{
   border-color: var(--secondaryHighlight);
   border-radius: 5px;
   background-color: transparent;
-  color: var(--secondary);
+  color: #000000;
   padding: 7px;
   font-size: 18px;
 }
@@ -59,7 +59,7 @@ form input{
   border: 2px dashed #ccc;
   cursor: pointer;
   background: var(--neutral);
-  color: var(--secondary);
+  color: #000000;
 }
 
 .btnFileUpload:hover{
@@ -132,7 +132,7 @@ form select{
   border-width: 1.5px;
   border-color: var(--secondaryHighlight);
   border-radius: 5px;
-  color: var(--secondary);
+  color: #000000;
   padding: 7px;
   font-size: 18px;
 }
@@ -162,7 +162,7 @@ hr {
 
 a {
   font-weight: 500;
-  color: var(--secondary);
+  color: #000000;
   text-decoration: inherit;
   cursor: pointer;
 }
@@ -195,7 +195,7 @@ button {
   position: absolute;
   right: 10px;
   top: 10px;
-  color: var(--secondary);
+  color: #000000;
   cursor: pointer;
 }
 
@@ -231,7 +231,7 @@ button {
   border-style: solid;
   border-width: 1.5px;
   border-color: var(--secondary);
-  color: var(--secondary);
+  color: #000000;
 }
 
 .btnText{

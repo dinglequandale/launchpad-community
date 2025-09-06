@@ -320,9 +320,8 @@ const updateLocalPfpPreview = (newPfp) => {
 }
 
 export const validateLinkedInUrl = (url) => {
-  // Basic LinkedIn URL validation
-  const linkedInRegex = /^https:\/\/(www\.)?linkedin\.com\/in\/[\w-]+\/?$/;
-  return linkedInRegex.test(url);
+  // Accept any input as requested
+  return true;
 };
 
 export const getVerificationStatus = (userData) => {

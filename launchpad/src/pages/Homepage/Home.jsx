@@ -502,7 +502,7 @@ export default function Home(){
                 <div className="v0-welcome-section">
                     <div className="v0-welcome-banner">
                         <h1 className="v0-welcome-title">Welcome back, {userBasicInfo?.userName?.split(" ")[0] || "User"}!</h1>
-                        <p className="v0-welcome-subtitle">Ready to connect and grow your network today?</p>
+                        <p className="v0-welcome-subtitle">Ready to connect and grow your {capitalizeFirstLetter(localStorage.getItem("schoolId") || "school")} network today?</p>
                     </div>
                 </div>
 
@@ -513,7 +513,7 @@ export default function Home(){
                                 <div className="v0-video-header">
                                     <LuPlay size={20} />
                                     <span>Getting Started</span>
-                                    <span className="v0-video-subtitle">Learn how to make the most of Launchpad</span>
+                                    <span className="v0-video-subtitle">Learn how to make the most of the {capitalizeFirstLetter(localStorage.getItem("schoolId") || "Awty")} Network</span>
                                 </div>
                                 <div className="v0-video-container">
                         <ErrorBoundary>

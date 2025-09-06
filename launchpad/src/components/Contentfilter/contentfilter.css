@@ -92,6 +92,7 @@
     max-height: 350px;
     overflow-y: auto;
     margin-top: 4px;
+    /* margin-left: 10px; */
     background-color: white;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -101,8 +102,8 @@
 
 .search-container {
     display: flex;
+    padding: 10px;
     align-items: center;
-    padding: 12px 16px;
     position: relative;
     border-bottom: 1px solid #f3f4f6;
 }
@@ -126,7 +127,7 @@
 
 .searchIcon {
     position: absolute;
-    left: 24px;
+    left: 45px;
     color: #9ca3af;
     z-index: 1;
 }

@@ -165,6 +165,13 @@ export default function Organizations(){
         setFilters(prev => ({...prev, [filterKey]: value}));
     };
 
+    const clearAllFilters = () => {
+        setFilters({
+            organizationType: 'Any Category',
+            areasOfInterestOrExpertise: 'Any Subject Matter'
+        });
+    };
+
     const pageName = "Opportunities";
 
     const user = auth.currentUser;
@@ -213,7 +220,13 @@ export default function Organizations(){
             <TopBar/>
             <SideNav/>
             <div className={`organizationsContainer ${isSidebarCollapsed ? 'organizations-sidebar-collapsed' : 'organizations-sidebar-expanded'}`}>
-                <SearchBar filters = {filterContent} pageName = {pageName} handleFilterChange={handleFilterChange} handleSearch={handleSearch}/> 
+                <SearchBar 
+                    filters={filterContent} 
+                    pageName={pageName} 
+                    handleFilterChange={handleFilterChange} 
+                    handleSearch={handleSearch}
+                    clearAllFilters={clearAllFilters}
+                /> 
                 
                 <div className="v0-organizations-content">
                     {initLoading ?

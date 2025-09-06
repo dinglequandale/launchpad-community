@@ -68,3 +68,23 @@
     flex-wrap: wrap;
     border-top: 1px solid #f3f4f6;
 }
+
+.v0-clear-filters-btn {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    height: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: auto;
+}
+
+.v0-clear-filters-btn:hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+    color: #111827;
+}

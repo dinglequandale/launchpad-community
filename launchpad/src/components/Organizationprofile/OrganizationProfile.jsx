@@ -11,7 +11,7 @@ import { displayFieldsOfInterest } from '../../services/userProfileServices'
 import { stableLinkCheck } from '../../services/opportunityServices'
 import toast from 'react-hot-toast'
 
-export default function OrganizationProfile({ organizationData, location, handleShowProfile, handleReferalClick, isPublished = true }) {
+export default function OrganizationProfile({ organizationData, location, handleShowProfile, handleReferalClick, isPublished = true, isPreview = false, hideHeartButton = false }) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [isContentExpanded, setIsContentExpanded] = useState(false)
@@ -135,7 +135,9 @@ export default function OrganizationProfile({ organizationData, location, handle
 
   // Check if actions should be disabled
   useEffect(() => {
-    if (!organizationData.createdBy && location !== 'organizations_page') {
+    if (isPreview) {
+      setIsDisabled(true)
+    } else if (!organizationData.createdBy && location !== 'organizations_page') {
       setIsDisabled(true)
     } else if (
       location !== 'organizations_page' && 
@@ -144,7 +146,7 @@ export default function OrganizationProfile({ organizationData, location, handle
     ) {
       setIsDisabled(true)
     }
-  }, [organizationData.createdBy, location, currentUser?.uid])
+  }, [organizationData.createdBy, location, currentUser?.uid, isPreview])
 
   // Check if description needs expansion
   useEffect(() => {
@@ -268,13 +270,15 @@ export default function OrganizationProfile({ organizationData, location, handle
       )}
 
       {/* Favorite Button */}
-      <button 
-        className={`v0-favorite-button ${isFavorite ? 'favorited' : ''}`} 
-        onClick={handleToggleFavorite} 
-        aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-      >
-        <LuHeart size={18} />
-      </button>
+      {!hideHeartButton && (
+        <button 
+          className={`v0-favorite-button ${isFavorite ? 'favorited' : ''}`} 
+          onClick={handleToggleFavorite} 
+          aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+        >
+          <LuHeart size={18} />
+        </button>
+      )}
 
       {/* Organization Logo */}
       <div className="v0-organization-logo">
@@ -295,20 +299,19 @@ export default function OrganizationProfile({ organizationData, location, handle
           </div>
         </div>
 
-        {/* Description */}
-        <div className="v0-organization-description">
-          <div 
-            ref={descRef}
-            className={`v0-description-text ${!isDescriptionExpanded && !isExpanded ? 'contracted' : 'expanded'}`}
-            onClick={() => setIsExpanded(!isExpanded)}
-            style={{ cursor: 'pointer' }}
-          >
-            {organizationProfile.description}
-          </div>
-        </div>
-
         {/* Content Container with Fixed Height */}
-        <div className={`v0-organization-content-container ${isContentExpanded ? 'expanded' : 'contracted'}`}>
+        <div className={`v0-organization-content-container ${isContentExpanded ? 'expanded' : 'contracted'} ${(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host || hasLogistics || organizationProfile.description?.length > 200) ? 'has-expand-button' : ''}`}>
+          {/* Description */}
+          <div className="v0-organization-description">
+            <div 
+              ref={descRef}
+              className={`v0-description-text ${!isDescriptionExpanded && !isExpanded ? 'contracted' : 'expanded'}`}
+              onClick={() => setIsExpanded(!isExpanded)}
+              style={{ cursor: 'pointer' }}
+            >
+              {organizationProfile.description}
+            </div>
+          </div>
           {/* Dates and Organizer Info - only show in wide contexts */}
           {(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host) && (
             <div className="v0-organization-dates">
@@ -371,7 +374,7 @@ export default function OrganizationProfile({ organizationData, location, handle
         </div>
 
         {/* Expand/Collapse Button - only show if there's content to expand */}
-        {(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host || hasLogistics) && (
+        {(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host || hasLogistics || organizationProfile.description?.length > 200) && (
           <button 
             className={`v0-organization-expand-btn ${isContentExpanded ? 'expanded' : ''}`}
             onClick={() => setIsContentExpanded(!isContentExpanded)}

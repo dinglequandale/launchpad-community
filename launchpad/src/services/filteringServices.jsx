@@ -7,6 +7,10 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
 
     const {userInterests, userColleges, userHS } = await getUserData("areasOfInterest", currentUserId);
 
+    // Separate array filters from other filters to avoid Firebase conflicts
+    const arrayFilters = [];
+    const otherFilters = [];
+    
     // Process filters based on actual Firebase data structure
     const filterOperations = await Promise.all(Object.entries(filters).map(async ([key, value]) => {
         if (!value || (Array.isArray(value) && value.length === 0)) return null;
@@ -17,20 +21,22 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
                 const userInterestsExtended = getExtendedInterests(userInterests);
                 
                 if (collectionName === "opportunities") {
-                    return { key: "organizationTags", operation: "array-contains-any", value: userInterestsExtended };
+                    arrayFilters.push({ key: "organizationTags", operation: "array-contains-any", value: userInterestsExtended });
                 } else {
-                    return { key: "areasOfInterest", operation: "array-contains-any", value: userInterestsExtended };
+                    arrayFilters.push({ key: "areasOfInterest", operation: "array-contains-any", value: userInterestsExtended });
                 }
+                return null; // Don't apply this filter directly
             } else if (Array.isArray(value)) {
                 // Handle specific interest selections
                 const specificInterests = value.filter(v => !v.includes("My") && !v.includes("Any"));
                 if (specificInterests.length > 0) {
                     if (collectionName === "opportunities") {
-                        return { key: "organizationTags", operation: "array-contains-any", value: specificInterests };
+                        arrayFilters.push({ key: "organizationTags", operation: "array-contains-any", value: specificInterests });
                     } else {
-                        return { key: "areasOfInterest", operation: "array-contains-any", value: specificInterests };
+                        arrayFilters.push({ key: "areasOfInterest", operation: "array-contains-any", value: specificInterests });
                     }
                 }
+                return null; // Don't apply this filter directly
             }
         }
         else if (key === "schoolAttending") {
@@ -87,12 +93,28 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
                 }
             }
         }
-        // Note: networkingCommitment field doesn't exist in user data, so we skip it
+        else if (key === "networkingLevel") {
+            // Handle networking level filtering
+            if (value === "Any Availability" || (Array.isArray(value) && value.includes("Any Availability"))) {
+                return null;
+            }
+            
+            if (Array.isArray(value)) {
+                const specificLevels = value.filter(v => !v.includes("Any"));
+                if (specificLevels.length > 0) {
+                    arrayFilters.push({ key: "networkingLevel", operation: "array-contains-any", value: specificLevels });
+                }
+                return null; // Don't apply this filter directly
+            } else if (value && !value.includes("Any")) {
+                arrayFilters.push({ key: "networkingLevel", operation: "array-contains", value: value });
+                return null; // Don't apply this filter directly
+            }
+        }
         
         return null;
     }));
   
-    // Apply filters
+    // Apply non-array filters first
     filterOperations.forEach(filter => {
         if (filter) {
             q = query(q, where(filter.key, filter.operation, filter.value));
@@ -107,10 +129,30 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
 
     // Apply pagination
     if (lastDoc) q = query(q, startAfter(lastDoc));
-    q = query(q, limit(maxLimit));
+    q = query(q, limit(maxLimit * 2)); // Get more results to account for post-filtering
 
     const querySnapshot = await getDocs(q);
-    const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((user) => user.id !== currentUserId);
+    let results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((user) => user.id !== currentUserId);
+
+    // Apply array filters in post-processing to avoid Firebase conflicts
+    if (arrayFilters.length > 0) {
+        results = results.filter(user => {
+            return arrayFilters.every(filter => {
+                const userValue = user[filter.key];
+                if (!userValue || !Array.isArray(userValue)) return false;
+                
+                if (filter.operation === "array-contains-any") {
+                    return filter.value.some(val => userValue.includes(val));
+                } else if (filter.operation === "array-contains") {
+                    return userValue.includes(filter.value);
+                }
+                return true;
+            });
+        });
+    }
+
+    // Limit results after post-filtering
+    results = results.slice(0, maxLimit);
 
     // Sort results by relevance based on interests
     try {

@@ -314,14 +314,24 @@ const RetiredStatus = ({ selectedOptions, handleChange }) => {
       <div className="onboardingQuestions">
         {questionsForPage.map((question) => (
           <div className="form-group" key={question.id}>
-            <CustomSelect
-              options={question.options}
-              value={selectedOptions[question.id] || ''}
-              onChange={(label) => handleChange(question.id, label)}
-              placeholder="Select an option"
-              isMulti={false}
-              isSearchable={false}
-            />
+            {question.type === "text-box" ? (
+              <input
+                type="text"
+                value={selectedOptions[question.id] || ''}
+                onChange={(e) => handleChange(question.id, e.target.value)}
+                placeholder={question.placeholder}
+                className="form-input"
+              />
+            ) : (
+              <CustomSelect
+                options={question.options}
+                value={selectedOptions[question.id] || ''}
+                onChange={(label) => handleChange(question.id, label)}
+                placeholder="Select an option"
+                isMulti={false}
+                isSearchable={false}
+              />
+            )}
           </div>
         ))}
       </div>
@@ -401,7 +411,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
               
               {question.type === 'multi-select' && (
                 <div className="contact-sharing-container">
-                  {question.options.map((option) => (
+                  {Array.isArray(question.options) && question.options.map((option) => (
                     <div className="radio-option" key={option.value}>
                       <label className="radio-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                         <input

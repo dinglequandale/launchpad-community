@@ -448,6 +448,59 @@
   }
 }
 
+/* School Branding Styles */
+.auth-school-branding {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.auth-school-logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 16px;
+  object-fit: contain;
+}
+
+.auth-powered-by {
+  text-align: right;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Agreement Checkbox Styles */
+.auth-agreement-section {
+  margin: 20px 0;
+  padding: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.auth-agreement-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  line-height: 1.5;
+}
+
+.auth-checkbox-input {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: #1157e2;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.auth-checkbox-text {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.5;
+}
+
 @media screen and (min-width: 1440px) {
   .auth-body {
     width: 500px;

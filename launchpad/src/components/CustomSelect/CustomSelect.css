@@ -22,14 +22,14 @@
 }
 
 .select-trigger:hover {
-  border-color: #1976d2;
-  background: #f0f8ff;
+  border-color: #60a5fa;
+  background: #f8fafc;
 }
 
 .select-trigger.open {
-  border-color: #1976d2;
+  border-color: #60a5fa;
   background: white;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
 }
 
 .select-trigger.disabled {
@@ -219,17 +219,17 @@
 
 .select-option:hover,
 .select-option.focused {
-  background: #f0f8ff;
-  color: #1976d2;
+  background: #f0f9ff;
+  color: #0ea5e9;
 }
 
 .select-option.selected {
-  background: #1976d2;
+  background: #0ea5e9;
   color: white;
 }
 
 .select-option.selected:hover {
-  background: #1565c0;
+  background: #0284c7;
 }
 
 .option-label {

@@ -25,7 +25,8 @@ export default function CustomSelect({
   const inputRef = useRef(null);
 
   // Filter options based on search query
-  const filteredOptions = options.filter(option => {
+  const safeOptions = Array.isArray(options) ? options : [];
+  const filteredOptions = safeOptions.filter(option => {
     if (!searchQuery) return true;
     const label = typeof option === 'string' ? option : option.label || option.value;
     return label.toLowerCase().includes(searchQuery.toLowerCase());
@@ -108,7 +109,14 @@ export default function CustomSelect({
 
   const handleRemoveOption = (optionToRemove) => {
     if (isMulti && Array.isArray(value)) {
-      const newValues = value.filter(v => v !== optionToRemove);
+      const newValues = value.filter(v => {
+        if (typeof v === 'string' && typeof optionToRemove === 'string') {
+          return v !== optionToRemove;
+        } else if (typeof v === 'object' && typeof optionToRemove === 'object') {
+          return (v.value || v.label) !== (optionToRemove.value || optionToRemove.label);
+        }
+        return true;
+      });
       onChange(newValues);
     }
   };
@@ -154,9 +162,9 @@ export default function CustomSelect({
   const getDisplayValue = () => {
     if (isMulti) {
       if (!Array.isArray(value) || value.length === 0) return '';
-      return value.join(', ');
+      return value.map(val => getOptionLabel(val)).join(', ');
     }
-    return value || '';
+    return getOptionLabel(value) || '';
   };
 
   const getOptionLabel = (option) => {
@@ -180,7 +188,7 @@ export default function CustomSelect({
             {/* When dropdown is open, show all selected items */}
             {(isOpen ? value : value.slice(0, 2)).map((val, index) => (
               <span key={index} className="multi-value">
-                {val}
+                {getOptionLabel(val)}
                 <button
                   type="button"
                   className="remove-value"
@@ -303,8 +311,19 @@ export default function CustomSelect({
                   const optionLabel = getOptionLabel(option);
                   const optionValue = getOptionValue(option);
                   const isSelected = isMulti 
-                    ? Array.isArray(value) && value.includes(optionValue)
-                    : value === optionValue;
+                    ? Array.isArray(value) && value.some(v => {
+                        if (typeof v === 'string' && typeof option === 'string') {
+                          return v === option;
+                        } else if (typeof v === 'object' && typeof option === 'object') {
+                          return (v.value || v.label) === (option.value || option.label);
+                        }
+                        return false;
+                      })
+                    : (typeof value === 'string' && typeof option === 'string' 
+                        ? value === option 
+                        : typeof value === 'object' && typeof option === 'object'
+                        ? (value.value || value.label) === (option.value || option.label)
+                        : false);
                   const isFocused = index === focusedIndex;
 
                   return (

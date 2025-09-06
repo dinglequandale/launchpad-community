@@ -221,12 +221,16 @@ const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, s
     const fieldId = field;
     
     if (isMultiSelect) {
-      // For multi-select, selectedOption is an array of college labels
-      const value = selectedOption || [];
+      // For multi-select (collegeInterestsOrDecision), store as array of strings
+      const value = selectedOption ? selectedOption.map(college => 
+        typeof college === 'string' ? college : college.label || college.value
+      ) : [];
       handleChange(fieldId, value);
     } else {
-      // For single select, selectedOption is a single college label
-      const value = selectedOption || '';
+      // For single select (collegeAttending), store as string
+      const value = selectedOption ? 
+        (typeof selectedOption === 'string' ? selectedOption : selectedOption.label || selectedOption.value) 
+        : '';
       handleChange(fieldId, value);
     }
   };
@@ -235,26 +239,23 @@ const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, s
   const getCurrentValue = () => {
     // Add safety check for selectedOptions
     if (!selectedOptions) return isMultiSelect ? [] : '';
-    const currentValue = field === "collegeAttending" ? selectedOptions.collegeAttending : selectedOptions.collegeInterestsOrDecision;
+    const currentValue = selectedOptions[field];
     
     if (isMultiSelect) {
-      // Handle both string and array values for backward compatibility
-      if (typeof currentValue === 'string') {
-        // If it's a string (user committed to college), return as single-item array
-        return currentValue ? [currentValue] : [];
-      } else if (Array.isArray(currentValue)) {
-        return currentValue;
+      // For multi-select (collegeInterestsOrDecision), currentValue should be an array
+      if (Array.isArray(currentValue)) {
+        // Convert string array to object array format
+        return currentValue.map(college => 
+          typeof college === 'string' 
+            ? { label: college, value: college }
+            : college
+        );
       } else {
         return [];
       }
     } else {
-      // For single select, handle both string and array
-      if (Array.isArray(currentValue)) {
-        // If it's an array, return the first item or empty string
-        return currentValue.length > 0 ? currentValue[0] : '';
-      } else {
-        return currentValue || '';
-      }
+      // For single select (collegeAttending), currentValue should be a string
+      return currentValue ? { label: currentValue, value: currentValue } : '';
     }
   };
 

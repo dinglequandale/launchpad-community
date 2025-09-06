@@ -448,6 +448,42 @@ function PrivacyOption({ option, isSelected, onSelect }) {
     );
 }
 
+function DreamUniversitiesPrivacyToggle() {
+    const { userData, currentUser } = useContext(ProfileContext);
+    const [isPrivate, setIsPrivate] = useState(userData.dreamUniversitiesPrivate || false);
+
+    const handleToggle = async () => {
+        const newPrivacy = !isPrivate;
+        setIsPrivate(newPrivacy);
+        try {
+            await editUserData({ dreamUniversitiesPrivate: newPrivacy }, currentUser, userData);
+        } catch (error) {
+            console.error('Error updating dream universities privacy:', error);
+            // Revert on error
+            setIsPrivate(!newPrivacy);
+        }
+    };
+
+    return (
+        <div className="v0-dream-universities-privacy">
+            <div className="v0-privacy-toggle-container">
+                <label className="v0-toggle-label">
+                    <input
+                        type="checkbox"
+                        checked={isPrivate}
+                        onChange={handleToggle}
+                        className="v0-privacy-checkbox"
+                    />
+                    <span className="v0-toggle-text">Keep dream universities private</span>
+                </label>
+                <p className="v0-privacy-description">
+                    Inputting this information allows you to match up with alumni studying at your dream schools
+                </p>
+            </div>
+        </div>
+    );
+}
+
 
 function SkillBase({ skillModalVisibility, setSkillModalVisibility }) {
     const { userData } = useContext(ProfileContext);
@@ -572,10 +608,27 @@ function ResumeUpload(){
 
     async function onFileChange(event) {
         const file = event.target.files[0];
-        const userResumePreview = await handleUserResumeUpdate(userData, file, currentUser, currentPrivacy);
-        setPdfUrl(userResumePreview);
-        // setPdfUrl(URL.createObjectURL(file));
-  }
+        if (file && file.type === 'application/pdf') {
+            const userResumePreview = await handleUserResumeUpdate(userData, file, currentUser, currentPrivacy);
+            setPdfUrl(userResumePreview);
+        } else {
+            alert('Please upload a PDF file only.');
+        }
+    }
+
+    const handleDeleteResume = async () => {
+        if (window.confirm('Are you sure you want to delete your resume?')) {
+            try {
+                // Set resume to null in user data
+                const newData = { userResumePreview: null };
+                await editUserData(newData, currentUser, userData);
+                setPdfUrl(null);
+            } catch (error) {
+                console.error('Error deleting resume:', error);
+                alert('Failed to delete resume. Please try again.');
+            }
+        }
+    }
   
     return (
         <>
@@ -595,13 +648,16 @@ function ResumeUpload(){
             ) : (
                 <div className="v0-resume-container">
                     <div className="v0-resume-header">
-                        <button className="v0-edit-btn" onClick={handleUploadClick}>
+                        <button className="v0-edit-btn" onClick={handleUploadClick} title="Change resume">
                             <FaRegEdit size={16} />
+                        </button>
+                        <button className="v0-delete-btn" onClick={handleDeleteResume} title="Delete resume">
+                            <BiTrash size={16} />
                         </button>
                     </div>
                     <div className="v0-resume-viewer">
                         <iframe 
-                            src={pdfUrl} 
+                            src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&statusbar=0&messages=0&scrollbar=0`}
                             frameBorder="0" 
                             className="v0-resume-iframe"
                             title="Resume Preview"
@@ -744,7 +800,12 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
             <div style={{display: "flex"}}>
             <div className='userInfo' style={{fontSize: "16px"}}>
                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userFirstDesc.desc1}</span>: {basicInfoContent.userFirstDesc.desc2}</span>
-                <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>
+                <div className="v0-college-info-container">
+                    <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>
+                    {userData.userType === "High Schooler" && userData.collegeDecision === "No" && (
+                        <DreamUniversitiesPrivacyToggle />
+                    )}
+                </div>
                 {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
                 {userData.sponsoredClubs && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.sponsoredClubs.desc1}</span>: {basicInfoContent.sponsoredClubs.desc2}</span></>}
             </div>
@@ -784,7 +845,7 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
             {deleteWarningVisibility && <DeleteWarningModal onCancel={()=>setDeleteWarningVisibility(false)} onVerify={() => deleteOpportunity(opportunityId)} visibility={deleteWarningVisibility}
                 objectOfDeletation={opportunityData.organizationType}/>}
         </div>
-        <div>
+        <div style={{width: "100%"}}>
             { (opportunityData && !loading) ? <>
             {isPublished && <div style={{ textAlign: "center", marginBottom: "12px"}}>
             <span
@@ -793,10 +854,11 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
             </span>
             </div>}
             <div 
+                className="edit-profile-opportunity-card"
                 onMouseEnter={() => setOpportunityEditVisibility(true)}
                 onMouseLeave={() => setOpportunityEditVisibility(false)}
                 style={{position: "relative"}}>
-                <OrganizationProfile location={"user_profile"} organizationData={opportunityData} isPublished={isPublished}/>
+                <OrganizationProfile location={"user_profile"} organizationData={opportunityData} isPublished={isPublished} hideHeartButton={true}/>
                 
                 {opportunityEditVisibility && <>
                 <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "70px", top: "-17px", background: "red", zIndex: "2"}}>
