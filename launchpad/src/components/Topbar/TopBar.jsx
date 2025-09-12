@@ -5,22 +5,40 @@ import { useAuth } from '../../contexts/auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useModal } from '../../contexts/ModalContext';
 import { useReport } from '../../contexts/report/ReportContext';
+import { useConnections } from '../../contexts/ConnectionContext';
 import DefaultIcon from '../DefaultIcon/DefaultIcon';
 import './topbar.css';
 
 export default function TopBar({ isSidebarCollapsed }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [basicUserInfo, setBasicUserInfo] = useState(null);
+    const [notificationClicked, setNotificationClicked] = useState(false);
     const dropdownRef = useRef(null);
     const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
     const { openLogoutModal } = useModal();
     const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
+    
+    // Get connection data for notifications
+    const {
+        pending,
+        pending_parental_approval,
+        parent_approved,
+        approved,
+        incomingRequests,
+        loading: connectionsLoading,
+    } = useConnections();
 
     useEffect(() => {
         const userInfo = localStorage.getItem('basicUserInfo');
         if (userInfo) {
             setBasicUserInfo(JSON.parse(userInfo));
+        }
+        
+        // Check if notification was already clicked in this session
+        const notificationClickedFlag = sessionStorage.getItem('notificationClicked');
+        if (notificationClickedFlag) {
+            setNotificationClicked(true);
         }
     }, []);
 
@@ -64,6 +82,35 @@ export default function TopBar({ isSidebarCollapsed }) {
         return name.substring(0, 20) + "...";
     };
 
+    // Check if there are connection notifications
+    const hasNotifications = () => {
+        if (connectionsLoading || !basicUserInfo || notificationClicked) return false;
+        
+        // basicUserInfo is already parsed as an object from the useEffect
+        if (basicUserInfo.userType === "High Schooler") {
+            return pending.length > 0 ||
+                   pending_parental_approval.length > 0 ||
+                   parent_approved.length > 0 ||
+                   approved.length > 0 ||
+                   incomingRequests.length > 0;
+        } else {
+            return pending.length > 0 ||
+                   approved.length > 0 ||
+                   incomingRequests.length > 0;
+        }
+    };
+
+    // Handle notification click to show connection modal
+    const handleNotificationClick = () => {
+        // Mark notification as clicked in this session
+        sessionStorage.setItem('notificationClicked', 'true');
+        setNotificationClicked(true);
+        
+        // We need to trigger the connection modal from GlobalAuthWrapper
+        // We'll use a custom event to communicate with the parent
+        window.dispatchEvent(new CustomEvent('showConnectionModal'));
+    };
+
     return (
         <div className={`v0-topbar ${isSidebarCollapsed ? 'v0-topbar-sidebar-collapsed' : 'v0-topbar-sidebar-expanded'}`}>
             <div className="v0-topbar-left">
@@ -78,8 +125,16 @@ export default function TopBar({ isSidebarCollapsed }) {
             </div>
             
             <div className="v0-topbar-right">
-                <button className="v0-notification-btn">
-                    <LuBell size={24} />
+                <button 
+                    className="v0-notification-btn"
+                    onClick={handleNotificationClick}
+                >
+                    <div className="v0-notification-icon-wrapper">
+                        <LuBell size={24} />
+                        {hasNotifications() && (
+                            <div className="v0-notification-dot"></div>
+                        )}
+                    </div>
                 </button>
                 <button className="v0-report-btn" onClick={handleReportClick}>
                     <BiFlag size={26} />

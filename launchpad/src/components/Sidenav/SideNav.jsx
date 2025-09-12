@@ -45,7 +45,14 @@ export default function SideNav({show}){
     }
 
     const toggleSidebar = () => {
-        setIsCollapsed(!isCollapsed);
+        const newCollapsedState = !isCollapsed;
+        setIsCollapsed(newCollapsedState);
+        
+        // Dispatch custom event for other components to listen to
+        const event = new CustomEvent('sidebarToggle', { 
+            detail: { isCollapsed: newCollapsedState } 
+        });
+        window.dispatchEvent(event);
     }
 
     const handleSettingsClick = () => {

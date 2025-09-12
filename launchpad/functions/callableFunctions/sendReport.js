@@ -1,17 +1,5 @@
 const functions = require('firebase-functions');
-const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
-
-const OAuth2 = google.auth.OAuth2;
-const oauth2Client = new OAuth2(
-    process.env.GMAIL_CLIENT_ID,
-    process.env.GMAIL_CLIENT_SECRET,
-    "https://developers.google.com/oauthplayground"
-);
-
-oauth2Client.setCredentials({
-    refresh_token: process.env.GMAIL_REFRESH_TOKEN
-});
+const admin = require('firebase-admin');
 
 exports.sendReport = functions.https.onCall(async (data, context) => {
     const { reportedUser, reportTarget, reportReason } = data;
@@ -22,20 +10,7 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
     }
 
     try {
-        const accessToken = await oauth2Client.getAccessToken();
-
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                type: 'OAuth2',
-                user: 'launchpad861@gmail.com',
-                clientId: process.env.GMAIL_CLIENT_ID,
-                clientSecret: process.env.GMAIL_CLIENT_SECRET,
-                refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-                accessToken: accessToken,
-            }
-        });
-
+        // Create email template
         const emailTemplate = `
         <!DOCTYPE html>
         <html lang="en">
@@ -51,43 +26,110 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
                     max-width: 600px;
                     margin: 0 auto;
                     padding: 20px;
+                    background-color: #f8f9fa;
+                }
+                .email-container {
+                    background-color: #ffffff;
+                    border-radius: 10px;
+                    padding: 30px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    border-bottom: 2px solid #e53e3e;
+                    padding-bottom: 20px;
+                }
+                .header h1 {
+                    color: #e53e3e;
+                    font-size: 24px;
+                    margin: 0;
                 }
                 .report-details {
                     background-color: #f8f9fa;
-                    padding: 15px;
-                    border-radius: 5px;
+                    padding: 20px;
+                    border-radius: 8px;
                     margin: 20px 0;
+                    border-left: 4px solid #e53e3e;
                 }
                 .label {
                     font-weight: bold;
                     color: #2c5282;
+                    display: inline-block;
+                    min-width: 150px;
+                }
+                .value {
+                    color: #4a5568;
+                }
+                .footer {
+                    margin-top: 30px;
+                    padding-top: 20px;
+                    border-top: 1px solid #e2e8f0;
+                    color: #718096;
+                    font-size: 14px;
                 }
             </style>
         </head>
         <body>
-            <h2>New Report Submission</h2>
-            <div class="report-details">
-                <p><span class="label">Report Type:</span> ${reportTarget}</p>
-                <p><span class="label">Reported User/Organization:</span> ${reportedUser}</p>
-                <p><span class="label">Report Reason:</span></p>
-                <p>${reportReason}</p>
+            <div class="email-container">
+                <div class="header">
+                    <h1>🚨 New Report Submission</h1>
+                </div>
+                
+                <div class="report-details">
+                    <p><span class="label">Report Type:</span> <span class="value">${reportTarget}</span></p>
+                    <p><span class="label">Reported User/Organization:</span> <span class="value">${reportedUser}</span></p>
+                    <p><span class="label">Report Reason:</span></p>
+                    <p class="value" style="margin-top: 10px; padding: 10px; background: white; border-radius: 4px; border: 1px solid #e2e8f0;">${reportReason}</p>
+                </div>
+                
+                <p><strong>Action Required:</strong> This report was submitted by a user on Launchpad. Please review and take appropriate action.</p>
+                
+                <div class="footer">
+                    <p>Report submitted on: ${new Date().toLocaleString()}</p>
+                    <p>Please investigate this matter promptly.</p>
+                </div>
             </div>
-            <p>This report was submitted by a user on Launchpad. Please review and take appropriate action.</p>
         </body>
         </html>
         `;
 
-        const mailOptions = {
-            from: 'launchpad861@gmail.com',
+        // Create email document for MailGun
+        const emailDoc = await admin.firestore().collection('mail').add({
             to: 'launchpadhelpline@gmail.com',
-            subject: `New Report: ${reportTarget} - ${reportedUser}`,
-            html: emailTemplate
-        };
+            message: {
+                subject: `🚨 New Report: ${reportTarget} - ${reportedUser}`,
+                html: emailTemplate,
+            },
+            from: 'no-reply@launchpadhouston.com',
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            status: 'pending',
+            provider: 'mailgun',
+            emailType: 'report',
+            reportedUser: reportedUser,
+            reportTarget: reportTarget,
+            reportReason: reportReason,
+            reporterId: context.auth.uid
+        });
 
-        await transporter.sendMail(mailOptions);
-        return { success: true, message: 'Report submitted successfully' };
+        // Log the report for tracking
+        await admin.firestore().collection('reports').add({
+            reportedUser: reportedUser,
+            reportTarget: reportTarget,
+            reportReason: reportReason,
+            reporterId: context.auth.uid,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            status: 'pending',
+            emailId: emailDoc.id
+        });
+
+        return { 
+            success: true, 
+            message: 'Report submitted successfully',
+            emailId: emailDoc.id
+        };
     } catch (error) {
         console.error('Error sending report:', error);
         throw new functions.https.HttpsError('internal', 'Error submitting report: ' + error.message, error);
     }
-}); 
+});

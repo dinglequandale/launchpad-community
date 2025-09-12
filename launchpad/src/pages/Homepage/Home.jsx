@@ -12,13 +12,11 @@ import "slick-carousel/slick/slick-theme.css";
 import { auth, db } from "../../firebase/firebaseConfig";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 import ParentalVerificationModal from '../../components/ParentalVerificationModal';
-import ConnectionStatusModal from '../../components/ConnectionStatusModal';
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { parentVerificationResendTemplate } from "../../utils/parentVerificationTemplates";
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useOutletContext } from "react-router-dom";
-import { useConnections } from "../../contexts/ConnectionContext";
 import { useModal } from '../../contexts/ModalContext';
 import ResourceCarousel from "./ResourceCarousel";
 import { LuPlay, LuUsers, LuGraduationCap, LuBriefcase, LuFileText, LuBookOpen, LuMapPin, LuCalendar, LuTarget, LuAward } from "react-icons/lu";
@@ -51,9 +49,8 @@ export default function Home(){
 
     const [userBasicInfo, setUserBasicInfo] = useState(null);
     const [showParentModal, setShowParentModal] = useState(false);
-    const [showConnectionModal, setShowConnectionModal] = useState(false);
-    const [connectedUserData, setConnectedUserData] = useState(null);
     const [showVerifedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
+    const [connectedUserData, setConnectedUserData] = useState(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [selectedResource, setSelectedResource] = useState(null);
     const [favorites, setFavorites] = useState(() => {
@@ -62,15 +59,6 @@ export default function Home(){
     });
     const [selectedFavorite, setSelectedFavorite] = useState(null);
     const [showFavoriteModal, setShowFavoriteModal] = useState(false);
-    const {
-      pending,
-      pending_parental_approval,
-      parent_approved,
-      approved,
-      incomingRequests,
-      loading: connectionsLoading,
-      refetchConnections,
-    } = useConnections();
     const {openProfileModal, openApplyModal, openConnectModal} = useModal();
 
     const { chatClient } = useOutletContext();
@@ -81,24 +69,24 @@ export default function Home(){
 
     // Listen for sidebar state changes
     useEffect(() => {
-        const handleSidebarChange = () => {
-            const sidebar = document.querySelector('.v0-sidebar');
-            if (sidebar) {
-                setIsSidebarCollapsed(sidebar.classList.contains('v0-sidebar-collapsed'));
-            }
+        const handleSidebarToggle = (event) => {
+            const isCollapsed = event.detail.isCollapsed;
+            setIsSidebarCollapsed(isCollapsed);
         };
 
-        // Initial check
-        handleSidebarChange();
-
-        // Set up observer to watch for sidebar class changes
-        const observer = new MutationObserver(handleSidebarChange);
+        // Initial check - get current state from DOM
         const sidebar = document.querySelector('.v0-sidebar');
         if (sidebar) {
-            observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+            const isCollapsed = sidebar.classList.contains('v0-sidebar-collapsed');
+            setIsSidebarCollapsed(isCollapsed);
         }
 
-        return () => observer.disconnect();
+        // Listen for custom sidebar toggle events
+        window.addEventListener('sidebarToggle', handleSidebarToggle);
+
+        return () => {
+            window.removeEventListener('sidebarToggle', handleSidebarToggle);
+        };
     }, []);
 
     const getUserData = async () => {
@@ -184,54 +172,10 @@ export default function Home(){
 
     }, []);
 
-    useEffect(() => {
-      const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
-      console.log("connectionSessionFlag:", connectionSessionFlag);
-      
-      if (
-        (info &&
-        info.userType === 'High Schooler' &&
-        info.parentVerified &&
-        !connectionSessionFlag) ||
-        (info.userType !== 'High Schooler' 
-          && !connectionSessionFlag)
-      ) {
-        // console.log("All conditions met for connection modal check");
-        const openConnectionModal = info.userType === "High Schooler" ? (pending.length > 0 ||
-          pending_parental_approval.length > 0 ||
-          parent_approved.length > 0 ||
-          approved.length > 0) : (pending.length > 0 ||
-            
-            approved.length > 0);
-        if(openConnectionModal){
-          setShowConnectionModal(true);
-          sessionStorage.setItem("connectionModalShown", true);
-        }
-        
-      } else {
-        // console.log("Conditions not met for connection modal:");
-        // console.log("- info exists:", !!info);
-        // console.log("- userType is High Schooler:", info?.userType === 'High Schooler');
-        // console.log("- parentVerified:", info?.parentVerified);
-        // console.log("- connectionSessionFlag:", connectionSessionFlag);
-      }
-    }, [info, pending,pending_parental_approval,
-      parent_approved,
-      approved,]);
-
     const handleOnConnectClick = async (connectingUserData) => {
       setConnectedUserData(connectingUserData);
       setShowVerifiedConnectionModal(true);
     }
-
-    const handleOnProfileClick = (userData) => {
-      openProfileModal({userData, onConnectClick: handleOnConnectClick});
-    } 
-
-    useEffect(()=>{
-      console.log("showing: ", showConnectionModal);
-      console.log("showing verification: ", showParentModal);
-    },[showConnectionModal]);
     
     const resourceData = {
         "How To Network": [
@@ -464,18 +408,6 @@ export default function Home(){
                 onUpdateEmail={onUpdateParentEmail}
               />
             )}
-            {showConnectionModal && (
-              <ConnectionStatusModal
-                onClose={() => setShowConnectionModal(false)}
-                onConnect={handleOnConnectClick}
-                handleProfileClick={handleOnProfileClick}
-                pending={pending}
-                pending_parental_approval={pending_parental_approval}
-                parent_approved={parent_approved}
-                approved={approved}
-                incomingRequests={incomingRequests}
-              />
-            )}
             
             {/* Organization Profile Modal for Favorites */}
             {showFavoriteModal && selectedFavorite && (
@@ -490,7 +422,7 @@ export default function Home(){
                 handleReferalClick={handleReferalClick}
               />
             )}
-            <TopBar/>
+            <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
             <SideNav/>
             <div className={`v0-home-container ${isSidebarCollapsed ? 'v0-home-sidebar-collapsed' : 'v0-home-sidebar-expanded'}`}>
                 {/* {localStorage.getItem("schoolId") && (

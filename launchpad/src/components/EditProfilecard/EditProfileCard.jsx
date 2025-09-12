@@ -34,7 +34,7 @@ const ProfileContext = createContext({
     userData: {},
   });
 
-export default function EditProfileCard() {
+export default function EditProfileCard({ isSidebarCollapsed }) {
     const navigate = useNavigate();
     const location = useLocation();
     const prevPath = location.state?.pathName;
@@ -172,7 +172,7 @@ export default function EditProfileCard() {
         {skillModalVisibility && <SkillModal onClose={()=>setSkillModalVisibility(false)} visibility={skillModalVisibility} userData={userData}/>}
         {availabilityModalVisibility && <AvailabilityModal onClose={()=>setAvailabilityModalVisibility(false)} visibility={availabilityModalVisibility} userData={userData}/>}
         
-        <div className="complete-profile-container">
+        <div className={`complete-profile-container ${isSidebarCollapsed ? 'complete-profile-container-sidebar-collapsed' : 'complete-profile-container-sidebar-expanded'}`}>
             <ProfileContext.Provider value={{currentUser, userData}}>
             <div className="v0-profile-container">
                 {/* Header */}

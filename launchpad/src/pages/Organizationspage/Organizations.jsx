@@ -48,24 +48,24 @@ export default function Organizations(){
 
     // Listen for sidebar state changes
     useEffect(() => {
-        const handleSidebarChange = () => {
-            const sidebar = document.querySelector('.v0-sidebar');
-            if (sidebar) {
-                setIsSidebarCollapsed(sidebar.classList.contains('v0-sidebar-collapsed'));
-            }
+        const handleSidebarToggle = (event) => {
+            const isCollapsed = event.detail.isCollapsed;
+            setIsSidebarCollapsed(isCollapsed);
         };
 
-        // Initial check
-        handleSidebarChange();
-
-        // Set up observer to watch for sidebar class changes
-        const observer = new MutationObserver(handleSidebarChange);
+        // Initial check - get current state from DOM
         const sidebar = document.querySelector('.v0-sidebar');
         if (sidebar) {
-            observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+            const isCollapsed = sidebar.classList.contains('v0-sidebar-collapsed');
+            setIsSidebarCollapsed(isCollapsed);
         }
 
-        return () => observer.disconnect();
+        // Listen for custom sidebar toggle events
+        window.addEventListener('sidebarToggle', handleSidebarToggle);
+
+        return () => {
+            window.removeEventListener('sidebarToggle', handleSidebarToggle);
+        };
     }, []);
     
         // useEffect(() => {
@@ -134,7 +134,7 @@ export default function Organizations(){
     }
 
     const handleConnectClick = async (userData) => {
-        openConnectModal({ userData });
+        openConnectModal({ userData, chat: chatClient });
     }
 
     const handleReferalClick = async (referalType, organizationData, userData) => {
@@ -217,11 +217,12 @@ export default function Organizations(){
     return(
         <>
             {/* <Toaster position={'bottom-right'} reverseOrder={false}/> */}
-            <TopBar/>
+            <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
             <SideNav/>
             <div className={`organizationsContainer ${isSidebarCollapsed ? 'organizations-sidebar-collapsed' : 'organizations-sidebar-expanded'}`}>
                 <SearchBar 
                     filters={filterContent} 
+                    currentFilters={filters}
                     pageName={pageName} 
                     handleFilterChange={handleFilterChange} 
                     handleSearch={handleSearch}

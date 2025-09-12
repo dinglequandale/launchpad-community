@@ -25,6 +25,7 @@ export default function ContentFilter({
     title="Filter", 
     filterKey, 
     filterContent, 
+    currentValue,
     onFilterChange,
     isMultiSelect = false,
     showSearch = true,
@@ -43,6 +44,17 @@ export default function ContentFilter({
             setSelectedOptions([filterContent[0]]);
         }
     }, [filterContent, isMultiSelect, selectedOptions.length]);
+
+    // Reset internal state when currentValue changes (for clear filters functionality)
+    useEffect(() => {
+        if (currentValue !== undefined) {
+            if (isMultiSelect) {
+                setSelectedOptions(Array.isArray(currentValue) ? currentValue : []);
+            } else {
+                setSelectedOptions(currentValue ? [currentValue] : []);
+            }
+        }
+    }, [currentValue, isMultiSelect]);
 
     // Filter options based on search query
     useEffect(() => {

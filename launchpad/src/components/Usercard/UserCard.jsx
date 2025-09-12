@@ -13,6 +13,7 @@ import { useConnections } from '../../contexts/ConnectionContext';
 import { useModal } from "../../contexts/ModalContext";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { isConnectionApproved } from "../../services/connectionService";
+import { useOutletContext } from "react-router-dom";
 
 /**
   Modernized User Card (v0 styling)
@@ -24,6 +25,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
   const { approved = [], parent_approved = [], loading: connectionsLoading } = useConnections();
   const { currentUser } = useAuth();
   const { openParentalConnectionModal, openConnectModal } = useModal();
+  const { chatClient } = useOutletContext();
 
   const connectionStatus =
     approved.some((conn) => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId) ||
@@ -48,7 +50,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
       openParentalConnectionModal({ professionalData: userData });
       return;
     }
-    openConnectModal({ userData });
+    openConnectModal({ userData, chat: chatClient });
   };
 
   const descType = () => {

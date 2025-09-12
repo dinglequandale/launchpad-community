@@ -5,8 +5,23 @@ const pushNotifPreference = localStorage.getItem("userNotificationPreferences")
     : true;
 
 export async function sendConnectMessageWithoutResume(message, currentUserId, connectingUserId, setChannelId, chat, schoolId){
+    console.log('sendConnectMessageWithoutResume called with:', {
+        message: message?.substring(0, 50) + '...',
+        currentUserId,
+        connectingUserId,
+        chat: !!chat,
+        schoolId,
+        chatType: typeof chat,
+        chatConstructor: chat?.constructor?.name,
+        chatUserID: chat?.userID
+    });
+    
     if (!chat || !connectingUserId) {
         console.log('sendConnectMessageWithoutResume: Missing chat or connectingUserId');
+        console.log('chat:', chat);
+        console.log('connectingUserId:', connectingUserId);
+        console.log('chat is falsy:', !chat);
+        console.log('connectingUserId is falsy:', !connectingUserId);
         return;
     }
 

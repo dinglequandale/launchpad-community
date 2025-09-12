@@ -7,6 +7,10 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebaseConfig';
 import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from '../services/onboardingServices';
 import { getConnectionsByStatus } from '../services/connectionService';
+import ConnectionStatusModal from '../components/ConnectionStatusModal';
+import ConnectModal from '../components/Connectmodal/ConnectModal';
+import { useConnections } from './ConnectionContext';
+import { useModal } from './ModalContext';
 
 function GlobalAuthWrapper() {
   const { currentUser, loading } = useAuth();
@@ -16,6 +20,40 @@ function GlobalAuthWrapper() {
   const navigate = useNavigate();
   const [userData,setUserData] = useState(null);
   const basicUserInfo = localStorage.getItem("basicUserInfo");
+  
+  // Connection modal state
+  const [showConnectionModal, setShowConnectionModal] = useState(false);
+  const [connectedUserData, setConnectedUserData] = useState(null);
+  const [showVerifiedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
+  
+  // Get connection data and modal functions
+  const {
+    pending,
+    pending_parental_approval,
+    parent_approved,
+    approved,
+    incomingRequests,
+    loading: connectionsLoading,
+    refetchConnections,
+  } = useConnections();
+  const { openProfileModal, openConnectModal } = useModal();
+
+  // Connection modal handlers
+  const handleOnConnectClick = async (connectingUserData) => {
+    console.log('GlobalAuthWrapper handleOnConnectClick called with:', {
+      connectingUserData,
+      chatClient: !!chatClient,
+      isConnected,
+      chatClientUserID: chatClient?.userID
+    });
+    
+    setConnectedUserData(connectingUserData);
+    setShowVerifiedConnectionModal(true);
+  };
+
+  const handleOnProfileClick = (userData) => {
+    openProfileModal({userData, onConnectClick: handleOnConnectClick});
+  };
 
   const user = auth.currentUser;
 
@@ -53,6 +91,45 @@ function GlobalAuthWrapper() {
     } catch (error) {
       console.error('Error fetching connections:', error);
     }
+  }, []);
+
+  // Connection modal logic - show once per session
+  useEffect(() => {
+    // Only run if we have basic user info and connections are loaded
+    if (!basicUserInfo || connectionsLoading) return;
+    
+    const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
+    const info = JSON.parse(basicUserInfo);
+    
+    if (
+      (info &&
+      info.userType === 'High Schooler' &&
+      info.parentVerified &&
+      !connectionSessionFlag) ||
+      (info && info.userType !== 'High Schooler' && !connectionSessionFlag)
+    ) {
+      const openConnectionModal = info.userType === "High Schooler" ? (pending.length > 0 ||
+        pending_parental_approval.length > 0 ||
+        parent_approved.length > 0 ||
+        approved.length > 0) : (pending.length > 0 ||
+          approved.length > 0);
+      if(openConnectionModal){
+        setShowConnectionModal(true);
+        sessionStorage.setItem("connectionModalShown", "true");
+      }
+    }
+  }, [basicUserInfo, pending, pending_parental_approval, parent_approved, approved, connectionsLoading]);
+
+  // Listen for notification click events from TopBar
+  useEffect(() => {
+    const handleShowConnectionModal = () => {
+      setShowConnectionModal(true);
+    };
+
+    window.addEventListener('showConnectionModal', handleShowConnectionModal);
+    return () => {
+      window.removeEventListener('showConnectionModal', handleShowConnectionModal);
+    };
   }, []);
 
   useEffect(() => {
@@ -119,7 +196,47 @@ function GlobalAuthWrapper() {
   if (!isConnected) {
     return <PageLoading />;
   }
-  return <Outlet context={{ chatClient, isConnected }} />;
+  
+  return (
+    <>
+      {showVerifiedConnectionModal && (
+        <>
+          {console.log('GlobalAuthWrapper rendering ConnectModal with:', {
+            chatClient: !!chatClient,
+            chatClientUserID: chatClient?.userID,
+            isConnected,
+            connectedUserData: connectedUserData?.userId
+          })}
+          <ConnectModal 
+            onClose={() => setShowVerifiedConnectionModal(false)} 
+            userData={connectedUserData} 
+            visibility={showVerifiedConnectionModal} 
+            chat={chatClient} 
+            userId={connectedUserData?.userId}
+          />
+        </>
+      )}
+      {showConnectionModal && (
+        <ConnectionStatusModal
+          onClose={() => setShowConnectionModal(false)}
+          onConnect={handleOnConnectClick}
+          handleProfileClick={handleOnProfileClick}
+          pending={pending}
+          pending_parental_approval={pending_parental_approval}
+          parent_approved={parent_approved}
+          approved={approved}
+          incomingRequests={incomingRequests}
+        />
+      )}
+      {console.log('GlobalAuthWrapper providing chatClient to Outlet:', {
+        chatClient: !!chatClient,
+        chatClientUserID: chatClient?.userID,
+        isConnected,
+        chatClientType: typeof chatClient
+      })}
+      <Outlet context={{ chatClient, isConnected }} />
+    </>
+  );
 }
 
 export default GlobalAuthWrapper;

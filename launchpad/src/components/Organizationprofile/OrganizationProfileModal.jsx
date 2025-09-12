@@ -5,6 +5,7 @@ import './organizationprofile.css'
 import { useModal } from '../../contexts/ModalContext'
 import { useReport } from '../../contexts/report/ReportContext'
 import { useAuth } from '../../contexts/auth/AuthContext'
+import { useOutletContext } from 'react-router-dom'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase/firebaseConfig'
 import { displayFieldsOfInterest } from '../../services/userProfileServices'
@@ -24,6 +25,7 @@ export default function OrganizationProfileModal({
   const { currentUser } = useAuth()
   const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport()
   const { openApplyModal, openConnectModal } = useModal()
+  const { chatClient } = useOutletContext()
 
   const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}')
   const disableActions = userBasicInfo?.userType === 'High Schooler' && !userBasicInfo?.parentVerified
@@ -153,6 +155,7 @@ export default function OrganizationProfileModal({
       if (userData) {
         openConnectModal({
           userData: userData,
+          chat: chatClient,
           isOpportunity: true,
           opportunityType: orgProfile.type,
           onClose: () => {},
@@ -182,6 +185,7 @@ export default function OrganizationProfileModal({
         // Open connect modal for messaging
         openConnectModal({
           userData: userData,
+          chat: chatClient,
           isOpportunity: true,
           opportunityType: orgProfile.type,
           onClose: () => {},

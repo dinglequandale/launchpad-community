@@ -34,24 +34,24 @@ export default function InitializeStream() {
 
   // Listen for sidebar state changes
   useEffect(() => {
-    const handleSidebarChange = () => {
-      const sidebar = document.querySelector('.v0-sidebar');
-      if (sidebar) {
-        setIsSidebarCollapsed(sidebar.classList.contains('v0-sidebar-collapsed'));
-      }
+    const handleSidebarToggle = (event) => {
+      const isCollapsed = event.detail.isCollapsed;
+      setIsSidebarCollapsed(isCollapsed);
     };
 
-    // Initial check
-    handleSidebarChange();
-
-    // Set up observer to watch for sidebar class changes
-    const observer = new MutationObserver(handleSidebarChange);
+    // Initial check - get current state from DOM
     const sidebar = document.querySelector('.v0-sidebar');
     if (sidebar) {
-      observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+      const isCollapsed = sidebar.classList.contains('v0-sidebar-collapsed');
+      setIsSidebarCollapsed(isCollapsed);
     }
 
-    return () => observer.disconnect();
+    // Listen for custom sidebar toggle events
+    window.addEventListener('sidebarToggle', handleSidebarToggle);
+
+    return () => {
+      window.removeEventListener('sidebarToggle', handleSidebarToggle);
+    };
   }, []);
   useEffect(() => {
     async function initializeChat() {
@@ -108,7 +108,7 @@ export default function InitializeStream() {
 
   return (
     <>
-      <TopBar/>
+      <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
       <SideNav/>
       <div className={`v0-messages-container ${isSidebarCollapsed ? 'v0-messages-sidebar-collapsed' : 'v0-messages-sidebar-expanded'}`}>
         <CustomChat client={chatClient} channels={channels} initialActiveChannel={activeChannel} filters={filters}/>

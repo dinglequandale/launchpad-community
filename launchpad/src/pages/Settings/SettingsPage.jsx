@@ -6,7 +6,8 @@ import NotificationSettings from './sections/NotificationSettings.jsx';
 import DisplaySettings from './sections/DisplaySettings.jsx';
 import SecuritySettings from './sections/SecuritySettings.jsx';
 import AccountSettings from './sections/AccountSettings.jsx';
-import { BiLock, BiNotification, BiPalette, BiUser } from 'react-icons/bi';
+import GraduationEmailSettings from './sections/GraduationEmailSettings.jsx';
+import { BiLock, BiNotification, BiPalette, BiUser, BiEnvelope } from 'react-icons/bi';
 import LegalityGoBack from '../../components/Legality Footer/LegalityGoBack.jsx';
 
 const settingsSections = [
@@ -14,6 +15,7 @@ const settingsSections = [
   // { id: 'display', label: 'Display', icon: <BiPalette className="settings-nav-icon"/>, component: DisplaySettings },
   { id: 'security', label: 'Security', icon: <BiLock className="settings-nav-icon" size={25}/>, component: SecuritySettings },
   { id: 'account', label: 'Account', icon: <BiUser className="settings-nav-icon" size={25}/>, component: AccountSettings },
+  { id: 'graduation-emails', label: 'Graduation Emails', icon: <BiEnvelope className="settings-nav-icon" size={25}/>, component: GraduationEmailSettings },
 ];
 
 const SettingsPage = () => {

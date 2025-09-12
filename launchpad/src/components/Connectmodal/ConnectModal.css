@@ -215,6 +215,21 @@
   transform: none;
 }
 
+.connect-modal-send-button.sending {
+  background: #1976d2;
+  cursor: not-allowed;
+  transform: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.connect-modal-send-button.sending:hover {
+  background: #1976d2;
+  transform: none;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

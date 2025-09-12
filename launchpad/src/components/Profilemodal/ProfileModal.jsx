@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/auth/AuthContext'
 import { useModal } from '../../contexts/ModalContext'
 import { useConnections } from '../../contexts/ConnectionContext'
 import { useReport } from '../../contexts/report/ReportContext'
+import { useOutletContext } from 'react-router-dom'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../../firebase/firebaseConfig'
 import {
@@ -31,6 +32,7 @@ export default function ProfileModal({
   const { openConnectModal, openParentalConnectionModal } = useModal()
   const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport()
   const { approved = [], parent_approved = [] } = useConnections()
+  const { chatClient } = useOutletContext()
 
   const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}')
   const schoolId = localStorage.getItem('schoolId')
@@ -98,7 +100,7 @@ export default function ProfileModal({
     if (!isApproved) {
       openParentalConnectionModal({ professionalData: userData })
     } else {
-      openConnectModal({ userData })
+      openConnectModal({ userData, chat: chatClient })
     }
   }
 

@@ -8,6 +8,7 @@ import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
 import { IoCloseOutline } from 'react-icons/io5';
 import { displayShortenedLinkedin } from '../../services/userProfileServices';
 import { addOrUpdateConnection } from '../../services/connectionService';
+import Loading from '../LoadingAnimation/Loading';
 import './ConnectModal.css';
 
 // TODO: actually implement clickedUser logic
@@ -22,7 +23,20 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   const [isCreatingConnection, setIsCreatingConnection] = useState(false);
   const [connectionCreated, setConnectionCreated] = useState(false);
   const [sendDirectMessage, setSendDirectMessage] = useState(false);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
   const modalRef = useRef(null);
+
+  // Debug logging
+  console.log('ConnectModal received props:', {
+    visibility,
+    chat: !!chat,
+    chatUserID: chat?.userID,
+    userId,
+    userData: userData?.userId,
+    isOpportunity,
+    chatType: typeof chat,
+    chatConstructor: chat?.constructor?.name
+  });
 
   const userType = userData.userType;
   const schoolId = localStorage.getItem("schoolId");
@@ -135,15 +149,46 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
 
   const onSendClick = async () => {
     try {
+      setIsSendingMessage(true);
+      console.log('ConnectModal onSendClick called with:', {
+        introMessage: introMessage?.substring(0, 50) + '...',
+        currentUserUid: currentUser?.uid,
+        targetUserId,
+        chat: !!chat,
+        schoolId,
+        sendWithResume
+      });
+      
       // Create connection first
       const connectionResult = await createConnection();
       
       if (connectionResult.success) {
         // Send message
         if (sendWithResume) {
-          await sendConnectMessageWithResume(introMessage, currentUser.uid, targetUserId, setChannelId, chat, schoolId);
+          // Fetch resume data for sending with resume
+          const resumeRef = ref(storage, `resumes/${currentUser.uid}`);
+          const resumeURL = await getDownloadURL(resumeRef);
+          const metaData = await getMetadata(resumeRef);
+          
+          await sendConnectMessageWithResume(
+            introMessage, 
+            resumeURL, 
+            metaData, 
+            currentUser.uid, 
+            targetUserId, 
+            setChannelId, 
+            chat, 
+            schoolId
+          );
         } else {
-          await sendConnectMessageWithoutResume(introMessage, currentUser.uid, targetUserId, setChannelId, chat, schoolId);
+          await sendConnectMessageWithoutResume(
+            introMessage, 
+            currentUser.uid, 
+            targetUserId, 
+            setChannelId, 
+            chat, 
+            schoolId
+          );
         }
         
         toast.success('Message sent successfully!');
@@ -153,6 +198,8 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error('Failed to send message');
+    } finally {
+      setIsSendingMessage(false);
     }
   };
 
@@ -272,11 +319,18 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
             {sendDirectMessage ? (
               <button 
                 onClick={onSendClick} 
-                disabled={!canSend} 
+                disabled={!canSend || isSendingMessage} 
                 type="submit" 
-                className="connect-modal-send-button"
+                className={`connect-modal-send-button ${isSendingMessage ? 'sending' : ''}`}
               >
-                Send
+                {isSendingMessage ? (
+                  <>
+                    <Loading size="20" />
+                    Sending...
+                  </>
+                ) : (
+                  'Send'
+                )}
               </button>
             ) : (
               <button 

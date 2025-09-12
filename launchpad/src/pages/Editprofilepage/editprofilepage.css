@@ -1,0 +1,23 @@
+/* Edit Profile Page Sidebar Responsive Classes */
+.editProfilePageContainer {
+    transition: padding-left 0.3s ease-in-out;
+}
+
+.editprofile-sidebar-expanded {
+    padding-left: 16% !important;
+}
+
+.editprofile-sidebar-collapsed {
+    padding-left: 4% !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .editProfilePageContainer {
+        padding-left: 0 !important;
+    }
+    
+    .editprofile-sidebar-collapsed {
+        padding-left: 0 !important;
+    }
+}

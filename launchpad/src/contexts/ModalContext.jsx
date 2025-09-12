@@ -72,6 +72,7 @@ export function ModalProvider({ children }) {
           {...connectModalProps}
           visibility={!!connectModalProps}
           onClose={closeConnectModal}
+          chat={connectModalProps.chat}
         />
       )}
       {parentalModalProps && (

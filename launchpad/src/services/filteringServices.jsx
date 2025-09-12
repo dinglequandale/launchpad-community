@@ -151,6 +151,31 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
         });
     }
 
+    // Additional post-processing: Exclude professionals when college filtering is active
+    if (filters.collegeInterestsOrDecision && Array.isArray(filters.collegeInterestsOrDecision) && filters.collegeInterestsOrDecision.length > 0) {
+        const specificColleges = filters.collegeInterestsOrDecision.filter(v => !v.includes("My") && !v.includes("Any"));
+        if (specificColleges.length > 0) {
+            results = results.filter(user => {
+                // Exclude professionals (they don't have college data)
+                if (user.userType === "Professional") return false;
+                
+                // For Alumni, check collegeAttending
+                if (user.userType === "Alumni") {
+                    return user.collegeAttending && specificColleges.includes(user.collegeAttending);
+                }
+                
+                // For High Schoolers, check collegeInterestsOrDecision
+                if (user.userType === "High Schooler") {
+                    return user.collegeInterestsOrDecision && 
+                           Array.isArray(user.collegeInterestsOrDecision) &&
+                           user.collegeInterestsOrDecision.some(college => specificColleges.includes(college));
+                }
+                
+                return false; // Exclude other user types
+            });
+        }
+    }
+
     // Limit results after post-filtering
     results = results.slice(0, maxLimit);
 

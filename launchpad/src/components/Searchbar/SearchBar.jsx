@@ -6,7 +6,7 @@ import { CiSearch } from "react-icons/ci";
 import { capitalizeFirstLetter } from '../../pages/Homepage/Home';
 import { careerInterests } from '../../pages/Onboarding/Options';
 
-export default function SearchBar({filters, pageName, handleFilterChange, handleSearch, clearAllFilters}) {
+export default function SearchBar({filters, currentFilters = null, pageName, handleFilterChange, handleSearch, clearAllFilters}) {
     const searchType = () => {
         switch(pageName){
             case `The ${capitalizeFirstLetter(localStorage.getItem("schoolId"))} Network`: 
@@ -115,10 +115,11 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
                         if (filterKey === 'collegeInterestsOrDecision') {
                             return (
                                 <CollegeSearchFilter 
-                                    key={filterKey}
+                                    key={`${filterKey}-${currentFilters ? JSON.stringify(currentFilters[filterKey]) : 'default'}`}
                                     title={config.title}
                                     filterKey={filterKey} 
                                     filterContent={enhancedContent} 
+                                    currentValue={currentFilters ? currentFilters[filterKey] : undefined}
                                     onFilterChange={handleFilterChange}
                                     isMultiSelect={config.isMultiSelect}
                                     showSearch={config.showSearch}
@@ -130,10 +131,11 @@ export default function SearchBar({filters, pageName, handleFilterChange, handle
                         
                         return (
                             <ContentFilter 
-                                key={filterKey}
+                                key={`${filterKey}-${currentFilters ? JSON.stringify(currentFilters[filterKey]) : 'default'}`}
                                 title={config.title}
                                 filterKey={filterKey} 
                                 filterContent={enhancedContent} 
+                                currentValue={currentFilters ? currentFilters[filterKey] : undefined}
                                 onFilterChange={handleFilterChange}
                                 isMultiSelect={config.isMultiSelect}
                                 showSearch={config.showSearch}

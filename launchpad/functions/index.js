@@ -16,6 +16,7 @@ const {verifyParentToken} = require("./callableFunctions/verifyParentToken");
 const {deleteAuthUsers} = require("./callableFunctions/deleteAuthUsers");
 const {generateUnsubscribeLink, processUnsubscribe, checkUnsubscribeStatus} = require("./callableFunctions/generateUnsubscribeLink");
 const {manageConnections} = require("./callableFunctions/manageConnections");
+const {sendGraduationEmails, sendMigrationReminders, scheduledGraduationEmails} = require("./callableFunctions/sendGraduationEmails");
 
 exports.createStreamToken = createStreamToken;
 exports.sendInviteEmail = sendInviteEmail;
@@ -31,3 +32,6 @@ exports.generateUnsubscribeLink = generateUnsubscribeLink;
 exports.processUnsubscribe = processUnsubscribe;
 exports.checkUnsubscribeStatus = checkUnsubscribeStatus;
 exports.manageConnections = manageConnections;
+exports.sendGraduationEmails = sendGraduationEmails;
+exports.sendMigrationReminders = sendMigrationReminders;
+exports.scheduledGraduationEmails = scheduledGraduationEmails;

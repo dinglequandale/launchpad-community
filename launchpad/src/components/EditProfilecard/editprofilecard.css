@@ -691,97 +691,24 @@
 }
 
 .v0-resume-header {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 10;
-  display: flex;
-  gap: 8px;
-}
-
-.v0-delete-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.v0-delete-btn:hover {
-  background: #fef2f2;
-  color: #dc2626;
-}
-
-.v0-college-info-container {
-  position: relative;
-}
-
-.v0-dream-universities-privacy {
-  margin-top: 8px;
-  padding: 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-}
-
-.v0-privacy-toggle-container {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.v0-toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-}
-
-.v0-privacy-checkbox {
-  width: 16px;
-  height: 16px;
-  accent-color: #1157e2;
-  cursor: pointer;
-}
-
-.v0-toggle-text {
-  user-select: none;
-}
-
-.v0-privacy-description {
-  margin: 0;
-  font-size: 12px;
-  color: #6b7280;
-  line-height: 1.4;
-  font-style: italic;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
 }
 
 .v0-resume-viewer {
     width: 100%;
-    width: 750px;
     height: 500px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     overflow: hidden;
-    background: #f9fafb;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .v0-resume-iframe {
     width: 100%;
     height: 100%;
     border: none;
-    background: white;
 }
 
 .v0-contact-content {
@@ -1595,7 +1522,7 @@
 
 .v0-modal-link-container {
   position: relative;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 }
 
 .v0-modal-link-label {
@@ -1815,30 +1742,24 @@
   margin-top: 12px;
   color: #6b7280;
   background: #f9fafb;
-  border: 2px solid #e5e7eb;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 12px 20px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-weight: 600;
-  text-align: center;
-  width: 100%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
 }
 
 .v0-modal-no-apply-btn:hover {
   background: #f3f4f6;
   border-color: #d1d5db;
   color: #374151;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .v0-modal-no-apply-btn.active {
   color: #1157e2;
   background: #eff6ff;
   border-color: #1157e2;
-  box-shadow: 0 0 0 3px rgba(17, 87, 226, 0.1);
 }
 
 .v0-modal-preview-container {
