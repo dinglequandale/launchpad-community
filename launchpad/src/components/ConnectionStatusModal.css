@@ -222,14 +222,13 @@
 }
 
 .connection-status-modal-profile-button {
-  background: linear-gradient(90deg, #667eea 0%, #1976d2 100%);
-  color: #fff;
+  background: transparent;
+  color: #1976d2;
   border: none;
   border-radius: 6px;
-  padding: 5px 14px;
+  padding: 6px 8px;
   font-weight: 600;
-  font-size: 14px;
-  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
+  font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -238,7 +237,8 @@
 }
 
 .connection-status-modal-profile-button:hover {
-  transform: scale(1.02);
+  background: #eef2ff;
+  color: #1565c0;
 }
 
 .connection-status-modal-connection-description {

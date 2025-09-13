@@ -10,7 +10,7 @@ import { getConnectionsByStatus } from '../services/connectionService';
 import ConnectionStatusModal from '../components/ConnectionStatusModal';
 import ConnectModal from '../components/Connectmodal/ConnectModal';
 import { useConnections } from './ConnectionContext';
-import { useModal } from './ModalContext';
+import { ModalProvider } from './ModalContext';
 
 function GlobalAuthWrapper() {
   const { currentUser, loading } = useAuth();
@@ -36,8 +36,6 @@ function GlobalAuthWrapper() {
     loading: connectionsLoading,
     refetchConnections,
   } = useConnections();
-  const { openProfileModal, openConnectModal } = useModal();
-
   // Connection modal handlers
   const handleOnConnectClick = async (connectingUserData) => {
     console.log('GlobalAuthWrapper handleOnConnectClick called with:', {
@@ -52,7 +50,8 @@ function GlobalAuthWrapper() {
   };
 
   const handleOnProfileClick = (userData) => {
-    openProfileModal({userData, onConnectClick: handleOnConnectClick});
+    // This will be handled by the individual pages through their own modal context
+    console.log('Profile click in GlobalAuthWrapper:', userData);
   };
 
   const user = auth.currentUser;
@@ -198,7 +197,7 @@ function GlobalAuthWrapper() {
   }
   
   return (
-    <>
+    <ModalProvider chatClient={chatClient}>
       {showVerifiedConnectionModal && (
         <>
           {console.log('GlobalAuthWrapper rendering ConnectModal with:', {
@@ -235,7 +234,7 @@ function GlobalAuthWrapper() {
         chatClientType: typeof chatClient
       })}
       <Outlet context={{ chatClient, isConnected }} />
-    </>
+    </ModalProvider>
   );
 }
 

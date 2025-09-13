@@ -16,7 +16,7 @@
 
 /* Ensure MakeChanges modal appears above other modals */
 .v0-modal-overlay .MakeChanges {
-    z-index: 9999;
+    z-index: 99999;
 }
 
 .v0-modal-container {

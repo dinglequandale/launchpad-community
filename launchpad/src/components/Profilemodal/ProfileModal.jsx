@@ -27,12 +27,12 @@ export default function ProfileModal({
   visibility,
   onClose,
   handleReferalClick,
+  chatClient,
 }) {
   const { currentUser } = useAuth()
-  const { openConnectModal, openParentalConnectionModal } = useModal()
+  const { openConnectModal, openParentalConnectionModal, isConnectModalOpen } = useModal()
   const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport()
   const { approved = [], parent_approved = [] } = useConnections()
-  const { chatClient } = useOutletContext()
 
   const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}')
   const schoolId = localStorage.getItem('schoolId')
@@ -46,6 +46,19 @@ export default function ProfileModal({
   const [opportunitiesData, setOpportunitiesData] = useState([])
   const [opportunitiesLoading, setOpportunitiesLoading] = useState(false)
   const modalRef = useRef(null)
+  const connectModalOpenRef = useRef(false)
+  const closeTimeoutRef = useRef(null)
+
+  // Track ConnectModal state
+  useEffect(() => {
+    connectModalOpenRef.current = isConnectModalOpen
+    
+    // Clear any pending close timeout when ConnectModal opens
+    if (isConnectModalOpen && closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+  }, [isConnectModalOpen])
 
   // Fetch opportunities
   useEffect(() => {
@@ -72,7 +85,15 @@ export default function ProfileModal({
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
-        onClose()
+        // Don't close if ConnectModal is open
+        if (!connectModalOpenRef.current) {
+          // Add a small delay to prevent immediate closing when ConnectModal closes
+          closeTimeoutRef.current = setTimeout(() => {
+            if (!connectModalOpenRef.current) {
+              onClose()
+            }
+          }, 100)
+        }
       }
     }
 
@@ -84,8 +105,21 @@ export default function ProfileModal({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
       document.body.style.overflow = 'unset'
+      // Clear timeout on cleanup
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
     }
   }, [visibility, onClose])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const handleConnect = () => {
     const isApproved = isConnectionApproved(

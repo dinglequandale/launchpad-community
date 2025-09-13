@@ -7,6 +7,7 @@ import toast, { Toaster } from "react-hot-toast";
 import emailData from "../../json_data/studentEmailData.json";
 import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from "../../services/onboardingServices";
 import { getConnectionsByStatus } from "../../services/connectionService";
+import { capitalizeFirstLetter } from "../Homepage/Home";
 
 export default function SignUp(){
     const { userLoggedIn } = useAuth();
@@ -22,7 +23,8 @@ export default function SignUp(){
     const schoolInfo = localStorage.getItem("tempSchoolInfo") || '';
     const schoolId = schoolInfo ? JSON.parse(schoolInfo).schoolId : "";
 
-    const schoolEmailCondition = userType === "High Schooler" || userType === "Staff";
+    const schoolEmailCondition = userType === "High Schooler";
+    const staffEmailCondition = userType === "Staff";
 
     // Check for school code validation
     const tempSchoolInfo = JSON.parse(localStorage.getItem("tempSchoolInfo"));
@@ -130,6 +132,15 @@ export default function SignUp(){
                 return;
             }
         }
+        else if(staffEmailCondition){
+            // Staff users can input any email - just validate basic email format
+            const basicEmailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!basicEmailPattern.test(userEmail)) {
+                toast.error('Please enter a valid email address.');
+                return;
+            }
+            setEmailValid(true);
+        }
         else{
             setEmailValid(true);
         }
@@ -146,7 +157,33 @@ export default function SignUp(){
             setUserIsSigningIn(true);
             try {
                 // console.log("Student record: ", studentRecord.graduation_year);
-                if(studentRecord) localStorage.setItem("tempStudentInfo", JSON.stringify(studentRecord));
+                
+                // Save student record to localStorage - create fallback if using override
+                if (schoolEmailCondition) {
+                    console.log("Running school email condition");
+                    if (studentRecord) {
+                        console.log("Student record found");
+                        console.log("Student record: ", studentRecord);
+                        localStorage.setItem("tempStudentInfo", JSON.stringify(studentRecord));
+                    } else if (emailOverride) {
+                        // Create a minimal student record for override users
+                        const fallbackRecord = {
+                            full_name: "", // Will be filled in onboarding
+                            graduation_year: "", // Will be filled in onboarding
+                            email_frag: userEmail.split('@')[0] // Extract username part
+                        };
+                        localStorage.setItem("tempStudentInfo", JSON.stringify(fallbackRecord));
+                    }
+                } else if (staffEmailCondition) {
+                    // Create a minimal record for staff users
+                    const staffRecord = {
+                        full_name: "", // Will be filled in onboarding
+                        graduation_year: "", // Not applicable for staff
+                        email_frag: userEmail.split('@')[0] // Extract username part
+                    };
+                    localStorage.setItem("tempStudentInfo", JSON.stringify(staffRecord));
+                }
+                
                 const emailToUse = (schoolEmailCondition && !emailOverride) ? userEmail + emailData[0].email_hook : userEmail;
                 const userCredential = await toast.promise(
                     doCreateUserWithEmailAndPassword(emailToUse, userPassword),
@@ -170,9 +207,9 @@ export default function SignUp(){
                 );
                 
                 // Run profile completion logic for new users
-                if (userCredential && userCredential.user) {
-                    await runProfileCompletionLogic(studentRecord || {});
-                }
+                // if (userCredential && userCredential.user) {
+                //     await runProfileCompletionLogic(studentRecord || {});
+                // }
                 
                 navigate("/Home");
             } catch (error) {
@@ -192,9 +229,9 @@ export default function SignUp(){
                 const userCredential = await doSignInWithGoogle();
                 
                 // Run profile completion logic for new Google users
-                if (userCredential && userCredential.user) {
-                    await runProfileCompletionLogic({});
-                }
+                // if (userCredential && userCredential.user) {
+                //     await runProfileCompletionLogic({});
+                // }
                 
                 navigate("/Home");
             } catch (error) {
@@ -236,7 +273,7 @@ export default function SignUp(){
                                 alt="Launchpad Logo" 
                                 className="auth-school-logo"
                             />
-                            <h1 className="auth-title">The {tempSchoolInfo?.schoolDisplayName || "School"} Network</h1>
+                            <h1 className="auth-title">The {capitalizeFirstLetter(tempSchoolInfo?.schoolId) || "School"} Network</h1>
                             <p className="auth-subtitle">Your journey beyond the classroom starts here</p>
                         </div>
                         <div className="auth-powered-by">
@@ -246,7 +283,7 @@ export default function SignUp(){
                     
                     <main className="auth-main">
                         <div className="auth-form-section">
-                            {(!schoolEmailCondition) && (
+                            {(!schoolEmailCondition && !staffEmailCondition) && (
                                 <>
                                     <button className="auth-social-button" onClick={(e)=>onContinueWithGoogle(e)}>
                                         <svg style={{width: "20px"}} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -285,12 +322,12 @@ export default function SignUp(){
                                                 setEmailValid(true);
                                                 // Don't reset override state when typing - let user keep their choice
                                                 if(schoolEmailCondition && !emailOverride) {
-                                                    // Only restrict input when override is disabled
+                                                    // Only restrict input when override is disabled for high schoolers
                                                     if(!(e.target.value.includes("@") || e.target.value.includes("."))){
                                                         setUserEmail(e.target.value);
                                                     }
                                                 } else {
-                                                    // Allow full email input when override is enabled or for non-school users
+                                                    // Allow full email input when override is enabled, for staff users, or for non-school users
                                                     setUserEmail(e.target.value);
                                                 }
                                             }}

@@ -455,8 +455,8 @@
 }
 
 .auth-school-logo {
-  width: 80px;
-  height: 80px;
+  width: 250px;
+  /* height: 80px; */
   margin-bottom: 16px;
   object-fit: contain;
 }
@@ -481,9 +481,9 @@
 .auth-agreement-checkbox {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 20px;
   cursor: pointer;
-  line-height: 1.5;
+  /* line-height: 1.5; */
 }
 
 .auth-checkbox-input {
@@ -492,7 +492,8 @@
   height: 18px;
   accent-color: #1157e2;
   flex-shrink: 0;
-  margin-top: 2px;
+  /* margin-top: 2px; */
+  margin-top: -6px;
 }
 
 .auth-checkbox-text {

@@ -30,7 +30,6 @@ import UnsubscribePage from './pages/UnsubscribePage.jsx';
 import LandingPageRevamped from './pages/landing_page/LandingPageRevamped.jsx';
 import UserType from './pages/Onboarding/UserType.jsx';
 import MigrateToAlumni from './pages/MigrateToAlumni/MigrateToAlumni.jsx';
-import { ModalProvider } from './contexts/ModalContext.jsx';
 import { ConnectionProvider } from './contexts/ConnectionContext';
 import { Toaster } from 'react-hot-toast';
 
@@ -200,11 +199,7 @@ const router = createBrowserRouter([
         element: <Onboarding/>
       },
       {
-        element: (
-          <ModalProvider>
-            <GlobalAuthWrapper/>
-          </ModalProvider>
-        ),
+        element: <GlobalAuthWrapper/>,
         children: [
           {
             path: '/Home',

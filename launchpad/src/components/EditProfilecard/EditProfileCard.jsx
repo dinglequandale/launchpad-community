@@ -740,6 +740,7 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
             userFirstDesc,
             userSecondDesc,
             acceptedColleges: {desc1: `Accepted Colleges`, desc2: `${userData.acceptedColleges}`},
+            sponsoredClubs: {desc1: `Sponsored Clubs`, desc2: `${userData.sponsoredClubs}`},
         });
     },[userData])
 
@@ -801,13 +802,13 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
             <div className='userInfo' style={{fontSize: "16px"}}>
                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userFirstDesc.desc1}</span>: {basicInfoContent.userFirstDesc.desc2}</span>
                 <div className="v0-college-info-container">
-                    <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>
+                    {userData.userType !== "Staff" && <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>}
                     {userData.userType === "High Schooler" && userData.collegeDecision === "No" && (
                         <DreamUniversitiesPrivacyToggle />
                     )}
                 </div>
                 {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
-                {userData.sponsoredClubs && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.sponsoredClubs.desc1}</span>: {basicInfoContent.sponsoredClubs.desc2}</span></>}
+                {userData.sponsoredClubs && <><span><span style={{fontWeight: "500"}}>{basicInfoContent.sponsoredClubs.desc1}</span>: {basicInfoContent.sponsoredClubs.desc2}</span></>}
             </div>
             
         </div>

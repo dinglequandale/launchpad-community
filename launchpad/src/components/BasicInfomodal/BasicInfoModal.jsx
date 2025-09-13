@@ -296,7 +296,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
                       {question.text}
                       {question.required && <span className="v0-required-indicator">*</span>}
                     </label>
-                    {!question.required && <OptionalNotice/>}
+                    {/* {!question.required && <OptionalNotice/>} */}
                     
                     {(question.type !== "multi-select" && question.type !== "select") ? (
                       <input 

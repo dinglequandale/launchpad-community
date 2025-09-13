@@ -29,14 +29,27 @@ const staffQuestionsConfig = [
     optional: true,
     page: 1
   },
-  // {
-  //   id: "schoolAttending",
-  //   text: "Which school are you an administrator/staff at?",
-  //   type: "select",
-  //   options: highSchools,
-  //   placeholder: "N/A",
-  //   page: 1
-  // },
+  {
+    id: "areasOfInterest",
+    text: "What are your areas of expertise?",
+    type: "multi-select",
+    options: careerInterests,
+    page: 1
+  },
+  {
+    id: "linkedinLink",
+    text: "LinkedIn profile (optional):",
+    placeholder: "https://www.linkedin.com/in/your-profile",
+    type: "text",
+    optional: true,
+    page: 1
+  },
+  {
+    id: "email",
+    text: "Email (optional)",
+    optional: true,
+    page: 1
+  },
   {
     id: "schoolRole",
     text: "What is your role/position at the school?",
@@ -45,32 +58,9 @@ const staffQuestionsConfig = [
     page: 2
   },
   {
-    id: "areasOfInterest",
-    text: "What are your areas of expertise?",
-    type: "multi-select",
-    options: careerInterests,
-    page: 2
-  },
-  {
     id: "personalEmail",
     text: "Enter your personal email: (optional)",
     // placeholder: "your.name@school.org",
-    type: "text",
-    optional: true,
-    page: 2
-  },
-//   {
-//     id: "phoneNumber",
-//     text: "Phone number (optional):",
-//     placeholder: "E.g. (555) 123-4567",
-//     type: "text",
-//     optional: true,
-//     page: 2
-//   },
-  {
-    id: "linkedinLink",
-    text: "LinkedIn profile (optional):",
-    placeholder: "https://www.linkedin.com/in/your-profile",
     type: "text",
     optional: true,
     page: 2
@@ -108,6 +98,7 @@ export default function Staff({currentPage, isSubmitting, setCanSubmit, schoolIn
     personalEmail: "",
     sponsoredClubs: "",
     userAboutMe: "",
+    schoolAttending: schoolInfo?.schoolDisplayName || "",
     schoolId: schoolInfo?.schoolId || "",
     userType: "Staff",
   });
@@ -170,16 +161,18 @@ export default function Staff({currentPage, isSubmitting, setCanSubmit, schoolIn
             <div className="onboardingQuestions">
               {staffQuestionsConfig.filter(q => q.page === 2).map(question => (
                 <div key={question.id} className="form-group">
-                  <label className="form-label">{question.id !== "areasOfInterest" && question.text}</label>
+                  <label className="form-label">{question.text}</label>
                   {question.type === 'text' ? (
                     <input
                       type="text"
                       value={staffData[question.id] || ''}
                       onChange={e => handleChange(question.id, e.target.value)}
                       className="form-input"
+                      style={{width: "94%"}}
                       placeholder={question.placeholder}
                     />
                   ) : question.type === 'multi-select' ? (
+                    <div style={{width: "94%"}}>
                     <CustomSelect
                       options={question.options}
                       value={staffData[question.id] || []}
@@ -188,6 +181,7 @@ export default function Staff({currentPage, isSubmitting, setCanSubmit, schoolIn
                       isMulti={true}
                       isSearchable={true}
                     />
+                    </div>
                   ) : (
                     <input
                       type="text"
@@ -215,7 +209,7 @@ export default function Staff({currentPage, isSubmitting, setCanSubmit, schoolIn
                     onChange={e => handleChange(question.id, e.target.value)}
                     className="form-input"
                     placeholder={question.placeholder}
-                    style={{ minHeight: 100, resize: "vertical" }}
+                    style={{ minHeight: 100, resize: "vertical", width: "94%" }}
                   />
                 </div>
               ))}

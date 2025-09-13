@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import { useAuth } from '../contexts/auth/AuthContext';
+import { useModal } from '../contexts/ModalContext';
 import DefaultIcon from './DefaultIcon/DefaultIcon';
 import { displayShortenedName, getBasicUserDescription } from '../services/userProfileServices';
 import { IoCheckmarkOutline, IoCloseOutline } from 'react-icons/io5';
@@ -21,18 +22,40 @@ export default function ConnectionStatusModal({
   ...props
 }) {
   const { currentUser } = useAuth();
+  const { openProfileModal, openConnectModal, isConnectModalOpen } = useModal();
   const [userMap, setUserMap] = useState({});
   const [loadingAction, setLoadingAction] = useState({}); // { [connId]: 'approve' | 'deny' | null }
   const [removingCards, setRemovingCards] = useState({}); // Track cards being animated out
   const [hiddenCards, setHiddenCards] = useState(new Set()); // Track cards to hide after animation
   const modalRef = useRef(null);
+  const connectModalOpenRef = useRef(false);
+  const closeTimeoutRef = useRef(null);
   const userType = localStorage.getItem("basicUserInfo") ? JSON.parse(localStorage.getItem("basicUserInfo")).userType : "";
+
+  // Track ConnectModal state
+  useEffect(() => {
+    connectModalOpenRef.current = isConnectModalOpen;
+    
+    // Clear any pending close timeout when ConnectModal opens
+    if (isConnectModalOpen && closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  }, [isConnectModalOpen]);
 
   // Handle outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
-        onClose();
+        // Don't close if ConnectModal is open
+        if (!connectModalOpenRef.current) {
+          // Add a small delay to prevent immediate closing when ConnectModal closes
+          closeTimeoutRef.current = setTimeout(() => {
+            if (!connectModalOpenRef.current) {
+              onClose();
+            }
+          }, 100);
+        }
       }
     };
 
@@ -42,8 +65,21 @@ export default function ConnectionStatusModal({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.body.style.overflow = 'unset';
+      // Clear timeout on cleanup
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
     };
   }, [onClose]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) {
+        clearTimeout(closeTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const allConnections = [
@@ -174,9 +210,15 @@ export default function ConnectionStatusModal({
               </h3>
               <button
                 className="connection-status-modal-profile-button"
-                onClick={() => handleProfileClick && handleProfileClick(user)}
+                onClick={() => {
+                  if (handleProfileClick) {
+                    handleProfileClick(user);
+                  } else {
+                    openProfileModal({ userData: user });
+                  }
+                }}
               >
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path fill="#fff" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.418 0-8 2.239-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.761-3.582-5-8-5Z"/></svg>
+                {/* <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path fill="#fff" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.418 0-8 2.239-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.761-3.582-5-8-5Z"/></svg> */}
                 See Profile
               </button>
             </div>
@@ -216,7 +258,13 @@ export default function ConnectionStatusModal({
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: 120 }}>
             <button
               className="connection-status-modal-connect-button"
-              onClick={() => onConnect && onConnect(user)}
+              onClick={() => {
+                if (onConnect) {
+                  onConnect(user);
+                } else {
+                  openConnectModal({ userData: user });
+                }
+              }}
             >
               Connect
             </button>
@@ -227,7 +275,11 @@ export default function ConnectionStatusModal({
   };
 
   return (
-    <div className="connection-status-modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="connection-status-modal-overlay" onClick={e => { 
+      if (e.target === e.currentTarget && !connectModalOpenRef.current) {
+        onClose();
+      }
+    }}>
       <div className="connection-status-modal" ref={modalRef}>
         <div className="connection-status-modal-header">
           <button className="connection-status-modal-close-btn" onClick={onClose} title="Close">

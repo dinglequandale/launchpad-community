@@ -11,7 +11,7 @@ export function useModal() {
   return useContext(ModalContext);
 }
 
-export function ModalProvider({ children }) {
+export function ModalProvider({ children, chatClient }) {
   const [applyModalProps, setApplyModalProps] = useState(null);
   const [profileModalProps, setProfileModalProps] = useState(null);
   const [connectModalProps, setConnectModalProps] = useState(null);
@@ -65,6 +65,7 @@ export function ModalProvider({ children }) {
           {...profileModalProps}
           visibility={!!profileModalProps}
           onClose={closeProfileModal}
+          chatClient={chatClient}
         />
       )}
       {connectModalProps && (

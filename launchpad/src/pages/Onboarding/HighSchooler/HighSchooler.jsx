@@ -132,16 +132,7 @@ const highSchoolQuestionsConfig = [
 
 export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, setCanSubmit, setUserData }) {
   
-  const tempStudentInfo = (() => {
-    const stored = localStorage.getItem('tempStudentInfo');
-    if (!stored) return {};
-    try {
-      return JSON.parse(stored);
-    } catch (error) {
-      console.warn('Failed to parse tempStudentInfo from localStorage:', error);
-      return {};
-    }
-  })();
+  const tempStudentInfo = localStorage.getItem('tempStudentInfo') ? JSON.parse(localStorage.getItem('tempStudentInfo')) : {};
   const [highSchoolerData, setHighSchoolerData] = useState({
     userName: tempStudentInfo.full_name ? 
       tempStudentInfo.full_name.split(', ')[1] + ' ' + tempStudentInfo.full_name.split(', ')[0] : '',
@@ -165,7 +156,8 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
 
   const { currentUser } = useAuth();
 
-  // const tempStudentInfo = JSON.parse(localStorage.getItem('tempStudentInfo') || '{}');
+  
+  console.log("tempStudentInfo: ", JSON.parse(localStorage.getItem('tempStudentInfo') || '{}'));
 
   // Update parent component with user data whenever it changes
   useEffect(() => {
@@ -219,6 +211,7 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
             <SafetyWarning isShortened={true} />
             <BasicUserInfo 
               selectedOptions={highSchoolerData}
+              setSelectedOptions={setHighSchoolerData}
               handleChange={handleChange}
               questionsForPage={highSchoolQuestionsConfig.filter(q => q.page === 1)}
             />
