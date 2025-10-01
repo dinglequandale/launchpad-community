@@ -213,7 +213,7 @@ export const getBasicUserDescription = (userData, shortened=true) => {
      : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear || 'N/A'}, ${getUserHS(userData.schoolAttending || 'Unknown School')}` 
      : userData.userType === "Professional" ? `${userData.yearsOfExperience || 'N/A'}+ Years of Experience in ${shortened ? (userData.areasOfInterest && userData.areasOfInterest.length > 0 ? userData.areasOfInterest[0] : 'General Field') 
         : displayFieldsOfInterest(userData.areasOfInterest || [])}`
-    : `${userData.schoolRole || 'Staff Member'} at ${getUserHS(userData.schoolAttending || 'Unknown School')}`;
+    : `${userData.schoolRole || 'Staff Member'}`;
 }
 
 export const editUserData = async (newData, currentUser, origUserData) => {

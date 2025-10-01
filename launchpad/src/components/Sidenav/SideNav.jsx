@@ -79,10 +79,12 @@ export default function SideNav({show}){
             <div className={`v0-sidebar ${isCollapsed ? 'v0-sidebar-collapsed' : ''}`}>
                 <div className="v0-sidebar-header">
                     <div className="v0-logo-section">
-                        <div className="v0-logo-icon">
-                            <LuGraduationCap size={28} />
-                        </div>
-                        {!isCollapsed && <span className="v0-logo-text">Launchpad</span>}
+        
+                        {!isCollapsed ? <span className="v0-logo-text"><div style={{display: "flex", justifyContent: "center"}}>
+                        <img src="assets/launchpad_logo.png" alt="" style={{width: "150px"}}/>
+                    </div></span> : <div style={{display: "flex", justifyContent: "center"}}>
+                        <img src="assets/launchpad_logo_raw.png" alt="" style={{width: "35px"}}/>
+                    </div>}
                     </div>
                     <button className="v0-collapse-btn" onClick={toggleSidebar}>
                         {isCollapsed ? <LuChevronRight size={20} /> : <LuChevronLeft size={20} />}

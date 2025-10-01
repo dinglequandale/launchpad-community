@@ -18,6 +18,7 @@ export default function TopBar({ isSidebarCollapsed }) {
     const navigate = useNavigate();
     const { openLogoutModal } = useModal();
     const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
+    const [userPfp, setUserPfp] = useState(null);
     
     // Get connection data for notifications
     const {
@@ -33,6 +34,7 @@ export default function TopBar({ isSidebarCollapsed }) {
         const userInfo = localStorage.getItem('basicUserInfo');
         if (userInfo) {
             setBasicUserInfo(JSON.parse(userInfo));
+            setUserPfp(JSON.parse(userInfo).userPfpPreview);
         }
         
         // Check if notification was already clicked in this session
@@ -119,7 +121,7 @@ export default function TopBar({ isSidebarCollapsed }) {
                 </button> */}
                 <div className="v0-logo-section">
                 <div style={{display: "flex", justifyContent: "center"}}>
-            <img src="assets/launchpad_logo.png" alt="" style={{width: "250px"}}/>
+            <img src="assets/awty_school_raw.jpg" alt="" style={{width: "72px"}}/>
           </div>
                 </div>
             </div>
@@ -144,10 +146,10 @@ export default function TopBar({ isSidebarCollapsed }) {
                         className="v0-user-dropdown-trigger"
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
-                        {currentUser?.photoURL ? (
+                        {userPfp ? (
                             <img 
                                 className="v0-user-avatar" 
-                                src={currentUser.photoURL} 
+                                src={userPfp} 
                                 alt={currentUser.displayName || "User"} 
                             />
                         ) : (
@@ -161,10 +163,10 @@ export default function TopBar({ isSidebarCollapsed }) {
                     {isDropdownOpen && (
                         <div className="v0-user-dropdown">
                             <div className="v0-dropdown-header">
-                                {currentUser?.photoURL ? (
+                                {userPfp ? (
                                     <img 
                                         className="v0-dropdown-avatar" 
-                                        src={currentUser.photoURL} 
+                                        src={userPfp} 
                                         alt={currentUser.displayName || "User"} 
                                     />
                                 ) : (
