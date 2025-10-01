@@ -39,7 +39,7 @@ export default function UserType() {
                     <header className="onboarding-header">
                         <div className="onboarding-logo-container">
                             <img 
-                                src="/assets/launchpad_logo.png" 
+                                src="/assets/launchpad_logo_v2.png" 
                                 alt="Launchpad Logo" 
                                 className="onboarding-logo"
                             />

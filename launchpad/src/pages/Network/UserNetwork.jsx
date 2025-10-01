@@ -479,11 +479,12 @@ export default function UserNetwork() {
                             <span className="v0-network-section-badge">{isRecommended}</span>
                           </div>
                           <div className="v0-network-section-content">
-                            <UserCarousel 
+                            <UserGrid 
                               userNetworkData={staff}
                               onEndReached={() => loadMore('Staff')}
                               loading={loading.staff}
                               connectionRefreshKey={connectionRefreshKey}
+                              title="Staff"
                             />
                           </div>
                         </div>
