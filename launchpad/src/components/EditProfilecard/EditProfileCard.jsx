@@ -450,7 +450,7 @@ function PrivacyOption({ option, isSelected, onSelect }) {
 
 function DreamUniversitiesPrivacyToggle() {
     const { userData, currentUser } = useContext(ProfileContext);
-    const [isPrivate, setIsPrivate] = useState(userData.dreamUniversitiesPrivate || false);
+    const [isPrivate, setIsPrivate] = useState(userData.dreamUniversitiesPrivate ?? false);
 
     const handleToggle = async () => {
         const newPrivacy = !isPrivate;
@@ -862,7 +862,7 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
                 <OrganizationProfile location={"user_profile"} organizationData={opportunityData} isPublished={isPublished} hideHeartButton={true}/>
                 
                 {opportunityEditVisibility && <>
-                <button className='btnCircle' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "70px", top: "-17px", background: "red", zIndex: "2"}}>
+                <button className='btnCircle2' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "70px", top: "-17px", background: "red", zIndex: "2"}}>
                     <MdDeleteOutline size={28}/>
                 </button>
                 <div className='addOne' style={{position: "absolute", right: "0", top: "-17px"}}>

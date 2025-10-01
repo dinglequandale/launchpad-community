@@ -165,119 +165,122 @@ export default function ProfileModal({
         </div>
 
         {/* Profile Section */}
-        <div className="profile-modal-section">
-          <div className="profile-modal-avatar">
-            {userData.userPfpPreview ? (
-              <img src={userData.userPfpPreview || "/placeholder.svg"} alt={`${userData.userName}'s profile`} />
-            ) : (
-              <DefaultIcon size={80} />
-            )}
-          </div>
-          
-          <div className="profile-modal-info">
-            <div className="profile-modal-name-row">
-              <h1 className="profile-modal-name">{userData.userName}</h1>
-              {isConnection && (
-                <span className="profile-modal-connection-badge">Connected</span>
+        <div className="profile-modal-section-container">
+          <div className="profile-modal-section">
+            <div className="profile-modal-avatar">
+              {userData.userPfpPreview ? (
+                <img src={userData.userPfpPreview || "/placeholder.svg"} alt={`${userData.userName}'s profile`} />
+              ) : (
+                <DefaultIcon size={80} />
               )}
             </div>
-            <p className="profile-modal-description">{userDescription}</p>
+            
+            <div className="profile-modal-info">
+              <div className="profile-modal-name-row">
+                <h1 className="profile-modal-name">{userData.userName}</h1>
+                {isConnection && (
+                  <span className="profile-modal-connection-badge">Connected</span>
+                )}
+              </div>
+              <p className="profile-modal-description">{userDescription}</p>
+            </div>
           </div>
+                        {/* Connect Button */}
+                        {!hideConnectBtn && (
+              <button 
+                className={`profile-modal-connect-btn ${isConnection ? 'connected' : ''}`}
+                onClick={handleConnect}
+                disabled={disableActions || (userBasicInfo?.userType === 'Alumni' && userData?.userType === 'High Schooler')}
+                title={
+                  disableActions 
+                    ? 'Parent/guardian approval required' 
+                    : userBasicInfo?.userType === 'Alumni' && userData?.userType === 'High Schooler'
+                    ? 'High Schoolers cannot connect with Alumni'
+                    : ''
+                }
+              >
+                <FaLink size={18} />
+                {isConnection ? 'Contact' : 'Connect'}
+              </button>
+            )}
         </div>
 
-        {/* Details Grid */}
-        <div className="profile-modal-details">
-          <div className="profile-modal-detail-item">
-            <div className="profile-modal-detail-icon">
-              {userData.userType === 'Professional' ? <LuBriefcase size={16} /> : <LuGraduationCap size={16} />}
-            </div>
-            <div className="profile-modal-detail-content">
-              <span className="profile-modal-detail-label">
-                {userData.userType !== 'Professional' ? 'Interests' : 'Expertise'}
-              </span>
-              <span className="profile-modal-detail-value">
-                {displayFieldsOfInterest(userData.areasOfInterest || [], 'longer')}
-              </span>
-            </div>
-          </div>
-
-          <div className="profile-modal-detail-item">
-            <div className="profile-modal-detail-icon">
-              <LuMapPin size={16} />
-            </div>
-            <div className="profile-modal-detail-content">
-              <span className="profile-modal-detail-label">
-                {userData.userType === 'Professional' ? 'Position' : 
-                 userData.userType === 'Alumni' ? 'College' : 
-                 userData.collegeDecision === 'No' ? 'Dream Colleges' : 'Committed College'}
-              </span>
-              <span className="profile-modal-detail-value">
-                {userData.userType === 'Professional' 
-                  ? `${userData.industryPosition || 'Not specified'}${userData.companyName ? ` at ${userData.companyName}` : ''}`
-                  : userData.userType === 'Alumni'
-                  ? displayColleges([userData.collegeAttending])
-                  : displayColleges(Array.isArray(userData.collegeInterestsOrDecision) 
-                      ? userData.collegeInterestsOrDecision 
-                      : [userData.collegeInterestsOrDecision])}
-              </span>
-            </div>
-          </div>
-
-          {userData.acceptedColleges?.length > 0 && (
-            <div className="profile-modal-detail-item">
-              <div className="profile-modal-detail-icon">
-                <LuCalendar size={16} />
-              </div>
-              <div className="profile-modal-detail-content">
-                <span className="profile-modal-detail-label">Accepted Colleges</span>
-                <span className="profile-modal-detail-value">{userData.acceptedColleges}</span>
-              </div>
-            </div>
-          )}
-
-          {userData.linkedinLink && (
-            <div className="profile-modal-detail-item">
-              <div className="profile-modal-detail-icon">
-                <FaLink size={16} />
-              </div>
-              <div className="profile-modal-detail-content">
-                <span className="profile-modal-detail-label">LinkedIn</span>
-                <span className="profile-modal-detail-value">
-                  <a 
-                    href={userData.linkedinLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="profile-modal-linkedin-link"
-                  >
-                    View Profile
-                  </a>
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Connect Button */}
-        {!hideConnectBtn && (
-          <button 
-            className={`profile-modal-connect-btn ${isConnection ? 'connected' : ''}`}
-            onClick={handleConnect}
-            disabled={disableActions || (userBasicInfo?.userType === 'Alumni' && userData?.userType === 'High Schooler')}
-            title={
-              disableActions 
-                ? 'Parent/guardian approval required' 
-                : userBasicInfo?.userType === 'Alumni' && userData?.userType === 'High Schooler'
-                ? 'High Schoolers cannot connect with Alumni'
-                : ''
-            }
-          >
-            <FaLink size={18} />
-            {isConnection ? 'Contact' : 'Connect'}
-          </button>
-        )}
-
-        {/* Content Sections */}
+        {/* Scrollable Content */}
         <div className="profile-modal-content">
+          {/* Basic Info Details */}
+          <div className="profile-modal-content-section">
+            <div className="profile-modal-details">
+              <div className="profile-modal-detail-item">
+                <div className="profile-modal-detail-icon">
+                  {userData.userType === 'Professional' ? <LuBriefcase size={16} /> : <LuGraduationCap size={16} />}
+                </div>
+                <div className="profile-modal-detail-content">
+                  <span className="profile-modal-detail-label">
+                    {userData.userType !== 'Professional' ? 'Interests' : 'Expertise'}
+                  </span>
+                  <span className="profile-modal-detail-value">
+                    {displayFieldsOfInterest(userData.areasOfInterest || [], 'longer')}
+                  </span>
+                </div>
+              </div>
+
+              <div className="profile-modal-detail-item">
+                <div className="profile-modal-detail-icon">
+                  <LuMapPin size={16} />
+                </div>
+                <div className="profile-modal-detail-content">
+                  <span className="profile-modal-detail-label">
+                    {userData.userType === 'Professional' ? 'Position' : 
+                     userData.userType === 'Alumni' ? 'College' : 
+                     userData.collegeDecision === 'No' ? 'Dream Colleges' : 'Committed College'}
+                  </span>
+                  <span className="profile-modal-detail-value">
+                    {userData.userType === 'Professional' 
+                      ? `${userData.industryPosition || 'Not specified'}${userData.companyName ? ` at ${userData.companyName}` : ''}`
+                      : userData.userType === 'Alumni'
+                      ? displayColleges([userData.collegeAttending])
+                      : displayColleges(Array.isArray(userData.collegeInterestsOrDecision) 
+                          ? userData.collegeInterestsOrDecision 
+                          : [userData.collegeInterestsOrDecision])}
+                  </span>
+                </div>
+              </div>
+
+              {userData.acceptedColleges?.length > 0 && (
+                <div className="profile-modal-detail-item">
+                  <div className="profile-modal-detail-icon">
+                    <LuCalendar size={16} />
+                  </div>
+                  <div className="profile-modal-detail-content">
+                    <span className="profile-modal-detail-label">Accepted Colleges</span>
+                    <span className="profile-modal-detail-value">{userData.acceptedColleges}</span>
+                  </div>
+                </div>
+              )}
+
+              {userData.linkedinLink && (
+                <div className="profile-modal-detail-item">
+                  <div className="profile-modal-detail-icon">
+                    <FaLink size={16} />
+                  </div>
+                  <div className="profile-modal-detail-content">
+                    <span className="profile-modal-detail-label">LinkedIn</span>
+                    <span className="profile-modal-detail-value">
+                      <a 
+                        href={userData.linkedinLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="profile-modal-linkedin-link"
+                      >
+                        View Profile
+                      </a>
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Opportunities */}
           {opportunitiesLoading ? (
             <div className="profile-modal-loading-section">

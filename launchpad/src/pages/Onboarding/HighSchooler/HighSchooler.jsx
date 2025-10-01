@@ -11,6 +11,7 @@ import EmailConfirmation from '../EmailConfirmation';
 import { FaExclamationTriangle, FaShieldAlt } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { parentVerificationInitialTemplate } from '../../../utils/parentVerificationTemplates';
+import Loading from '../../../components/LoadingAnimation/Loading';
 
 // Move getEmail function creation outside component to prevent recreation on every render
 const getEmail = httpsCallable(getFunctions(), 'getEmail');
@@ -453,7 +454,7 @@ const ParentEmailPage = ({ selectedOptions, handleChange, currentUser, schoolInf
       >
         {isRequesting ? (
           <>
-            <div className="spinner"></div>
+            <Loading size={16} />
             Sending Request...
           </>
         ) : requestSent ? (

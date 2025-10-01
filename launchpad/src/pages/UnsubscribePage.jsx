@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { CgClose } from 'react-icons/cg';
 import './UnsubscribePage.css';
+import Loading from '../components/LoadingAnimation/Loading';
 
 export default function UnsubscribePage() {
   const [searchParams] = useSearchParams();
@@ -62,7 +63,7 @@ export default function UnsubscribePage() {
       case 'loading':
         return (
           <div className="unsubscribe-content">
-            <div className="loading-spinner"></div>
+            <Loading size={40} />
             <h2>Processing your request...</h2>
             <p>Please wait while we process your unsubscribe request.</p>
           </div>

@@ -4,6 +4,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import { capitalizeFirstLetter } from './Homepage/Home';
 import { studentAccountReminderTemplate, studentConnectionReminderTemplate } from '../utils/parentVerificationTemplates';
 import './ParentVerificationPage.css';
+import Loading from '../components/LoadingAnimation/Loading';
 
 export default function ParentVerificationPage() {
   const [searchParams] = useSearchParams();
@@ -204,7 +205,7 @@ export default function ParentVerificationPage() {
         >
           {loading ? (
             <>
-              <div className="loading-spinner-small"></div>
+              <Loading size={16} />
               Processing...
             </>
           ) : (
@@ -270,7 +271,7 @@ export default function ParentVerificationPage() {
         >
           {loading ? (
             <>
-              <div className="loading-spinner-small"></div>
+              <Loading size={16} />
               Processing...
             </>
           ) : (

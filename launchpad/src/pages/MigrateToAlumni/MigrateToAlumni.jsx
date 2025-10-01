@@ -10,6 +10,7 @@ import CustomSelect from '../../components/CustomSelect';
 import { BiPlus, BiTrash } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import './MigrateToAlumni.css';
+import Loading from '../../components/LoadingAnimation/Loading';
 
 const sendSESEmail = httpsCallable(getFunctions(), 'sendSESEmail');
 
@@ -193,7 +194,7 @@ const MigrateToAlumni = () => {
         return (
             <div className="migration-container">
                 <div className="loading-spinner">
-                    <div className="spinner"></div>
+                    <Loading size={40} />
                     <p>Loading migration data...</p>
                 </div>
             </div>

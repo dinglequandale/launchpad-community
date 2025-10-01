@@ -783,19 +783,28 @@
 }
 
 .addOne{
-    color: #006876;
+    color: #6b7280;
     font-size: larger;
     display: flex; 
     align-items: center;
     justify-content: center;
-    gap:4px;
-    cursor:pointer;
-    padding-top: 8px;
+    gap: 4px;
+    cursor: pointer;
+    padding: 8px;
     position: relative;
-    transition: color 0.3s ease;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 .addOne:hover{
-    color: var(--highlight);
+    color: #1157e2;
+    background: rgba(17, 87, 226, 0.1);
+    border-color: #1157e2;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(17, 87, 226, 0.2);
 }
 
 /* .dropdownContainer{
@@ -954,16 +963,47 @@
   }
 
   .editInfoIcon {
-    background: #DFECEF;
-    border-radius: 50%;
-    padding: 5px;
-    /* transition: background-color 0.5s ease; */
-    transition: box-shadow 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    padding: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    color: #6b7280;
   }
 
   .editInfoIcon:hover{
-    /* background-color: rgb(179,205,255); */
-    box-shadow: 0 4px 8px 0 rgba(179,205,255, 0.5), 0 6px 20px 0 rgba(179,205,255, 0.4);
+    background: rgba(17, 87, 226, 0.1);
+    border-color: #1157e2;
+    color: #1157e2;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(17, 87, 226, 0.2);
+  }
+
+  /* Modern Delete Button Styling */
+  .btnCircle2 {
+    background: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(8px);
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.2s ease !important;
+    color: #6b7280 !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .btnCircle2:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
   }
 
 
@@ -1027,6 +1067,71 @@
   background: linear-gradient(90deg, #1976d2 0%, #667eea 100%);
   transform: translateY(-2px) scale(1.03);
   box-shadow: 0 4px 18px rgba(25, 118, 210, 0.18);
+}
+
+/* Dream Universities Privacy Toggle Modernization */
+.v0-dream-universities-privacy {
+  margin-top: 16px;
+  padding: 16px;
+  width: 690px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.v0-dream-universities-privacy:hover {
+  border-color: #1157e2;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 100%);
+  box-shadow: 0 2px 8px rgba(17, 87, 226, 0.1);
+}
+
+.v0-privacy-toggle-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.v0-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #374151;
+  transition: color 0.2s ease;
+}
+
+.v0-toggle-label:hover {
+  color: #1157e2;
+}
+
+.v0-privacy-checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: #1157e2;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.v0-privacy-checkbox:hover {
+  transform: scale(1.05);
+}
+
+.v0-toggle-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.v0-privacy-description {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 32px;
+  font-style: italic;
 }
 
 /* Progress Bar Modernization */

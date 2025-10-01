@@ -4,6 +4,7 @@ import { getColleges } from "../../pages/Onboarding/Options";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { BiX, BiTrash } from "react-icons/bi";
 import { CiSearch } from "react-icons/ci";
+import Loading from "../LoadingAnimation/Loading";
 
 export default function CollegeSearchFilter({ 
     title="College", 
@@ -199,7 +200,8 @@ export default function CollegeSearchFilter({
                     {/* Loading state */}
                     {loading && (
                         <div className="loading-container">
-                            <div className="loading-spinner">Loading colleges...</div>
+                            <Loading size={20} />
+                            <span style={{marginLeft: '8px', fontSize: '14px', color: '#6b7280'}}>Loading colleges...</span>
                         </div>
                     )}
                     

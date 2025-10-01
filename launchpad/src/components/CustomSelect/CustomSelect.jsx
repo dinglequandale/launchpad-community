@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { BiX } from 'react-icons/bi';
 import './CustomSelect.css';
+import Loading from '../LoadingAnimation/Loading';
 
 export default function CustomSelect({
   options = [],
@@ -297,7 +298,7 @@ export default function CustomSelect({
         <div className="select-dropdown">
           {isLoading ? (
             <div className="select-loading">
-              <div className="loading-spinner"></div>
+              <Loading size={16} />
               {/* <span>{loadingMessage}</span> */}
             </div>
           ) : filteredOptions.length === 0 ? (
