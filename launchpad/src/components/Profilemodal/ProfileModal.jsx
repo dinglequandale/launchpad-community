@@ -30,7 +30,7 @@ export default function ProfileModal({
   chatClient,
 }) {
   const { currentUser } = useAuth()
-  const { openConnectModal, openParentalConnectionModal, isConnectModalOpen } = useModal()
+  const { openConnectModal, openParentalConnectionModal, isConnectModalOpen, isApplyModalOpen } = useModal()
   const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport()
   const { approved = [], parent_approved = [] } = useConnections()
 
@@ -47,6 +47,7 @@ export default function ProfileModal({
   const [opportunitiesLoading, setOpportunitiesLoading] = useState(false)
   const modalRef = useRef(null)
   const connectModalOpenRef = useRef(false)
+  const applyModalOpenRef = useRef(false)
   const closeTimeoutRef = useRef(null)
 
   // Track ConnectModal state
@@ -59,6 +60,17 @@ export default function ProfileModal({
       closeTimeoutRef.current = null
     }
   }, [isConnectModalOpen])
+
+  // Track ApplyModal state
+  useEffect(() => {
+    applyModalOpenRef.current = isApplyModalOpen
+    
+    // Clear any pending close timeout when ApplyModal opens
+    if (isApplyModalOpen && closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+  }, [isApplyModalOpen])
 
   // Fetch opportunities
   useEffect(() => {
@@ -85,11 +97,11 @@ export default function ProfileModal({
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (modalRef.current && !modalRef.current.contains(e.target)) {
-        // Don't close if ConnectModal is open
-        if (!connectModalOpenRef.current) {
-          // Add a small delay to prevent immediate closing when ConnectModal closes
+        // Don't close if ConnectModal or ApplyModal is open
+        if (!connectModalOpenRef.current && !applyModalOpenRef.current) {
+          // Add a small delay to prevent immediate closing when modals close
           closeTimeoutRef.current = setTimeout(() => {
-            if (!connectModalOpenRef.current) {
+            if (!connectModalOpenRef.current && !applyModalOpenRef.current) {
               onClose()
             }
           }, 100)

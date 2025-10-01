@@ -577,20 +577,22 @@ function UserCarousel({userNetworkData, loading, onEndReached, connectionRefresh
         }
       </div>
       
-      <button 
-        className="carousel-button prev" 
-        onClick={prevSlide}
-        disabled={currentIndex === 0}
-      >
-        <GrPrevious color="var(--accent)"/>
-      </button>
-      <button 
-        className="carousel-button next" 
-        onClick={nextSlide}
-        disabled={currentIndex + itemsPerPage >= userNetworkData.length}
-      >
-        <GrNext color="var(--accent)"/>
-      </button>
+      {currentIndex > 0 && (
+        <button 
+          className="carousel-button prev" 
+          onClick={prevSlide}
+        >
+          <GrPrevious color="var(--accent)"/>
+        </button>
+      )}
+      {currentIndex + itemsPerPage < userNetworkData.length && (
+        <button 
+          className="carousel-button next" 
+          onClick={nextSlide}
+        >
+          <GrNext color="var(--accent)"/>
+        </button>
+      )}
     </div>
   )
 }

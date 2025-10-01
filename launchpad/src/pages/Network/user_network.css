@@ -62,10 +62,6 @@ body.modal-open {
   background: rgba(0, 0, 0, 0.7);
 }
 
-.carousel-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 .carousel-button.prev {
   left: 10px;
