@@ -14,23 +14,22 @@ import { ModalProvider } from './ModalContext';
 
 function GlobalAuthWrapper() {
   const { currentUser, loading } = useAuth();
-  const [schoolId, setSchoolId] = useState("");
+  // COMMUNITY VERSION: Removed schoolId state (no longer needed)
   const { chatClient, isConnected, connectToStream } = useStreamConnection();
   const [isInitializing, setIsInitializing] = useState(true);
   const navigate = useNavigate();
   const [userData,setUserData] = useState(null);
   const basicUserInfo = localStorage.getItem("basicUserInfo");
-  
+
   // Connection modal state
   const [showConnectionModal, setShowConnectionModal] = useState(false);
   const [connectedUserData, setConnectedUserData] = useState(null);
   const [showVerifiedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
-  
+
   // Get connection data and modal functions
+  // COMMUNITY VERSION: Removed parent approval states
   const {
     pending,
-    pending_parental_approval,
-    parent_approved,
     approved,
     incomingRequests,
     loading: connectionsLoading,
@@ -56,68 +55,38 @@ function GlobalAuthWrapper() {
 
   const user = auth.currentUser;
 
-  const getUserTokenInfo = useCallback(async () => {
-    const idTokenResult = await user.getIdTokenResult();
-    // console.log("schoolId!!!!! ", idTokenResult.claims.school_id);
-    return idTokenResult.claims.school_id;
-  }, [user]);
+  // COMMUNITY VERSION: Removed getUserTokenInfo (no longer needed without custom claims)
 
   const fetchAndStoreConnections = useCallback(async () => {
     try {
-      const schoolId = localStorage.getItem("schoolId");
-      if (schoolId) {
-        const parentPendingResult = await getConnectionsByStatus(schoolId, 'pending_parental_approval');
-        const parentApprovedResult = await getConnectionsByStatus(schoolId, 'parent_approved');
-        // const approvedResult = await getConnectionsByStatus(schoolId, 'approved');
-        // Extract user IDs from the connections
-        const pendingUserIds = parentPendingResult.connections?.map(conn => 
-          conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
-        ) || [];
-        
-        const parentApprovedUserIds = parentApprovedResult.connections?.map(conn => 
-          conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
-        ) || [];
+      // COMMUNITY VERSION: Simplified connection fetching without parent approval states
+      const approvedResult = await getConnectionsByStatus('approved');
+      const approvedUserIds = approvedResult.connections?.map(conn =>
+        conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+      ) || [];
 
-        // const approvedUserIds = approvedResult.connections?.map(conn => 
-        //   conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
-        // ) || [];
-
-        
-        localStorage.setItem('pendingConnections', JSON.stringify(pendingUserIds));
-        localStorage.setItem('approvedConnections', JSON.stringify(parentApprovedUserIds));
-        // localStorage.setItem('trueApprovedConnections', JSON.stringify(approvedUserIds));
-      }
+      localStorage.setItem('approvedConnections', JSON.stringify(approvedUserIds));
     } catch (error) {
       console.error('Error fetching connections:', error);
     }
   }, []);
 
-  // Connection modal logic - show once per session
+  // COMMUNITY VERSION: Simplified connection modal logic (no parent verification check)
   useEffect(() => {
     // Only run if we have basic user info and connections are loaded
     if (!basicUserInfo || connectionsLoading) return;
-    
+
     const connectionSessionFlag = sessionStorage.getItem('connectionModalShown');
     const info = JSON.parse(basicUserInfo);
-    
-    if (
-      (info &&
-      info.userType === 'High Schooler' &&
-      info.parentVerified &&
-      !connectionSessionFlag) ||
-      (info && info.userType !== 'High Schooler' && !connectionSessionFlag)
-    ) {
-      const openConnectionModal = info.userType === "High Schooler" ? (pending.length > 0 ||
-        pending_parental_approval.length > 0 ||
-        parent_approved.length > 0 ||
-        approved.length > 0) : (pending.length > 0 ||
-          approved.length > 0);
+
+    if (info && !connectionSessionFlag) {
+      const openConnectionModal = (pending.length > 0 || approved.length > 0);
       if(openConnectionModal){
         setShowConnectionModal(true);
         sessionStorage.setItem("connectionModalShown", "true");
       }
     }
-  }, [basicUserInfo, pending, pending_parental_approval, parent_approved, approved, connectionsLoading]);
+  }, [basicUserInfo, pending, approved, connectionsLoading]);
 
   // Listen for notification click events from TopBar
   useEffect(() => {
@@ -133,17 +102,16 @@ function GlobalAuthWrapper() {
 
   useEffect(() => {
     let unsubscribe;
-    const fetchUserTokenInfo = async () => {
+    const initializeUser = async () => {
       if (!currentUser) {
         navigate("/Login");
         return;
       }
-  
+
       try {
-        const schoolId = await getUserTokenInfo();
-        localStorage.setItem("schoolId", schoolId);
-        console.log("School id: ", localStorage.getItem("schoolId"), "UID: ", currentUser.uid);
-        const userRef = doc(db, "tenants", schoolId, 'users', currentUser.uid);
+        // COMMUNITY VERSION: Removed tenant-based architecture and custom claims
+        console.log("Initializing user UID: ", currentUser.uid);
+        const userRef = doc(db, 'users', currentUser.uid);
         async function initializeApp() {
           if (currentUser && !isConnected) {
             unsubscribe = onSnapshot(userRef, (doc) => {
@@ -151,38 +119,36 @@ function GlobalAuthWrapper() {
                 navigate("/Onboarding");
                 return;
               }
-              
-              // if(!basicUserInfo){packageBasicUserInfoToLS(doc.data())};
-              //IMPORTANT: Switch back later
+
               packageBasicUserInfoToLS(doc.data());
               pushInitialProfileCompletion(doc.data());
 
-              // connections population logic (single subcollection)
+              // connections population logic
               fetchAndStoreConnections();
             });
-            
+
             await connectToStream(currentUser);
           }
           setIsInitializing(false);
         }
-    
+
         if (!loading) {
           initializeApp();
         }
-    
+
         return () => {
           if (unsubscribe) {
               unsubscribe();
           }
-      };    
+      };
       } catch (error) {
-        console.error("Error fetching user token info:", error);
+        console.error("Error initializing user:", error);
         navigate("/Onboarding");
       }
     };
-  
-    fetchUserTokenInfo();
-  }, [currentUser, isConnected, connectToStream, loading, getUserTokenInfo, fetchAndStoreConnections, navigate]);
+
+    initializeUser();
+  }, [currentUser, isConnected, connectToStream, loading, fetchAndStoreConnections, navigate]);
 
   if (loading || isInitializing) {
     return <PageLoading />;
@@ -221,8 +187,6 @@ function GlobalAuthWrapper() {
           onConnect={handleOnConnectClick}
           handleProfileClick={handleOnProfileClick}
           pending={pending}
-          pending_parental_approval={pending_parental_approval}
-          parent_approved={parent_approved}
           approved={approved}
           incomingRequests={incomingRequests}
         />

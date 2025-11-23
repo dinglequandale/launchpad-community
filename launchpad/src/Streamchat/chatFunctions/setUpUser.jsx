@@ -43,9 +43,14 @@ export const getStreamToken = async () => {
       console.log('Current chatClient.userID:', chatClient.userID);
       console.log('Current user:', user.uid);
 
-      // console.log(userData.userName);
+      // Check if basicUserInfo exists in localStorage
+      const basicUserInfoString = localStorage.getItem("basicUserInfo");
+      if (!basicUserInfoString) {
+        console.log('No basicUserInfo found in localStorage - user likely in onboarding');
+        return;
+      }
 
-      const {userName, userPfpPreview} = JSON.parse(localStorage.getItem("basicUserInfo"));
+      const {userName, userPfpPreview} = JSON.parse(basicUserInfoString);
 
       if(chatClient.userID){
         setIsConnected(true);
@@ -53,7 +58,7 @@ export const getStreamToken = async () => {
       }
 
       if (!isConnectedRef.current && !chatClient.userID) {
-        
+
         try {
           const token = await getStreamToken();
           await chatClient.connectUser(

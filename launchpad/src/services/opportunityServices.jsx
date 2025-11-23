@@ -5,8 +5,8 @@ import toast from 'react-hot-toast';
 // import { deleteFromTypesense, updateTypesense } from '../typesense/typesenseClient';
 
 export const saveOpportunity = async (opportunityData, organizationLogo, currentUser, isEditing, opportunityId) => {
-  const schoolId = localStorage.getItem("schoolId");
-  const opportunitiesCollectionRef = collection(db, "tenants", schoolId, "opportunities");
+  // COMMUNITY VERSION: Removed tenant-based architecture
+  const opportunitiesCollectionRef = collection(db, "opportunities");
   let opportunityRef;
 
   try {
@@ -18,17 +18,16 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
       });
 
       // Update Typesense
-      // await updateTypesense('opportunities', opportunityRef.id, 
+      // await updateTypesense('opportunities', opportunityRef.id,
       //   {
       //     ...opportunityData,
       //     createdBy: currentUser.uid,
       //     createdAt: new Date(),
-      //   },
-      //   schoolId);
+      //   });
     } else {
-      opportunityRef = doc(db, "tenants", schoolId, "opportunities", opportunityId);
+      opportunityRef = doc(db, "opportunities", opportunityId);
       await updateDoc(opportunityRef, opportunityData);
-      // await updateTypesense('opportunities', opportunityId, opportunityData, schoolId);
+      // await updateTypesense('opportunities', opportunityId, opportunityData);
     }
 
     if (organizationLogo) {
@@ -60,7 +59,8 @@ const uploadImage = async (file, opportunityId) => {
 };
 
 export const loadOpportunities = (user, setLoading, setOpportunities) => {
-  const opportunitiesRef = collection(db, "tenants", localStorage.getItem("schoolId"), "opportunities");
+  // COMMUNITY VERSION: Removed tenant-based architecture
+  const opportunitiesRef = collection(db, "opportunities");
   const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", user.uid));
   
   return onSnapshot(qUserOpportunity, async (querySnapshot) => {
@@ -98,7 +98,8 @@ const loadOpportunityLogo = async (opportunityId) => {
 };
 
 export const handleDeleteOpportunity = async (opportunityId) => {
-    const opportunityDoc = doc(db, "tenants", localStorage.getItem("schoolId"), "opportunities", opportunityId);
+    // COMMUNITY VERSION: Removed tenant-based architecture
+    const opportunityDoc = doc(db, "opportunities", opportunityId);
     try {
         await deleteDoc(opportunityDoc);
         // await deleteFromTypesense('opportunities', opportunityId);

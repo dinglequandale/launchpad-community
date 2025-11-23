@@ -5,18 +5,17 @@ const manageConnections = httpsCallable(functions, 'manageConnections');
 
 /**
  * Check if a connection exists between two users
- * @param {string} schoolId - The school ID
  * @param {string} targetUserId - The target user's ID
  * @returns {Promise<Object>} - Object containing isConnected boolean and connection data
  */
-export const checkConnection = async (schoolId, targetUserId) => {
+// COMMUNITY VERSION: Removed schoolId parameter
+export const checkConnection = async (targetUserId) => {
     try {
         const result = await manageConnections({
             action: 'check',
-            schoolId,
             targetUserId
         });
-        
+
         return result.data;
     } catch (error) {
         console.error('Error checking connection:', error);
@@ -26,24 +25,19 @@ export const checkConnection = async (schoolId, targetUserId) => {
 
 /**
  * Create a connection between two users
- * @param {string} schoolId - The school ID
  * @param {string} targetUserId - The target user's ID
  * @param {string} status - The connection status (e.g., 'pending', 'accepted')
- * @param {string} userType - The current user's type
- * @param {string} targetUserType - The target user's type
  * @returns {Promise<Object>} - Object containing success status and message
  */
-export const createConnection = async (schoolId, targetUserId, status, userType, targetUserType) => {
+// COMMUNITY VERSION: Removed schoolId and user type parameters
+export const createConnection = async (targetUserId, status) => {
     try {
         const result = await manageConnections({
             action: 'create',
-            schoolId,
             targetUserId,
-            status,
-            userType,
-            targetUserType
+            status
         });
-        
+
         return result.data;
     } catch (error) {
         console.error('Error creating connection:', error);
@@ -53,18 +47,17 @@ export const createConnection = async (schoolId, targetUserId, status, userType,
 
 /**
  * Remove a connection between two users
- * @param {string} schoolId - The school ID
  * @param {string} targetUserId - The target user's ID
  * @returns {Promise<Object>} - Object containing success status and message
  */
-export const removeConnection = async (schoolId, targetUserId) => {
+// COMMUNITY VERSION: Removed schoolId parameter
+export const removeConnection = async (targetUserId) => {
     try {
         const result = await manageConnections({
             action: 'remove',
-            schoolId,
             targetUserId
         });
-        
+
         return result.data;
     } catch (error) {
         console.error('Error removing connection:', error);
@@ -74,18 +67,17 @@ export const removeConnection = async (schoolId, targetUserId) => {
 
 /**
  * Get connections by status for the current user
- * @param {string} schoolId - The school ID
  * @param {string} status - The connection status to filter by
  * @returns {Promise<Object>} - Object containing connections array and count
  */
-export const getConnectionsByStatus = async (schoolId, status) => {
+// COMMUNITY VERSION: Removed schoolId parameter
+export const getConnectionsByStatus = async (status) => {
     try {
         const result = await manageConnections({
             action: 'getByStatus',
-            schoolId,
             status
         });
-        
+
         return result.data;
     } catch (error) {
         console.error('Error getting connections by status:', error);
@@ -95,16 +87,15 @@ export const getConnectionsByStatus = async (schoolId, status) => {
 
 /**
  * Get all connections for the current user
- * @param {string} schoolId - The school ID
  * @returns {Promise<Object>} - Object containing connections array and count
  */
-export const getAllConnections = async (schoolId) => {
+// COMMUNITY VERSION: Removed schoolId parameter
+export const getAllConnections = async () => {
     try {
         const result = await manageConnections({
-            action: 'getAll',
-            schoolId
+            action: 'getAll'
         });
-        
+
         return result.data;
     } catch (error) {
         console.error('Error getting all connections:', error);
@@ -120,22 +111,14 @@ export const getAllConnections = async (schoolId) => {
  * @param {Function} setIsConnection - Callback to update connection state
  * @returns {Promise<Object>} - Result of the connection operation
  */
-export const addOrUpdateConnection = async (currentUser, targetUser, status, setIsConnection, isHighSchooler=false) => {
-    const schoolId = localStorage.getItem("schoolId");
+// COMMUNITY VERSION: Simplified connection logic (removed parent approval and type restrictions)
+export const addOrUpdateConnection = async (currentUser, targetUser, status, setIsConnection) => {
     const targetUserId = targetUser.userId || targetUser.id;
-    const userType = currentUser.userType || currentUser.type;
-    const targetUserType = targetUser.userType || targetUser.type;
-    
-    if(isHighSchooler){
-        const pending = JSON.parse(localStorage.getItem("pendingConnections")) || [];
-        localStorage.setItem("pendingConnections", JSON.stringify([...pending, targetUserId]));
-        return;
-    }
 
     try {
         // First check if connection already exists
-        const checkResult = await checkConnection(schoolId, targetUserId);
-        
+        const checkResult = await checkConnection(targetUserId);
+
         if (checkResult.isConnected) {
             // Connection already exists
             setIsConnection && setIsConnection(true);
@@ -146,19 +129,19 @@ export const addOrUpdateConnection = async (currentUser, targetUser, status, set
                 connectionData: checkResult.connectionData
             };
         }
-        
+
         // Create new connection
-        const createResult = await createConnection(schoolId, targetUserId, status, userType, targetUserType);
-        
+        const createResult = await createConnection(targetUserId, status);
+
         // Update local state
         setIsConnection && setIsConnection(createResult.isConnected);
-        
+
         // Handle pending connections in localStorage
-        if (status === "pending" || createResult.needsParentalApproval) {
+        if (status === "pending") {
             const pending = JSON.parse(localStorage.getItem("pendingConnections")) || [];
             localStorage.setItem("pendingConnections", JSON.stringify([...pending, targetUserId]));
         }
-        
+
         return createResult;
     } catch (error) {
         console.error('Error in addOrUpdateConnection:', error);
@@ -167,30 +150,12 @@ export const addOrUpdateConnection = async (currentUser, targetUser, status, set
     }
 }; 
 
-export function isConnectionApproved(currentUserType, currentUser, targetUser, parent_approved, approved, parentVerified) {
-    // If not a high schooler connecting to a professional, always approved
+// COMMUNITY VERSION: Removed all user type restrictions and parent verification
+export function isConnectionApproved(currentUserType, currentUser, targetUser, approved) {
     if (!currentUser || !targetUser) return false;
-    
-    // High Schoolers cannot connect with Alumni
-    if (currentUserType === 'High Schooler' && targetUser.userType === 'Alumni') {
-        return false;
-    }
-    
-    // Alumni cannot connect with High Schoolers
-    if (currentUserType === 'Alumni' && targetUser.userType === 'High Schooler') {
-        return false;
-    }
-    
-    // If not a high schooler connecting to a professional, always approved
-    if (currentUserType !== 'High Schooler' || targetUser.userType === 'High Schooler') {
-        return true;
-    }
-    
-    if (!parentVerified) {
-        return false;
-    }
-    const total_approved = [...parent_approved, ...approved];
-    return total_approved.some(conn =>
+
+    // All users can connect with each other in the community version
+    return approved.some(conn =>
         (conn.initiateUserId === currentUser.uid && (conn.targetUserId === targetUser.id || conn.targetUserId === targetUser.userId)) ||
         (conn.initiateUserId === (targetUser.id || targetUser.userId) && conn.targetUserId === currentUser.uid)
     );

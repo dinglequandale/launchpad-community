@@ -3,7 +3,8 @@ import { db } from '../firebase/firebaseConfig';
 import { careerInterests } from '../pages/Onboarding/Options';
 
 export async function getFilteredData(collectionName, filters, currentUserId, category = null, lastDoc = null, maxLimit = 6) {
-    let q = collection(db, "tenants", localStorage.getItem("schoolId"), collectionName);
+    // COMMUNITY VERSION: Removed tenant-based architecture
+    let q = collection(db, collectionName);
 
     const {userInterests, userColleges, userHS } = await getUserData("areasOfInterest", currentUserId);
 
@@ -199,11 +200,12 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
 }
 
 const getUserData = async (dataType, currentUserId) => {
-    const userSnap = await getDoc(doc(db, "tenants", localStorage.getItem("schoolId"), "users", currentUserId));
+    // COMMUNITY VERSION: Removed tenant-based architecture
+    const userSnap = await getDoc(doc(db, "users", currentUserId));
     if (userSnap.exists()) {
         return {
-            userInterests: userSnap.data()[dataType], 
-            userColleges: userSnap.data()["collegeInterestsOrDecision"], 
+            userInterests: userSnap.data()[dataType],
+            userColleges: userSnap.data()["collegeInterestsOrDecision"],
             userHS: userSnap.data()["schoolAttending"]
         };
     } else {

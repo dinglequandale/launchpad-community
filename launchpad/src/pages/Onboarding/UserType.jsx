@@ -23,13 +23,13 @@ export default function UserType() {
 
     const handleContinue = () => {
         localStorage.setItem('userType', selectedOption);
-        navigate("/Signup", {state: selectedOption});
+        navigate("/Onboarding", {state: selectedOption});
     };
 
-    // If tempSchoolInfo is not present, redirect to school-signup
-    if (!localStorage.getItem('tempSchoolInfo')) {
-        return <Navigate to="/school-signup" replace={true}/>;
-    }
+    // COMMUNITY VERSION: Removed school-signup redirect
+    // if (!localStorage.getItem('tempSchoolInfo')) {
+    //     return <Navigate to="/school-signup" replace={true}/>;
+    // }
 
     return (
         <div className='onboarding-container'>

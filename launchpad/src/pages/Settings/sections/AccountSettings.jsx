@@ -16,9 +16,10 @@ const AccountSettings = () => {
   const handleExportData = async () => {
     try {
       const loadingToast = toast.loading('Preparing your data export...');
-      
-      const userDoc = await getDoc(doc(db, "tenants", localStorage.getItem("schoolId"), "users", currentUser.uid));
-      
+
+      // COMMUNITY VERSION: Removed tenant-based architecture
+      const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+
       if (!userDoc.exists()) {
         toast.error('Could not find your user data', { id: loadingToast });
         return;
@@ -48,7 +49,8 @@ const AccountSettings = () => {
     if (confirmDelete === 'DELETE') {
       try {
         const loadingToast = toast.loading('Deleting your account...');
-        const userDoc = doc(db, "tenants", localStorage.getItem("schoolId"), "users", currentUser.uid);
+        // COMMUNITY VERSION: Removed tenant-based architecture
+        const userDoc = doc(db, "users", currentUser.uid);
         await deleteDoc(userDoc);
         await currentUser.delete();
         localStorage.clear();

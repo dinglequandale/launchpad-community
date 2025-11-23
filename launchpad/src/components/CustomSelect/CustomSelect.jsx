@@ -169,11 +169,13 @@ export default function CustomSelect({
   };
 
   const getOptionLabel = (option) => {
+    if (!option) return '';
     if (typeof option === 'string') return option;
     return option.label || option.value || '';
   };
 
   const getOptionValue = (option) => {
+    if (!option) return '';
     if (typeof option === 'string') return option;
     return option.value || option.label || '';
   };

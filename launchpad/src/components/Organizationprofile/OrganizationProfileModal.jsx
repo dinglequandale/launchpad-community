@@ -28,14 +28,16 @@ export default function OrganizationProfileModal({
   const { chatClient } = useOutletContext()
 
   const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}')
-  const disableActions = userBasicInfo?.userType === 'High Schooler' && !userBasicInfo?.parentVerified
+  // COMMUNITY VERSION: Removed parent verification check
+  const disableActions = false
 
   // Get user data for the organization
   useEffect(() => {
     const fetchUserData = async () => {
       if (organization?.userId) {
         try {
-          const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', organization.userId)
+          // COMMUNITY VERSION: Removed tenant-based architecture
+          const userDocRef = doc(db, 'users', organization.userId)
           const userDoc = await getDoc(userDocRef)
           if (userDoc.exists()) {
             setUserData(userDoc.data())

@@ -75,7 +75,8 @@ export default function EditProfileCard({ isSidebarCollapsed }) {
         setLoading(true);
 
         if (currentUser) {
-            const userDocRef = doc(db, 'tenants', localStorage.getItem("schoolId"), 'users', currentUser.uid);
+            // COMMUNITY VERSION: Removed tenant-based architecture
+            const userDocRef = doc(db, 'users', currentUser.uid);
             unsubscribe = onSnapshot(userDocRef, (doc) => {
                 if (doc.exists()) {
                     setUserData(doc.data());

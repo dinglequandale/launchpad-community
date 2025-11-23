@@ -34,9 +34,9 @@ export default function UserNetwork() {
 
   const { chatClient, isConnected } = useOutletContext();
 
+  // COMMUNITY VERSION: Generic network name instead of school-specific
   const schoolId = localStorage.getItem("schoolId");
-
-  const pageName = `The ${capitalizeFirstLetter(schoolId)} Network`;
+  const pageName = schoolId ? `The ${capitalizeFirstLetter(schoolId)} Network` : "Launchpad Network";
 
   const [tenantId, setTenantId] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);

@@ -25,43 +25,13 @@ export default function Onboarding() {
     const [canSubmit, setCanSubmit] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [userData, setUserData] = useState({});
-    let schoolId, schoolDisplayName, userRole;
 
     const user = auth.currentUser;
     const {userLoggedIn} = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
-    const tempSchoolInfo = location.state ?? JSON.parse(localStorage.getItem("tempSchoolInfo") || '{}');
 
-    // Validate that we have the required school information
-    if (!tempSchoolInfo || !tempSchoolInfo.schoolId) {
-        console.error('Missing school information:', tempSchoolInfo);
-        // Redirect to school signup if no valid school info
-        return <Navigate to="/school-signup" replace={true}/>;
-    }
-
-    try{
-        schoolId = tempSchoolInfo.schoolId;
-        schoolDisplayName = tempSchoolInfo.schoolDisplayName;
-        userRole = tempSchoolInfo.userRole;
-    }catch(error){
-        console.error('Error extracting school info:', error);
-        return <Navigate to="/school-signup" replace={true}/>;
-    }
-
-    useEffect(()=>{
-        const setUserToken = async () => {
-            const functions = getFunctions();
-            const createSchoolClaim = httpsCallable(functions, 'createSchoolClaim');
-            
-            const result = await createSchoolClaim({ schoolId });
-    
-            await user.getIdToken(true);
-            console.log("USER TOKEN CREATED");
-        }
-        setUserToken();
-        
-    },[]);
+    // COMMUNITY VERSION: Removed school validation and custom claims setup
     
     useEffect(() => {
         setNumOfSections(getNumOfSections());
@@ -97,10 +67,10 @@ export default function Onboarding() {
         
         try {
             // Get the user data from the appropriate component
+            // COMMUNITY VERSION: Removed schoolId, keep userType as-is (no Alumni conversion)
             const currentUserData = {
                 ...userData,
-                schoolId: schoolId,
-                userType: selectedOption === "College Student" ? "Alumni" : selectedOption
+                userType: selectedOption
             };
 
             // Call the appropriate save function based on user type
@@ -138,7 +108,7 @@ export default function Onboarding() {
         <>
             <div className='onboarding-container'>
                 <div className='background-blend'></div>
-                {!tempSchoolInfo && <Navigate to="/school-signup" replace={true}/>}
+                {/* COMMUNITY VERSION: Removed school signup redirect */}
                 {!userLoggedIn && <Navigate to="/Landing" replace={true}/>}
                 
                 <div className="onboarding-wrapper">
@@ -172,41 +142,39 @@ export default function Onboarding() {
                         
                         <main className="onboarding-main">
                             {selectedOption === "High Schooler" && (
-                                <HighSchooler 
-                                    schoolInfo={tempSchoolInfo} 
-                                    currentPage={currentPage} 
-                                    isSubmitting={isSubmitting} 
+                                <HighSchooler
+                                    currentPage={currentPage}
+                                    isSubmitting={isSubmitting}
                                     setCanSubmit={setCanSubmit}
                                     setUserData={setUserData}
                                 />
                             )}
                             {selectedOption === "College Student" && (
-                                <CollegeStudent 
-                                    schoolInfo={tempSchoolInfo} 
-                                    currentPage={currentPage} 
-                                    isSubmitting={isSubmitting} 
+                                <CollegeStudent
+                                    currentPage={currentPage}
+                                    isSubmitting={isSubmitting}
                                     setCanSubmit={setCanSubmit}
                                     setUserData={setUserData}
                                 />
                             )}
                             {selectedOption === "Professional" && (
-                                <Professional 
-                                    schoolInfo={tempSchoolInfo} 
-                                    currentPage={currentPage} 
-                                    isSubmitting={isSubmitting} 
+                                <Professional
+                                    currentPage={currentPage}
+                                    isSubmitting={isSubmitting}
                                     setCanSubmit={setCanSubmit}
                                     setUserData={setUserData}
                                 />
                             )}
-                            {userRole === "admin" && (
-                                <Staff 
-                                    schoolInfo={tempSchoolInfo} 
-                                    currentPage={currentPage} 
-                                    isSubmitting={isSubmitting} 
+                            {/* COMMUNITY VERSION: Commented out admin staff onboarding */}
+                            {/* {userRole === "admin" && (
+                                <Staff
+                                    schoolInfo={tempSchoolInfo}
+                                    currentPage={currentPage}
+                                    isSubmitting={isSubmitting}
                                     setCanSubmit={setCanSubmit}
                                     setUserData={setUserData}
                                 />
-                            )}
+                            )} */}
                         </main>
                         
                         <footer className="onboarding-footer">

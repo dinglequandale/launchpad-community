@@ -18,8 +18,8 @@ export default function Login(){
     const [userData, setUserData] = useState(null);
     const [userIsSigningIn, setUserIsSigningIn] = useState(false);
 
-    // Check for school code validation
-    const tempSchoolInfo = JSON.parse(localStorage.getItem("tempSchoolInfo"));
+    // COMMUNITY VERSION: Removed school code validation
+    // const tempSchoolInfo = JSON.parse(localStorage.getItem("tempSchoolInfo"));
     // if (!tempSchoolInfo) {
     //     return <Navigate to="/school-signup" replace={true}/>;
     // }

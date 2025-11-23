@@ -199,4 +199,46 @@ export function studentConnectionReminderTemplate({ studentName="", connectionNa
       </div>
     </div>
   `;
+}
+
+/**
+ * Invite parent to join Launchpad (sent by student during onboarding)
+ * @param {Object} params
+ * @param {string} params.studentName - The name of the student who is inviting
+ * @param {string} [params.unsubscribeLink] - Optional unsubscribe link
+ * @returns {string} HTML email
+ */
+export function parentInvitationTemplate({ studentName, unsubscribeLink="" }) {
+  return `
+    <div style="font-family: Arial, sans-serif; background: #f7f7f7; padding: 32px;">
+      <div style="max-width: 500px; margin: auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); padding: 32px;">
+        <h2 style="color: #1976d2;">Your Child Invited You to Join Launchpad</h2>
+        <p>Hi there,</p>
+        <p><strong>${studentName}</strong> has joined Launchpad and invited you to become part of our community!</p>
+
+        <div style="background: #f8f9fa; border-left: 4px solid #1976d2; padding: 16px; margin: 20px 0; border-radius: 4px;">
+          <h3 style="margin: 0 0 12px 0; color: #1976d2; font-size: 16px;">What is Launchpad?</h3>
+          <p style="margin: 0; font-size: 14px; line-height: 1.5;">
+            Launchpad is a professional networking platform that connects students with professionals, alumni, and peers. As a parent professional, you can offer mentorship, share career insights, and help students discover opportunities in your field.
+          </p>
+        </div>
+
+        <div style="margin: 24px 0; padding: 20px; background: #e3f2fd; border-radius: 8px;">
+          <h4 style="margin: 0 0 12px 0; color: #1976d2;">Benefits of Joining:</h4>
+          <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
+            <li>Share your professional expertise with motivated students</li>
+            <li>Make a difference in students' career development</li>
+            <li>Connect with other professionals and parents</li>
+            <li>Stay connected with your child's network and growth</li>
+          </ul>
+        </div>
+
+        <p><strong>Ready to join?</strong></p>
+        <a href="https://launchpadhouston.com" style="display: inline-block; background: #1976d2; color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px; margin-bottom: 16px;">Join Launchpad Today</a>
+
+        <p style="margin-top: 24px; color: #666; font-size: 14px;">Questions? Contact us at support@launchpadhouston.com</p>
+        ${generateParentVerificationFooter({ unsubscribeLink })}
+      </div>
+    </div>
+  `;
 } 

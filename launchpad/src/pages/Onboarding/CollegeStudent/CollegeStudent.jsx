@@ -110,12 +110,11 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
     linkedinLink: "",
     email: "",
     // collegeInterestsOrDecision: "",
-    schoolAttending: schoolInfo?.schoolDisplayName || "",
+    schoolAttending: "",
     collegeAttending: "",
-    schoolId: schoolInfo?.schoolId || "",
     graduationYear: "",
     userSkills: [],
-    userType: "Alumni",
+    userType: "College Student",
   });
 
   // Update parent component with user data whenever it changes

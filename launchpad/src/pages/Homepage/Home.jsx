@@ -90,7 +90,8 @@ export default function Home(){
     }, []);
 
     const getUserData = async () => {
-      const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
+      // COMMUNITY VERSION: Removed tenant-based architecture
+      const userDocRef = doc(db, 'users', currentUser.uid);
       unsubscribe = onSnapshot(userDocRef, (doc) => {
           if (doc.exists()) {
               return doc.data();
@@ -101,40 +102,40 @@ export default function Home(){
       });
     };
 
-    const onUpdateParentEmail = async (newEmail) => {
-      const updatedBasicUserInfo = { ...userBasicInfo, parentEmail: newEmail };
-      localStorage.setItem('basicUserInfo', JSON.stringify(updatedBasicUserInfo));
-      setUserBasicInfo(updatedBasicUserInfo);
-      const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
-      try{
-        await updateDoc(userDocRef, {parentEmail: newEmail});
-      } catch (error) {
-        console.error("Error updating parent email:", error);
-      }
-    };
+    // COMMUNITY VERSION: Commented out parent verification logic
+    // const onUpdateParentEmail = async (newEmail) => {
+    //   const updatedBasicUserInfo = { ...userBasicInfo, parentEmail: newEmail };
+    //   localStorage.setItem('basicUserInfo', JSON.stringify(updatedBasicUserInfo));
+    //   setUserBasicInfo(updatedBasicUserInfo);
+    //   const userDocRef = doc(db, 'users', currentUser.uid);
+    //   try{
+    //     await updateDoc(userDocRef, {parentEmail: newEmail});
+    //   } catch (error) {
+    //     console.error("Error updating parent email:", error);
+    //   }
+    // };
 
-    const onParentVerificationResend = async () => {
-
-      const generateVerificationLink = httpsCallable(getFunctions(), "generateVerificationLink");
-      const verificationLinkResult = await generateVerificationLink({
-        uid: currentUser.uid,
-        action: "verify_account",
-        schoolId: localStorage.getItem("schoolId"),
-      });
-
-      // Extract the verification link from the result
-      const verificationLink = verificationLinkResult.data;
-
-      const sendSESEmail = httpsCallable(getFunctions(), "sendSESEmail");
-      const result = await sendSESEmail({
-        recipient: [ userBasicInfo.parentEmail ], 
-        subject: "Verify Your Student's Account", 
-        htmlTemplate: parentVerificationResendTemplate({
-          studentName: userBasicInfo.userName ? userBasicInfo.userName.split(" ")[0] : "",
-          parentName: "",
-          verificationLink: verificationLink}),
-        emailType: "parent_verification"});
-    };
+    // COMMUNITY VERSION: Commented out parent verification logic
+    // const onParentVerificationResend = async () => {
+    //   const generateVerificationLink = httpsCallable(getFunctions(), "generateVerificationLink");
+    //   const verificationLinkResult = await generateVerificationLink({
+    //     uid: currentUser.uid,
+    //     action: "verify_account",
+    //   });
+    //
+    //   // Extract the verification link from the result
+    //   const verificationLink = verificationLinkResult.data;
+    //
+    //   const sendSESEmail = httpsCallable(getFunctions(), "sendSESEmail");
+    //   const result = await sendSESEmail({
+    //     recipient: [ userBasicInfo.parentEmail ],
+    //     subject: "Verify Your Student's Account",
+    //     htmlTemplate: parentVerificationResendTemplate({
+    //       studentName: userBasicInfo.userName ? userBasicInfo.userName.split(" ")[0] : "",
+    //       parentName: "",
+    //       verificationLink: verificationLink}),
+    //     emailType: "parent_verification"});
+    // };
 
     
     const getUserTokenInfo = async () => {
@@ -654,6 +655,7 @@ export default function Home(){
 }
 
 export function capitalizeFirstLetter(str) {
+  if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 

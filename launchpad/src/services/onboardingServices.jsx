@@ -2,11 +2,13 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../firebase/firebaseConfig';
 import { doc, setDoc } from 'firebase/firestore';
 import { getBasicUserDescription } from './userProfileServices';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { parentInvitationTemplate } from '../utils/parentVerificationTemplates';
 // import { updateTypesense } from '../typesense/typesenseClient';
 
 export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess) => {
     try {
-        const { userPfp, userResume, parentRequested, ...otherData } = highSchoolerData;
+        const { userPfp, userResume, ...otherData } = highSchoolerData;
 
         const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
         const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
@@ -16,19 +18,36 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         userPfpPreview: pfpURL,
         userResumePreview: resumeURL,
         userId: currentUser.uid,
-        parentEmail: highSchoolerData.parentEmail,
-        parentVerified: false,
+        // COMMUNITY VERSION: Removed parent verification fields
         };
 
-        // here, highSchoolerData.schoolId is basically always going to equal 'awty' for now
-        const docRef = await setDoc(doc(db, 'tenants', highSchoolerData.schoolId, 'users', currentUser.uid), dataToSave);
-        
+        // COMMUNITY VERSION: Removed tenant-based architecture
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
+
         // console.log("High Schooler info saved -- written with ID: ", docRef.id);
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        // JOSE TODO
-        // await updateTypesense('users', currentUser.uid, dataToSave, highSchoolerData.schoolId);
+        // Send parent invitation email if email was provided
+        if (highSchoolerData.parentEmail && highSchoolerData.parentEmail.trim()) {
+            try {
+                const sendSESEmail = httpsCallable(getFunctions(), 'sendSESEmail');
+                await sendSESEmail({
+                    recipient: [highSchoolerData.parentEmail],
+                    subject: `${highSchoolerData.userName} invited you to join Launchpad`,
+                    htmlTemplate: parentInvitationTemplate({
+                        studentName: highSchoolerData.userName || 'Your child',
+                    }),
+                    emailType: "parent_invitation"
+                });
+                console.log('Parent invitation email sent to:', highSchoolerData.parentEmail);
+            } catch (emailError) {
+                console.error('Error sending parent invitation email:', emailError);
+                // Don't fail the onboarding if email fails
+            }
+        }
+
+        // await updateTypesense('users', currentUser.uid, dataToSave);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -51,12 +70,13 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         userSkills: (collegeStudentData.userSkills.length > 0 && collegeStudentData.userSkills[0].skillDescription === "") ? [] : collegeStudentData.userSkills,
         };
 
-        const docRef = await setDoc(doc(db, 'tenants', collegeStudentData.schoolId, 'users', currentUser.uid), dataToSave);
+        // COMMUNITY VERSION: Removed tenant-based architecture
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
         // console.log("College Student info saved -- written with ID: ", docRef.id);
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        // await updateTypesense('users', currentUser.uid, dataToSave, collegeStudentData.schoolId);
+        // await updateTypesense('users', currentUser.uid, dataToSave);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -79,28 +99,31 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         userId: currentUser.uid
         };
 
-        const docRef = await setDoc(doc(db, 'tenants', professionalData.schoolId, 'users', currentUser.uid), dataToSave);
+        // COMMUNITY VERSION: Removed tenant-based architecture
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
         // console.log("Professional info saved -- written with ID: ", docRef.id);
 
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        // await updateTypesense('users', currentUser.uid, dataToSave, professionalData.schoolId);
+        // await updateTypesense('users', currentUser.uid, dataToSave);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
     }
 };
 
+// COMMUNITY VERSION: Staff logic preserved but simplified
 export const saveStaff = async (currentUser, staffData, onSuccess) => {
     try {
-        const docRef = await setDoc(doc(db, 'tenants', staffData.schoolId, 'users', currentUser.uid), staffData);
+        // COMMUNITY VERSION: Removed tenant-based architecture
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), staffData);
         // console.log("Professional info saved -- written with ID: ", docRef.id);
 
         pushInitialProfileCompletion(staffData);
         packageBasicUserInfoToLS(staffData);
 
-        // await updateTypesense('users', currentUser.uid, dataToSave, professionalData.schoolId);
+        // await updateTypesense('users', currentUser.uid, dataToSave);
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
@@ -155,8 +178,8 @@ export const packageBasicUserInfoToLS = (userData) => {
         userSchoolId: userData.schoolId,
         userSchool: userData.schoolName,
         isCommitted: (userData.userType === "High Schooler") ? !Array.isArray(userData.collegeInterestsOrDecision) : null,
+        // COMMUNITY VERSION: Removed parent verification fields
         parentEmail: (userData.userType === "High Schooler") ? userData.parentEmail : null,
-        parentVerified: (userData.userType === "High Schooler") ? userData.parentVerified : null,
     };
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));

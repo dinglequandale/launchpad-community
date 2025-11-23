@@ -23,12 +23,12 @@ export default function TopBar({ isSidebarCollapsed }) {
     // Get connection data for notifications
     const {
         pending,
-        pending_parental_approval,
-        parent_approved,
         approved,
         incomingRequests,
         loading: connectionsLoading,
     } = useConnections();
+
+    // COMMUNITY VERSION: Parent approval states removed
 
     useEffect(() => {
         const userInfo = localStorage.getItem('basicUserInfo');
@@ -87,19 +87,11 @@ export default function TopBar({ isSidebarCollapsed }) {
     // Check if there are connection notifications
     const hasNotifications = () => {
         if (connectionsLoading || !basicUserInfo || notificationClicked) return false;
-        
-        // basicUserInfo is already parsed as an object from the useEffect
-        if (basicUserInfo.userType === "High Schooler") {
-            return pending.length > 0 ||
-                   pending_parental_approval.length > 0 ||
-                   parent_approved.length > 0 ||
-                   approved.length > 0 ||
-                   incomingRequests.length > 0;
-        } else {
-            return pending.length > 0 ||
-                   approved.length > 0 ||
-                   incomingRequests.length > 0;
-        }
+
+        // COMMUNITY VERSION: Simplified - removed parent approval checks
+        return (pending?.length > 0 ||
+                approved?.length > 0 ||
+                incomingRequests?.length > 0);
     };
 
     // Handle notification click to show connection modal
@@ -121,7 +113,7 @@ export default function TopBar({ isSidebarCollapsed }) {
                 </button> */}
                 <div className="v0-logo-section">
                 <div style={{display: "flex", justifyContent: "center"}}>
-            <img src="assets/awty_school_raw.jpg" alt="" style={{width: "72px"}}/>
+            {/* <img src="assets/awty_school_raw.jpg" alt="" style={{width: "72px"}}/> */}
           </div>
                 </div>
             </div>

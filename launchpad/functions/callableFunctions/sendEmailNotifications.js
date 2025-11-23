@@ -26,25 +26,25 @@ oauth2Client.setCredentials({
 // Function to send email notification
 exports.sendEmailNotifications = functions.https.onCall(async (data, context) => {
     try {
-        const { receiverId, senderName, messagePreview, schoolId } = data;
-        console.log('Received data:', { receiverId, senderName, schoolId });
-        
+        const { receiverId, senderName, messagePreview } = data;
+        console.log('Received data:', { receiverId, senderName });
+
         // Get user's email from Firestore
-        const userDoc = await admin.firestore().collection('tenants').doc(schoolId).collection('users').doc(receiverId).get();
-        
+        const userDoc = await admin.firestore().collection('users').doc(receiverId).get();
+
         if (!userDoc.exists) {
-            console.error('User document not found:', { receiverId, schoolId });
+            console.error('User document not found:', { receiverId });
             throw new Error('User not found');
         }
-        
+
         const userData = userDoc.data();
         const userEmail = userData.email;
-        
+
         if (!userEmail) {
-            console.error('User email not found in document:', { receiverId, schoolId });
+            console.error('User email not found in document:', { receiverId });
             throw new Error('User email not found');
         }
-        
+
         await sendEmailNotification(userEmail, senderName, messagePreview);
         return { success: true };
     } catch (error) {

@@ -7,31 +7,37 @@ const app = express();
 const {createStreamToken} = require("./callableFunctions/getStreamJWT");
 const {sendInviteEmail} = require("./callableFunctions/sendInvite");
 const {getEmail} = require("./callableFunctions/getEmail");
-const {createSchoolClaim} = require("./callableFunctions/createSchoolClaim");
+// COMMUNITY VERSION: Removed school claim function (no longer needed without tenant architecture)
+// const {createSchoolClaim} = require("./callableFunctions/createSchoolClaim");
 const {sendEmailNotifications} = require("./callableFunctions/sendEmailNotifications");
 const {sendReport} = require("./callableFunctions/sendReport");
 const {sendSESEmail} = require("./callableFunctions/sendSESEmail");
-const {generateVerificationLink} = require("./callableFunctions/generateVerificationLink");
-const {verifyParentToken} = require("./callableFunctions/verifyParentToken");
+// COMMUNITY VERSION: Removed parent verification functions
+// const {generateVerificationLink} = require("./callableFunctions/generateVerificationLink");
+// const {verifyParentToken} = require("./callableFunctions/verifyParentToken");
 const {deleteAuthUsers} = require("./callableFunctions/deleteAuthUsers");
 const {generateUnsubscribeLink, processUnsubscribe, checkUnsubscribeStatus} = require("./callableFunctions/generateUnsubscribeLink");
 const {manageConnections} = require("./callableFunctions/manageConnections");
-const {sendGraduationEmails, sendMigrationReminders, scheduledGraduationEmails} = require("./callableFunctions/sendGraduationEmails");
+// COMMUNITY VERSION: Removed graduation/migration email functions
+// const {sendGraduationEmails, sendMigrationReminders, scheduledGraduationEmails} = require("./callableFunctions/sendGraduationEmails");
 
 exports.createStreamToken = createStreamToken;
 exports.sendInviteEmail = sendInviteEmail;
 exports.getEmail = getEmail;
-exports.createSchoolClaim = createSchoolClaim;
+// COMMUNITY VERSION: Removed school claim export
+// exports.createSchoolClaim = createSchoolClaim;
 exports.sendEmailNotifications = sendEmailNotifications;
 exports.sendReport = sendReport;
 exports.sendSESEmail = sendSESEmail;
-exports.generateVerificationLink = generateVerificationLink;
-exports.verifyParentToken = verifyParentToken;
+// COMMUNITY VERSION: Removed parent verification exports
+// exports.generateVerificationLink = generateVerificationLink;
+// exports.verifyParentToken = verifyParentToken;
 exports.deleteAuthUsers = deleteAuthUsers;
 exports.generateUnsubscribeLink = generateUnsubscribeLink;
 exports.processUnsubscribe = processUnsubscribe;
 exports.checkUnsubscribeStatus = checkUnsubscribeStatus;
 exports.manageConnections = manageConnections;
-exports.sendGraduationEmails = sendGraduationEmails;
-exports.sendMigrationReminders = sendMigrationReminders;
-exports.scheduledGraduationEmails = scheduledGraduationEmails;
+// COMMUNITY VERSION: Removed graduation/migration email exports
+// exports.sendGraduationEmails = sendGraduationEmails;
+// exports.sendMigrationReminders = sendMigrationReminders;
+// exports.scheduledGraduationEmails = scheduledGraduationEmails;

@@ -10,7 +10,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import EmailConfirmation from '../EmailConfirmation';
 import { FaExclamationTriangle, FaShieldAlt } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
-import { parentVerificationInitialTemplate } from '../../../utils/parentVerificationTemplates';
+import { parentInvitationTemplate } from '../../../utils/parentVerificationTemplates';
 import Loading from '../../../components/LoadingAnimation/Loading';
 
 // Move getEmail function creation outside component to prevent recreation on every render
@@ -118,16 +118,10 @@ const highSchoolQuestionsConfig = [
   // Page 4
   {
     id: "parentEmail",
-    text: "Parent/Guardian Email",
+    text: "Invite Parent to Join Launchpad (Optional)",
     type: "text",
-    page: 4
-  },
-  // Page 5
-  {
-    id: "parentRequested",
-    text: "Parent Verification Requested",
     optional: true,
-    page: 5
+    page: 4
   },
 ]
 
@@ -135,7 +129,7 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
   
   const tempStudentInfo = localStorage.getItem('tempStudentInfo') ? JSON.parse(localStorage.getItem('tempStudentInfo')) : {};
   const [highSchoolerData, setHighSchoolerData] = useState({
-    userName: tempStudentInfo.full_name ? 
+    userName: tempStudentInfo.full_name ?
       tempStudentInfo.full_name.split(', ')[1] + ' ' + tempStudentInfo.full_name.split(', ')[0] : '',
     userPfp: null,
     userPfpPreview: null,
@@ -147,11 +141,9 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
     graduationYear: tempStudentInfo.graduation_year,
     collegeDecision: "",
     collegeInterestsOrDecision: [],
-    schoolAttending: schoolInfo?.schoolDisplayName || "",
-    schoolId: schoolInfo?.schoolId || "",
+    schoolAttending: "",
+    schoolId: "",
     parentEmail: "",
-    parentRequested: false,
-    parentVerified: false,
     userType: "High Schooler",
   });
 
@@ -244,20 +236,12 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
       case 4:
         return (
           <div className="form-section">
-            <h2 className="page-title">Parent Verification</h2>
-            <ParentEmailPage 
+            <h2 className="page-title">Invite Your Parent</h2>
+            <ParentInvitationPage
               selectedOptions={highSchoolerData}
               handleChange={handleChange}
               currentUser={currentUser}
-              schoolInfo={schoolInfo}
             />
-          </div>
-        );
-      case 5:
-        return (
-          <div className="form-section">
-            <h2 className="page-title">Email Confirmation</h2>
-            <EmailConfirmation />
           </div>
         );
       default:
@@ -349,18 +333,17 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
   );
 };
 
-const ParentEmailPage = ({ selectedOptions, handleChange, currentUser, schoolInfo }) => {
+const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) => {
   const [parentEmail, setParentEmail] = useState(selectedOptions.parentEmail || '');
-  const [isRequesting, setIsRequesting] = useState(false);
-  const [requestSent, setRequestSent] = useState(false);
   const [error, setError] = useState('');
 
   const validateParentEmail = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!parentEmail) {
-      setError('Parent email is required');
-      return false;
+      // Email is optional, so clear error if empty
+      setError('');
+      return true;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(parentEmail)) {
       setError('Please enter a valid email address');
       return false;
@@ -369,62 +352,25 @@ const ParentEmailPage = ({ selectedOptions, handleChange, currentUser, schoolInf
     return true;
   };
 
-  const handleRequestAccess = async () => {
-    if (!validateParentEmail()) return;
-
-    // Validate that we have the required school information
-    if (!schoolInfo || !schoolInfo.schoolId) {
-      toast.error('School information is missing. Please refresh the page and try again.');
-      console.error('Missing school information in handleRequestAccess:', schoolInfo);
-      return;
-    }
-
-    setIsRequesting(true);
-    try {
-
-      const generateVerificationLink = httpsCallable(getFunctions(), "generateVerificationLink");
-      const verificationLinkResult = await generateVerificationLink({
-        uid: currentUser.uid,
-        action: "verify_account",
-        schoolId: schoolInfo.schoolId, // Use schoolInfo prop instead of localStorage
-      });
-
-      // Extract the verification link from the result
-      const verificationLink = verificationLinkResult.data;
-
-      const sendSESEmail = httpsCallable(getFunctions(), 'sendSESEmail');
-      await sendSESEmail({
-        recipient: [parentEmail],
-        subject: "Verify Your Student's Launchpad Account",
-        htmlTemplate: parentVerificationInitialTemplate({
-          studentName: selectedOptions.userName ? selectedOptions.userName.split(" ")[0] : "",
-          parentName: "",
-          verificationLink: verificationLink,
-        }),
-        emailType: "parent_verification"
-      });
-
-      setRequestSent(true);
-      handleChange('parentEmail', parentEmail);
-      handleChange('parentRequested', true);
-      toast.success('Parent verification email sent successfully!');
-    } catch (error) {
-      console.error('Error sending parent verification email:', error);
-      toast.error('Failed to send verification email');
-    } finally {
-      setIsRequesting(false);
-    }
+  const handleEmailChange = (e) => {
+    const email = e.target.value;
+    setParentEmail(email);
+    handleChange('parentEmail', email);
   };
 
   return (
     <div className="onboardingQuestions">
-      <div className="parent-notice">
+      <div className="parent-notice" style={{ background: '#e3f2fd', border: '1px solid #90caf9' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-          <FaExclamationTriangle className="parent-notice-icon" />
+          <FaShieldAlt className="parent-notice-icon" style={{ color: '#1976d2' }} />
           <div className="parent-notice-content">
-            <h3>Parent/Guardian Verification Required</h3>
+            <h3>Invite Your Parent to Join</h3>
             <p>
-              As a high school student, we require parent/guardian verification to ensure your safety and compliance with our platform guidelines.
+              Help grow the Launchpad community! If your parent is a professional, they can join and mentor other students.
+              We'll send them an invitation email when you complete your onboarding.
+            </p>
+            <p style={{ marginTop: '8px', fontSize: '14px', fontStyle: 'italic' }}>
+              This is completely optional - you can skip this step if you prefer.
             </p>
           </div>
         </div>
@@ -432,43 +378,42 @@ const ParentEmailPage = ({ selectedOptions, handleChange, currentUser, schoolInf
 
       <div className="form-group">
         <label className="form-label">
-          Parent/Guardian Email Address
+          Parent/Guardian Email (Optional)
         </label>
         <div className="input-group">
           <input
             type="email"
             className="form-input form-shorter-input"
-            placeholder="Enter parent/guardian email"
+            placeholder="Enter parent email to invite them"
             value={parentEmail}
-            onChange={(e) => setParentEmail(e.target.value)}
+            onChange={handleEmailChange}
             onBlur={validateParentEmail}
           />
         </div>
         {error && <div className="error-message">{error}</div>}
-      </div>
-
-      <button
-        className={`request-btn ${requestSent ? 'success' : ''}`}
-        onClick={handleRequestAccess}
-        disabled={isRequesting || requestSent}
-      >
-        {isRequesting ? (
-          <>
-            <Loading size={16} />
-            Sending Request...
-          </>
-        ) : requestSent ? (
-          'Request Sent Successfully!'
-        ) : (
-          'Send Verification Request'
+        {parentEmail && !error && (
+          <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
+            ✓ We'll send an invitation to {parentEmail} when you submit
+          </div>
         )}
-      </button>
-
-      {requestSent && (
-        <div className="success-message">
-          ✓ Verification email sent to {parentEmail}
-        </div>
-      )}
+      </div>
+{/* 
+      <div style={{
+        marginTop: '20px',
+        padding: '16px',
+        background: '#f8f9fa',
+        borderRadius: '8px',
+        fontSize: '14px',
+        color: '#666'
+      }}>
+        <strong>What happens next?</strong>
+        <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+          <li>If you provide an email, we'll send your parent an invitation when you click Submit</li>
+          <li>The email will mention that you invited them to join Launchpad</li>
+          <li>They can choose to join or simply ignore the invitation</li>
+          <li>This won't affect your account in any way</li>
+        </ul>
+      </div> */}
     </div>
   );
 };

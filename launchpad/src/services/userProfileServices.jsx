@@ -209,21 +209,22 @@ export const displaySchools = (schools) => {
 
 export const getBasicUserDescription = (userData, shortened=true) => {
     return userData.userType === "High Schooler" ?
-     `Class of ${userData.graduationYear || 'N/A'}, ${getUserHS(userData.schoolAttending || 'Unknown School')}` 
-     : userData.userType === "Alumni" ? `Graduated in ${userData.graduationYear || 'N/A'}, ${getUserHS(userData.schoolAttending || 'Unknown School')}` 
-     : userData.userType === "Professional" ? `${userData.yearsOfExperience || 'N/A'}+ Years of Experience in ${shortened ? (userData.areasOfInterest && userData.areasOfInterest.length > 0 ? userData.areasOfInterest[0] : 'General Field') 
+     `Class of ${userData.graduationYear || 'N/A'}, ${getUserHS(userData.schoolAttending || 'Unknown School')}`
+     : userData.userType === "College Student" ? `${userData.collegeAttending || 'College Student'}, Class of ${userData.graduationYear || 'N/A'}`
+     : userData.userType === "Professional" ? `${userData.yearsOfExperience || 'N/A'}+ Years of Experience in ${shortened ? (userData.areasOfInterest && userData.areasOfInterest.length > 0 ? userData.areasOfInterest[0] : 'General Field')
         : displayFieldsOfInterest(userData.areasOfInterest || [])}`
     : `${userData.schoolRole || 'Staff Member'}`;
 }
 
 export const editUserData = async (newData, currentUser, origUserData) => {
     try{
-        const userRef = doc(db, "tenants", localStorage.getItem("schoolId"), "users", currentUser.uid);
+        // COMMUNITY VERSION: Removed tenant-based architecture
+        const userRef = doc(db, "users", currentUser.uid);
         await updateDoc(userRef, newData);
         console.log("Updated user data!!!");
         pushInitialProfileCompletion({... origUserData, ...newData});
 
-        // await updateTypesense('users', currentUser.uid, {... origUserData, ...newData}, localStorage.getItem("schoolId"));
+        // await updateTypesense('users', currentUser.uid, {... origUserData, ...newData});
     }catch(error){console.log(error)};
 }
 
@@ -232,7 +233,8 @@ export const loadUserData = async (currentUser, setLoading, setUserData) => {
     setLoading(true);
 
     if (currentUser) {
-        const userDocRef = doc(db, "tenants", localStorage.getItem("schoolId"), 'users', currentUser.uid);
+        // COMMUNITY VERSION: Removed tenant-based architecture
+        const userDocRef = doc(db, 'users', currentUser.uid);
         unsubscribe = onSnapshot(userDocRef, (doc) => {
             if (doc.exists()) {
                 setUserData(doc.data());
