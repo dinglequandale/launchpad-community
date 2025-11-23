@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import "./organizations.css"
+import "./Organizations.css"
 import SearchBar from "../../components/Searchbar/SearchBar";
 import SideNav from "../../components/Sidenav/SideNav";
 import TopBar from "../../components/Topbar/TopBar";

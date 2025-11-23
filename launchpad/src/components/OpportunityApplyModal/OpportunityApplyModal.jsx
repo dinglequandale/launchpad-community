@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import './opportunity_apply_modal.css';
+import './OpportunityApplyModal.css';
 import { IoCloseOutline } from 'react-icons/io5';
 import { LuMapPin, LuCalendar, LuBriefcase, LuClock, LuUsers, LuTarget } from 'react-icons/lu';
 

@@ -1,4 +1,4 @@
-import './editprofilecard.css';
+import './EditProfileCard.css';
 import React, { createContext, useContext } from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { IoAdd } from "react-icons/io5";

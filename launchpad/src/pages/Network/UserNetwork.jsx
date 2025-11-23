@@ -1,4 +1,4 @@
-import "./user_network.css";
+import "./UserNetwork.css";
 import UserCard from "../../components/Usercard/UserCard";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";

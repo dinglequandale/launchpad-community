@@ -20,7 +20,7 @@ import DefaultIcon from '../DefaultIcon/DefaultIcon'
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile'
 import Loading from '../LoadingAnimation/Loading'
 import { isConnectionApproved } from '../../services/connectionService'
-import './profilemodal.css'
+import './ProfileModal.css'
 
 export default function ProfileModal({
   userData,

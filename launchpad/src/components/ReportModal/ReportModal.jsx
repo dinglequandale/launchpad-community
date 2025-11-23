@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 import toast from 'react-hot-toast';
-import './report_modal.css';
+import './ReportModal.css';
 import { useReport } from '../../contexts/report/ReportContext';
 import { getFunctions, httpsCallable } from "firebase/functions";
 

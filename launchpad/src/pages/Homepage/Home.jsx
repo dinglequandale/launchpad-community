@@ -1,4 +1,4 @@
-import "./home.css";
+import "./Home.css";
 import TopBar from "../../components/Topbar/TopBar";
 import SideNav from "../../components/Sidenav/SideNav";
 import ReactPlayer from "react-player/youtube";

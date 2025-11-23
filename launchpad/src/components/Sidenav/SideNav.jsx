@@ -1,4 +1,4 @@
-import './sidenav.css';
+import './SideNav.css';
 import { useState, useEffect } from 'react';
 import { IoHomeOutline } from "react-icons/io5";
 import { TbUserHexagon } from "react-icons/tb";

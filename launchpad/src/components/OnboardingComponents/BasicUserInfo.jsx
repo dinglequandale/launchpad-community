@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
-import "../../pages/Onboarding/onboarding.css";
-import "./basic_user_info.css";
+import "../../pages/Onboarding/Onboarding.css";
+import "./BasicUserInfo.css";
 import OnboardingDropdown from "../OnboardingDropdown/OnboardingDropdown";
 import CustomSelect from "../CustomSelect";
 import { BiEdit, BiShield, BiTrash, BiUpload } from "react-icons/bi";

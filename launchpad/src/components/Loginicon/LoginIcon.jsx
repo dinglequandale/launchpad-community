@@ -1,4 +1,4 @@
-import "./loginicon.css";
+import "./LoginIcon.css";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { displayShortenedName } from "../../services/userProfileServices";

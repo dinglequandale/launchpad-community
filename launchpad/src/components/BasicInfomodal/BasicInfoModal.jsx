@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react"
-import "./basicinfomodal.css"
+import "./BasicInfoModal.css"
 import Modal from "react-modal"
 import MakeChanges from "../Makechanges/MakeChanges";
 import toast, { Toaster } from "react-hot-toast";

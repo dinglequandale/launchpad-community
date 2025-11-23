@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { IoCloseOutline, IoFlag, IoCalendar, IoLocation, IoTime, IoPerson } from 'react-icons/io5'
 import { LuMapPin, LuCalendar, LuBriefcase, LuGraduationCap, LuUsers, LuBuilding, LuBookOpen, LuAward, LuGlobe, LuTarget, LuZap, LuChevronDown, LuChevronUp } from 'react-icons/lu'
-import './organizationprofile.css'
+import './OrganizationProfile.css'
 import { useModal } from '../../contexts/ModalContext'
 import { useReport } from '../../contexts/report/ReportContext'
 import { useAuth } from '../../contexts/auth/AuthContext'

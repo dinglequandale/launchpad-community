@@ -1,4 +1,4 @@
-import "./usercard.css";
+import "./UserCard.css";
 import ConnectionBanner from "../Connectionbanner/ConnectionBanner";
 import { useState } from "react";
 import { FaLink } from "react-icons/fa6";

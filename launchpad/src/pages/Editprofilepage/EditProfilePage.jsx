@@ -1,4 +1,4 @@
-import "./editprofilepage.css";
+import "./EditProfilePage.css";
 import EditProfileCard from "../../components/EditProfilecard/EditProfileCard"
 import TopBar from "../../components/Topbar/TopBar";
 import SideNav from "../../components/Sidenav/SideNav";

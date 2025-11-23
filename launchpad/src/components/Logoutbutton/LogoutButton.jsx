@@ -1,4 +1,4 @@
-import './logoutbutton.css';
+import './LogoutButton.css';
 import { FiLogOut } from "react-icons/fi";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { doSignOut } from "../../firebase/auth";

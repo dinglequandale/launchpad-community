@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import "./contentfilter.css";
+import "./ContentFilter.css";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { BiSearch, BiTrash, BiX } from "react-icons/bi";
 import { CiSearch } from "react-icons/ci";

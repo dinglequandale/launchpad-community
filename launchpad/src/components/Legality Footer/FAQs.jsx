@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './footer_content.css';
+import './FooterContent.css';
 import LegalityGoBack from './LegalityGoBack';
 import LegalityFooter from './LegalityFooter';
 

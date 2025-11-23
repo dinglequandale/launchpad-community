@@ -1,4 +1,4 @@
-import "./connectionbanner.css";
+import "./ConnectionBanner.css";
 
 export default function ConnectionBanner(userData){
     let txtAvailability = "internships";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./progressbar.css";
+import "./ProgressBar.css";
 import { GrFormPrevious } from "react-icons/gr";
 import { GrFormNext } from "react-icons/gr";
 import Modal from "react-modal";

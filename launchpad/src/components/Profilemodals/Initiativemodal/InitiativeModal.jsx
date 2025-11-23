@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useContext, useRef } from 'react';
 import Modal from 'react-modal';
-import "./initiativemodal.css";
+import "./InitiativeModal.css";
 import MakeChanges from '../../Makechanges/MakeChanges';
 import OrganizationProfile from '../../Organizationprofile/OrganizationProfile';
 import ProgressBar from '../../Progressbar/ProgressBar';

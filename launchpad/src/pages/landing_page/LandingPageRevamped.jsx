@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import "./landingpage.css";
+import "./LandingPage.css";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { PiBuilding, PiGraduationCap, PiStudent, PiSuitcase } from "react-icons/pi";
 import Landing_Nav from "./Landing_Nav/Landing_Nav";

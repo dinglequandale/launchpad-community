@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Routes, Route, useLocation } from 'react-router-dom';
-import './landing_nav.css';
+import './LandingNav.css';
 
 export default function Landing_Nav () {
   const [activePage, setActivePage] = useState('Landing');

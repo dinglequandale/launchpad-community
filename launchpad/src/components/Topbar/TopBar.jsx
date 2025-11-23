@@ -7,7 +7,7 @@ import { useModal } from '../../contexts/ModalContext';
 import { useReport } from '../../contexts/report/ReportContext';
 import { useConnections } from '../../contexts/ConnectionContext';
 import DefaultIcon from '../DefaultIcon/DefaultIcon';
-import './topbar.css';
+import './TopBar.css';
 
 export default function TopBar({ isSidebarCollapsed }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

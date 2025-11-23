@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "./profilestrength.css";
+import "./ProfileStrength.css";
 import { useNavigate } from "react-router-dom";
 import { displayShortenedName } from "../../services/userProfileServices";
 import DefaultIcon from "../DefaultIcon/DefaultIcon";

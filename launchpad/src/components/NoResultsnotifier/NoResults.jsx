@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaSearch } from 'react-icons/fa';
 import { FaFolderOpen } from 'react-icons/fa';
-import "./noresults.css";
+import "./NoResults.css";
 import { useNavigate } from 'react-router-dom';
 import { FcOrganization } from 'react-icons/fc';
 import InviteContactsModal from '../InviteContactsmodal/InviteContactsModal';

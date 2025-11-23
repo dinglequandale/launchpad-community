@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import CollegeStudent from './CollegeStudent/CollegeStudent';
 import HighSchooler from './HighSchooler/HighSchooler';
-import "./onboarding.css"
+import "./Onboarding.css"
 import Professional from './Professional/Professional';
 import Staff from './Staff/Staff';
 import { BsBackpack } from 'react-icons/bs';

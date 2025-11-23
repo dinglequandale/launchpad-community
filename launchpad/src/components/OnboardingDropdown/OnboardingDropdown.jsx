@@ -1,6 +1,6 @@
 import React from 'react';
 import CustomSelect from '../CustomSelect';
-import "./onboardingdropdown.css";
+import "./OnboardingDropdown.css";
 
 export default function OnboardingDropdown({ question, options, selectedOption, onChange, type, onSearchQueryChange, showQuestion=true, placeholder=null, isLoading=false, loadingMessage="" }) {
     const handleChange = (selectedOptions) => {

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import './footer_content.css';
+import './FooterContent.css';
 import { RiArrowGoBackFill } from 'react-icons/ri';
 
 export default function LegalityGoBack() {

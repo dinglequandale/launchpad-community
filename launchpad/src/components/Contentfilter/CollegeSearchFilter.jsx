@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import "./contentfilter.css";
+import "./ContentFilter.css";
 import { getColleges } from "../../pages/Onboarding/Options";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { BiX, BiTrash } from "react-icons/bi";

@@ -1,4 +1,4 @@
-import './footer_content.css';
+import './FooterContent.css';
 import LegalityFooter from './LegalityFooter';
 import LegalityGoBack from './LegalityGoBack';
 

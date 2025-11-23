@@ -1,6 +1,6 @@
 import { useEffect, useState, createContext, useContext, useRef } from 'react';
 import Modal from 'react-modal';
-import "./opportunitymodal.css";
+import "./OpportunityModal.css";
 import OrganizationProfile from '../../Organizationprofile/OrganizationProfile';
 import ProgressBar from '../../Progressbar/ProgressBar';
 import { GrAdd } from 'react-icons/gr';

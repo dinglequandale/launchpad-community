@@ -5,7 +5,7 @@ import Modal from "react-modal";
 import { editUserData } from "../../services/userProfileServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { BiPlus, BiTrash, BiX } from "react-icons/bi";
-import "./skillmodal.css";
+import "./SkillModal.css";
 import { IoCloseOutline } from "react-icons/io5";
 
 export default function SkillModal({visibility, onClose, userData}) {

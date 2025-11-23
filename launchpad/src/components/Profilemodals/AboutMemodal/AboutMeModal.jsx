@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Modal from 'react-modal';
-import "./aboutmemodal.css"
+import "./AboutMeModal.css"
 import MakeChanges from '../../Makechanges/MakeChanges';
 import { editUserData } from '../../../services/userProfileServices';
 import { useAuth } from '../../../contexts/auth/AuthContext';

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ContentFilter from "../Contentfilter/ContentFilter";
 import CollegeSearchFilter from "../Contentfilter/CollegeSearchFilter";
-import "./searchbar.css";
+import "./SearchBar.css";
 import { CiSearch } from "react-icons/ci";
 import { capitalizeFirstLetter } from '../../pages/Homepage/Home';
 import { careerInterests } from '../../pages/Onboarding/Options';
