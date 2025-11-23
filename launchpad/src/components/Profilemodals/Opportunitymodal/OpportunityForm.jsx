@@ -194,7 +194,7 @@
 //       id: "applicants",
 //       text: "What type of students can apply?",
 //       type: "select",
-//       options: ["High Schoolers/Alumni", "High Schoolers", "Alumni"],
+//       options: ["High Schoolers/College Students", "High Schoolers", "College Students"],
 //       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
 //       required: true,
 //     },

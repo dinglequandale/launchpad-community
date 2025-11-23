@@ -16,7 +16,8 @@ import { searchDocuments } from "../../services/searchServices";
 import NoResults from "../../components/NoResultsnotifier/NoResults";
 import Loading from "../../components/LoadingAnimation/Loading";
 import toast, { Toaster } from "react-hot-toast";
-import { auth } from "../../firebase/firebaseConfig";
+import { auth, db } from "../../firebase/firebaseConfig";
+import { collection, getDocs } from 'firebase/firestore';
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 import { capitalizeFirstLetter } from "../Homepage/Home";
 import ParentalConnectionModal from "../../components/ParentalConnectionModal";
@@ -35,10 +36,9 @@ export default function UserNetwork() {
   const { chatClient, isConnected } = useOutletContext();
 
   // COMMUNITY VERSION: Generic network name instead of school-specific
-  const schoolId = localStorage.getItem("schoolId");
-  const pageName = schoolId ? `The ${capitalizeFirstLetter(schoolId)} Network` : "Launchpad Network";
+  const pageName = "Launchpad Network";
 
-  const [tenantId, setTenantId] = useState(null);
+  // COMMUNITY VERSION: Removed tenantId - no longer needed without multi-tenant architecture
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const { openProfileModal, openConnectModal, openParentalConnectionModal } = useModal();
@@ -91,11 +91,13 @@ export default function UserNetwork() {
     }
   }
 
-  const { userType,isCommitted,parentVerified } = JSON.parse(localStorage.getItem("basicUserInfo"));
+  // COMMUNITY VERSION: Removed parentVerified - no longer needed without parent verification system
+  const { userType, isCommitted } = JSON.parse(localStorage.getItem("basicUserInfo"));
   const [filters, setFilters] = useState({
     userType: 'Any User',
     collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
-    areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+    // COMMUNITY VERSION: Changed default from "My Interests" to "Any Interests" to show all users by default
+    areasOfInterestOrExpertise: [`Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
     networkingLevel: 'Any Availability',
     // schoolAttending: 'Any High School',
   });
@@ -112,6 +114,25 @@ export default function UserNetwork() {
 
   useEffect(()=>{
     setOverallLoading(true);
+
+    // DIAGNOSTIC: Check what's actually in the database
+    const diagnosticCheck = async () => {
+      console.log('🔍 DIAGNOSTIC: Checking users collection...');
+      const usersSnapshot = await getDocs(collection(db, 'users'));
+      console.log('🔍 Total users in database:', usersSnapshot.docs.length);
+
+      const userTypes = {};
+      usersSnapshot.docs.forEach(doc => {
+        const data = doc.data();
+        const type = data.userType || 'NO_TYPE';
+        userTypes[type] = (userTypes[type] || 0) + 1;
+        console.log('🔍 User:', doc.id, 'Type:', data.userType, 'Name:', data.userName);
+      });
+
+      console.log('🔍 UserType breakdown:', userTypes);
+    };
+    diagnosticCheck();
+
     fetchAllUserTypes();
     
     // Check if any interests are selected (not just "Any")
@@ -138,7 +159,7 @@ export default function UserNetwork() {
           console.log('Fetching all user types');
           await Promise.all([
               fetchUserType('High Schooler'),
-              fetchUserType('Alumni'),
+              fetchUserType('College Student'),
               fetchUserType('Professional'),
               fetchUserType('Staff')
           ]);
@@ -147,7 +168,7 @@ export default function UserNetwork() {
           // Map filter values to actual user types
           const userTypeMap = {
               'High Schoolers': 'High Schooler',
-              'College Students': 'Alumni',
+              'College Students': 'College Student',
               'Professionals': 'Professional',
               'Staff': 'Staff'
           };
@@ -157,7 +178,7 @@ export default function UserNetwork() {
               console.log('Target user type:', targetUserType);
               // Clear other user type arrays when filtering to specific type
               if (targetUserType !== 'High Schooler') setHighSchoolers([]);
-              if (targetUserType !== 'Alumni') setCollegeStudents([]);
+              if (targetUserType !== 'College Student') setCollegeStudents([]);
               if (targetUserType !== 'Professional') setProfessionals([]);
               if (targetUserType !== 'Staff') setStaff([]);
               
@@ -168,23 +189,26 @@ export default function UserNetwork() {
 
   const fetchUserType = async (category, isLoadMore = false) => {
       setLoading(prev => ({ ...prev, [category]: true }));
+      console.log(`[UserNetwork] Fetching ${category} with filters:`, filters);
       try {
           const { results, lastVisible } = await getFilteredData(
-              'users', 
-              filters, 
-              currentUser.uid, 
+              'users',
+              filters,
+              currentUser.uid,
               category,
               isLoadMore ? lastDocs[category] : null,
               loadLimit,
           );
 
+          console.log(`[UserNetwork] Got ${results.length} results for ${category}:`, results);
           setLastDocs(prev => ({ ...prev, [category]: lastVisible }));
 
           switch(category) {
               case 'High Schooler':
-                  setHighSchoolers(prev => isLoadMore ? [...prev, ...results].filter(result => result.parentVerified) : results.filter(result => result.parentVerified));
+                  // COMMUNITY VERSION: Removed parentVerified filter - all high schoolers are now visible
+                  setHighSchoolers(prev => isLoadMore ? [...prev, ...results] : results);
                   break;
-              case 'Alumni':
+              case 'College Student':
                   setCollegeStudents(prev => isLoadMore ? [...prev, ...results] : results);
                   break;
               case 'Professional':
@@ -224,7 +248,8 @@ export default function UserNetwork() {
     setFilters({
       userType: 'Any User',
       collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
-      areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+      // COMMUNITY VERSION: Changed to "Any Interests" to show all users
+      areasOfInterestOrExpertise: [`Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
       networkingLevel: 'Any Availability',
     });
     setFilterChanged(true);
@@ -232,21 +257,15 @@ export default function UserNetwork() {
 
   const handleConnectClick = (userId) => {
     const user = allVisibleUserData.filter((user) => user.userId === userId)[0];
-    // Parental connection logic
-    if (userType === 'High Schooler' && user.userType !== 'High Schooler') {
-      const isApproved = isConnectionApproved(currentUser, user, parent_approved, approved, parentVerified);
-      if (!isApproved) {
-        openParentalConnectionModal({ professionalData: user });
-        return;
-      }
-    }
+    // COMMUNITY VERSION: Removed parental connection logic - all users can connect freely
     
     // Get connection status from localStorage to avoid redundant Firebase calls
     // const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
     // const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
     // Check both pending and approved connections, or any direct connections (not in pending list)
     // const isConnected = pendingConnections.includes(userId) || approvedConnections.includes(userId);
-    const connectionData = checkConnection(schoolId, userId);
+    // COMMUNITY VERSION: No schoolId needed
+    const connectionData = checkConnection(userId);
     
     openConnectModal({ 
       userData: user, 
@@ -284,23 +303,17 @@ export default function UserNetwork() {
 
   // All modal logic is now handled via ModalContext
 
-  const user = auth.currentUser;
-  useEffect(() => {
-    const getUserTokenInfo = async () => {
-      const idTokenResult = await user.getIdTokenResult();
-      setTenantId(idTokenResult.claims.school_id);
-    };
-
-    getUserTokenInfo();
-  }, [user]);
+  // COMMUNITY VERSION: Removed custom claims logic - no longer using school_id claims
 
   const handleSearch = async (e, queryText) => {
     e.preventDefault();
     if (queryText) {
-      const searchResults = await searchDocuments('users', queryText, tenantId);
+      // COMMUNITY VERSION: No tenantId needed for search
+      const searchResults = await searchDocuments('users', queryText);
       setAllVisibleUserData(searchResults);
-      setHighSchoolers(searchResults.filter((result) => (result.userType === "High Schooler" && result.parentVerified)));
-      setCollegeStudents(searchResults.filter((result) => result.userType === "Alumni"));
+      // COMMUNITY VERSION: Removed parentVerified filter from search results
+      setHighSchoolers(searchResults.filter((result) => result.userType === "High Schooler"));
+      setCollegeStudents(searchResults.filter((result) => result.userType === "College Student"));
       setProfessionals(searchResults.filter((result) => result.userType === "Professional"));
     }
   };
@@ -396,7 +409,7 @@ export default function UserNetwork() {
                       {filters.userType === 'College Students' && collegeStudents.length > 0 && (
                         <UserGrid 
                           userNetworkData={collegeStudents}
-                          onEndReached={() => loadMore('Alumni')}
+                          onEndReached={() => loadMore('College Student')}
                           loading={loading.college}
                           connectionRefreshKey={connectionRefreshKey}
                           title="College Students"
@@ -449,7 +462,7 @@ export default function UserNetwork() {
                           <div className="v0-network-section-content">
                             <UserCarousel 
                               userNetworkData={collegeStudents}
-                              onEndReached={() => loadMore('Alumni')}
+                              onEndReached={() => loadMore('College Student')}
                               loading={loading.college}
                               connectionRefreshKey={connectionRefreshKey}
                             />

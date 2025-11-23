@@ -32,7 +32,7 @@ export default function Organizations(){
     const [loading, setLoading] = useState(false);
     const [initLoading, setInitLoading] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    const [tenantId, setTenantId] = useState(null);
+    // COMMUNITY VERSION: Removed tenantId state - no longer needed without multi-tenant architecture
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     const [lastDoc, setlastDoc] = useState(null);
@@ -174,21 +174,14 @@ export default function Organizations(){
 
     const pageName = "Opportunities";
 
-    const user = auth.currentUser;
-    useEffect(() => {
-        const getUserTokenInfo = async () => {
-          const idTokenResult = await user.getIdTokenResult();
-          setTenantId(idTokenResult.claims.school_id);
-        };
-      
-        getUserTokenInfo();
-      }, [user]);
+    // COMMUNITY VERSION: Removed custom claims logic - no longer using school_id claims
 
     const handleSearch = async (e, queryText) => {
         e.preventDefault();
         setIsSearching(false);
         if (queryText) {
-            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText, tenantId);
+            // COMMUNITY VERSION: No tenantId needed for search
+            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText);
             setOrganizationsData(searchResults);
             console.log(searchResults);
         }

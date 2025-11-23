@@ -1,6 +1,7 @@
 import { algoliaClient } from '../typesense/typesenseClient'
 
-const searchDocuments = async (collectionName, searchText, tenantId) => {
+// COMMUNITY VERSION: Removed tenantId parameter - no longer needed without multi-tenant architecture
+const searchDocuments = async (collectionName, searchText) => {
   try {
     // let searchParameters;
 

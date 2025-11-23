@@ -39,7 +39,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   });
 
   const userType = userData.userType;
-  const schoolId = localStorage.getItem("schoolId");
+  // const schoolId = localStorage.getItem("schoolId");
   const navigate = useNavigate();
   const targetUserId = userId || userData?.userId || userData?.id; // Use userId if provided, otherwise extract from userData
 
@@ -155,7 +155,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
         currentUserUid: currentUser?.uid,
         targetUserId,
         chat: !!chat,
-        schoolId,
+        // schoolId,
         sendWithResume
       });
       

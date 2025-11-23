@@ -59,7 +59,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
                 // Handle specific college selections
                 const specificColleges = value.filter(v => !v.includes("My") && !v.includes("Any"));
                 if (specificColleges.length > 0) {
-                    if (category === "Alumni") {
+                    if (category === "College Student") {
                         return { key: "collegeAttending", operation: "in", value: specificColleges };
                     } else if (category === "High Schooler") {
                         return { key: "collegeInterestsOrDecision", operation: "array-contains-any", value: specificColleges };
@@ -124,6 +124,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
   
     // Add category filter if specified
     if (category && collectionName === "users") {
+        console.log('[filteringServices] ⚠️  QUERYING FOR userType ==', category);
         q = query(q, where('userType', '==', category));
         q = query(q, orderBy('userName'));
     }
@@ -132,8 +133,21 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     if (lastDoc) q = query(q, startAfter(lastDoc));
     q = query(q, limit(maxLimit * 2)); // Get more results to account for post-filtering
 
+    console.log('[filteringServices] Executing Firebase query...');
     const querySnapshot = await getDocs(q);
-    let results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).filter((user) => user.id !== currentUserId);
+    console.log('[filteringServices] ✅ Firebase returned', querySnapshot.docs.length, 'documents');
+
+    // Log the actual userType values returned
+    if (querySnapshot.docs.length > 0) {
+        const userTypes = querySnapshot.docs.map(doc => doc.data().userType);
+        console.log('[filteringServices] UserTypes in results:', [...new Set(userTypes)]);
+    }
+
+    let results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    console.log('[filteringServices] Before currentUser filter:', results.length, 'results');
+
+    results = results.filter((user) => user.id !== currentUserId);
+    console.log('[filteringServices] After currentUser filter:', results.length, 'results');
 
     // Apply array filters in post-processing to avoid Firebase conflicts
     if (arrayFilters.length > 0) {
@@ -160,8 +174,8 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
                 // Exclude professionals (they don't have college data)
                 if (user.userType === "Professional") return false;
                 
-                // For Alumni, check collegeAttending
-                if (user.userType === "Alumni") {
+                // For College Students, check collegeAttending
+                if (user.userType === "College Student") {
                     return user.collegeAttending && specificColleges.includes(user.collegeAttending);
                 }
                 

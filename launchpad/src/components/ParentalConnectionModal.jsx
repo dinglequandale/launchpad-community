@@ -153,9 +153,9 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
                           </div>
                         )}
                       </>
-                    ) : professionalData.userType === 'Alumni' ? (
+                    ) : professionalData.userType === 'College Student' ? (
                       <>
-                        <div className="parental-connection-modal-details-title">Alumni Details:</div>
+                        <div className="parental-connection-modal-details-title">College Student Details:</div>
                         <div className="parental-connection-modal-details-item">
                           <strong>Name:</strong> {professionalData.userName}
                         </div>
@@ -171,7 +171,7 @@ export default function ParentalConnectionModal({ professionalData, onClose, onA
                     ) : null}
                   </div>
                   <p className="parental-connection-modal-description">
-                    To connect with this {professionalData.userType === 'Alumni' ? 'alumnus/alumna' : 'professional'}, we need your parent or guardian's approval for your safety.
+                    To connect with this {professionalData.userType === 'College Student' ? 'college student' : 'professional'}, we need your parent or guardian's approval for your safety.
                   </p>
                 </>
               ) : (

@@ -141,7 +141,7 @@ const MigrateToAlumni = () => {
             // Update user data to alumni
             const userRef = doc(db, 'tenants', userData.schoolId, 'users', currentUser.uid);
             await updateDoc(userRef, {
-                userType: 'Alumni',
+                userType: 'College Student',
                 collegeAttending: alumniData.collegeAttending,
                 userSkills: alumniData.userSkills,
                 networkingLevel: alumniData.networkingLevel,

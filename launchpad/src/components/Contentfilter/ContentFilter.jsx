@@ -8,7 +8,7 @@ const filterDisplayToIdPairs = {
     "My Interests":"areasOfInterest",
     "My Fields of Expertise":"areasOfInterest",
     "High Schoolers":"High Schooler",
-    "College Students":"Alumni",
+    "College Students":"College Student",
     "Professionals": "Professional",
     "Workplace Opportunities":["Internship", "Shadowing", "Job"],
     "Community Service":"Community Service",

@@ -51,7 +51,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       id: "graduationYear",
       text: "What year did you graduate high school?",
       type: "number",
-      userTypeIncluders: ["Alumni"],
+      userTypeIncluders: ["College Student"],
       required: true,
       placeholder: "E.g. 2026",
     },
@@ -59,7 +59,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       id: "areasOfInterest",
       text: "What are your areas of interest?",
       type: "multi-select",
-      userTypeIncluders: ["High Schooler", "Alumni"],
+      userTypeIncluders: ["High Schooler", "College Student"],
       options: careerInterests,
       required: true,
     },
@@ -110,7 +110,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
     //   text: "What colleges have you been accepted into?",
     //   type: "multi-select",
     //   options: [],
-    //   userTypeIncluders: ["High Schooler", "Alumni"],
+    //   userTypeIncluders: ["High Schooler", "College Student"],
     //   required: false,
     // },
     {
@@ -119,7 +119,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
       type: "select",
       // change this later to an actual searchable list
       options: [],
-      userTypeIncluders: ["Alumni"],
+      userTypeIncluders: ["College Student"],
       required: true,
     },
     // {
@@ -284,7 +284,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
               </button>
               <h2 className="v0-modal-title">My Introduction</h2>
               <p className="v0-modal-subtitle">
-                Enlighten us with your {safeUserType==="Professional" ? "expertise" : "interests"} and {safeUserType==="Professional" ? "work experience" : safeUserType==="Alumni" ? "education" : "dream colleges"}!
+                Enlighten us with your {safeUserType==="Professional" ? "expertise" : "interests"} and {safeUserType==="Professional" ? "work experience" : safeUserType==="College Student" ? "education" : "dream colleges"}!
               </p>
             </div>
             

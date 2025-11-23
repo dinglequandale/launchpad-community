@@ -92,8 +92,8 @@ export default function AllConnectionsModal({ onClose, onViewProfile }) {
     switch(userData.userType){
       case "High Schooler":
         return userData.collegeDecision === "No" ? "Dream Colleges" : "Committed College";
-      case "Alumni":
-        return "Attending College";
+      case "College Student":
+        return "College Attending";
       case "Professional":
         return "Current Position";
       default:
@@ -104,7 +104,7 @@ export default function AllConnectionsModal({ onClose, onViewProfile }) {
   const getBasicInfoContent = (userData) => {
     const userType = userData.userType;
     return {
-      userPreface: userType === "Alumni" ? getBasicUserDescription(userData) : getBasicUserDescription(userData).split(' in ')[0],
+      userPreface: userType === "College Student" ? getBasicUserDescription(userData) : getBasicUserDescription(userData).split(' in ')[0],
       userFirstDesc: {
         label: userType !== "Professional" ? "Interests" : "Expertise",
         content: (userData.areasOfInterest && userData.areasOfInterest.length > 0) 
@@ -113,9 +113,9 @@ export default function AllConnectionsModal({ onClose, onViewProfile }) {
       },
       userSecondDesc: {
         label: getDescType(userData),
-        content: userType === "Professional" 
+        content: userType === "Professional"
           ? (userData.industryPosition ? userData.industryPosition : "None")
-          : userType === "Alumni" 
+          : userType === "College Student"
             ? displayColleges([userData.collegeAttending], "shorter")
             : (Array.isArray(userData.collegeInterestsOrDecision) 
                 ? displayColleges([...userData.collegeInterestsOrDecision], "shorter")

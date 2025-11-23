@@ -30,13 +30,12 @@ export default function ProfileModal({
   chatClient,
 }) {
   const { currentUser } = useAuth()
-  const { openConnectModal, openParentalConnectionModal, isConnectModalOpen, isApplyModalOpen } = useModal()
+  const { openConnectModal, isConnectModalOpen, isApplyModalOpen } = useModal()
   const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport()
   const { approved = [], parent_approved = [] } = useConnections()
 
   const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}')
-  const schoolId = localStorage.getItem('schoolId')
-  const disableActions = userBasicInfo?.userType === 'High Schooler' && !userBasicInfo?.parentVerified
+  // COMMUNITY VERSION: Removed schoolId and disableActions
   const hideConnectBtn = false // Always show connect button
 
   const isConnection =
@@ -74,12 +73,12 @@ export default function ProfileModal({
 
   // Fetch opportunities
   useEffect(() => {
-    if (!visibility || !schoolId || !userData?.userId) return
+    if (!visibility || !userData?.userId) return
 
     const fetchOpportunities = async () => {
       setOpportunitiesLoading(true)
       try {
-        const opportunitiesRef = collection(db, 'tenants', schoolId, 'opportunities')
+        const opportunitiesRef = collection(db, 'opportunities')
         const userOpportunityQuery = query(opportunitiesRef, where('createdBy', '==', userData.userId))
         const snapshot = await getDocs(userOpportunityQuery)
         setOpportunitiesData(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
@@ -91,7 +90,7 @@ export default function ProfileModal({
     }
 
     fetchOpportunities()
-  }, [visibility, schoolId, userData?.userId])
+  }, [visibility, userData?.userId])
 
   // Handle outside click
   useEffect(() => {
@@ -134,20 +133,8 @@ export default function ProfileModal({
   }, [])
 
   const handleConnect = () => {
-    const isApproved = isConnectionApproved(
-      userBasicInfo?.userType,
-      currentUser,
-      userData,
-      parent_approved,
-      approved,
-      userBasicInfo?.parentVerified
-    )
-    
-    if (!isApproved) {
-      openParentalConnectionModal({ professionalData: userData })
-    } else {
-      openConnectModal({ userData, chat: chatClient })
-    }
+    // COMMUNITY VERSION: Removed parental approval logic - all users can connect freely
+    openConnectModal({ userData, chat: chatClient })
   }
 
   const handleReport = () => {
@@ -199,17 +186,10 @@ export default function ProfileModal({
           </div>
                         {/* Connect Button */}
                         {!hideConnectBtn && (
-              <button 
+              <button
                 className={`profile-modal-connect-btn ${isConnection ? 'connected' : ''}`}
                 onClick={handleConnect}
-                disabled={disableActions || (userBasicInfo?.userType === 'Alumni' && userData?.userType === 'High Schooler')}
-                title={
-                  disableActions 
-                    ? 'Parent/guardian approval required' 
-                    : userBasicInfo?.userType === 'Alumni' && userData?.userType === 'High Schooler'
-                    ? 'High Schoolers cannot connect with Alumni'
-                    : ''
-                }
+                disabled={false}
               >
                 <FaLink size={18} />
                 {isConnection ? 'Contact' : 'Connect'}
@@ -242,17 +222,17 @@ export default function ProfileModal({
                 </div>
                 <div className="profile-modal-detail-content">
                   <span className="profile-modal-detail-label">
-                    {userData.userType === 'Professional' ? 'Position' : 
-                     userData.userType === 'Alumni' ? 'College' : 
+                    {userData.userType === 'Professional' ? 'Position' :
+                     userData.userType === 'College Student' ? 'College Attending' :
                      userData.collegeDecision === 'No' ? 'Dream Colleges' : 'Committed College'}
                   </span>
                   <span className="profile-modal-detail-value">
-                    {userData.userType === 'Professional' 
+                    {userData.userType === 'Professional'
                       ? `${userData.industryPosition || 'Not specified'}${userData.companyName ? ` at ${userData.companyName}` : ''}`
-                      : userData.userType === 'Alumni'
+                      : userData.userType === 'College Student'
                       ? displayColleges([userData.collegeAttending])
-                      : displayColleges(Array.isArray(userData.collegeInterestsOrDecision) 
-                          ? userData.collegeInterestsOrDecision 
+                      : displayColleges(Array.isArray(userData.collegeInterestsOrDecision)
+                          ? userData.collegeInterestsOrDecision
                           : [userData.collegeInterestsOrDecision])}
                   </span>
                 </div>

@@ -34,19 +34,19 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
             id: "casualConnection",
             text: "Answer occasional questions from students regarding your career fields",
             value: "Casual Connection",
-            includers: ["High Schooler", "Alumni", "Professional"]
+            includers: ["High Schooler", "College Student", "Professional"]
         },
         { 
             id: "generalInquiries",
             text: "Entertain student inquiries about opportunities you know of within your career field",
             value: "General Inquiries",
-            includers: ["Alumni", "Professional"]
+            includers: ["College Student", "Professional"]
         },
         { 
             id: "informationalInterview",
             text: "Occasionally hold short discussions about your career experiences with students or school clubs",
             value: "Short Interview",
-            includers: ["Alumni", "Professional"]
+            includers: ["College Student", "Professional"]
         },
         // {
         //     id: "generalAdvice",

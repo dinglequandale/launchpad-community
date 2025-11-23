@@ -34,22 +34,10 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
   const [userBasicInfo, setUserBasicInfo] = useState(JSON.parse(localStorage.getItem('basicUserInfo') || '{}'));
   const viewingUserType = userBasicInfo.userType;
   const hideConnectBtn = false; // Always show connect button
-  const disableActions = userBasicInfo && userBasicInfo.userType === 'High Schooler' && !userBasicInfo.parentVerified;
+  // COMMUNITY VERSION: Removed disableActions - all users can connect freely
 
   const handleConnectClick = () => {
-    const parentVerified = userBasicInfo.parentVerified;
-    const isApproved = isConnectionApproved(
-      viewingUserType,
-      currentUser,
-      userData,
-      parent_approved,
-      approved,
-      parentVerified,
-    );
-    if (!isApproved) {
-      openParentalConnectionModal({ professionalData: userData });
-      return;
-    }
+    // COMMUNITY VERSION: Removed parental approval logic
     openConnectModal({ userData, chat: chatClient });
   };
 
@@ -57,8 +45,8 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
     switch (userData.userType) {
       case 'High Schooler':
         return userData.collegeDecision === 'No' ? 'Dream Colleges' : 'Committed College';
-      case 'Alumni':
-        return 'Attending College';
+      case 'College Student':
+        return 'College Attending';
       case 'Professional':
         return 'Job';
       default:
@@ -68,7 +56,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
 
   const userType = userData.userType;
   const basicInfoContent = {
-    userPreface: userType === 'Alumni' ? getBasicUserDescription(userData) : getBasicUserDescription(userData).split(' in ')[0],
+    userPreface: userType === 'College Student' ? getBasicUserDescription(userData) : getBasicUserDescription(userData).split(' in ')[0],
     userFirstDesc: {
       label: userType !== 'Professional' ? 'Interests' : 'Expertise',
       content:
@@ -81,7 +69,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
       content:
         userType === 'Professional'
           ? userData.industryPosition || 'None'
-          : userType === 'Alumni'
+          : userType === 'College Student'
           ? displayColleges([userData.collegeAttending], 'shorter')
           : Array.isArray(userData.collegeInterestsOrDecision)
           ? displayColleges([...userData.collegeInterestsOrDecision], 'shorter')
@@ -96,7 +84,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
     //   disableActions, 
     //   viewingUserType, 
     //   userDataUserType: userData.userType,
-    //   condition: viewingUserType === 'Alumni' && userData.userType === 'High Schooler'
+    //   condition: viewingUserType === 'College Student' && userData.userType === 'High Schooler'
     // });
     
     if (connectionsLoading) {
@@ -105,13 +93,10 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
     if (connectionStatus) {
       return { text: 'Contact', disabled: false };
     }
-    if (disableActions) {
-      return { text: 'Connect', disabled: true };
-    }
-    // For Alumni viewing High Schoolers, show connect button but disabled
-    if (viewingUserType === 'Alumni' && userData.userType === 'High Schooler') {
-      console.log('Alumni viewing High Schooler - button should be disabled');
-      return { text: 'Connect', disabled: true };
+    // COMMUNITY VERSION: Removed disableActions and user type restrictions
+    // All users can connect with each other freely
+    if (viewingUserType === 'College Student' && userData.userType === 'High Schooler') {
+      return { text: 'Connect', disabled: false };
     }
     return { text: 'Connect', disabled: false };
   };
@@ -156,15 +141,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
         <button
           className="v0-btn v0-btn-primary v0-btn-block"
           disabled={buttonState.disabled}
-          title={
-            disableActions
-              ? 'Parent/guardian approval required'
-              : viewingUserType === 'Alumni' && userData.userType === 'High Schooler'
-              ? 'High Schoolers cannot connect with Alumni'
-              : connectionStatus
-              ? 'Contact'
-              : 'Connect'
-          }
+          title={connectionStatus ? 'Contact' : 'Connect'}
           onClick={() => {
             if (!buttonState.disabled) handleConnectClick();
           }}
