@@ -93,6 +93,13 @@ const highSchoolQuestionsConfig = [
   },
   // Page 2
   {
+    id: "schoolAttending",
+    text: "What high school do you attend?",
+    type: "select",
+    options: highSchools,
+    page: 2
+  },
+  {
     id: "graduationYear",
     text: "What year do you graduate?",
     type: "select",
@@ -213,14 +220,27 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
       case 2:
         return (
           <div className="form-section">
-            <h2 className="page-title">Graduation Information</h2>
-            <OnboardingDropdown
-              question={highSchoolQuestionsConfig.find(q => q.id === 'graduationYear')}
-              options={graduationYears}
-              selectedOption={highSchoolerData.graduationYear}
-              onChange={(value) => handleChange('graduationYear', value)}
-              type="select"
-            />
+            <h2 className="page-title">High School Information</h2>
+            <div className="onboardingQuestions">
+              <div className="form-group">
+                <OnboardingDropdown
+                  question={highSchoolQuestionsConfig.find(q => q.id === 'schoolAttending')}
+                  options={highSchools}
+                  selectedOption={highSchoolerData.schoolAttending}
+                  onChange={(value) => handleChange('schoolAttending', value)}
+                  type="select"
+                />
+              </div>
+              <div className="form-group">
+                <OnboardingDropdown
+                  question={highSchoolQuestionsConfig.find(q => q.id === 'graduationYear')}
+                  options={graduationYears}
+                  selectedOption={highSchoolerData.graduationYear}
+                  onChange={(value) => handleChange('graduationYear', value)}
+                  type="select"
+                />
+              </div>
+            </div>
           </div>
         );
       case 3:

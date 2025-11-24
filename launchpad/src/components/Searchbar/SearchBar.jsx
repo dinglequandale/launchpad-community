@@ -50,7 +50,7 @@ export default function SearchBar({filters, currentFilters = null, pageName, han
                 return {
                     title: "High School",
                     isMultiSelect: false,
-                    showSearch: false,
+                    showSearch: true,
                     allowAnyOption: true
                 };
             case 'networkingLevel':

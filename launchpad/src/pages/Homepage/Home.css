@@ -37,14 +37,20 @@
     background: linear-gradient(135deg, rgba(14, 195, 111, 0.1) 0%, rgba(14, 195, 111, 0.05) 100%);
     border: 1px solid rgba(14, 195, 111, 0.2);
     border-radius: 12px;
-    padding: 24px;
-    text-align: center;
+    padding: 32px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .v0-invite-content {
-    max-width: 600px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .v0-invite-title {
@@ -55,30 +61,55 @@
 }
 
 .v0-invite-text {
-    font-size: 18px;
+    font-size: 19px;
     color: #374151;
     line-height: 1.6;
     margin: 0 0 24px 0;
+    max-width: 800px;
 }
 
 .v0-invite-btn {
     background: #1157e2;
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 14px 32px;
     border-radius: 8px;
     font-weight: 600;
+    font-size: 15px;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(17, 87, 226, 0.2);
 }
 
 .v0-invite-btn:hover:not(:disabled) {
     background: #0d47b8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(17, 87, 226, 0.3);
 }
 
 .v0-invite-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+/* Responsive invite card */
+@media (max-width: 768px) {
+    .v0-invite-card {
+        padding: 24px;
+    }
+
+    .v0-invite-title {
+        font-size: 24px;
+    }
+
+    .v0-invite-text {
+        font-size: 15px;
+    }
+
+    .v0-invite-btn {
+        width: 100%;
+        max-width: 300px;
+    }
 }
 
 .v0-welcome-section {

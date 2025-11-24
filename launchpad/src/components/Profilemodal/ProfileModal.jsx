@@ -2,24 +2,21 @@ import React, { useEffect, useRef, useState } from 'react'
 import { IoCloseOutline } from 'react-icons/io5'
 import { BiFlag } from 'react-icons/bi'
 import { FaLink } from 'react-icons/fa'
-import { LuMapPin, LuCalendar, LuBriefcase, LuGraduationCap } from 'react-icons/lu'
+import { LuMapPin, LuCalendar, LuBriefcase, LuGraduationCap, LuSchool } from 'react-icons/lu'
 import { useAuth } from '../../contexts/auth/AuthContext'
 import { useModal } from '../../contexts/ModalContext'
 import { useConnections } from '../../contexts/ConnectionContext'
 import { useReport } from '../../contexts/report/ReportContext'
-import { useOutletContext } from 'react-router-dom'
 import { collection, getDocs, query, where } from 'firebase/firestore'
 import { db } from '../../firebase/firebaseConfig'
 import {
   displayColleges,
   displayFieldsOfInterest,
-  displaySchools,
   getBasicUserDescription,
 } from '../../services/userProfileServices'
 import DefaultIcon from '../DefaultIcon/DefaultIcon'
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile'
 import Loading from '../LoadingAnimation/Loading'
-import { isConnectionApproved } from '../../services/connectionService'
 import './ProfileModal.css'
 
 export default function ProfileModal({
@@ -237,6 +234,24 @@ export default function ProfileModal({
                   </span>
                 </div>
               </div>
+
+              {userData.schoolAttending && (
+                <div className="profile-modal-detail-item">
+                  <div className="profile-modal-detail-icon">
+                    <LuSchool size={16} />
+                  </div>
+                  <div className="profile-modal-detail-content">
+                    <span className="profile-modal-detail-label">
+                      {userData.userType === 'High Schooler' ? 'Attends' :
+                       userData.userType === 'College Student' ? 'Graduated From' :
+                       'School Connection'}
+                    </span>
+                    <span className="profile-modal-detail-value">
+                      {userData.schoolAttending}
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {userData.acceptedColleges?.length > 0 && (
                 <div className="profile-modal-detail-item">

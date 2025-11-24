@@ -5,7 +5,6 @@ import ReactPlayer from "react-player/youtube";
 import ProfileStrength from "../../components/Profilestrength/ProfileStrength";
 import { FaArrowCircleDown } from "react-icons/fa";
 import React, { useEffect, useRef, useState } from "react";
-import InviteContactsModal from "../../components/InviteContactsmodal/InviteContactsModal";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -399,16 +398,7 @@ export default function Home(){
     return(
         <>
             {showVerifedConnectionModal && <ConnectModal onClose = {()=>setShowVerifiedConnectionModal(false)} userData={connectedUserData} visibility={showVerifedConnectionModal} chat={chatClient} userId = {connectedUserData.id}/>}
-            {showParentModal && (
-              <ParentalVerificationModal
-                parentEmail={userBasicInfo.parentEmail}
-                parentVerified={userBasicInfo.parentVerified}
-                userEmail={userBasicInfo.email}
-                onResend={onParentVerificationResend}
-                onClose={() => setShowParentModal(false)}
-                onUpdateEmail={onUpdateParentEmail}
-              />
-            )}
+        
             
             {/* Organization Profile Modal for Favorites */}
             {showFavoriteModal && selectedFavorite && (
@@ -426,17 +416,8 @@ export default function Home(){
             <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
             <SideNav/>
             <div className={`v0-home-container ${isSidebarCollapsed ? 'v0-home-sidebar-collapsed' : 'v0-home-sidebar-expanded'}`}>
-                {/* {localStorage.getItem("schoolId") && (
-                    <div className="v0-invite-section">
-                    {userBasicInfo && <InviteContacts userBasicInfo={userBasicInfo} userName={userBasicInfo.userName.split(" ")[0] ?? "User"} tenantId={capitalizeFirstLetter(localStorage.getItem("schoolId"))}/>}
-                    </div>
-                )}
-                 */}
-                <div className="v0-welcome-section">
-                    <div className="v0-welcome-banner">
-                        <h1 className="v0-welcome-title">Welcome back, {userBasicInfo?.userName?.split(" ")[0] || "User"}!</h1>
-                        <p className="v0-welcome-subtitle">Ready to connect and grow your {capitalizeFirstLetter(localStorage.getItem("schoolId") || "school")} network today?</p>
-                    </div>
+                <div className="v0-invite-section">
+                    {userBasicInfo && <InviteContacts userBasicInfo={userBasicInfo} userName={userBasicInfo.userName.split(" ")[0] ?? "User"} />}
                 </div>
 
                 <div className="v0-main-content">
@@ -659,31 +640,24 @@ export function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function InviteContacts({userName, tenantId, userBasicInfo}){
-    const [inviteContactsModalVisibility,setInviteContactsModalVisibility] = useState(false);
-
-    const disableActions = userBasicInfo.userType === "High Schooler" && !userBasicInfo.parentVerified;
+function InviteContacts({userName, userBasicInfo}){
+    const { openInviteModal } = useModal();
 
     return(
-        <>
-        {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} tenantId={tenantId}/>}
         <div className="v0-invite-card">
             <div className="v0-invite-content">
-                <h2 className="v0-invite-title">Hello, {userName}!</h2>
+                <h2 className="v0-invite-title">Grow the Community</h2>
                 <p className="v0-invite-text">
-                    Know any <strong>{tenantId} high schoolers</strong> or <strong>{tenantId} alumni</strong> who would benefit from being on the app? Know other <strong>professionals</strong> in the {tenantId} community willing to share their expertise? Invite friends and family below!
+                    Help us expand our network! Invite motivated <strong>friends</strong>, <strong>family members</strong>, <strong>professionals</strong>, or <strong>school alumni</strong> who would benefit from connecting and sharing their expertise.
                 </p>
-                <button 
-                  disabled={disableActions} 
+                <button
                     className="v0-invite-btn"
-                    onClick={() => {if(!disableActions)setInviteContactsModalVisibility(true)}}
-                  title={disableActions ? "Parent/guardian approval required" : ""}
+                    onClick={() => openInviteModal({ userName })}
                 >
                   Invite Contacts
                 </button>
             </div>
         </div>
-        </>
     )
 }
 

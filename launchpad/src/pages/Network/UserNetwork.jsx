@@ -24,6 +24,7 @@ import ParentalConnectionModal from "../../components/ParentalConnectionModal";
 import { useModal } from '../../contexts/ModalContext';
 import { useConnections } from "../../contexts/ConnectionContext";
 import { checkConnection, isConnectionApproved } from "../../services/connectionService";
+import { highSchools } from "../Onboarding/Options";
 // import { checkConnection } from "../../services/connectionService";
 
 
@@ -99,7 +100,7 @@ export default function UserNetwork() {
     // COMMUNITY VERSION: Changed default from "My Interests" to "Any Interests" to show all users by default
     areasOfInterestOrExpertise: [`Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
     networkingLevel: 'Any Availability',
-    // schoolAttending: 'Any High School',
+    schoolAttending: 'Any High School',
   });
   const [filterChanged, setFilterChanged] = useState(false);
 
@@ -108,8 +109,7 @@ export default function UserNetwork() {
     collegeInterestsOrDecision:  (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]),
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
     networkingLevel: ["Any Availability", "Casual Connection", "General Inquiries", "Short Interview", "Project Support", "Mock Interview", "Workplace Opportunities"],
-    // schoolAttending: ["Any High School", "My High School"]
-    // schoolAttending: ["Any High School", "My High School"],
+    schoolAttending: ["Any High School", "My High School", ...highSchools.map(school => school.label)],
   };
 
   useEffect(()=>{
@@ -251,6 +251,7 @@ export default function UserNetwork() {
       // COMMUNITY VERSION: Changed to "Any Interests" to show all users
       areasOfInterestOrExpertise: [`Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
       networkingLevel: 'Any Availability',
+      schoolAttending: 'Any High School',
     });
     setFilterChanged(true);
   };

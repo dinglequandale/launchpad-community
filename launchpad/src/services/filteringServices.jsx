@@ -44,8 +44,10 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
             // High school filtering - maps to schoolAttending field
             if (value === "My High School") {
                 return { key: "schoolAttending", operation: "==", value: userHS };
+            } else if (value !== "Any High School" && value) {
+                // Filter by specific high school across all user types
+                return { key: "schoolAttending", operation: "==", value: value };
             }
-            // For other school selections, this would need to be handled differently
         }
         else if (key === "collegeInterestsOrDecision") {
             // College filtering - maps to collegeAttending for college students, collegeInterestsOrDecision for high schoolers

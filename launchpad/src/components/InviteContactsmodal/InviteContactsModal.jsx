@@ -1,105 +1,167 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { CgClose } from "react-icons/cg";
-import { GrAdd } from "react-icons/gr";
-import Modal from "react-modal";
+import toast from "react-hot-toast";
+import { IoCloseOutline } from "react-icons/io5";
+import { BiPlus, BiTrash } from "react-icons/bi";
+import { LuMail, LuUser, LuUsers } from "react-icons/lu";
+import './InviteContactsModal.css';
 
-export default function InviteContactsModal({visibility, onClose,tenantId}){
+export default function InviteContactsModal({ visibility, onClose, userName }) {
+  const [recipients, setRecipients] = useState([{ id: 0, userName: "", email: "" }]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // const [targetUserData, setTargetUserData] = useState([{userName: "", email: ""}]);
-    const [targetUserData,setTargetUserData] = useState([{id: 0, userName: "", email: ""}])
-    const {userName} = JSON.parse(localStorage.getItem("basicUserInfo"));
-    const customStyles = {
-        content: {
-          top: '50%',
-          left: '50%',
-          right: 'auto',
-          bottom: 'auto',
-          marginRight: '-50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: "4",
-        },
-        overlay: {
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(5px)',
-          zIndex: "4",
-        }
-      };
+  const handleInputChange = (key, value, id) => {
+    setRecipients(recipients.map((recipient) =>
+      recipient.id === id ? { ...recipient, [key]: value } : recipient
+    ));
+  };
 
-      const onInviteSend = async () => {
-        const loadingToast = toast.loading('Sending your invitations...');
-      
-        try {
-          const sendInvitations = httpsCallable(getFunctions(), "sendInviteEmail");
-          const result = await sendInvitations({ recipientData: targetUserData, senderName: userName });
-    
-          toast.success('Invitations sent successfully!', { id: loadingToast });
-      
-          onClose();
-      
-        } catch (error) {
-          toast.error(`Failed to send invitations!`, { id: loadingToast });
-      
-          // You can handle the error case here (e.g., log the error, show more details to the user)
-          console.error('Error sending invitations:', error);
-        }
-      };
-      
+  const handleAddRecipient = () => {
+    if (recipients.length < 4) {
+      setRecipients([...recipients, { id: recipients.length, userName: "", email: "" }]);
+    }
+  };
 
-      const handleInputChange = (key, value, index) => {
-        // const prevUserData = targetUserData;
-        
-        // prevUserData[index] = {...prevUserData[index], [key]: value};
-        setTargetUserData([...targetUserData.map((userData) => (userData.id === index ? {id: index, ... targetUserData[index], [key]: value} : userData))]);
-        console.log(targetUserData);
-      }
+  const handleRemoveRecipient = (id) => {
+    if (recipients.length > 1) {
+      setRecipients(recipients.filter((recipient) => recipient.id !== id));
+    }
+  };
 
-      const handleAddTargetUser = () => {
-        console.log("Adding user")
-        // const newTargetData = targetUserData.push({userName: "", email: ""});
-        setTargetUserData([...targetUserData, {id: targetUserData.length, userName: "", email: ""}]);
+  const isValidEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
-        console.log(targetUserData)
-      }
-    
-      return (
-        <div>
-           {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
-          <Modal
-            isOpen={visibility}
-            onRequestClose={onClose}
-            style={customStyles}
-            contentLabel="Invite Contacts Modal"
-          >
-            <header>
-              <button className='btnClose' onClick={onClose} style={{background:"none"}}><CgClose size={25}/></button>
-              <h2 style={{margin: "0 auto", textAlign: "center", paddingBottom: "5px"}}> Help Grow the {tenantId} Network <br /> <span style={{fontWeight: "250", fontSize: "smaller"}}> Invite Friends, Family, and Colleagues </span></h2>
-              <hr style={{borderColor: "var(--secondary)"}}/>
-            </header>
-            <main style={{paddingTop: "10px", display: "flex", flexDirection: "column", gap: "7px"}}>
-                {targetUserData.map((user, index) => (
-                  <form onSubmit={handleAddTargetUser}>
-                    <h2 style={{color: "var(--secondary)", textAlign: "center"}}>Recipient {index + 1}</h2>
-                    <div style={{display: "flex", justifyContent: "space-around"}}>
-                    <input type="text" style={{width: "35%"}} value={user.userName} placeholder="Full Name" onChange={(e) => handleInputChange("userName", e.target.value, index)}/>
-                    <input type="text" style={{width: "50%"}} value={user.email} placeholder="Email" onChange={(e) => handleInputChange("email", e.target.value, index)}/>
-                    </div>
-                  </form>
-                ))}
-            </main>
-            <footer style={{paddingTop: "20px", position: "relative"}}>
-                {targetUserData.length <= 3 && <button className="btnText" onClick={handleAddTargetUser} style={{display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", fontSize: "larger", margin: "0 auto", marginBottom: "20px"}}>
-                  <GrAdd size={25}/> Add another contact
-                  </button>}
-                <div style={{display: "flex", justifyContent: "space-between",}}>
-                  <button onClick={onClose} className="btnUnfilled" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger"}}>
-                      Cancel</button>
-                  <button onClick={onInviteSend} type='submit' className="btnSaveChanges" style={{borderRadius: "4px", width: "35%", padding: "8px", fontSize: "larger", color: "white", boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)"}}>
-                      Send</button>
-                </div>
-            </footer>
-          </Modal>
+  const canSubmit = () => {
+    return recipients.every(
+      (recipient) =>
+        recipient.userName.trim() !== "" &&
+        recipient.email.trim() !== "" &&
+        isValidEmail(recipient.email)
+    );
+  };
+
+  const onInviteSend = async () => {
+    if (!canSubmit()) {
+      toast.error('Please fill in all fields with valid email addresses');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const loadingToast = toast.loading('Sending invitations...');
+
+    try {
+      const sendInvitations = httpsCallable(getFunctions(), "sendInviteEmail");
+      await sendInvitations({ recipientData: recipients, senderName: userName });
+
+      toast.success(`Successfully sent ${recipients.length} invitation${recipients.length > 1 ? 's' : ''}!`, {
+        id: loadingToast,
+      });
+
+      onClose();
+    } catch (error) {
+      toast.error('Failed to send invitations. Please try again.', { id: loadingToast });
+      console.error('Error sending invitations:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!visibility) return null;
+
+  return (
+    <div className="invite-modal-overlay" onClick={onClose}>
+      <div className="invite-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
+        <div className="invite-modal-header">
+          <button className="invite-modal-close-btn" onClick={onClose} title="Close">
+            <IoCloseOutline size={20} />
+          </button>
         </div>
-      );
+
+        {/* Content */}
+        <div className="invite-modal-content">
+          <div className="invite-modal-title-section">
+            <div className="invite-modal-icon-wrapper">
+              <LuUsers size={24} />
+            </div>
+            <h2 className="invite-modal-title">Invite to Launchpad</h2>
+            <p className="invite-modal-subtitle">
+              Share the power of professional networking with your friends, family, and colleagues
+            </p>
+          </div>
+
+          {/* Recipients */}
+          <div className="invite-modal-recipients">
+            {recipients.map((recipient, index) => (
+              <div key={recipient.id} className="invite-recipient-card">
+                <div className="invite-recipient-header">
+                  <span className="invite-recipient-number">Recipient {index + 1}</span>
+                  {recipients.length > 1 && (
+                    <button
+                      className="invite-remove-btn"
+                      onClick={() => handleRemoveRecipient(recipient.id)}
+                      title="Remove recipient"
+                    >
+                      <BiTrash size={18} />
+                    </button>
+                  )}
+                </div>
+
+                <div className="invite-recipient-fields">
+                  <div className="invite-input-group">
+                    <div className="invite-input-icon">
+                      <LuUser size={16} />
+                    </div>
+                    <input
+                      type="text"
+                      className="invite-input"
+                      placeholder="Full Name"
+                      value={recipient.userName}
+                      onChange={(e) => handleInputChange("userName", e.target.value, recipient.id)}
+                    />
+                  </div>
+
+                  <div className="invite-input-group">
+                    <div className="invite-input-icon">
+                      <LuMail size={16} />
+                    </div>
+                    <input
+                      type="email"
+                      className="invite-input"
+                      placeholder="Email Address"
+                      value={recipient.email}
+                      onChange={(e) => handleInputChange("email", e.target.value, recipient.id)}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add More Button */}
+          {recipients.length < 4 && (
+            <button className="invite-add-btn" onClick={handleAddRecipient}>
+              <BiPlus size={20} />
+              Add Another Recipient
+            </button>
+          )}
+
+          {/* Action Buttons */}
+          <div className="invite-modal-actions">
+            <button className="invite-btn-secondary" onClick={onClose} disabled={isSubmitting}>
+              Cancel
+            </button>
+            <button
+              className="invite-btn-primary"
+              onClick={onInviteSend}
+              disabled={!canSubmit() || isSubmitting}
+            >
+              {isSubmitting ? 'Sending...' : `Send ${recipients.length} Invitation${recipients.length > 1 ? 's' : ''}`}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

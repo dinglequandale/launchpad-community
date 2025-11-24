@@ -4,6 +4,7 @@ import ProfileModal from '../components/Profilemodal/ProfileModal';
 import ConnectModal from '../components/Connectmodal/ConnectModal';
 import ParentalConnectionModal from '../components/ParentalConnectionModal';
 import LogoutVerificationModal from '../components/Logoutbutton/LogoutVerificationModal';
+import InviteContactsModal from '../components/InviteContactsmodal/InviteContactsModal';
 
 const ModalContext = createContext();
 
@@ -17,6 +18,7 @@ export function ModalProvider({ children, chatClient }) {
   const [connectModalProps, setConnectModalProps] = useState(null);
   const [parentalModalProps, setParentalModalProps] = useState(null);
   const [logoutModalProps, setLogoutModalProps] = useState(null);
+  const [inviteModalProps, setInviteModalProps] = useState(null);
 
   // Opportunity Apply Modal
   const openApplyModal = (props) => setApplyModalProps(props);
@@ -38,6 +40,10 @@ export function ModalProvider({ children, chatClient }) {
   const openLogoutModal = (props) => setLogoutModalProps(props);
   const closeLogoutModal = () => setLogoutModalProps(null);
 
+  // Invite Contacts Modal
+  const openInviteModal = (props) => setInviteModalProps(props);
+  const closeInviteModal = () => setInviteModalProps(null);
+
   return (
     <ModalContext.Provider value={{
       openApplyModal, closeApplyModal,
@@ -45,12 +51,14 @@ export function ModalProvider({ children, chatClient }) {
       openConnectModal, closeConnectModal,
       openParentalConnectionModal, closeParentalConnectionModal,
       openLogoutModal, closeLogoutModal,
+      openInviteModal, closeInviteModal,
       // Add modal state for checking if modals are open
       isApplyModalOpen: !!applyModalProps,
       isProfileModalOpen: !!profileModalProps,
       isConnectModalOpen: !!connectModalProps,
       isParentalModalOpen: !!parentalModalProps,
-      isLogoutModalOpen: !!logoutModalProps
+      isLogoutModalOpen: !!logoutModalProps,
+      isInviteModalOpen: !!inviteModalProps
     }}>
       {children}
       {applyModalProps && (
@@ -88,6 +96,13 @@ export function ModalProvider({ children, chatClient }) {
           visibility={!!logoutModalProps}
           onCancel={closeLogoutModal}
           onVerify={logoutModalProps.onVerify}
+        />
+      )}
+      {inviteModalProps && (
+        <InviteContactsModal
+          {...inviteModalProps}
+          visibility={!!inviteModalProps}
+          onClose={closeInviteModal}
         />
       )}
     </ModalContext.Provider>
