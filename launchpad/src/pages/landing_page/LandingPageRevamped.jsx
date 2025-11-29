@@ -2,12 +2,13 @@ import React, { useEffect, useState, useRef } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import "./LandingPage.css";
 import { useAuth } from "../../contexts/auth/AuthContext";
-import { PiBuilding, PiGraduationCap, PiStudent, PiSuitcase } from "react-icons/pi";
+import { PiBuilding, PiGraduationCap, PiStudent, PiSuitcase, PiRocket, PiNetwork, PiUsers, PiLightbulb, PiArrowRight, PiTrendUp } from "react-icons/pi";
 import Landing_Nav from "./Landing_Nav/Landing_Nav";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { useSchoolConfig } from "../../utils/subdomainUtils";
 import SchoolCTAButton from "../../components/SchoolCTAButton/SchoolCTAButton";
+import { motion } from "framer-motion";
 
 const createUserTypes = (schoolConfig) => ({
   highschooler: {
@@ -185,109 +186,204 @@ export default function LandingPageRevamped() {
   return (
     <>
       {userLoggedIn && <Navigate to="/Home" replace={true} />}
-      <div className={content.bgClass}>
-        <header className="landing-header">
-          <nav className="navbar">
-            <img src="/assets/launchpad_logo.png" alt="Logo" style={{ width: "20%" }} />
+      <div className="modern-landing">
+        {/* Modern Navbar */}
+        <nav className="modern-navbar">
+          <div className="modern-navbar-container">
+            <img src="/assets/launchpad_logo.png" alt="Logo" className="modern-logo" />
             <Landing_Nav />
-            <div style={{ display: "flex", gap: "20px", marginRight: "10px" }}>
-              <div style={{ display: "flex", gap: "10px", justifyContent: "center", alignItems: "center" }}>
-                <button className="authButtons btnUnfilled" onClick={() => handleJoin("Signup")}>Signup</button>
-                <button className="authButtons" onClick={() => handleJoin("Login")}>Login</button>
-              </div>
+            <div className="modern-auth-buttons">
+              <button className="modern-btn modern-btn-outline" onClick={() => handleJoin("Login")}>
+                Login
+              </button>
+              <button className="modern-btn modern-btn-primary" onClick={() => handleJoin("Signup")}>
+                Get Started
+              </button>
             </div>
-          </nav>
-          <div style={{ paddingTop: "30px" }}>
-            <h1 className="landing-title">{content.heroTitle}</h1>
           </div>
-          <p className="subheader">{content.subheader}</p>
-          <SchoolCTAButton onClick={() => handleJoin()} variant="primary" />
-        </header>
+        </nav>
 
-        <main className="main-content">
-          <div className="feature-container">
-            <section
-              className="feature-section"
-              ref={featureRef}
-              style={{
-                opacity: featureVisible ? 1 : 0,
-                transform: featureVisible ? "none" : "translateY(50px)",
-                transition: "opacity 0.8s cubic-bezier(.4,0,.2,1), transform 0.8s cubic-bezier(.4,0,.2,1)",
-              }}
-            >
-              {content.featureCards.map((card, idx) => (
-                <div className="feature-card" key={idx}>
-                  <span className="pillarTitle">{card.title}</span>
-                  <div className="pillarText" style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-                    <span>{card.text}</span>
-                  </div>
-                </div>
-              ))}
-            </section>
-          </div>
+        {/* Hero Section with Earth Background */}
+        <section className="modern-hero">
+          <div className="modern-hero-container">
+            <div className="modern-hero-grid">
+              {/* Left Column - Content */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: [0.645, 0.045, 0.355, 1] }}
+                className="modern-hero-content"
+              >
+                {/* <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                  className="modern-badge"
+                >
+                  <PiNetwork className="modern-badge-icon" />
+                  <span>CONNECTING COMMUNITIES</span>
+                </motion.div> */}
 
-          <section
-            className="who-are-we"
-            ref={whoRef}
-            style={{
-              opacity: whoVisible ? 1 : 0,
-              transform: whoVisible ? "none" : "translateY(50px)",
-              transition: "opacity 0.8s cubic-bezier(.4,0,.2,1) 0.2s, transform 0.8s cubic-bezier(.4,0,.2,1) 0.2s",
-            }}
-          >
-            <div className="container">
-              <h2 className="section-title">Who are we?</h2>
-              <div className="content-wrapper">
-                <p className="description">{STATIC_CONTENT.WHO_ARE_WE}</p>
-                <div className="network-grid">
-                  {STATIC_CONTENT.NETWORK_GRID.map((item, idx) => (
-                    <div className="network-item" key={idx}>
-                      <i>{item.icon}</i>
-                      <span>{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-                <p className="description goal">
-                  {STATIC_CONTENT.GOAL}
+                <h1 className="modern-hero-title">
+                  Empowering Student
+                  <span className="modern-hero-gradient"> Excellence</span>
+                </h1>
+
+                <p className="modern-hero-subtitle">
+                  Launching {schoolConfig.schoolShortName} youth into collegiate and professional success through meaningful connections and real opportunities.
                 </p>
-              </div>
+
+                <div className="modern-hero-buttons">
+                  <button className="modern-hero-btn-primary" onClick={() => handleJoin("Signup")}>
+                    <span>Join the Network</span>
+                    <PiArrowRight className="modern-btn-icon" />
+                  </button>
+                  {/* <button className="modern-hero-btn-secondary" onClick={() => handleJoin("Login")}>
+                    Sign In
+                  </button> */}
+                </div>
+              </motion.div>
+
+              {/* Right Column - Earth Image */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: 0.3, ease: [0.645, 0.045, 0.355, 1] }}
+                className="modern-hero-image-container"
+              >
+                <div className="modern-hero-image-wrapper">
+                  <img
+                    src="/assets/earth_connect_landing.png"
+                    alt="Global Network"
+                    className="modern-hero-image"
+                  />
+                  <div className="modern-hero-image-glow"></div>
+                </div>
+              </motion.div>
             </div>
-          </section>
-
-          <section
-            className="mission-statement"
-            ref={missionRef}
-            style={{
-              opacity: missionVisible ? 1 : 0,
-              transform: missionVisible ? "none" : "translateY(50px)",
-              transition: "opacity 0.8s cubic-bezier(.4,0,.2,1) 0.4s, transform 0.8s cubic-bezier(.4,0,.2,1) 0.4s",
-            }}
-          >
-            <h2 className="mission-title">Our Mission</h2>
-            <div className="mission-container" style={{marginBottom: "50px"}}>
-              <p className="mission-text">{STATIC_CONTENT.MISSION}</p>
-            </div>
-          </section>
-
-          <section
-            className="cta-section"
-            ref={ctaRef}
-            style={{
-              opacity: ctaVisible ? 1 : 0,
-              transform: ctaVisible ? "none" : "translateY(50px)",
-              transition: "opacity 0.8s cubic-bezier(.4,0,.2,1) 0.6s, transform 0.8s cubic-bezier(.4,0,.2,1) 0.6s",
-            }}
-          >
-            <span className="next-steps-title">Ready to take the next step?</span>
-            <SchoolCTAButton onClick={() => handleJoin()} variant="primary" />
-          </section>
-
-          <div style={{ display: "flex", justifyContent: "center", paddingBottom: "10px" }}>
-            <img src="/assets/launchpad_logo.png" alt="Logo" style={{ width: "33%" }} />
           </div>
-        </main>
+        </section>
 
-        <footer className="landing-footer">
+        {/* Features Section */}
+        <section className="modern-features">
+          <div className="modern-container">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="modern-section-header"
+            >
+              <h2 className="modern-section-title">Why Choose Launchpad?</h2>
+              <p className="modern-section-subtitle">
+                Everything you need to build your future, all in one platform
+              </p>
+            </motion.div>
+
+            <div className="modern-features-grid">
+              {content.featureCards.map((card, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  className="modern-feature-card"
+                >
+                  <div className="modern-feature-icon">
+                    {idx === 0 && <PiUsers />}
+                    {idx === 1 && <PiLightbulb />}
+                    {idx === 2 && <PiRocket />}
+                  </div>
+                  <h3 className="modern-feature-title">{card.title}</h3>
+                  <p className="modern-feature-text">{card.text}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Section with Rocket Background */}
+        <section className="modern-stats">
+          <div className="modern-stats-background">
+            <img src="/assets/rocket_landing.jpg" alt="Launch" className="modern-stats-image" />
+            <div className="modern-stats-overlay"></div>
+          </div>
+          <div className="modern-container modern-stats-content">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="modern-stats-title"
+            >
+              Launching Careers, Building Futures
+            </motion.h2>
+
+            <div className="modern-stats-grid">
+              {STATIC_CONTENT.NETWORK_GRID.map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+                  whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: idx * 0.15 }}
+                  className="modern-stat-card"
+                >
+                  <div className="modern-stat-icon">{item.icon}</div>
+                  <p className="modern-stat-label">{item.label}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Mission Section */}
+        <section className="modern-mission">
+          <div className="modern-container">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="modern-mission-card"
+            >
+              <h2 className="modern-mission-title">Our Mission</h2>
+              <p className="modern-mission-text">{STATIC_CONTENT.MISSION}</p>
+              <div className="modern-mission-highlight">
+                <PiTrendUp className="modern-mission-icon" />
+                <p>{STATIC_CONTENT.GOAL}</p>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="modern-cta">
+          <div className="modern-container">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="modern-cta-card"
+            >
+              <h2 className="modern-cta-title">Ready to Launch Your Future?</h2>
+              <p className="modern-cta-subtitle">
+                Join our community of ambitious students, successful alumni, and industry professionals.
+              </p>
+              <button className="modern-cta-button" onClick={() => handleJoin("Signup")}>
+                <span>Get Started Today</span>
+                <PiArrowRight className="modern-btn-icon" />
+              </button>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="modern-footer">
+          <div className="modern-footer-content">
+            <img src="/assets/launchpad_logo.png" alt="Logo" className="modern-footer-logo" />
+          </div>
           <LegalityFooter pathName={location.pathname} />
         </footer>
       </div>
