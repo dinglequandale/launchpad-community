@@ -99,10 +99,10 @@ export default function ConnectionStatusModal({
       setUserMap({});
       return;
     }
-    const schoolId = localStorage.getItem('schoolId');
+    // COMMUNITY VERSION: Use flat collection path
     Promise.all(
       Array.from(userIds).map(async userId => {
-        const userDoc = await getDoc(doc(db, 'tenants', schoolId, 'users', userId));
+        const userDoc = await getDoc(doc(db, 'users', userId));
         return userDoc.exists() ? { id: userId, ...userDoc.data() } : null;
       })
     ).then(users => {
@@ -132,11 +132,10 @@ export default function ConnectionStatusModal({
     setHiddenCards(prev => new Set(prev).add(conn.id));
     setTimeout(async () => {
       try {
-        const schoolId = localStorage.getItem('schoolId');
+        // COMMUNITY VERSION: Removed schoolId parameter
         const manageConnections = httpsCallable(getFunctions(), 'manageConnections');
         await manageConnections({
           action: 'updateStatus',
-          schoolId,
           connectionId: conn.id,
           status: 'approved',
         });
@@ -161,11 +160,10 @@ export default function ConnectionStatusModal({
     setHiddenCards(prev => new Set(prev).add(conn.id));
     setTimeout(async () => {
       try {
-        const schoolId = localStorage.getItem('schoolId');
+        // COMMUNITY VERSION: Removed schoolId parameter
         const manageConnections = httpsCallable(getFunctions(), 'manageConnections');
         await manageConnections({
           action: 'remove',
-          schoolId,
           targetUserId: conn.initiateUserId === currentUser.uid ? conn.targetUserId : conn.initiateUserId,
         });
         if (refetchConnections) await refetchConnections();

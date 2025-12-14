@@ -187,7 +187,7 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
           ) : (
             <div className="onboarding-linkedin-section">
               <span className="onboardingQuestion">{questionsForPage[3].text}</span>
-              {selectedOptions["linkedinLink"] && (
+              {/* {selectedOptions["linkedinLink"] && (
                 <div className="onboarding-linkedin-verification">
                   {validateLinkedInUrl(selectedOptions["linkedinLink"]) ? (
                     <div className="onboarding-verification-status verified">
@@ -201,7 +201,7 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
                     </div>
                   )}
                 </div>
-              )}
+              )} */}
               <div>
                 <input
                   type="url"

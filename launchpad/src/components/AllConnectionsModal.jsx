@@ -23,26 +23,25 @@ export default function AllConnectionsModal({ onClose, onViewProfile }) {
   const fetchApprovedConnections = async () => {
     try {
       setLoading(true);
-      const schoolId = localStorage.getItem('schoolId');
-      
-      // Fetch approved connections from the database
-      const result = await getConnectionsByStatus(schoolId, 'approved');
-      
+
+      // COMMUNITY VERSION: Fetch approved connections without schoolId
+      const result = await getConnectionsByStatus('approved');
+
       if (result.success && result.connections) {
         setApprovedConnections(result.connections);
-        
+
         // Extract user IDs from connections
-        const userIds = result.connections.map(conn => 
+        const userIds = result.connections.map(conn =>
           conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
         );
-        
-        // Fetch user data for all IDs
+
+        // COMMUNITY VERSION: Fetch user data from flat collection
         if (userIds.length > 0) {
           const userPromises = userIds.map(async (uid) => {
-            const userDoc = await getDoc(doc(db, 'tenants', schoolId, 'users', uid));
+            const userDoc = await getDoc(doc(db, 'users', uid));
             return userDoc.exists() ? { id: uid, ...userDoc.data() } : null;
           });
-          
+
           const users = await Promise.all(userPromises);
           const data = {};
           users.forEach(user => {
@@ -62,22 +61,22 @@ export default function AllConnectionsModal({ onClose, onViewProfile }) {
   const handleRemoveConnection = async (connection, userId) => {
     try {
       setRemovingConnection(userId);
-      const schoolId = localStorage.getItem('schoolId');
-      
-      await removeConnection(schoolId, userId);
-      
+
+      // COMMUNITY VERSION: Remove connection without schoolId
+      await removeConnection(userId);
+
       // Remove from local state
-      setApprovedConnections(prev => prev.filter(conn => 
+      setApprovedConnections(prev => prev.filter(conn =>
         !(conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId === userId)
       ));
-      
+
       // Remove from connection data
       setConnectionData(prev => {
         const newData = { ...prev };
         delete newData[userId];
         return newData;
       });
-      
+
       toast.success('Connection removed successfully');
     } catch (error) {
       console.error('Error removing connection:', error);

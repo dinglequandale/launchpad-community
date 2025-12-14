@@ -175,20 +175,94 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
             results = results.filter(user => {
                 // Exclude professionals (they don't have college data)
                 if (user.userType === "Professional") return false;
-                
+
                 // For College Students, check collegeAttending
                 if (user.userType === "College Student") {
                     return user.collegeAttending && specificColleges.includes(user.collegeAttending);
                 }
-                
+
                 // For High Schoolers, check collegeInterestsOrDecision
                 if (user.userType === "High Schooler") {
-                    return user.collegeInterestsOrDecision && 
+                    return user.collegeInterestsOrDecision &&
                            Array.isArray(user.collegeInterestsOrDecision) &&
                            user.collegeInterestsOrDecision.some(college => specificColleges.includes(college));
                 }
-                
+
                 return false; // Exclude other user types
+            });
+        }
+    }
+
+    // Filter professionals based on cross-school connection preferences
+    if (collectionName === "users" && (category === "Professional" || !category)) {
+        results = results.filter(user => {
+            // Only apply this filter to professionals
+            if (user.userType !== "Professional") return true;
+
+            // If professional has no preference set, or is open to all, or N/A, show them to everyone
+            if (!user.openToCrossSchoolConnections ||
+                user.openToCrossSchoolConnections === 'yes' ||
+                user.openToCrossSchoolConnections === 'not_applicable') {
+                return true;
+            }
+
+            // If professional only wants students from their affiliated school
+            if (user.openToCrossSchoolConnections === 'no') {
+                // Show them only if current user's school matches professional's affiliated school
+                return user.schoolAttending && user.schoolAttending === userHS;
+            }
+
+            return true; // Default to showing
+        });
+    }
+
+    // Filter opportunities based on owner's cross-school connection preferences
+    if (collectionName === "opportunities") {
+        // Fetch all unique creator IDs
+        const creatorIds = [...new Set(results.map(opp => opp.createdBy).filter(id => id))];
+
+        if (creatorIds.length > 0) {
+            // Fetch creator data for all opportunities
+            const creatorDataPromises = creatorIds.map(async (creatorId) => {
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', creatorId));
+                    return userDoc.exists() ? { id: creatorId, ...userDoc.data() } : null;
+                } catch (error) {
+                    console.error(`Error fetching creator ${creatorId}:`, error);
+                    return null;
+                }
+            });
+
+            const creatorsData = await Promise.all(creatorDataPromises);
+            const creatorsMap = {};
+            creatorsData.forEach(creator => {
+                if (creator) creatorsMap[creator.id] = creator;
+            });
+
+            // Filter opportunities based on creator preferences
+            results = results.filter(opportunity => {
+                const creator = creatorsMap[opportunity.createdBy];
+
+                // If no creator data, show the opportunity (fail open)
+                if (!creator) return true;
+
+                // If creator is not a professional, show the opportunity
+                if (creator.userType !== "Professional") return true;
+
+                // If professional has no preference set, or is open to all, or N/A, show to everyone
+                if (!creator.openToCrossSchoolConnections ||
+                    creator.openToCrossSchoolConnections === 'yes' ||
+                    creator.openToCrossSchoolConnections === 'not_applicable') {
+                    return true;
+                }
+
+                // If professional only wants students from their affiliated school
+                if (creator.openToCrossSchoolConnections === 'no') {
+                    // Show only if current user's school matches creator's affiliated school
+                    return creator.schoolAttending && creator.schoolAttending === userHS;
+                }
+
+                return true; // Default to showing
             });
         }
     }

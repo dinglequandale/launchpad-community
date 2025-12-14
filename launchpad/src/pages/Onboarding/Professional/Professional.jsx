@@ -59,23 +59,37 @@ const professionalQuestionsConfig = [
     optional: true,
     page: 1
   },
+  // Page 2
   {
     id: "schoolAttending",
-    // TODO: change to affiliatedSchools
     text: "What Houston school are you connected to? (e.g. as a parent)",
     type: "select",
     options: highSchools,
     placeholder: "N/A",
-    // page: 1
+    optional: true,
+    page: 2
   },
-  // Page 2
+  {
+    id: "openToCrossSchoolConnections",
+    text: "Are you open to having high schoolers from schools other than your affiliated school reach out to you?",
+    type: "select",
+    options: [
+      { value: "yes", label: "Yes, I'm open to connecting with students from any school" },
+      { value: "no", label: "No, I prefer to connect only with students from my affiliated school" },
+      { value: "not_applicable", label: "Not applicable / No school affiliation" }
+    ].map(option => option),
+    placeholder: "Select your preference",
+    optional: true,
+    page: 2
+  },
+  // Page 3
   {
     id: "retiredStatus",
     text: "What is your current professional status?",
     type: "select",
     options: [
       "Currently employed full-time",
-      "Currently employed part-time", 
+      "Currently employed part-time",
       "Self-employed/Entrepreneur",
       "Freelancer/Consultant",
       "Retired but active",
@@ -83,10 +97,10 @@ const professionalQuestionsConfig = [
       "Student pursuing advanced degree",
       "Other"
     ].map(option => ({ value: option, label: option })),
-    page: 2,
+    page: 3,
   },
 
-  // Page 3
+  // Page 4
   // For currently employed or active professionals
   {
     id: "industryPosition",
@@ -95,7 +109,7 @@ const professionalQuestionsConfig = [
     placeholder: "E.g. Senior Software Engineer, Marketing Director, Financial Analyst",
     retired: false,
     options: null,
-    page: 3,
+    page: 4,
   },
   {
     id: "companyName",
@@ -104,7 +118,7 @@ const professionalQuestionsConfig = [
     type: "text-box",
     options: null,
     retired: false,
-    page: 3
+    page: 4
   },
   {
     id: "yearsOfExperience",
@@ -113,7 +127,7 @@ const professionalQuestionsConfig = [
     placeholder: "E.g. 15",
     retired: false,
     options: null,
-    page: 3,
+    page: 4,
   },
   // For retired professionals
   {
@@ -123,7 +137,7 @@ const professionalQuestionsConfig = [
     placeholder: "E.g. CEO, Professor, Senior Manager",
     retired: true,
     options: null,
-    page: 3,
+    page: 4,
   },
   {
     id: "companyName",
@@ -132,7 +146,7 @@ const professionalQuestionsConfig = [
     type: "text-box",
     options: null,
     retired: true,
-    page: 3
+    page: 4
   },
   {
     id: "yearsOfExperience",
@@ -140,9 +154,9 @@ const professionalQuestionsConfig = [
     placeholder: "E.g. 25",
     retired: true,
     options: null,
-    page: 3,
+    page: 4,
   },
-  // Page 4
+  // Page 5
   {
     id: "networkingLevel",
     text: "Your knowledge and mentorship are valuable resources for students on this platform. Please select the types of support you're willing to provide:",
@@ -156,7 +170,7 @@ const professionalQuestionsConfig = [
         "Mentorship - Ongoing guidance and support",
         "Workplace Opportunities - Internships, job shadowing, or entry-level positions"
     ].map(option => ({ value: option.split(' - ')[0], label: option })),
-    page: 4
+    page: 5
   },
 ];
 
@@ -175,6 +189,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
     email: "",
     schoolAttending: schoolInfo?.schoolDisplayName || "",
     schoolId: schoolInfo?.schoolId || "",
+    openToCrossSchoolConnections: "",
     userType: "Professional",
     // Professional status and work details
     retiredStatus: "",
@@ -287,13 +302,13 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
       case 1:
         return <BasicUserInfo selectedOptions={professionalData} questionsForPage={professionalQuestionsConfig.filter((question)=>question.page === 1)} setSelectedOptions={setProfessionalData} handleChange={handleChange}/>
       case 2:
-        return <RetiredStatus selectedOptions={professionalData} handleChange={handleChange} />;
+        return <SchoolAffiliation selectedOptions={professionalData} handleChange={handleChange} />;
       case 3:
-        return <WorkDetails selectedOptions={professionalData} handleChange={handleChange} />;
+        return <RetiredStatus selectedOptions={professionalData} handleChange={handleChange} />;
       case 4:
-        return <ConnectionLevel selectedOptions={professionalData} setSelectedOptions={setProfessionalData} />;
+        return <WorkDetails selectedOptions={professionalData} handleChange={handleChange} />;
       // case 5:
-      //   return <EmailConfirmation selectedOptions={professionalData} handleChange={handleChange} loginEmail={loginEmail}/>
+      //   return <ConnectionLevel selectedOptions={professionalData} setSelectedOptions={setProfessionalData} />;
       default:
         return null;
     }
@@ -306,8 +321,39 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
   );
 };
 
-const RetiredStatus = ({ selectedOptions, handleChange }) => {
+const SchoolAffiliation = ({ selectedOptions, handleChange }) => {
   const questionsForPage = professionalQuestionsConfig.filter((question)=>question.page === 2);
+  return (
+    <div className="form-section">
+      <h2 className="page-title">School Affiliation</h2>
+      <div className="onboardingQuestions">
+        {questionsForPage.map((question) => (
+          <div className="form-group" key={question.id}>
+            <label className="form-label">
+              {question.text}
+              {question.optional && (
+                <div className="onboarding-optional-label-container">
+                  <span className="optional-label">(Optional)</span>
+                </div>
+              )}
+            </label>
+            <CustomSelect
+              options={question.options}
+              value={selectedOptions[question.id] || ''}
+              onChange={(label) => handleChange(question.id, label)}
+              placeholder={question.placeholder || "Select an option"}
+              isMulti={false}
+              isSearchable={true}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const RetiredStatus = ({ selectedOptions, handleChange }) => {
+  const questionsForPage = professionalQuestionsConfig.filter((question)=>question.page === 3);
   return (
     <div className="form-section">
       <h2 className="page-title">Professional Status</h2>
@@ -341,7 +387,7 @@ const RetiredStatus = ({ selectedOptions, handleChange }) => {
 
 const WorkDetails = ({selectedOptions, handleChange}) => {
   const isRetired = selectedOptions.retiredStatus === "Retired but active" || selectedOptions.retiredStatus === "Retired and not working";
-  const questionsForPage = professionalQuestionsConfig.filter((question)=>(question.page === 3 && question.retired === isRetired));
+  const questionsForPage = professionalQuestionsConfig.filter((question)=>(question.page === 4 && question.retired === isRetired));
   return (
     <div className="form-section">
       <h2 className="page-title">{isRetired ? "Previous Work Experience" : "Current Work Experience"}</h2>
@@ -376,7 +422,7 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
   );
 };
   const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
-    const questionsForPage = professionalQuestionsConfig.filter((question) => question.page === 4);
+    const questionsForPage = professionalQuestionsConfig.filter((question) => question.page === 5);
     
     const handleOptionChange = (event) => {
       const value = event.target.value;

@@ -18,30 +18,41 @@ export function ConnectionProvider({ children }) {
 
   const fetchAllConnections = async () => {
     setLoading(true);
-    // COMMUNITY VERSION: Simplified to only pending and approved
-    const statuses = ["pending", "approved"];
-    const results = await Promise.all(
-      statuses.map((status) => getConnectionsByStatus(status))
-    );
-    const categorized = {};
-    statuses.forEach((status, i) => {
-      categorized[status] = results[i]?.connections || [];
-    });
+    try {
+      // COMMUNITY VERSION: Simplified to only pending and approved
+      const statuses = ["pending", "approved"];
+      const results = await Promise.all(
+        statuses.map((status) => getConnectionsByStatus(status))
+      );
+      const categorized = {};
+      statuses.forEach((status, i) => {
+        categorized[status] = results[i]?.connections || [];
+      });
 
-    const incomingRequests = categorized["pending"].filter((connection) => connection.role==='target');
+      const incomingRequests = categorized["pending"].filter((connection) => connection.role==='target');
 
-    setConnections({...categorized, incomingRequests});
+      setConnections({...categorized, incomingRequests});
 
-    // Update localStorage for compatibility
-    localStorage.setItem(
-      "approvedConnections",
-      JSON.stringify(
-        categorized["approved"].map((conn) =>
-          conn.role === "initiator" ? conn.targetUserId : conn.initiateUserId
+      // Update localStorage for compatibility
+      localStorage.setItem(
+        "approvedConnections",
+        JSON.stringify(
+          categorized["approved"].map((conn) =>
+            conn.role === "initiator" ? conn.targetUserId : conn.initiateUserId
+          )
         )
-      )
-    );
-    setLoading(false);
+      );
+    } catch (error) {
+      console.error('Error fetching connections:', error);
+      // Set empty connections on error
+      setConnections({
+        pending: [],
+        approved: [],
+        incomingRequests: [],
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

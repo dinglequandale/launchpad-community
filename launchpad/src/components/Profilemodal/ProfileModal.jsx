@@ -253,6 +253,22 @@ export default function ProfileModal({
                 </div>
               )}
 
+              {/* {userData.userType === 'Professional' && userData.openToCrossSchoolConnections && (
+                <div className="profile-modal-detail-item">
+                  <div className="profile-modal-detail-icon">
+                    <LuSchool size={16} />
+                  </div>
+                  <div className="profile-modal-detail-content">
+                    <span className="profile-modal-detail-label">Cross-School Connections</span>
+                    <span className="profile-modal-detail-value">
+                      {userData.openToCrossSchoolConnections === 'yes' ? 'Open to students from all schools' :
+                       userData.openToCrossSchoolConnections === 'no' ? 'Prefers students from affiliated school only' :
+                       'Not applicable'}
+                    </span>
+                  </div>
+                </div>
+              )} */}
+
               {userData.acceptedColleges?.length > 0 && (
                 <div className="profile-modal-detail-item">
                   <div className="profile-modal-detail-icon">
