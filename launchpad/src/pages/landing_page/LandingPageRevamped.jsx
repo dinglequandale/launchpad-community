@@ -253,7 +253,7 @@ export default function LandingPageRevamped() {
               >
                 <div className="modern-hero-image-wrapper">
                   <img
-                    src="/assets/earth_connect_landing.png"
+                    src="/assets/earth_connect_landing.jpg"
                     alt="Global Network"
                     className="modern-hero-image"
                   />

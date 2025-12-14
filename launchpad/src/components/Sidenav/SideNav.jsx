@@ -11,15 +11,21 @@ import toast from 'react-hot-toast';
 import { useModal } from '../../contexts/ModalContext';
 
 export default function SideNav({show}){
-    
+
     const location = useLocation();
     const navigate = useNavigate();
-    const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Initialize collapsed state from sessionStorage
+    const [isCollapsed, setIsCollapsed] = useState(() => {
+        const savedState = sessionStorage.getItem('sidebarCollapsed');
+        return savedState === 'true';
+    });
+
     const { openLogoutModal } = useModal();
     const navList = [
-        [<IoHomeOutline size={24}/>, "Home", "/Home"], 
+        [<IoHomeOutline size={24}/>, "Home", "/Home"],
         [<TbUserHexagon size={24}/>, "Network", "/network"],
-        [<GoOrganization size={24}/>, "Organizations", "/Organizations"], 
+        [<GoOrganization size={24}/>, "Organizations", "/Organizations"],
         [<LuMessagesSquare size={24}/>, "Messages", "/chat"]
     ];
 
@@ -47,10 +53,13 @@ export default function SideNav({show}){
     const toggleSidebar = () => {
         const newCollapsedState = !isCollapsed;
         setIsCollapsed(newCollapsedState);
-        
+
+        // Save to sessionStorage for persistence across page changes
+        sessionStorage.setItem('sidebarCollapsed', newCollapsedState.toString());
+
         // Dispatch custom event for other components to listen to
-        const event = new CustomEvent('sidebarToggle', { 
-            detail: { isCollapsed: newCollapsedState } 
+        const event = new CustomEvent('sidebarToggle', {
+            detail: { isCollapsed: newCollapsedState }
         });
         window.dispatchEvent(event);
     }

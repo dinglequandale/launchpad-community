@@ -15,7 +15,7 @@ const settingsSections = [
   // { id: 'display', label: 'Display', icon: <BiPalette className="settings-nav-icon"/>, component: DisplaySettings },
   { id: 'security', label: 'Security', icon: <BiLock className="settings-nav-icon" size={25}/>, component: SecuritySettings },
   { id: 'account', label: 'Account', icon: <BiUser className="settings-nav-icon" size={25}/>, component: AccountSettings },
-  { id: 'graduation-emails', label: 'Graduation Emails', icon: <BiEnvelope className="settings-nav-icon" size={25}/>, component: GraduationEmailSettings },
+  // { id: 'graduation-emails', label: 'Graduation Emails', icon: <BiEnvelope className="settings-nav-icon" size={25}/>, component: GraduationEmailSettings },
 ];
 
 const SettingsPage = () => {
