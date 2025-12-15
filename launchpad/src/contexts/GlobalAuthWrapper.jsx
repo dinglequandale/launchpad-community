@@ -190,6 +190,7 @@ function GlobalAuthWrapper() {
           pending={pending}
           approved={approved}
           incomingRequests={incomingRequests}
+          refetchConnections={refetchConnections}
         />
       )}
       {console.log('GlobalAuthWrapper providing chatClient to Outlet:', {

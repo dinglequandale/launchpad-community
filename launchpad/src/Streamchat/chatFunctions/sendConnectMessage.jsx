@@ -4,13 +4,12 @@ const pushNotifPreference = localStorage.getItem("userNotificationPreferences")
     ? JSON.parse(localStorage.getItem("userNotificationPreferences")).push_notifications
     : true;
 
-export async function sendConnectMessageWithoutResume(message, currentUserId, connectingUserId, setChannelId, chat, schoolId){
+export async function sendConnectMessageWithoutResume(message, currentUserId, connectingUserId, setChannelId, chat){
     console.log('sendConnectMessageWithoutResume called with:', {
         message: message?.substring(0, 50) + '...',
         currentUserId,
         connectingUserId,
         chat: !!chat,
-        schoolId,
         chatType: typeof chat,
         chatConstructor: chat?.constructor?.name,
         chatUserID: chat?.userID
@@ -48,17 +47,12 @@ export async function sendConnectMessageWithoutResume(message, currentUserId, co
     console.log('Setting channel ID:', newChannel.id);
     setChannelId(newChannel.id);
 
-    // console.log("schoolId", schoolId);
-    // console.log("receiving user", connectingUserId);
-    // console.log("current user", currentUserId);
-    // console.log("message", message);
-    
     // TODO: add a check to see if the user has already received an email notification from this user
     console.log("push notif preference:" + pushNotifPreference)
     if(pushNotifPreference){
         const sendEmailNotifications = httpsCallable(getFunctions(), "sendEmailNotifications");
         try{
-            const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: currentUserId, messagePreview: message, schoolId: schoolId});
+            const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: currentUserId, messagePreview: message});
             console.log('Email notification sent:', result);
         }catch(error){
             console.log('Email notification error:', error);
@@ -66,7 +60,7 @@ export async function sendConnectMessageWithoutResume(message, currentUserId, co
     }
 }
 
-export async function sendConnectMessageWithResume(message, resumeURL, metaData, currentUserId, connectingUserId, setChannelId, chat, schoolId){
+export async function sendConnectMessageWithResume(message, resumeURL, metaData, currentUserId, connectingUserId, setChannelId, chat){
     if (!chat || !connectingUserId) {
         console.log('sendConnectMessageWithResume: Missing chat or connectingUserId');
         return;
@@ -106,9 +100,9 @@ export async function sendConnectMessageWithResume(message, resumeURL, metaData,
     setChannelId(newChannel.id);
 
     if(pushNotifPreference){
-        const sendInitEmailNotification = httpsCallable(getFunctions(), "sendInitEmailNotification");
+        const sendEmailNotifications = httpsCallable(getFunctions(), "sendEmailNotifications");
         try{
-            const result = await sendInitEmailNotification({receiverId: connectingUserId, senderName: currentUserId, messagePreview: message, schoolId: schoolId});
+            const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: currentUserId, messagePreview: message});
             console.log('Email notification sent:', result);
         }catch(error){
             console.log('Email notification error:', error);

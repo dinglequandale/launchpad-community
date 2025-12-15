@@ -39,7 +39,6 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   });
 
   const userType = userData.userType;
-  // const schoolId = localStorage.getItem("schoolId");
   const navigate = useNavigate();
   const targetUserId = userId || userData?.userId || userData?.id; // Use userId if provided, otherwise extract from userData
 
@@ -155,7 +154,6 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
         currentUserUid: currentUser?.uid,
         targetUserId,
         chat: !!chat,
-        // schoolId,
         sendWithResume
       });
       
@@ -171,23 +169,21 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
           const metaData = await getMetadata(resumeRef);
           
           await sendConnectMessageWithResume(
-            introMessage, 
-            resumeURL, 
-            metaData, 
-            currentUser.uid, 
-            targetUserId, 
-            setChannelId, 
-            chat, 
-            schoolId
+            introMessage,
+            resumeURL,
+            metaData,
+            currentUser.uid,
+            targetUserId,
+            setChannelId,
+            chat
           );
         } else {
           await sendConnectMessageWithoutResume(
-            introMessage, 
-            currentUser.uid, 
-            targetUserId, 
-            setChannelId, 
-            chat, 
-            schoolId
+            introMessage,
+            currentUser.uid,
+            targetUserId,
+            setChannelId,
+            chat
           );
         }
         

@@ -141,7 +141,7 @@ export default function ConnectionStatusModal({
           connectionId: conn.id,
           status: 'approved',
         });
-        // if (refetchConnections) await refetchConnections();
+        if (refetchConnections) await refetchConnections();
       } catch (error) {
         console.error('Error approving connection:', error);
       } finally {
@@ -211,11 +211,7 @@ export default function ConnectionStatusModal({
               <button
                 className="connection-status-modal-profile-button"
                 onClick={() => {
-                  if (handleProfileClick) {
-                    handleProfileClick(user);
-                  } else {
-                    navigate(`/profile/${user.userId || user.id}`);
-                  }
+           navigate(`/profile/${user.userId || user.id}`);
                 }}
               >
                 {/* <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path fill="#fff" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.418 0-8 2.239-8 5v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1c0-2.761-3.582-5-8-5Z"/></svg> */}
@@ -295,8 +291,34 @@ export default function ConnectionStatusModal({
         </div>
         
         <hr className="connection-status-modal-divider" />
-        
+
         <div className="connection-status-modal-content">
+          {/* Empty state when no connection updates */}
+          {incomingRequests.filter(conn => !hiddenCards.has(conn.id)).length === 0 &&
+           pending.filter(conn => !hiddenCards.has(conn.id)).length === 0 &&
+           approved.filter(conn => !hiddenCards.has(conn.id)).length === 0 &&
+           pending_parental_approval.filter(conn => !hiddenCards.has(conn.id)).length === 0 &&
+           parent_approved.filter(conn => !hiddenCards.has(conn.id)).length === 0 && (
+            <div style={{
+              textAlign: 'center',
+              padding: '48px 24px',
+              color: '#6b7280'
+            }}>
+              <div style={{ fontSize: '48px', marginBottom: '16px' }}>📭</div>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                marginBottom: '8px',
+                color: '#374151'
+              }}>
+                No Connection Updates
+              </h3>
+              <p style={{ fontSize: '14px', color: '#6b7280' }}>
+                You're all caught up! Check back later for new connection requests and updates.
+              </p>
+            </div>
+          )}
+
           {incomingRequests.filter(conn => !hiddenCards.has(conn.id)).length > 0 && (
             <h3 className="connection-status-modal-section-title incoming">📥 Incoming Connection Requests</h3>
           )}
