@@ -9,7 +9,7 @@ import TopBar from "../../components/Topbar/TopBar";
 import SearchBar from "../../components/Searchbar/SearchBar";
 import { GrNext, GrPrevious } from "react-icons/gr";
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { getFilteredData } from "../../services/filteringServices";
 import { searchDocuments } from "../../services/searchServices";
@@ -33,6 +33,7 @@ const NetworkContext = createContext();
 export default function UserNetwork() {
 
   const {currentUser} = useAuth();
+  const navigate = useNavigate();
 
   const { chatClient, isConnected } = useOutletContext();
 
@@ -42,7 +43,7 @@ export default function UserNetwork() {
   // COMMUNITY VERSION: Removed tenantId - no longer needed without multi-tenant architecture
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  const { openProfileModal, openConnectModal, openParentalConnectionModal } = useModal();
+  const { openConnectModal, openParentalConnectionModal } = useModal();
 
   const [highSchoolers, setHighSchoolers] = useState([]);
   const [collegeStudents, setCollegeStudents] = useState([]);
@@ -281,25 +282,8 @@ export default function UserNetwork() {
   };
 
   const handleOnProfileClick = (userId, connectionStatus) => {
-    const user = allVisibleUserData.filter((user) => (user.userId === userId))[0];
-    
-    // Use connection status from UserCard if provided, otherwise check localStorage
-    let isConnected = false;
-    if (connectionStatus !== undefined) {
-      // connectionStatus can be true (connected), false (not connected), or null (not checked)
-      isConnected = connectionStatus === true;
-    } else {
-      const pendingConnections = JSON.parse(localStorage.getItem('pendingConnections') || '[]');
-      const approvedConnections = JSON.parse(localStorage.getItem('approvedConnections') || '[]');
-      isConnected = pendingConnections.includes(userId) || approvedConnections.includes(userId);
-    }
-    
-    openProfileModal({ 
-      userData: user, 
-      onConnectClick: handleConnectClick, 
-      handleReferalClick,
-      isConnected: isConnected
-    });
+    // Navigate to the user's profile page
+    navigate(`/profile/${userId}`);
   };
 
   // All modal logic is now handled via ModalContext

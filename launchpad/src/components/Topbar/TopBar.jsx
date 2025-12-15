@@ -111,11 +111,14 @@ export default function TopBar({ isSidebarCollapsed }) {
                 {/* <button className="v0-mobile-menu-btn">
                     <LuMenu size={20} />
                 </button> */}
-                <div className="v0-logo-section">
-                <div style={{display: "flex", justifyContent: "center"}}>
-            {/* <img src="assets/awty_school_raw.jpg" alt="" style={{width: "72px"}}/> */}
-          </div>
-                </div>
+                {/* <div className="v0-logo-section">
+                    <img
+                        src="/assets/launchpad_logo_v2.png"
+                        alt="Launchpad"
+                        style={{height: "40px", cursor: "pointer"}}
+                        onClick={() => navigate('/')}
+                    />
+                </div> */}
             </div>
             
             <div className="v0-topbar-right">

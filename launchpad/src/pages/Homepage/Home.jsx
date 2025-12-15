@@ -15,7 +15,7 @@ import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { getFunctions, httpsCallable } from "firebase/functions";
 import { parentVerificationResendTemplate } from "../../utils/parentVerificationTemplates";
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { useModal } from '../../contexts/ModalContext';
 import ResourceCarousel from "./ResourceCarousel";
 import { LuPlay, LuUsers, LuGraduationCap, LuBriefcase, LuFileText, LuBookOpen, LuMapPin, LuCalendar, LuTarget, LuAward } from "react-icons/lu";
@@ -45,6 +45,7 @@ class ErrorBoundary extends React.Component {
 export default function Home(){
 
     const currentUser = auth.currentUser;
+    const navigate = useNavigate();
 
     const [userBasicInfo, setUserBasicInfo] = useState(null);
     const [showParentModal, setShowParentModal] = useState(false);
@@ -56,8 +57,6 @@ export default function Home(){
         const saved = localStorage.getItem('launchpadOrganizationFavorites');
         return saved ? JSON.parse(saved) : [];
     });
-    const [selectedFavorite, setSelectedFavorite] = useState(null);
-    const [showFavoriteModal, setShowFavoriteModal] = useState(false);
     const {openProfileModal, openApplyModal, openConnectModal} = useModal();
 
     const { chatClient } = useOutletContext();
@@ -309,8 +308,14 @@ export default function Home(){
     };
 
     const openFavoriteModal = (favorite) => {
-        setSelectedFavorite(favorite);
-        setShowFavoriteModal(true);
+        // Navigate to organization page using the organization ID
+        if (favorite.id) {
+            console.log("Navigating to organization with ID:", favorite.id);
+            navigate(`/organization/${favorite.id}`);
+        } else {
+            toast.error('Unable to view this opportunity. Please try removing and re-adding it to favorites.');
+            console.error('Favorite missing ID:', favorite);
+        }
     };
 
     const handleReferalClick = (action, organizationData, userData) => {
@@ -382,7 +387,7 @@ export default function Home(){
         }
     }, [selectedResource]);
 
-    // Listen for storage changes to update favorites
+    // Listen for storage changes to update favorites (from other tabs)
     useEffect(() => {
         const handleStorageChange = (e) => {
             if (e.key === 'launchpadOrganizationFavorites') {
@@ -395,24 +400,25 @@ export default function Home(){
         return () => window.removeEventListener('storage', handleStorageChange);
     }, []);
 
+    // Refresh favorites when window regains focus (when navigating back from other pages)
+    useEffect(() => {
+        const refreshFavorites = () => {
+            const saved = localStorage.getItem('launchpadOrganizationFavorites');
+            const currentFavorites = saved ? JSON.parse(saved) : [];
+            setFavorites(currentFavorites);
+        };
+
+        window.addEventListener('focus', refreshFavorites);
+        // Also refresh when component mounts/remounts
+        refreshFavorites();
+
+        return () => window.removeEventListener('focus', refreshFavorites);
+    }, []);
+
     return(
         <>
             {showVerifedConnectionModal && <ConnectModal onClose = {()=>setShowVerifiedConnectionModal(false)} userData={connectedUserData} visibility={showVerifedConnectionModal} chat={chatClient} userId = {connectedUserData.id}/>}
-        
-            
-            {/* Organization Profile Modal for Favorites */}
-            {showFavoriteModal && selectedFavorite && (
-              <OrganizationProfileModal
-                organization={selectedFavorite}
-                isVisible={showFavoriteModal}
-                onClose={() => {
-                  setShowFavoriteModal(false);
-                  setSelectedFavorite(null);
-                }}
-                location="modal"
-                handleReferalClick={handleReferalClick}
-              />
-            )}
+
             <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
             <SideNav/>
             <div className={`v0-home-container ${isSidebarCollapsed ? 'v0-home-sidebar-collapsed' : 'v0-home-sidebar-expanded'}`}>

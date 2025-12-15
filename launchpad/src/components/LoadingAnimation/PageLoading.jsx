@@ -8,7 +8,7 @@ export default function PageLoading() {
           left: "0", right: "0", marginLeft: "auto", marginRight: "auto"
         }}>
           <div style={{display: "flex", justifyContent: "center"}}>
-            <img src="assets/launchpad_logo.png" alt="" style={{width: "500px"}}/>
+            <img src="/assets/launchpad_logo.png" alt="" style={{width: "500px"}}/>
           </div>
           <Loading/>
           <div style={{width: "30%", margin: "0 auto", marginTop: "2rem"}}>

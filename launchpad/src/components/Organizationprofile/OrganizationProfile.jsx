@@ -18,8 +18,10 @@ export default function OrganizationProfile({ organizationData, location, handle
   const [userData, setUserData] = useState(null)
   const [isDisabled, setIsDisabled] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
-  
+  const [needsExpandButton, setNeedsExpandButton] = useState(false)
+
   const descRef = useRef()
+  const contentRef = useRef()
   const { currentUser } = useAuth()
   const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport()
   const { openApplyModal } = useModal()
@@ -73,9 +75,10 @@ export default function OrganizationProfile({ organizationData, location, handle
   useEffect(() => {
     const getUserData = async () => {
       if (!organizationProfile.createdBy) return
-      
+
       try {
-        const userSnap = await getDoc(doc(db, 'tenants', localStorage.getItem('schoolId'), 'users', organizationProfile.createdBy))
+        // COMMUNITY VERSION: Use flat collection path
+        const userSnap = await getDoc(doc(db, 'users', organizationProfile.createdBy))
         if (userSnap.exists()) {
           setUserData({ id: userSnap.id, ...userSnap.data() })
         }
@@ -83,7 +86,7 @@ export default function OrganizationProfile({ organizationData, location, handle
         console.error('Error fetching user data:', error)
       }
     }
-    
+
     getUserData()
   }, [organizationProfile.createdBy])
 
@@ -135,18 +138,10 @@ export default function OrganizationProfile({ organizationData, location, handle
 
   // Check if actions should be disabled
   useEffect(() => {
-    if (isPreview) {
-      setIsDisabled(true)
-    } else if (!organizationData.createdBy && location !== 'organizations_page') {
-      setIsDisabled(true)
-    } else if (
-      location !== 'organizations_page' && 
-      location !== 'user_profile_public' && 
-      organizationData.createdBy === currentUser?.uid
-    ) {
-      setIsDisabled(true)
-    }
-  }, [organizationData.createdBy, location, currentUser?.uid, isPreview])
+    // Disable if it's a preview or if the current user created this opportunity
+    const isOwnOpportunity = organizationData.createdBy === currentUser?.uid;
+    setIsDisabled(isPreview || isOwnOpportunity);
+  }, [organizationData.createdBy, currentUser?.uid, isPreview])
 
   // Check if description needs expansion
   useEffect(() => {
@@ -154,6 +149,22 @@ export default function OrganizationProfile({ organizationData, location, handle
       setIsDescriptionExpanded(true)
     }
   }, [organizationProfile.description])
+
+  // Check if content container needs expand button
+  useEffect(() => {
+    if (location === 'organizations_page' && contentRef.current) {
+      // Temporarily expand to measure full height
+      const originalMaxHeight = contentRef.current.style.maxHeight
+      contentRef.current.style.maxHeight = 'none'
+      const fullHeight = contentRef.current.scrollHeight
+      contentRef.current.style.maxHeight = originalMaxHeight
+
+      // Only show expand button if content is taller than contracted height (approx 250px)
+      setNeedsExpandButton(fullHeight > 250)
+    } else {
+      setNeedsExpandButton(false)
+    }
+  }, [location, organizationProfile.description, organizationProfile.startDate, organizationProfile.deadline, organizationProfile.host, organizationProfile.logistics])
 
   const getActionButtonText = (orgType) => {
     switch(orgType){
@@ -300,7 +311,7 @@ export default function OrganizationProfile({ organizationData, location, handle
         </div>
 
         {/* Content Container with Fixed Height */}
-        <div className={`v0-organization-content-container ${isContentExpanded ? 'expanded' : 'contracted'} ${(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host || hasLogistics || organizationProfile.description?.length > 200) ? 'has-expand-button' : ''}`}>
+        <div ref={contentRef} className={`v0-organization-content-container ${isContentExpanded ? 'expanded' : 'contracted'} ${needsExpandButton ? 'has-expand-button' : ''}`}>
           {/* Description */}
           <div className="v0-organization-description">
             <div 
@@ -373,9 +384,9 @@ export default function OrganizationProfile({ organizationData, location, handle
           )}
         </div>
 
-        {/* Expand/Collapse Button - only show if there's content to expand */}
-        {(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host || hasLogistics || organizationProfile.description?.length > 200) && (
-          <button 
+        {/* Expand/Collapse Button - only show if content actually needs collapsing */}
+        {needsExpandButton && (
+          <button
             className={`v0-organization-expand-btn ${isContentExpanded ? 'expanded' : ''}`}
             onClick={() => setIsContentExpanded(!isContentExpanded)}
           >
@@ -395,20 +406,20 @@ export default function OrganizationProfile({ organizationData, location, handle
 
         {/* Action Buttons */}
         <div className="v0-organization-actions">
-          <button 
-            className="v0-btn v0-btn-secondary" 
+          <button
+            className="v0-btn v0-btn-secondary"
             onClick={handleLearnMore}
-            disabled={disableActions}
-            title={disableActions ? 'Parent/guardian approval required' : ''}
+            disabled={isDisabled}
+            title={isDisabled ? (isPreview ? 'Available after publishing' : "You can't interact with your own opportunity") : ''}
           >
             Learn More
           </button>
           {organizationData.apply !== "NOAPPLY" && (
-            <button 
-              className="v0-btn v0-btn-primary" 
+            <button
+              className="v0-btn v0-btn-primary"
               onClick={handleConnect}
-              disabled={disableActions}
-              title={disableActions ? 'Parent/guardian approval required' : ''}
+              disabled={isDisabled}
+              title={isDisabled ? (isPreview ? 'Available after publishing' : "You can't apply to your own opportunity") : ''}
             >
               {getActionButtonText(organizationProfile.type)}
             </button>

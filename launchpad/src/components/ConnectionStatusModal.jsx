@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import { useAuth } from '../contexts/auth/AuthContext';
@@ -22,7 +23,8 @@ export default function ConnectionStatusModal({
   ...props
 }) {
   const { currentUser } = useAuth();
-  const { openProfileModal, openConnectModal, isConnectModalOpen } = useModal();
+  const { openConnectModal, isConnectModalOpen } = useModal();
+  const navigate = useNavigate();
   const [userMap, setUserMap] = useState({});
   const [loadingAction, setLoadingAction] = useState({}); // { [connId]: 'approve' | 'deny' | null }
   const [removingCards, setRemovingCards] = useState({}); // Track cards being animated out
@@ -212,7 +214,7 @@ export default function ConnectionStatusModal({
                   if (handleProfileClick) {
                     handleProfileClick(user);
                   } else {
-                    openProfileModal({ userData: user });
+                    navigate(`/profile/${user.userId || user.id}`);
                   }
                 }}
               >

@@ -32,6 +32,8 @@ import UserType from './pages/Onboarding/UserType.jsx';
 import MigrateToAlumni from './pages/MigrateToAlumni/MigrateToAlumni.jsx';
 import { ConnectionProvider } from './contexts/ConnectionContext';
 import { Toaster } from 'react-hot-toast';
+import ProfilePage from './pages/ProfilePage/ProfilePage.jsx';
+import OrganizationPage from './pages/OrganizationPage/OrganizationPage.jsx';
 
 const ErrorPage = () => {
   return (
@@ -210,12 +212,20 @@ const router = createBrowserRouter([
             element: <EditProfilePage/>
           },
           {
+            path: '/profile/:userId',
+            element: <ProfilePage/>
+          },
+          {
             path: '/network',
             element: <UserNetwork/>
           },
           {
             path: '/organizations',
             element: <Organizations/>
+          },
+          {
+            path: '/organization/:organizationId',
+            element: <OrganizationPage/>
           },
           {
             path: '/settings',

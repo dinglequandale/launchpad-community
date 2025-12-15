@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react';
-import { Outlet, Navigate, useNavigate } from 'react-router-dom';
+import { Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
 import { useStreamConnection } from '../Streamchat/chatFunctions/setUpUser';
 import PageLoading from '../components/LoadingAnimation/PageLoading';
@@ -18,6 +18,7 @@ function GlobalAuthWrapper() {
   const { chatClient, isConnected, connectToStream } = useStreamConnection();
   const [isInitializing, setIsInitializing] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
   const [userData,setUserData] = useState(null);
   const basicUserInfo = localStorage.getItem("basicUserInfo");
 
@@ -181,7 +182,7 @@ function GlobalAuthWrapper() {
           />
         </>
       )}
-      {showConnectionModal && (
+      {showConnectionModal && !location.pathname.startsWith('/profile') && !location.pathname.startsWith('/organization') && (
         <ConnectionStatusModal
           onClose={() => setShowConnectionModal(false)}
           onConnect={handleOnConnectClick}

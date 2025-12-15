@@ -11,7 +11,7 @@ import { useAuth } from "../../contexts/auth/AuthContext";
 import { searchDocuments } from "../../services/searchServices";
 import ProfileModal from "../../components/Profilemodal/ProfileModal"
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
-import { useOutletContext } from "react-router-dom";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../firebase/firebaseConfig";
 import { useModal } from '../../contexts/ModalContext';
@@ -27,7 +27,8 @@ const filterContent = {
 export default function Organizations(){
 
     const {currentUser} = useAuth();
-    const { openProfileModal, openConnectModal, isProfileModalOpen, isConnectModalOpen } = useModal();
+    const navigate = useNavigate();
+    const { openConnectModal, isProfileModalOpen, isConnectModalOpen } = useModal();
     const [organizationsData, setOrganizationsData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [initLoading, setInitLoading] = useState(false);
@@ -157,7 +158,8 @@ export default function Organizations(){
 
 
     const handleShowProfile = (userData) => {
-        openProfileModal({ userData, onConnectClick: handleConnectClick, handleReferalClick });
+        // Navigate to user's profile page
+        navigate(`/profile/${userData.userId || userData.id}`);
     }
 
     const handleFilterChange = (filterKey, value) => {

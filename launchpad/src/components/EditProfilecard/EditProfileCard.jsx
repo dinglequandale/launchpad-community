@@ -45,8 +45,6 @@ export default function EditProfileCard({ isSidebarCollapsed }) {
     const { currentUser } = useAuth();
     const [loading, setLoading] = useState(false);
     
-    const { openProfileModal } = useModal();
-    
     const [opportunitiesData, setOpportunitiesData] = useState([]);
     const [opportunitiesLoading, setOpportunitiesLoading] = useState(false);
     const [opportunityModalVisibility, setOpportunityModalVisibility] = useState(false);
@@ -134,9 +132,9 @@ export default function EditProfileCard({ isSidebarCollapsed }) {
         }
     }
 
-    // Handler to open profile modal from connections modal
+    // Handler to open profile page from connections modal
     const handleViewProfile = (user) => {
-        openProfileModal({ userData: user });
+        navigate(`/profile/${user.userId || user.id}`);
     };
 
     return(
