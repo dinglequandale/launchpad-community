@@ -21,6 +21,12 @@ const {manageConnections} = require("./callableFunctions/manageConnections");
 // COMMUNITY VERSION: Removed graduation/migration email functions
 // const {sendGraduationEmails, sendMigrationReminders, scheduledGraduationEmails} = require("./callableFunctions/sendGraduationEmails");
 
+// Firestore triggers for connection notifications
+const {onConnectionCreated, onConnectionStatusUpdated} = require("./triggers/connectionNotifications");
+
+// Firestore triggers for opportunity notifications
+const {onOpportunityCreated} = require("./triggers/opportunityNotifications");
+
 exports.createStreamToken = createStreamToken;
 exports.sendInviteEmail = sendInviteEmail;
 exports.getEmail = getEmail;
@@ -41,3 +47,10 @@ exports.manageConnections = manageConnections;
 // exports.sendGraduationEmails = sendGraduationEmails;
 // exports.sendMigrationReminders = sendMigrationReminders;
 // exports.scheduledGraduationEmails = scheduledGraduationEmails;
+
+// Connection notification triggers
+exports.onConnectionCreated = onConnectionCreated;
+exports.onConnectionStatusUpdated = onConnectionStatusUpdated;
+
+// Opportunity notification triggers
+exports.onOpportunityCreated = onOpportunityCreated;

@@ -1,177 +1,147 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-// const { StreamChat } = require('stream-chat');
-// const sgMail = require('../config/sendgrid');
-const { google } = require('googleapis');
-const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
-// admin.initializeApp() is automatically called by Firebase Functions runtime
+// Initialize Firebase Admin if not already initialized
+if (!admin.apps.length) {
+    admin.initializeApp();
+}
 
-// const serverClient = new StreamChat(
-//   process.env.STREAM_API_KEY,
-//   process.env.STREAM_SECRET
-// );
+const db = admin.firestore();
 
-const OAuth2 = google.auth.OAuth2;
-const oauth2Client = new OAuth2(
-    process.env.GMAIL_CLIENT_ID,
-    process.env.GMAIL_CLIENT_SECRET,
-    "https://developers.google.com/oauthplayground"
-);
+/**
+ * Generate unsubscribe token and link
+ */
+async function generateUnsubscribeLink(email, emailType) {
+    const token = crypto.randomUUID();
+    const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
 
-oauth2Client.setCredentials({
-  refresh_token: process.env.GMAIL_REFRESH_TOKEN
-});
+    await db.collection('unsubscribe_tokens').doc(token).set({
+        email: email.toLowerCase(),
+        emailType,
+        expiresAt,
+        used: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
+    });
 
-// Function to send email notification
+    return `https://launchpadhouston.com/unsubscribe?token=${token}`;
+}
+
+/**
+ * Check if user has unsubscribed from a specific email type
+ */
+async function isUnsubscribed(email, emailType) {
+    const unsubscribeDoc = await db.collection('unsubscribed_emails').doc(email.toLowerCase()).get();
+
+    if (unsubscribeDoc.exists) {
+        const unsubscribeData = unsubscribeDoc.data();
+        if (!unsubscribeData.emailType || unsubscribeData.emailType === emailType) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Check if user has email notifications enabled
+ */
+async function hasEmailNotificationsEnabled(userId) {
+    const userDoc = await db.collection('users').doc(userId).get();
+
+    if (!userDoc.exists) {
+        return false;
+    }
+
+    const userData = userDoc.data();
+    return userData.emailNotificationsEnabled !== false;
+}
+
+/**
+ * Callable function to send email notification when a message is received
+ * Called from client-side when a user sends a message
+ */
 exports.sendEmailNotifications = functions.https.onCall(async (data, context) => {
     try {
         const { receiverId, senderName, messagePreview } = data;
-        console.log('Received data:', { receiverId, senderName });
+        console.log('Message notification request:', { receiverId, senderName });
 
-        // Get user's email from Firestore
-        const userDoc = await admin.firestore().collection('users').doc(receiverId).get();
-
-        if (!userDoc.exists) {
-            console.error('User document not found:', { receiverId });
-            throw new Error('User not found');
+        // Ensure the user is authenticated (message sender)
+        if (!context.auth) {
+            throw new functions.https.HttpsError('unauthenticated', 'Only authenticated users can send messages.');
         }
 
-        const userData = userDoc.data();
-        const userEmail = userData.email;
+        // Get receiver's user data
+        const receiverDoc = await db.collection('users').doc(receiverId).get();
 
-        if (!userEmail) {
-            console.error('User email not found in document:', { receiverId });
-            throw new Error('User email not found');
+        if (!receiverDoc.exists) {
+            console.error('Receiver user document not found:', { receiverId });
+            throw new functions.https.HttpsError('not-found', 'Receiver user not found');
         }
 
-        await sendEmailNotification(userEmail, senderName, messagePreview);
-        return { success: true };
+        const receiverData = receiverDoc.data();
+        const receiverEmail = receiverData.email;
+
+        if (!receiverEmail) {
+            console.error('Receiver email not found in document:', { receiverId });
+            throw new functions.https.HttpsError('not-found', 'Receiver email not found');
+        }
+
+        // Check if receiver has email notifications enabled
+        const notificationsEnabled = await hasEmailNotificationsEnabled(receiverId);
+        if (!notificationsEnabled) {
+            console.log(`User ${receiverId} has email notifications disabled`);
+            return { success: true, message: 'User has notifications disabled' };
+        }
+
+        // Check if receiver has unsubscribed from message notifications
+        const unsubscribed = await isUnsubscribed(receiverEmail, 'new_message');
+        if (unsubscribed) {
+            console.log(`User ${receiverEmail} has unsubscribed from message notifications`);
+            return { success: true, message: 'User has unsubscribed' };
+        }
+
+        // Generate unsubscribe link
+        const unsubscribeLink = await generateUnsubscribeLink(receiverEmail, 'new_message');
+
+        // Prepare email template data
+        const recipientName = receiverData.userName?.split(' ')[0] || 'there';
+
+        // Import email template
+        const { newMessageEmailTemplate } = require('../utils/emailTemplates');
+
+        const emailHtml = newMessageEmailTemplate(
+            recipientName,
+            senderName,
+            messagePreview,
+            unsubscribeLink
+        );
+
+        // Create email document for MailGun
+        await db.collection('mail').add({
+            to: receiverEmail,
+            message: {
+                subject: `${senderName} sent you a message on Launchpad`,
+                html: emailHtml,
+            },
+            from: 'no-reply@launchpadhouston.com',
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            status: 'pending',
+            provider: 'mailgun',
+            emailType: 'new_message',
+            unsubscribeLink,
+            metadata: {
+                senderId: context.auth.uid,
+                receiverId,
+                messagePreview: messagePreview.substring(0, 100)
+            }
+        });
+
+        console.log(`Message notification email queued for ${receiverEmail}`);
+        return { success: true, message: 'Email notification queued' };
+
     } catch (error) {
         console.error('Error in sendEmailNotifications:', error);
         throw new functions.https.HttpsError('internal', error.message);
     }
 });
-
-async function sendEmailNotification(userEmail, senderName, messagePreview) {
-  const accessToken = await oauth2Client.getAccessToken();
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        type: 'OAuth2',
-        user: 'launchpad861@gmail.com',
-        clientId: process.env.GMAIL_CLIENT_ID,
-        clientSecret: process.env.GMAIL_CLIENT_SECRET,
-        refreshToken: process.env.GMAIL_REFRESH_TOKEN,
-        accessToken: accessToken.token,
-    }
-  });
-
-  const mailOptions = {
-    from: 'launchpad861@gmail.com',
-    to: userEmail,
-    subject: `New unread message from ${senderName}`,
-    html: `
-        <h2>You have an unread message</h2>
-        <p>${senderName} sent you a message:</p>
-        <p><em>${messagePreview}</em></p>
-        <p>Click here to view the message: <a href="${process.env.APP_URL}/chat">View Message</a></p>
-        `
-    };
-
-  // const msg = {
-  //   to: userEmail,
-  //   from: process.env.SENDGRID_FROM_EMAIL,
-  //   subject: `New unread message from ${senderName}`,
-  //   html: `
-  //     <h2>You have an unread message</h2>
-  //     <p>${senderName} sent you a message:</p>
-  //     <p><em>${messagePreview}</em></p>
-  //     <p>Click here to view the message: <a href="${process.env.APP_URL}/messages">View Message</a></p>
-  //   `
-  // };
-
-  try {
-    // Send email using SendGrid
-    // await sgMail.send(msg);
-
-    await transporter.sendMail(mailOptions);
-
-    await admin.firestore().collection('emailNotifications').add({
-      to: userEmail,
-      sentAt: admin.firestore.FieldValue.serverTimestamp(),
-      messagePreview,
-      senderName
-    });
-    
-    return true;
-  } catch (error) {
-    console.error('Error sending email:', error);
-    return false;
-  }
-}
-
-// Function to check for unread messages and send notifications
-// exports.checkUnreadMessages = functions.pubsub.schedule('every 24 hours').onRun(async (context) => {
-//   try {
-//     // Get all channels
-//     const channels = await serverClient.queryChannels({
-//       type: 'messaging'
-//     });
-
-//     for (const channel of channels) {
-//       // Get channel members
-//       const members = await channel.queryMembers();
-      
-//       for (const member of members.members) {
-//         // Skip if member is the sender
-//         if (member.user_id === channel.state.messages[channel.state.messages.length - 1]?.user?.id) {
-//           continue;
-//         }
-
-//         // Get user's last read timestamp
-//         const lastRead = channel.state.read[member.user_id]?.last_read;
-//         const lastMessage = channel.state.messages[channel.state.messages.length - 1];
-
-//         if (!lastRead || new Date(lastMessage.created_at) > new Date(lastRead)) {
-//           // Check if we've already sent a notification for this message
-//           const notificationRef = admin.firestore().collection('messageNotifications')
-//             .where('channelId', '==', channel.id)
-//             .where('messageId', '==', lastMessage.id)
-//             .where('recipientId', '==', member.user_id);
-
-//           const existingNotification = await notificationRef.get();
-
-//           if (existingNotification.empty) {
-//             // Get user's email from Firestore
-//             const userDoc = await admin.firestore().collection('users').doc(member.user_id).get();
-//             const userData = userDoc.data();
-
-//             if (userData && userData.email) {
-//               // Send email notification
-//               await sendEmailNotification(
-//                 userData.email,
-//                 lastMessage.user.name || 'Someone',
-//                 lastMessage.text || 'Sent you a message'
-//               );
-
-//               // Record that we sent a notification
-//               await admin.firestore().collection('messageNotifications').add({
-//                 channelId: channel.id,
-//                 messageId: lastMessage.id,
-//                 recipientId: member.user_id,
-//                 sentAt: admin.firestore.FieldValue.serverTimestamp()
-//               });
-//             }
-//           }
-//         }
-//       }
-//     }
-
-//     return null;
-//   } catch (error) {
-//     console.error('Error in checkUnreadMessages:', error);
-//     return null;
-//   }
-// }); 
