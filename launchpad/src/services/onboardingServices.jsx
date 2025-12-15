@@ -18,6 +18,7 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         userPfpPreview: pfpURL,
         userResumePreview: resumeURL,
         userId: currentUser.uid,
+        emailNotificationsEnabled: true, // Default to enabled for email notifications
         // COMMUNITY VERSION: Removed parent verification fields
         };
 
@@ -68,6 +69,7 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         userResumePreview: resumeURL,
         userId: currentUser.uid,
         userSkills: (collegeStudentData.userSkills.length > 0 && collegeStudentData.userSkills[0].skillDescription === "") ? [] : collegeStudentData.userSkills,
+        emailNotificationsEnabled: true, // Default to enabled for email notifications
         };
 
         // COMMUNITY VERSION: Removed tenant-based architecture
@@ -96,7 +98,8 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         ...otherData,
         userPfpPreview: pfpURL,
         // userResumePreview: resumeURL,
-        userId: currentUser.uid
+        userId: currentUser.uid,
+        emailNotificationsEnabled: true // Default to enabled for email notifications
         };
 
         // COMMUNITY VERSION: Removed tenant-based architecture
@@ -117,11 +120,15 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
 export const saveStaff = async (currentUser, staffData, onSuccess) => {
     try {
         // COMMUNITY VERSION: Removed tenant-based architecture
-        const docRef = await setDoc(doc(db, 'users', currentUser.uid), staffData);
+        const dataToSave = {
+            ...staffData,
+            emailNotificationsEnabled: true // Default to enabled for email notifications
+        };
+        const docRef = await setDoc(doc(db, 'users', currentUser.uid), dataToSave);
         // console.log("Professional info saved -- written with ID: ", docRef.id);
 
-        pushInitialProfileCompletion(staffData);
-        packageBasicUserInfoToLS(staffData);
+        pushInitialProfileCompletion(dataToSave);
+        packageBasicUserInfoToLS(dataToSave);
 
         // await updateTypesense('users', currentUser.uid, dataToSave);
         onSuccess();

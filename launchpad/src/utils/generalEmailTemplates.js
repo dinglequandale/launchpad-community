@@ -462,3 +462,368 @@ export const migrationSuccessEmailTemplate = (userName, schoolName) => {
     </html>
   `;
 };
+
+/**
+ * Connection Request Email Template
+ * Sent when someone sends a connection request
+ */
+export const connectionRequestEmailTemplate = (recipientName, senderName, senderUserType, senderDescription, senderPfp, unsubscribeLink) => {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Connection Request</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f8f9fa;
+            }
+            .email-container {
+                background-color: #ffffff;
+                border-radius: 10px;
+                padding: 30px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .logo {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .logo img {
+                max-width: 200px;
+                height: auto;
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .header h1 {
+                color: #2c5282;
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+            .content {
+                margin-bottom: 30px;
+            }
+            .content p {
+                margin-bottom: 15px;
+                font-size: 16px;
+            }
+            .user-card {
+                background-color: #f7fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .user-card img {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+            .user-card .user-info h3 {
+                margin: 0 0 5px 0;
+                color: #2c5282;
+                font-size: 18px;
+            }
+            .user-card .user-info p {
+                margin: 0;
+                color: #4a5568;
+                font-size: 14px;
+            }
+            .user-type-badge {
+                display: inline-block;
+                background-color: #e6fffa;
+                color: #234e52;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 600;
+                margin-top: 5px;
+            }
+            .button {
+                display: inline-block;
+                padding: 15px 30px;
+                background-color: #2c5282;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 16px;
+                margin: 20px 0;
+                text-align: center;
+                transition: background-color 0.3s ease;
+            }
+            .button:hover {
+                background-color: #2a4a7c;
+            }
+            .button-container {
+                text-align: center;
+                margin: 30px 0;
+            }
+            .footer {
+                text-align: center;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #e2e8f0;
+                color: #718096;
+                font-size: 14px;
+            }
+            .unsubscribe {
+                margin-top: 20px;
+                font-size: 12px;
+                color: #a0aec0;
+            }
+            .unsubscribe a {
+                color: #a0aec0;
+                text-decoration: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="logo">
+                <img src="https://launchpadhouston.com/assets/launchpad_logo.png" alt="Launchpad Logo">
+            </div>
+
+            <div class="header">
+                <h1>🔗 New Connection Request</h1>
+            </div>
+
+            <div class="content">
+                <p>Hi ${recipientName},</p>
+
+                <p><strong>${senderName}</strong> wants to connect with you on Launchpad!</p>
+
+                <div class="user-card">
+                    ${senderPfp ? `<img src="${senderPfp}" alt="${senderName}">` : `
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #4a5568;">
+                        ${senderName.charAt(0).toUpperCase()}
+                    </div>
+                    `}
+                    <div class="user-info">
+                        <h3>${senderName}</h3>
+                        <span class="user-type-badge">${senderUserType}</span>
+                        <p>${senderDescription}</p>
+                    </div>
+                </div>
+
+                <p>Connecting with ${senderName} can help you expand your network, discover new opportunities, and gain valuable insights!</p>
+            </div>
+
+            <div class="button-container">
+                <a href="https://launchpadhouston.com/Home" class="button">View Connection Request</a>
+            </div>
+
+            <div class="content">
+                <p>You can accept or decline this request from your Launchpad dashboard.</p>
+            </div>
+
+            <div class="footer">
+                <p>You're receiving this email because someone sent you a connection request on Launchpad.</p>
+                <div class="unsubscribe">
+                    <a href="${unsubscribeLink}">Unsubscribe from connection notifications</a>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+  `;
+};
+
+/**
+ * Connection Accepted Email Template
+ * Sent when someone accepts your connection request
+ */
+export const connectionAcceptedEmailTemplate = (recipientName, accepterName, accepterUserType, accepterDescription, accepterPfp, unsubscribeLink) => {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Connection Request Accepted</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f8f9fa;
+            }
+            .email-container {
+                background-color: #ffffff;
+                border-radius: 10px;
+                padding: 30px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .logo {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .logo img {
+                max-width: 200px;
+                height: auto;
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .header h1 {
+                color: #38a169;
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+            .content {
+                margin-bottom: 30px;
+            }
+            .content p {
+                margin-bottom: 15px;
+                font-size: 16px;
+            }
+            .user-card {
+                background-color: #f0fff4;
+                border: 1px solid #9ae6b4;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            .user-card img {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                object-fit: cover;
+            }
+            .user-card .user-info h3 {
+                margin: 0 0 5px 0;
+                color: #22543d;
+                font-size: 18px;
+            }
+            .user-card .user-info p {
+                margin: 0;
+                color: #2f855a;
+                font-size: 14px;
+            }
+            .user-type-badge {
+                display: inline-block;
+                background-color: #c6f6d5;
+                color: #22543d;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 600;
+                margin-top: 5px;
+            }
+            .success-banner {
+                background-color: #c6f6d5;
+                border-left: 4px solid #38a169;
+                padding: 15px;
+                margin: 20px 0;
+                border-radius: 4px;
+            }
+            .button {
+                display: inline-block;
+                padding: 15px 30px;
+                background-color: #38a169;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                font-size: 16px;
+                margin: 20px 0;
+                text-align: center;
+                transition: background-color 0.3s ease;
+            }
+            .button:hover {
+                background-color: #2f855a;
+            }
+            .button-container {
+                text-align: center;
+                margin: 30px 0;
+            }
+            .footer {
+                text-align: center;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #e2e8f0;
+                color: #718096;
+                font-size: 14px;
+            }
+            .unsubscribe {
+                margin-top: 20px;
+                font-size: 12px;
+                color: #a0aec0;
+            }
+            .unsubscribe a {
+                color: #a0aec0;
+                text-decoration: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="logo">
+                <img src="https://launchpadhouston.com/assets/launchpad_logo.png" alt="Launchpad Logo">
+            </div>
+
+            <div class="header">
+                <h1>✅ Connection Request Accepted!</h1>
+            </div>
+
+            <div class="content">
+                <p>Hi ${recipientName},</p>
+
+                <div class="success-banner">
+                    <strong>Great news!</strong> ${accepterName} accepted your connection request on Launchpad.
+                </div>
+
+                <div class="user-card">
+                    ${accepterPfp ? `<img src="${accepterPfp}" alt="${accepterName}">` : `
+                    <div style="width: 60px; height: 60px; border-radius: 50%; background-color: #c6f6d5; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #22543d;">
+                        ${accepterName.charAt(0).toUpperCase()}
+                    </div>
+                    `}
+                    <div class="user-info">
+                        <h3>${accepterName}</h3>
+                        <span class="user-type-badge">${accepterUserType}</span>
+                        <p>${accepterDescription}</p>
+                    </div>
+                </div>
+
+                <p>You can now message ${accepterName}, share opportunities, and collaborate!</p>
+            </div>
+
+            <div class="button-container">
+                <a href="https://launchpadhouston.com/chat" class="button">Send a Message</a>
+            </div>
+
+            <div class="content">
+                <p>Start building your relationship by sending a message or exploring ways you can help each other succeed.</p>
+            </div>
+
+            <div class="footer">
+                <p>You're receiving this email because your connection request was accepted on Launchpad.</p>
+                <div class="unsubscribe">
+                    <a href="${unsubscribeLink}">Unsubscribe from connection notifications</a>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+  `;
+};

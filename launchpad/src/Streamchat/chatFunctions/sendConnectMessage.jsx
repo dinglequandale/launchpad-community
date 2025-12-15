@@ -52,7 +52,11 @@ export async function sendConnectMessageWithoutResume(message, currentUserId, co
     if(pushNotifPreference){
         const sendEmailNotifications = httpsCallable(getFunctions(), "sendEmailNotifications");
         try{
-            const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: currentUserId, messagePreview: message});
+            // Get current user's name from localStorage
+            const basicUserInfo = localStorage.getItem("basicUserInfo");
+            const senderName = basicUserInfo ? JSON.parse(basicUserInfo).userName : 'A Launchpad user';
+
+            const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: senderName, messagePreview: message});
             console.log('Email notification sent:', result);
         }catch(error){
             console.log('Email notification error:', error);
@@ -102,7 +106,11 @@ export async function sendConnectMessageWithResume(message, resumeURL, metaData,
     if(pushNotifPreference){
         const sendEmailNotifications = httpsCallable(getFunctions(), "sendEmailNotifications");
         try{
-            const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: currentUserId, messagePreview: message});
+            // Get current user's name from localStorage
+            const basicUserInfo = localStorage.getItem("basicUserInfo");
+            const senderName = basicUserInfo ? JSON.parse(basicUserInfo).userName : 'A Launchpad user';
+
+            const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: senderName, messagePreview: message});
             console.log('Email notification sent:', result);
         }catch(error){
             console.log('Email notification error:', error);
