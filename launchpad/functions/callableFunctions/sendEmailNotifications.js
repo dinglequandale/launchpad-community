@@ -124,7 +124,7 @@ exports.sendEmailNotifications = functions.https.onCall(async (data, context) =>
                 subject: `${senderName} sent you a message on Launchpad`,
                 html: emailHtml,
             },
-            from: 'no-reply@launchpadhouston.com',
+            from: `no-reply@launchpadhouston.com`,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             status: 'pending',
             provider: 'mailgun',

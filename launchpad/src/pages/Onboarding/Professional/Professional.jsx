@@ -170,6 +170,7 @@ const professionalQuestionsConfig = [
         "Mentorship - Ongoing guidance and support",
         "Workplace Opportunities - Internships, job shadowing, or entry-level positions"
     ].map(option => ({ value: option.split(' - ')[0], label: option })),
+    optional: true,
     page: 5
   },
 ];

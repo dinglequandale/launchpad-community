@@ -98,6 +98,7 @@ const careerInterests = [
   {"value": "medicine_general", "label": "Medicine", "group": "Medical"},
   {"value": "military", "label": "Military", "group": "Public Service"},
   {"value": "music", "label": "Music", "group": "Arts & Humanities"},
+  {"value": "music_business", "label": "Music Business", "group": "Business"},
   {"value": "performing_arts", "label": "Performing Arts", "group": "Arts & Humanities"},
   {"value": "philosophy", "label": "Philosophy", "group": "Arts & Humanities"},
   {"value": "physics", "label": "Physics", "group": "STEM"},
