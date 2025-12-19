@@ -102,25 +102,52 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
 
   const {currentUser} = useAuth();
 
-  const [collegeStudentData, setCollegeStudentData] = useState({
-    userName: "",
-    userPfp: null,
-    userPfpPreview: null,
-    areasOfInterest: [],
-    linkedinLink: "",
-    email: "",
-    // collegeInterestsOrDecision: "",
-    schoolAttending: "",
-    collegeAttending: "",
-    graduationYear: "",
-    userSkills: [],
-    userType: "College Student",
-  });
+  // Initialize from localStorage if available
+  const getInitialCollegeStudentData = () => {
+    const saved = localStorage.getItem('tempCollegeStudentInfo');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          ...parsed,
+          userPfp: null, // Files can't be stored in localStorage
+          userPfpPreview: parsed.userPfpPreview || null,
+        };
+      } catch (e) {
+        console.error('Error parsing saved college student data:', e);
+      }
+    }
+    return {
+      userName: "",
+      userPfp: null,
+      userPfpPreview: null,
+      areasOfInterest: [],
+      linkedinLink: "",
+      email: "",
+      // collegeInterestsOrDecision: "",
+      schoolAttending: "",
+      collegeAttending: "",
+      graduationYear: "",
+      userSkills: [],
+      userType: "College Student",
+    };
+  };
+
+  const [collegeStudentData, setCollegeStudentData] = useState(getInitialCollegeStudentData());
 
   // Update parent component with user data whenever it changes
   useEffect(() => {
     setUserData(collegeStudentData);
   }, [collegeStudentData, setUserData]);
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    const dataToSave = {
+      ...collegeStudentData,
+      userPfp: null, // Exclude file object
+    };
+    localStorage.setItem('tempCollegeStudentInfo', JSON.stringify(dataToSave));
+  }, [collegeStudentData]);
 
   // Fetch user email on component mount
   useEffect(() => {

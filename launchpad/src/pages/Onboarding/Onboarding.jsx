@@ -77,21 +77,26 @@ export default function Onboarding() {
             switch (selectedOption) {
                 case "High Schooler":
                     await saveHighSchooler(user, currentUserData, () => {
+                        localStorage.removeItem('tempHighSchoolerInfo');
+                        localStorage.removeItem('tempStudentInfo');
                         navigate('/Home');
                     });
                     break;
                 case "College Student":
                     await saveCollegeStudent(user, currentUserData, () => {
+                        localStorage.removeItem('tempCollegeStudentInfo');
                         navigate('/Home');
                     });
                     break;
                 case "Professional":
                     await saveProfessional(user, currentUserData, () => {
+                        localStorage.removeItem('tempProfessionalInfo');
                         navigate('/Home');
                     });
                     break;
                 case "Staff":
                     await saveStaff(user, currentUserData, () => {
+                        localStorage.removeItem('tempStaffInfo');
                         navigate('/Home');
                     });
                     break;

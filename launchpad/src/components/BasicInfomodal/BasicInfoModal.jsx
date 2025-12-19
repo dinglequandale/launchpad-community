@@ -6,6 +6,7 @@ import toast, { Toaster } from "react-hot-toast";
 import OptionalNotice from "../Optionalnotice/OptionalNotice";
 import { careerInterests, CollegeSearch } from "../../pages/Onboarding/Options";
 import OnboardingDropdown from "../OnboardingDropdown/OnboardingDropdown";
+import CustomSelect from "../CustomSelect";
 import { editUserData } from "../../services/userProfileServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { CgClose } from "react-icons/cg";
@@ -320,22 +321,21 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
                         />
                       ) : (
                         <>
-                          <OnboardingDropdown
-                            showQuestion={false}
-                            key={question.id}
-                            question={question.text}
+                          <CustomSelect
                             options={question.options}
-                            selectedOption={basicInfoContent[question.id] || (question.type === 'multi-select' ? [] : '')}
+                            value={basicInfoContent[question.id] || (question.type === 'multi-select' ? [] : '')}
                             onChange={(label) => handleDropdownChange(question.id, label)}
-                            type={question.type}
+                            placeholder="Type to search..."
+                            isMulti={question.type === 'multi-select'}
+                            isSearchable={true}
                           />
                           {question.id === "areasOfInterest" && (
                             <div className="v0-field-suggestion">
                               <p className="v0-field-suggestion-text">
-                                Can't find a field of interest? 
-                                <a 
-                                  href="https://forms.gle/your-google-form-link" 
-                                  target="_blank" 
+                                Can't find a field of interest?
+                                <a
+                                  href="https://forms.gle/your-google-form-link"
+                                  target="_blank"
                                   rel="noopener noreferrer"
                                   className="v0-field-suggestion-link"
                                 >

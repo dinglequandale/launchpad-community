@@ -133,26 +133,47 @@ const highSchoolQuestionsConfig = [
 ]
 
 export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, setCanSubmit, setUserData }) {
-  
+
   const tempStudentInfo = localStorage.getItem('tempStudentInfo') ? JSON.parse(localStorage.getItem('tempStudentInfo')) : {};
-  const [highSchoolerData, setHighSchoolerData] = useState({
-    userName: tempStudentInfo.full_name ?
-      tempStudentInfo.full_name.split(', ')[1] + ' ' + tempStudentInfo.full_name.split(', ')[0] : '',
-    userPfp: null,
-    userPfpPreview: null,
-    areasOfInterest: [],
-    userResume: null,
-    userResumePreview: null,
-    linkedinLink: "",
-    email: "",
-    graduationYear: tempStudentInfo.graduation_year,
-    collegeDecision: "",
-    collegeInterestsOrDecision: [],
-    schoolAttending: "",
-    schoolId: "",
-    parentEmail: "",
-    userType: "High Schooler",
-  });
+
+  // Initialize from localStorage if available, otherwise use tempStudentInfo defaults
+  const getInitialHighSchoolerData = () => {
+    const saved = localStorage.getItem('tempHighSchoolerInfo');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          ...parsed,
+          userPfp: null, // Files can't be stored in localStorage
+          userResume: null,
+          userPfpPreview: parsed.userPfpPreview || null,
+          userResumePreview: parsed.userResumePreview || null,
+        };
+      } catch (e) {
+        console.error('Error parsing saved high schooler data:', e);
+      }
+    }
+    return {
+      userName: tempStudentInfo.full_name ?
+        tempStudentInfo.full_name.split(', ')[1] + ' ' + tempStudentInfo.full_name.split(', ')[0] : '',
+      userPfp: null,
+      userPfpPreview: null,
+      areasOfInterest: [],
+      userResume: null,
+      userResumePreview: null,
+      linkedinLink: "",
+      email: "",
+      graduationYear: tempStudentInfo.graduation_year,
+      collegeDecision: "",
+      collegeInterestsOrDecision: [],
+      schoolAttending: "",
+      schoolId: "",
+      parentEmail: "",
+      userType: "High Schooler",
+    };
+  };
+
+  const [highSchoolerData, setHighSchoolerData] = useState(getInitialHighSchoolerData());
 
   const { currentUser } = useAuth();
 
@@ -163,6 +184,16 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
   useEffect(() => {
     setUserData(highSchoolerData);
   }, [highSchoolerData, setUserData]);
+
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    const dataToSave = {
+      ...highSchoolerData,
+      userPfp: null, // Exclude file objects
+      userResume: null,
+    };
+    localStorage.setItem('tempHighSchoolerInfo', JSON.stringify(dataToSave));
+  }, [highSchoolerData]);
 
   const transformFullName = (name) => {
     if (!name) return '';

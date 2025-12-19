@@ -87,33 +87,60 @@ export default function Staff({currentPage, isSubmitting, setCanSubmit, schoolIn
 
   const {currentUser} = useAuth();
 
-  const [staffData, setStaffData] = useState({
-    userName: "",
-    userPfp: null,
-    userPfpPreview: null,
-    areasOfInterest: [],
-    linkedinLink: "",
-    email: "",
-    schoolRole: "",
-    personalEmail: "",
-    sponsoredClubs: "",
-    userAboutMe: "",
-    schoolAttending: schoolInfo?.schoolDisplayName || "",
-    schoolId: schoolInfo?.schoolId || "",
-    userType: "Staff",
-  });
+  // Initialize from localStorage if available
+  const getInitialStaffData = () => {
+    const saved = localStorage.getItem('tempStaffInfo');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          ...parsed,
+          userPfp: null, // Files can't be stored in localStorage
+          userPfpPreview: parsed.userPfpPreview || null,
+        };
+      } catch (e) {
+        console.error('Error parsing saved staff data:', e);
+      }
+    }
+    return {
+      userName: "",
+      userPfp: null,
+      userPfpPreview: null,
+      areasOfInterest: [],
+      linkedinLink: "",
+      email: "",
+      schoolRole: "",
+      personalEmail: "",
+      sponsoredClubs: "",
+      userAboutMe: "",
+      schoolAttending: schoolInfo?.schoolDisplayName || "",
+      schoolId: schoolInfo?.schoolId || "",
+      userType: "Staff",
+    };
+  };
+
+  const [staffData, setStaffData] = useState(getInitialStaffData());
 
   // Update parent component with user data whenever it changes
   useEffect(() => {
     setUserData(staffData);
   }, [staffData, setUserData]);
 
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    const dataToSave = {
+      ...staffData,
+      userPfp: null, // Exclude file object
+    };
+    localStorage.setItem('tempStaffInfo', JSON.stringify(dataToSave));
+  }, [staffData]);
+
   // Fetch user email on component mount
   useEffect(() => {
     const getUserEmail = async () => {
       try {
         const result = await getEmail({ uid: currentUser.uid });
-        if (result.data) {
+        if (result.data && result.data.email) {
           setStaffData(prev => ({
             ...prev,
             email: result.data.email

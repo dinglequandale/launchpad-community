@@ -66,7 +66,6 @@ const professionalQuestionsConfig = [
     type: "select",
     options: highSchools,
     placeholder: "N/A",
-    optional: true,
     page: 2
   },
   {
@@ -79,7 +78,6 @@ const professionalQuestionsConfig = [
       { value: "not_applicable", label: "Not applicable / No school affiliation" }
     ].map(option => option),
     placeholder: "Select your preference",
-    optional: true,
     page: 2
   },
   // Page 3
@@ -181,26 +179,44 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
 
   const [loginEmail,setLoginEmail] = useState("");
 
-  const [professionalData, setProfessionalData] = useState({
-    userName: "",
-    userPfp: null,
-    userPfpPreview: null,
-    areasOfInterest: [],
-    linkedinLink: "",
-    email: "",
-    schoolAttending: schoolInfo?.schoolDisplayName || "",
-    schoolId: schoolInfo?.schoolId || "",
-    openToCrossSchoolConnections: "",
-    userType: "Professional",
-    // Professional status and work details
-    retiredStatus: "",
-    // Work experience (current or previous based on retired status)
-    industryPosition: "",
-    companyName: "",
-    yearsOfExperience: "",
-    // Networking commitment
-    networkingLevel: [],
-  });
+  // Initialize from localStorage if available
+  const getInitialProfessionalData = () => {
+    const saved = localStorage.getItem('tempProfessionalInfo');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        return {
+          ...parsed,
+          userPfp: null, // Files can't be stored in localStorage
+          userPfpPreview: parsed.userPfpPreview || null,
+        };
+      } catch (e) {
+        console.error('Error parsing saved professional data:', e);
+      }
+    }
+    return {
+      userName: "",
+      userPfp: null,
+      userPfpPreview: null,
+      areasOfInterest: [],
+      linkedinLink: "",
+      email: "",
+      schoolAttending: schoolInfo?.schoolDisplayName || "",
+      schoolId: schoolInfo?.schoolId || "",
+      openToCrossSchoolConnections: "",
+      userType: "Professional",
+      // Professional status and work details
+      retiredStatus: "",
+      // Work experience (current or previous based on retired status)
+      industryPosition: "",
+      companyName: "",
+      yearsOfExperience: "",
+      // Networking commitment
+      networkingLevel: [],
+    };
+  };
+
+  const [professionalData, setProfessionalData] = useState(getInitialProfessionalData());
 
   // Helper function to determine if user is retired based on status
   const isRetired = (status) => {
@@ -212,15 +228,25 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
     setUserData(professionalData);
   }, [professionalData, setUserData]);
 
+  // Save to localStorage whenever data changes
+  useEffect(() => {
+    // Don't save file objects to localStorage, just the data
+    const dataToSave = {
+      ...professionalData,
+      userPfp: null, // Exclude file object
+    };
+    localStorage.setItem('tempProfessionalInfo', JSON.stringify(dataToSave));
+  }, [professionalData]);
+
   // Fetch user email on component mount
   useEffect(() => {
     const fetchUserEmail = async () => {
       try {
         const result = await getEmail({ uid: currentUser.uid });
-        if (result.data) {
+        if (result.data && result.data.email) {
           setProfessionalData(prev => ({
             ...prev,
-            email: result.data
+            email: result.data.email
           }));
         }
       } catch (error) {
@@ -235,40 +261,6 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
 
   // Check if required questions are answered
   useEffect(() => {
-    console.log("STUFF: ", professionalData);
-    if (requiredQuestionsAnswered(professionalQuestionsConfig, professionalData)) {
-      console.log("Can submit");
-      setCanSubmit(true);
-    } else {
-      setCanSubmit(false);
-    }
-  }, [professionalData, setCanSubmit]);
-
-  // Handle form submission
-  const handleSubmit = async () => {
-    try {
-      await saveProfessional(
-        currentUser, 
-        professionalData,
-        () => {
-          // Success callback
-          toast.success('Information saved successfully!');
-          navigate("/Home");
-        }
-      );
-    } catch (error) {
-      // Error callback
-      toast.error('Failed to save information. Please try again.');
-    }
-  };
-
-  // Auto-submit when isSubmitting is true
-  if (isSubmitting) {
-    handleSubmit();
-  }
-
-  // Check if all required questions are answered
-  useEffect(() => {
     const canSubmit = requiredQuestionsAnswered(professionalQuestionsConfig, professionalData);
     setCanSubmit(canSubmit);
   }, [professionalData, setCanSubmit]);
@@ -279,24 +271,6 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
       [id]: label,
     }));
   };
-
-  const getUserEmail = async () => {
-    try {
-      const result = await getEmail({ uid: currentUser.uid });
-      console.log("result:", result);
-      if (result.data && result.data.email) {
-        handleChange("email", result.data.email);
-      }
-    } catch (error) {
-      console.error('Error fetching user email:', error);
-    }
-  }
-  useEffect(()=>{
-    if (currentUser) {
-      getUserEmail();
-    }
-  },[currentUser]);
-  
 
   const renderPage = () => {
     switch (currentPage) {
