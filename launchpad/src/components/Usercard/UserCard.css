@@ -152,7 +152,17 @@
   -webkit-box-orient: vertical;
 }
 
-.v0-ellipsed strong {
+.v0-ellipsed-single {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.v0-ellipsed strong,
+.v0-ellipsed-single strong {
   color: #374151;
   font-weight: 600;
 }

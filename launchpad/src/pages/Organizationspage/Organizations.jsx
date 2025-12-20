@@ -88,7 +88,7 @@ export default function Organizations(){
         if (!isSearching && !loading) {
             setLoading(true);
             if(isInitial){setInitLoading(true)};
-    
+
             try {
                 const { results, lastVisible } = await getFilteredData(
                     'opportunities',
@@ -98,7 +98,7 @@ export default function Organizations(){
                     isInitial ? null : lastDoc,
                     5
                 );
-    
+
                 if(!isInitial){
                     setOrganizationsData([...organizationsData, ...results])
                 }
@@ -107,6 +107,10 @@ export default function Organizations(){
                     setInitLoadLength(results.length);
                 }
                 setlastDoc(lastVisible);
+
+                // Update hasMore based on whether we got a full page of results
+                // If we got fewer than the limit, there are no more results
+                setHasMore(results.length === 5 && lastVisible !== null);
             } catch (error) {
                 console.error("Error fetching opportunities:", error);
             } finally {
@@ -142,13 +146,12 @@ export default function Organizations(){
         const referalValue = organizationData[referalType === "learnMore" ? "learnMore" : "apply"];
         const methodType = referalValue?.split(': ')[0];
         const value = referalValue?.split(': ')[1];
-        
+
         switch(methodType){
             case "Messages":
-                handleConnectClick(userData);
-                return;
             case "Email":
-                handleEmailClick(value);
+                // Both "Message me" and "Email me" now open the ConnectModal for consistency
+                handleConnectClick(userData);
                 return;
             case "Website":
                 window.open(value, '_blank', 'noopener,noreferrer');
@@ -243,7 +246,7 @@ export default function Organizations(){
                         }
                         
                 </div>
-                {((organizationsData.length % 5 === 0) && !loading) && 
+                {(hasMore && !loading && !initLoading && organizationsData.length > 0) &&
                 <footer className="v0-show-more-footer">
                     <ShowMoreButton onShowMoreClick={onShowMoreClick}/>
                 </footer>}

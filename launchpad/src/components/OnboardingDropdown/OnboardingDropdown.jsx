@@ -46,7 +46,7 @@ export default function OnboardingDropdown({ question, options, selectedOption, 
                 onChange={onChange}
                 placeholder={placeholder ?? "Type..."}
                 isMulti={type === 'multi-select'}
-                isSearchable={!!onSearchQueryChange}
+                isSearchable={true}
                 onSearchQueryChange={handleInputChange}
                 isLoading={isLoading}
                 loadingMessage={loadingMessage}

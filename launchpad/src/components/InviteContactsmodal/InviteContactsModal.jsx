@@ -48,23 +48,27 @@ export default function InviteContactsModal({ visibility, onClose, userName }) {
     }
 
     setIsSubmitting(true);
-    const loadingToast = toast.loading('Sending invitations...');
 
-    try {
-      const sendInvitations = httpsCallable(getFunctions(), "sendInviteEmail");
-      await sendInvitations({ recipientData: recipients, senderName: userName });
+    // Show initial toast and close modal immediately
+    toast.loading('Sending invitations ...');
 
-      toast.success(`Successfully sent ${recipients.length} invitation${recipients.length > 1 ? 's' : ''}!`, {
-        id: loadingToast,
+    // Store data for background processing
+    const recipientDataToSend = [...recipients];
+    const inviteCount = recipients.length;
+
+    // Close modal immediately - don't make user wait
+    onClose();
+
+    // Send invitations in background (fire-and-forget)
+    const sendInvitations = httpsCallable(getFunctions(), "sendInviteEmail");
+    sendInvitations({ recipientData: recipientDataToSend, senderName: userName })
+      .then(() => {
+        toast.success(`Successfully sent ${inviteCount} invitation${inviteCount > 1 ? 's' : ''}!`);
+      })
+      .catch((error) => {
+        toast.error('Failed to send invitations. Please try again.');
+        console.error('Error sending invitations:', error);
       });
-
-      onClose();
-    } catch (error) {
-      toast.error('Failed to send invitations. Please try again.', { id: loadingToast });
-      console.error('Error sending invitations:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   if (!visibility) return null;

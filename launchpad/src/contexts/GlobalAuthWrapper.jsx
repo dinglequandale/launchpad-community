@@ -105,7 +105,7 @@ function GlobalAuthWrapper() {
     let unsubscribe;
     const initializeUser = async () => {
       if (!currentUser) {
-        navigate("/Login");
+        navigate("/");
         return;
       }
 
@@ -156,7 +156,7 @@ function GlobalAuthWrapper() {
   }
 
   if (!currentUser) {
-    return <Navigate to="/Login" />;
+    return <Navigate to="/" />;
   }
 
   if (!isConnected) {

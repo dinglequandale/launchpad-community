@@ -24,6 +24,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   const [connectionCreated, setConnectionCreated] = useState(false);
   const [sendDirectMessage, setSendDirectMessage] = useState(false);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [hasResume, setHasResume] = useState(false);
   const modalRef = useRef(null);
 
   // Debug logging
@@ -68,6 +69,25 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
       setConnectionCreated(false);
     }
   }, [visibility, initialConnectionStatus]);
+
+  // Check if user has resume when modal opens
+  useEffect(() => {
+    const checkResume = async () => {
+      if (!visibility || !currentUser) return;
+
+      try {
+        const resumeRef = ref(storage, `resumes/${currentUser.uid}`);
+        await getMetadata(resumeRef);
+        setHasResume(true);
+      } catch (error) {
+        // Resume doesn't exist
+        setHasResume(false);
+        setSendWithResume(false); // Uncheck if user doesn't have resume
+      }
+    };
+
+    checkResume();
+  }, [visibility, currentUser]);
 
   const createConnection = async () => {
     // Prevent duplicate connections
@@ -283,23 +303,25 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
             
             {sendDirectMessage && (
               <div className="connect-modal-message-section">
-                <textarea 
+                <textarea
                   className="connect-modal-textarea"
                   placeholder="Introduce yourself!"
-                  onChange={e => handleIntroChange(e.target.value)} 
+                  onChange={e => handleIntroChange(e.target.value)}
                   value={introMessage}
                 />
-                <div className="connect-modal-checkbox-container">
-                  <input 
-                    type="checkbox" 
-                    className="connect-modal-checkbox"
-                    checked={sendWithResume} 
-                    onChange={() => setSendWithResume(!sendWithResume)}
-                  />
-                  <span className="connect-modal-checkbox-label">
-                    Attach resume in your message
-                  </span>
-                </div>
+                {hasResume && (
+                  <div className="connect-modal-checkbox-container">
+                    <input
+                      type="checkbox"
+                      className="connect-modal-checkbox"
+                      checked={sendWithResume}
+                      onChange={() => setSendWithResume(!sendWithResume)}
+                    />
+                    <span className="connect-modal-checkbox-label">
+                      Attach resume in your message
+                    </span>
+                  </div>
+                )}
               </div>
             )}
           </main>

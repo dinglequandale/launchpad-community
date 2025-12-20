@@ -11,7 +11,7 @@ import Loading from '../../components/LoadingAnimation/Loading';
 import SideNav from '../../components/Sidenav/SideNav';
 import TopBar from '../../components/Topbar/TopBar';
 import { IoFlag, IoCalendar, IoTime, IoPerson } from 'react-icons/io5';
-import { LuMapPin, LuCalendar, LuAward, LuTarget, LuArrowLeft, LuShare2 } from 'react-icons/lu';
+import { LuMapPin, LuCalendar, LuAward, LuTarget, LuArrowLeft, LuShare2, LuUsers, LuMail } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 import './OrganizationPage.css';
 
@@ -163,6 +163,7 @@ export default function OrganizationPage() {
       hostName: organization.createdByUserName || organization.hostName,
       deadline: organization.deadline || organization.applicationDeadline,
       startDate: organization.startDate,
+      collaborators: organization.collaborators || [],
       tags: organization.organizationTags?.length > 0
         ? displayFieldsOfInterest(organization.organizationTags)
         : organization.applicantFieldOfWork || organization.fieldOfWork
@@ -229,9 +230,8 @@ export default function OrganizationPage() {
 
     if (orgProfile.learnMore.method === 'Website' && orgProfile.learnMore.value) {
       window.open(orgProfile.learnMore.value, '_blank', 'noopener,noreferrer');
-    } else if (orgProfile.learnMore.method === 'Email' && orgProfile.learnMore.value) {
-      window.location.href = `mailto:${orgProfile.learnMore.value}`;
-    } else if (orgProfile.learnMore.method === 'Messages' && userData) {
+    } else if ((orgProfile.learnMore.method === 'Email' || orgProfile.learnMore.method === 'Messages') && userData) {
+      // Both "Email me" and "Message me" now open the ConnectModal for consistency
       openConnectModal({
         userData: userData,
         chat: chatClient,
@@ -410,6 +410,69 @@ export default function OrganizationPage() {
             <div className="organization-page-section">
               <h4>Benefits</h4>
               <p>{benefits}</p>
+            </div>
+          )}
+
+          {/* Contact Details */}
+          {(userData || (orgProfile.collaborators && orgProfile.collaborators.length > 0)) && (
+            <div className="organization-page-section organization-page-contact-section">
+              <h4>Contact Details</h4>
+              <div className="organization-page-contact-grid">
+                {/* Organizer/Owner */}
+                {userData && orgProfile.hostName && (
+                  <div className="organization-page-contact-card">
+                    <div className="organization-page-contact-header">
+                      <IoPerson size={18} />
+                      <span className="organization-page-contact-role">Organizer</span>
+                    </div>
+                    <div className="organization-page-contact-info">
+                      <button
+                        className="organization-page-contact-name"
+                        onClick={handleOrganizerClick}
+                      >
+                        {orgProfile.hostName}
+                      </button>
+                      {userData.email && (
+                        <a
+                          href={`mailto:${userData.email}`}
+                          className="organization-page-contact-email"
+                        >
+                          <LuMail size={14} />
+                          {userData.email}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Collaborators */}
+                {orgProfile.collaborators && orgProfile.collaborators.length > 0 && (
+                  <div className="organization-page-contact-card">
+                    <div className="organization-page-contact-header">
+                      <LuUsers size={18} />
+                      <span className="organization-page-contact-role">
+                        {orgProfile.collaborators.length === 1 ? 'Collaborator' : 'Collaborators'}
+                      </span>
+                    </div>
+                    <div className="organization-page-contact-list">
+                      {orgProfile.collaborators
+                        .filter(collab => collab.name && collab.email)
+                        .map((collaborator, index) => (
+                          <div key={index} className="organization-page-contact-info">
+                            <span className="organization-page-contact-name">{collaborator.name}</span>
+                            <a
+                              href={`mailto:${collaborator.email}`}
+                              className="organization-page-contact-email"
+                            >
+                              <LuMail size={14} />
+                              {collaborator.email}
+                            </a>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

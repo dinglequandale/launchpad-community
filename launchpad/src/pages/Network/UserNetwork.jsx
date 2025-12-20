@@ -98,8 +98,8 @@ export default function UserNetwork() {
   const [filters, setFilters] = useState({
     userType: 'Any User',
     collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
-    // COMMUNITY VERSION: Changed default from "My Interests" to "Any Interests" to show all users by default
-    areasOfInterestOrExpertise: [`Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+    // Default to "My Interests" to show relevant users
+    areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
     networkingLevel: 'Any Availability',
     schoolAttending: 'Any High School',
   });
@@ -249,8 +249,8 @@ export default function UserNetwork() {
     setFilters({
       userType: 'Any User',
       collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
-      // COMMUNITY VERSION: Changed to "Any Interests" to show all users
-      areasOfInterestOrExpertise: [`Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+      // Reset to "My Interests" to show relevant users
+      areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
       networkingLevel: 'Any Availability',
       schoolAttending: 'Any High School',
     });
@@ -495,7 +495,10 @@ export default function UserNetwork() {
                   </div>
                 ) : (
                   <div className="v0-no-results-container">
-                    <NoResults/>
+                    <NoResults
+                      customMessage="No users found with your interests. Invite colleagues, friends, or mentors who share your passions to grow your network!"
+                      customButtonText="Invite People with Your Interests"
+                    />
                   </div>
                 )}
               </div>

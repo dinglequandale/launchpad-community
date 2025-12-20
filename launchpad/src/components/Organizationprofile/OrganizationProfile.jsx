@@ -5,6 +5,7 @@ import './OrganizationProfile.css'
 import { useModal } from '../../contexts/ModalContext'
 import { useReport } from '../../contexts/report/ReportContext'
 import { useAuth } from '../../contexts/auth/AuthContext'
+import { useNavigate } from 'react-router-dom'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase/firebaseConfig'
 import { displayFieldsOfInterest } from '../../services/userProfileServices'
@@ -25,6 +26,7 @@ export default function OrganizationProfile({ organizationData, location, handle
   const { currentUser } = useAuth()
   const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport()
   const { openApplyModal } = useModal()
+  const navigate = useNavigate()
 
   const userBasicInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}')
   const disableActions = userBasicInfo?.userType === 'High Schooler' && !userBasicInfo?.parentVerified
@@ -45,9 +47,10 @@ export default function OrganizationProfile({ organizationData, location, handle
     hostName: organizationData.createdByUserName,
     deadline: organizationData.deadline,
     startDate: organizationData.startDate,
-    tags: organizationData.organizationTags?.length > 0 
+    collaborators: organizationData.collaborators || [],
+    tags: organizationData.organizationTags?.length > 0
       ? displayFieldsOfInterest(organizationData.organizationTags)
-      : organizationData.applicantFieldOfWork 
+      : organizationData.applicantFieldOfWork
         ? `${organizationData.applicantFieldOfWork}, ${organizationData.applicantPosition}`
         : null,
     logistics: organizationData.isPaid ? {
@@ -243,6 +246,23 @@ export default function OrganizationProfile({ organizationData, location, handle
     setReportVisibility(true)
   }
 
+  const handleNavigateToOrganization = () => {
+    if (organizationData.id) {
+      navigate(`/organization/${organizationData.id}`)
+    }
+  }
+
+  const handleCardClick = (e) => {
+    // Only navigate if clicking on the card itself, not on buttons or interactive elements
+    const clickedElement = e.target
+    const isButton = clickedElement.tagName === 'BUTTON' || clickedElement.closest('button')
+    const isLink = clickedElement.tagName === 'A' || clickedElement.closest('a')
+
+    if (!isButton && !isLink) {
+      handleNavigateToOrganization()
+    }
+  }
+
   const getLayoutClass = () => {
     if (location === 'organizations_page') return 'v0-organization-wide'
     return 'v0-organization-popup'
@@ -261,7 +281,11 @@ export default function OrganizationProfile({ organizationData, location, handle
   const hasLogistics = organizationProfile.logistics
 
   return (
-    <div className={`v0-organization-card ${getLayoutClass()}`}>
+    <div
+      className={`v0-organization-card ${getLayoutClass()}`}
+      onClick={handleCardClick}
+      style={{ cursor: 'pointer' }}
+    >
       {/* Status Banners */}
       {!isPublished && (
         <div className="v0-unpublished-banner">Unpublished</div>
@@ -310,6 +334,22 @@ export default function OrganizationProfile({ organizationData, location, handle
           </div>
         </div>
 
+        {/* Organizer Information - Always Visible */}
+        {organizationProfile.hostName && (
+          <div className="v0-organization-owner">
+            <IoPerson size={14} />
+            <span className="v0-owner-label">Run by:</span>
+            <button
+              className="v0-owner-name"
+              onClick={handleHostClick}
+              disabled={isDisabled}
+              title={isDisabled ? "Can't view your own profile" : "View organizer profile"}
+            >
+              {organizationProfile.hostName}
+            </button>
+          </div>
+        )}
+
         {/* Content Container with Fixed Height */}
         <div ref={contentRef} className={`v0-organization-content-container ${isContentExpanded ? 'expanded' : 'contracted'} ${needsExpandButton ? 'has-expand-button' : ''}`}>
           {/* Description */}
@@ -324,7 +364,7 @@ export default function OrganizationProfile({ organizationData, location, handle
             </div>
           </div>
           {/* Dates and Organizer Info - only show in wide contexts */}
-          {(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host) && (
+          {/* {(location === 'organizations_page') && (organizationProfile.startDate || organizationProfile.deadline || organizationProfile.host) && (
             <div className="v0-organization-dates">
               {organizationProfile.startDate && (
                 <div className="v0-date-item">
@@ -341,14 +381,38 @@ export default function OrganizationProfile({ organizationData, location, handle
               {organizationProfile.host && (
                 <div className="v0-organizer-item">
                   <IoPerson size={16} />
-                  <strong>Organizer:</strong> 
+                  <strong>Organizer:</strong>
                   <button className="v0-organizer-link" onClick={handleHostClick} disabled={isDisabled}>
                     {organizationProfile.hostName}
                   </button>
                 </div>
               )}
+              {organizationProfile.collaborators && organizationProfile.collaborators.length > 0 && (
+                <div className="v0-collaborators-section">
+                  <div className="v0-collaborators-header">
+                    <LuUsers size={16} />
+                    <strong>Collaborators:</strong>
+                  </div>
+                  <div className="v0-collaborators-list">
+                    {organizationProfile.collaborators
+                      .filter(collab => collab.name && collab.email) // Only show complete collaborators
+                      .map((collaborator, index) => (
+                        <div key={index} className="v0-collaborator-item">
+                          <span className="v0-collaborator-name">{collaborator.name}</span>
+                          <a
+                            href={`mailto:${collaborator.email}`}
+                            className="v0-collaborator-email"
+                            onClick={(e) => e.stopPropagation()} // Prevent card click navigation
+                          >
+                            {collaborator.email}
+                          </a>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          )} */}
 
           {/* Logistics Section */}
           {hasLogistics && isExpanded && (
@@ -384,23 +448,14 @@ export default function OrganizationProfile({ organizationData, location, handle
           )}
         </div>
 
-        {/* Expand/Collapse Button - only show if content actually needs collapsing */}
+        {/* See More Button - routes to OrganizationPage when content exceeds height */}
         {needsExpandButton && (
           <button
-            className={`v0-organization-expand-btn ${isContentExpanded ? 'expanded' : ''}`}
-            onClick={() => setIsContentExpanded(!isContentExpanded)}
+            className="v0-organization-expand-btn"
+            onClick={handleNavigateToOrganization}
           >
-            {isContentExpanded ? (
-              <>
-                <LuChevronUp size={16} />
-                Show Less
-              </>
-            ) : (
-              <>
-                <LuChevronDown size={16} />
-                Show More
-              </>
-            )}
+            <LuChevronDown size={16} />
+            See More
           </button>
         )}
 

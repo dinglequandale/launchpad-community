@@ -259,3 +259,26 @@
   margin-top: 4px;
   text-align: center;
 }
+
+/* Drag and drop styles */
+.file-upload-preview.dragging {
+  background: #e3f2fd;
+  border-color: #1976d2 !important;
+}
+
+.file-upload-preview.dragging .btnFileUpload {
+  border-color: #1976d2;
+  background: #e3f2fd;
+  color: #1976d2;
+  transform: scale(1.02);
+}
+
+.file-error {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 4px;
+  padding: 8px 12px;
+  background: #fef2f2;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+}

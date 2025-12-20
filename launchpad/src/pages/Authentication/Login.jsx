@@ -45,15 +45,11 @@ export default function Login(){
         packageBasicUserInfoToLS(newUserData);
     };
 
-    // Check if user exists in Firebase collection
+    // COMMUNITY VERSION: Check if user exists in Firebase collection
     const checkUserExists = async (uid) => {
         try {
-            const schoolId = localStorage.getItem("schoolId");
-            if (!schoolId) {
-                console.error("School ID not found in localStorage");
-                return false;
-            }
-            const userDoc = await getDoc(doc(db, "tenants", schoolId, "users", uid));
+            // Use flat users collection (no tenant isolation)
+            const userDoc = await getDoc(doc(db, "users", uid));
             return userDoc.exists();
         } catch (error) {
             console.error("Error checking user existence:", error);
@@ -61,26 +57,18 @@ export default function Login(){
         }
     };
 
-    // Fetch and store connections for existing users
+    // COMMUNITY VERSION: Fetch and store connections for existing users
     const fetchAndStoreConnections = async () => {
         try {
-            const schoolId = localStorage.getItem("schoolId");
-            if (schoolId) {
-                const parentPendingResult = await getConnectionsByStatus(schoolId, 'pending_parental_approval');
-                const parentApprovedResult = await getConnectionsByStatus(schoolId, 'parent_approved');
-                
-                // Extract user IDs from the connections
-                const pendingUserIds = parentPendingResult.connections?.map(conn => 
-                    conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
-                ) || [];
-                
-                const parentApprovedUserIds = parentApprovedResult.connections?.map(conn => 
-                    conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
-                ) || [];
-                
-                localStorage.setItem('pendingConnections', JSON.stringify(pendingUserIds));
-                localStorage.setItem('approvedConnections', JSON.stringify(parentApprovedUserIds));
-            }
+            // Fetch approved connections (no schoolId or parent approval states)
+            const approvedResult = await getConnectionsByStatus('approved');
+
+            // Extract user IDs from the connections
+            const approvedUserIds = approvedResult.connections?.map(conn =>
+                conn.role === 'initiator' ? conn.targetUserId : conn.initiateUserId
+            ) || [];
+
+            localStorage.setItem('approvedConnections', JSON.stringify(approvedUserIds));
         } catch (error) {
             console.error('Error fetching connections:', error);
         }

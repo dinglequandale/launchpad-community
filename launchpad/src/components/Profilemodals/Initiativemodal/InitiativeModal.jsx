@@ -4,6 +4,7 @@ import "./InitiativeModal.css";
 import MakeChanges from '../../Makechanges/MakeChanges';
 import OrganizationProfile from '../../Organizationprofile/OrganizationProfile';
 import ProgressBar from '../../Progressbar/ProgressBar';
+import ProfilePictureCropModal from '../../ProfilePictureCropModal/ProfilePictureCropModal';
 import { GrAdd } from 'react-icons/gr';
 import { LuMessagesSquare } from 'react-icons/lu';
 import { MdEmail } from 'react-icons/md';
@@ -90,6 +91,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     apply: 'Email',
     organizationLogoPreview: null,
     createdByUserName: "",
+    collaborators: [], // Array of {name: string, email: string} objects
   });
 
   const {userName, userType} = JSON.parse(localStorage.getItem("basicUserInfo"));
@@ -316,24 +318,27 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
               <div className="v0-modal-footer">
                 <div className="v0-modal-navigation">
                   {currentInitiativePage > 1 && (
-                    <button 
-                      className="v0-btn-secondary" 
+                    <button
+                      type="button"
+                      className="v0-btn-secondary"
                       onClick={() => setCurrentInitiativePage(currentInitiativePage - 1)}
                     >
                       Previous
                     </button>
                   )}
                   {currentInitiativePage < 4 && (
-                    <button 
-                      className="v0-btn-primary" 
+                    <button
+                      type="button"
+                      className="v0-btn-primary"
                       onClick={() => setCurrentInitiativePage(currentInitiativePage + 1)}
                     >
                       Next
                     </button>
                   )}
                   {currentInitiativePage === 4 && (
-                    <button 
-                      className="v0-btn-primary" 
+                    <button
+                      type="button"
+                      className="v0-btn-primary"
                       onClick={publishInitiativeData}
                       disabled={isSaving}
                     >
@@ -441,14 +446,16 @@ function InitiativeMission(){
 function FinalInfo(){
   const { organizationData, setOrganizationData, organizationQuestionsConfig, setOrganizationLogo, currentUser } = useContext(InitiativeContext);
   const logoRef = useRef();
-  
+
   const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
-  
+
   const [learnMoreType, setLearnMoreType] = useState("");
   const [applyType, setApplyType] = useState("");
   const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState(false);
   const [applyInputVisibility, setApplyInputVisibility] = useState(false);
   const [applyDisabled, setApplyDisabled] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [selectedLogoFile, setSelectedLogoFile] = useState(null);
 
   useEffect(()=>{
     setLearnMoreType(organizationData.learnMore.split(": ")[0]);
@@ -492,13 +499,23 @@ function FinalInfo(){
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      console.log(file)
-      setOrganizationData(prevData => ({
-        ...prevData,
-        organizationLogoPreview: URL.createObjectURL(file)
-      }));
-      setOrganizationLogo(file);
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please upload an image file');
+        return;
+      }
+      setSelectedLogoFile(file);
+      setShowCropModal(true);
     }
+  }
+
+  const handleCroppedLogo = (croppedFile) => {
+    setShowCropModal(false);
+    setOrganizationData(prevData => ({
+      ...prevData,
+      organizationLogoPreview: URL.createObjectURL(croppedFile)
+    }));
+    setOrganizationLogo(croppedFile);
+    setSelectedLogoFile(null);
   }
 
   const handleChange = (event) => {
@@ -601,13 +618,76 @@ function FinalInfo(){
                   <div className="v0-modal-date-overlay" style={{display: (question.id === "apply" && applyDisabled) ? "" : "none", height: "100px"}}>
                   </div>
                   {(question.id === "apply") && (
-                    <button className="v0-modal-no-apply-btn" onClick={handleNoApplyClick}>
+                    <div style={{display: "flex", justifyContent: "center"}}>
+                    <button type="button" className="v0-modal-no-apply-btn" onClick={handleNoApplyClick}>
                       I don't want other students to participate.
                     </button>
+                    </div>
                   )}
                 </div>
               ))}
           </div>
+
+          {/* Collaborators Section */}
+          <div className="v0-modal-collaborators-container">
+            <label className="v0-modal-form-label">
+              Collaborators (Optional)
+              <span className="v0-modal-help-text">Add team members or cofounders who work with you on this initiative</span>
+            </label>
+            {(organizationData.collaborators || []).map((collaborator, index) => (
+              <div key={index} className="v0-modal-collaborator-item">
+                <div className="v0-modal-collaborator-inputs">
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={collaborator.name || ''}
+                    onChange={(e) => {
+                      const newCollaborators = [...(organizationData.collaborators || [])];
+                      newCollaborators[index] = { ...newCollaborators[index], name: e.target.value };
+                      setOrganizationData({ ...organizationData, collaborators: newCollaborators });
+                    }}
+                    className="v0-modal-collaborator-input"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={collaborator.email || ''}
+                    onChange={(e) => {
+                      const newCollaborators = [...(organizationData.collaborators || [])];
+                      newCollaborators[index] = { ...newCollaborators[index], email: e.target.value };
+                      setOrganizationData({ ...organizationData, collaborators: newCollaborators });
+                    }}
+                    className="v0-modal-collaborator-input"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="v0-modal-collaborator-remove-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const newCollaborators = (organizationData.collaborators || []).filter((_, i) => i !== index);
+                    setOrganizationData({ ...organizationData, collaborators: newCollaborators });
+                  }}
+                  title="Remove collaborator"
+                >
+                  <BiTrash size={18} />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="v0-modal-collaborator-add-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                const newCollaborators = [...(organizationData.collaborators || []), { name: '', email: '' }];
+                setOrganizationData({ ...organizationData, collaborators: newCollaborators });
+              }}
+            >
+              <GrAdd size={16} />
+              <span>Add Collaborator</span>
+            </button>
+          </div>
+
           {/* Logo upload */}
           <div className="v0-modal-file-container">
             {questionsForPage
@@ -620,8 +700,9 @@ function FinalInfo(){
                       <div className="v0-modal-file-preview-container">
                         <img src={organizationData.organizationLogoPreview} alt="Logo" className="v0-modal-file-preview-img"/>
                         <div className="v0-modal-file-preview-actions">
-                          <button 
-                            className="v0-modal-file-edit-btn" 
+                          <button
+                            type="button"
+                            className="v0-modal-file-edit-btn"
                             onClick={(e) => {
                               logoRef.current.click();
                               e.preventDefault();
@@ -630,8 +711,9 @@ function FinalInfo(){
                           >
                             <BiEdit size={16}/>
                           </button>
-                          <button 
-                            className="v0-modal-file-remove-btn" 
+                          <button
+                            type="button"
+                            className="v0-modal-file-remove-btn"
                             onClick={(e) => {
                               e.preventDefault();
                               setOrganizationData(prev => ({
@@ -656,8 +738,9 @@ function FinalInfo(){
                         />
                       </div>
                     ) : (
-                      <button 
-                        className="v0-modal-file-btn" 
+                      <button
+                        type="button"
+                        className="v0-modal-file-btn"
                         onClick={(e) => {
                           logoRef.current.click();
                           e.preventDefault();
@@ -682,6 +765,18 @@ function FinalInfo(){
           </div>
         </div>
     </main>
+
+    {/* Logo Crop Modal */}
+    {showCropModal && selectedLogoFile && (
+      <ProfilePictureCropModal
+        imageFile={selectedLogoFile}
+        onClose={() => {
+          setShowCropModal(false);
+          setSelectedLogoFile(null);
+        }}
+        onCropComplete={handleCroppedLogo}
+      />
+    )}
     </>
   )
 }

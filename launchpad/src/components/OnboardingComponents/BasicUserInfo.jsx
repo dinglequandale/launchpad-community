@@ -13,6 +13,7 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
   const resumeInputRef = useRef(null);
   const [resumeError, setResumeError] = useState(null);
   const [linkedInOptionSelected, setLinkedInOptionSelected] = useState(selectedOptions.linkedinLink);
+  const [isDraggingResume, setIsDraggingResume] = useState(false);
 
   const handleFileChange = (event, fileType) => {
     const file = event.target.files[0];
@@ -46,6 +47,40 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
       [fileType === 'pfp' ? 'userPfp' : 'userResume']: null
     }));
   }
+
+  // Drag and drop handlers for resume
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingResume(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingResume(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingResume(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type === 'application/pdf') {
+        setSelectedOptions(prevData => ({
+          ...prevData,
+          userResumePreview: URL.createObjectURL(file),
+          userResume: file
+        }));
+      } else {
+        setResumeError('Please upload a PDF file.');
+        setTimeout(() => setResumeError(null), 3000);
+      }
+    }
+  };
 
   const OptionalLabel = () => (
     <span className="optional-label">(Optional)</span>
@@ -114,7 +149,12 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
                     </div>
                   )} */}
                 </label>
-                <div className="file-upload-preview">
+                <div
+                  className={`file-upload-preview ${isDraggingResume ? 'dragging' : ''}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
                   {selectedOptions.userResumePreview ? (
                     <div className="btnFileUpload onboarding-upload" style={{position: "relative"}}>
                       <FaRegFilePdf size={25} />
@@ -131,11 +171,12 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
                   ) : (
                     <button onClick={() => triggerFileInput(resumeInputRef)} className="btnFileUpload onboarding-upload">
                       <BiUpload size={25} />
-                      <span>Upload Your Resume</span>
+                      <span>{isDraggingResume ? 'Drop PDF here' : 'Upload Resume (PDF)'}</span>
                     </button>
                   )}
                 </div>
-                <input 
+                {resumeError && <div className="file-error">{resumeError}</div>}
+                <input
                   type="file"
                   ref={resumeInputRef}
                   onChange={(e) => handleFileChange(e, 'resume')}

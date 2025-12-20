@@ -204,6 +204,49 @@
   white-space: nowrap;
 }
 
+/* Organizer Information - Always Visible */
+.v0-organization-owner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b7280;
+  padding: 4px 0;
+  margin-top: -4px;
+}
+
+.v0-organization-owner svg {
+  color: #1157e2;
+  flex-shrink: 0;
+}
+
+.v0-owner-label {
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.v0-owner-name {
+  background: transparent;
+  border: none;
+  color: #1157e2;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.v0-owner-name:hover:not(:disabled) {
+  color: #0d47b8;
+  text-decoration: underline;
+}
+
+.v0-owner-name:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
 /* Header row under title */
 .v0-organization-header {
   display: flex;
@@ -339,6 +382,63 @@
   color: #9ca3af;
   cursor: not-allowed;
   text-decoration: none;
+}
+
+/* Collaborators Section */
+.v0-collaborators-section {
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.v0-collaborators-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.v0-collaborators-header svg {
+  color: #1157e2;
+  flex-shrink: 0;
+}
+
+.v0-collaborators-header strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.v0-collaborators-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 24px;
+}
+
+.v0-collaborator-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+}
+
+.v0-collaborator-name {
+  color: #374151;
+  font-weight: 500;
+}
+
+.v0-collaborator-email {
+  color: #1157e2;
+  text-decoration: none;
+  font-size: 12px;
+  transition: color 0.2s ease;
+}
+
+.v0-collaborator-email:hover {
+  color: #0d47b8;
+  text-decoration: underline;
 }
 
 .v0-organization-actions {

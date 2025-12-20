@@ -28,6 +28,7 @@ import { FaRegEdit } from 'react-icons/fa';
 import AllConnectionsModal from '../AllConnectionsModal';
 import { useModal } from '../../contexts/ModalContext';
 import { FaUserFriends } from "react-icons/fa";
+import ProfilePictureCropModal from '../ProfilePictureCropModal/ProfilePictureCropModal';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -170,7 +171,7 @@ export default function EditProfileCard({ isSidebarCollapsed }) {
         {aboutMeModalVisibility && <AboutMeModal onClose={()=>setAboutMeModalVisibility(false)} visibility={aboutMeModalVisibility} userData={userData}/>}
         {skillModalVisibility && <SkillModal onClose={()=>setSkillModalVisibility(false)} visibility={skillModalVisibility} userData={userData}/>}
         {availabilityModalVisibility && <AvailabilityModal onClose={()=>setAvailabilityModalVisibility(false)} visibility={availabilityModalVisibility} userData={userData}/>}
-        
+
         <div className={`complete-profile-container ${isSidebarCollapsed ? 'complete-profile-container-sidebar-collapsed' : 'complete-profile-container-sidebar-expanded'}`}>
             <ProfileContext.Provider value={{currentUser, userData}}>
             <div className="v0-profile-container">
@@ -226,7 +227,7 @@ export default function EditProfileCard({ isSidebarCollapsed }) {
 
                         {/* Opportunities/Initiatives Section */}
                         {userData.userType !== "Staff" && (
-                            <div className="v0-profile-section">
+                            <div className="v0-profile-section" id="opportunities-section">
                                 <div className="v0-section-header">
                                     <h3 className="v0-section-title">
                                         {userData.userType === "Professional" ? "Workplace Opportunities" : "Student Initiatives"}
@@ -674,7 +675,7 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
     const { userData,currentUser } = useContext(ProfileContext);
 
     const userType = userData.userType;
-    
+
     const [basicInfoContent, setBasicInfoContent] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [pfpEditVisibility, setPfpEditVisibility] = useState(false);
@@ -682,11 +683,13 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
     const [pfpUrl, setPfpUrl] = useState(userData.userPfpPreview);
     // console.log("pfpUrl", userData.userPfpPreview)
 
+    const [showCropModal, setShowCropModal] = useState(false);
+    const [selectedImageFile, setSelectedImageFile] = useState(null);
+
     const pfpInputRef = useRef(null);
     const resumeInputRef = useRef(null);
 
     const handleFileChange = async (event, fileType) => {
-        setIsUploading(true);
         const file = event.target.files[0];
         if (file) {
           if (fileType === 'pfp' && !file.type.startsWith('image/')) {
@@ -697,20 +700,27 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
             // setResumeError('Please upload a PDF file.');
             return;
           }
-    
-        //   setSelectedOptions(prevData => ({
-        //     ...prevData,
-        //     [fileType === 'pfp' ? 'userPfpPreview' : 'userResumePreview']: URL.createObjectURL(file),
-        //     [fileType === 'pfp' ? 'userPfp' : 'userResume']: file
-        //   }));
-        
-        const newUserPfp = await handleUserProfileUpdate(userData, file, currentUser);
+
+          // For profile pictures, show crop modal
+          if (fileType === 'pfp') {
+            setSelectedImageFile(file);
+            setShowCropModal(true);
+          }
+          // For resumes, upload directly (existing behavior)
+          else {
+            // Handle resume upload
+          }
+        }
+      }
+
+    const handleCroppedImage = async (croppedFile) => {
+        setShowCropModal(false);
+        setIsUploading(true);
+
+        const newUserPfp = await handleUserProfileUpdate(userData, croppedFile, currentUser);
         setPfpUrl(newUserPfp);
         setIsUploading(false);
-    
-          // if (fileType === 'pfp') setPfpError(null);
-          // else setResumeError(null);
-        }
+        setSelectedImageFile(null);
       }
     
     const triggerFileInput = (inputRef) => {
@@ -809,9 +819,19 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
                 {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
                 {userData.sponsoredClubs && <><span><span style={{fontWeight: "500"}}>{basicInfoContent.sponsoredClubs.desc1}</span>: {basicInfoContent.sponsoredClubs.desc2}</span></>}
             </div>
-            
+
         </div>
         </>}
+        {showCropModal && selectedImageFile && (
+          <ProfilePictureCropModal
+            imageFile={selectedImageFile}
+            onClose={() => {
+              setShowCropModal(false);
+              setSelectedImageFile(null);
+            }}
+            onCropComplete={handleCroppedImage}
+          />
+        )}
         </>
     )
 }
@@ -847,31 +867,40 @@ function OpportunityPopup({opportunitiesOptions, opportunityData, setOpportunity
         </div>
         <div style={{width: "100%"}}>
             { (opportunityData && !loading) ? <>
-            {isPublished && <div style={{ textAlign: "center", marginBottom: "12px"}}>
+            {/* {isPublished && <div style={{ textAlign: "center", marginBottom: "12px"}}>
             <span
             style={{fontWeight: "300", fontSize: "22px", color: "var(--secondary)"}}>
                 {userData.userName.split(" ")[0]} is {userData.userType === "Professional" ? "offering" : "hosting"} {opportunityData.organizationType === "Internship" ? "an" : "a"} <span style={{fontWeight: "bold"}}>{opportunityData.organizationType.toLowerCase()}{userData.userType === "Professional" && " opportunity"}!</span>
             </span>
-            </div>}
-            <div 
+            </div>} */}
+            <div
                 className="edit-profile-opportunity-card"
                 onMouseEnter={() => setOpportunityEditVisibility(true)}
                 onMouseLeave={() => setOpportunityEditVisibility(false)}
                 style={{position: "relative"}}>
+                {opportunityEditVisibility && (
+                    <div className="v0-resume-header" style={{position: "absolute", right: "10px", top: "10px", zIndex: "2"}}>
+                        <button
+                            className="v0-edit-btn"
+                            onClick={() => {
+                                setEdittingOpportunity(opportunityData);
+                                setOpportunityModalVisibility(true);
+                                setIsEditing(true);
+                            }}
+                            title="Edit opportunity"
+                        >
+                            <FaRegEdit size={16} />
+                        </button>
+                        <button
+                            className="v0-delete-btn"
+                            onClick={() => setDeleteWarningVisibility(true)}
+                            title="Delete opportunity"
+                        >
+                            <BiTrash size={16} />
+                        </button>
+                    </div>
+                )}
                 <OrganizationProfile location={"user_profile"} organizationData={opportunityData} isPublished={isPublished} hideHeartButton={true}/>
-                
-                {opportunityEditVisibility && <>
-                <button className='btnCircle2' onClick={()=>setDeleteWarningVisibility(true)} style={{position: "absolute", right: "70px", top: "-17px", background: "red", zIndex: "2"}}>
-                    <MdDeleteOutline size={28}/>
-                </button>
-                <div className='addOne' style={{position: "absolute", right: "0", top: "-17px"}}>
-                    <EditInformation isAnswered={opportunityData} isOpportunity={true} onEdit={()=>{
-                        setEdittingOpportunity(opportunityData);
-                        setOpportunityModalVisibility(true);
-                        setIsEditing(true);
-                        }}/>
-                </div>
-                </>}
             </div>
             </> : loading ?
             <div>

@@ -7,12 +7,14 @@ import { useNavigate } from 'react-router-dom';
 import { FcOrganization } from 'react-icons/fc';
 import InviteContactsModal from '../InviteContactsmodal/InviteContactsModal';
 
-export default function NoResults ( {searchTerm} ) {
+export default function NoResults ( {searchTerm, customMessage, customButtonText} ) {
 
   const [inviteContactsModalVisibility,setInviteContactsModalVisibility] = useState(false);
+  const userName = JSON.parse(localStorage.getItem("basicUserInfo") || '{}').userName || '';
+
   return (
     <>
-    {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} />}
+    {inviteContactsModalVisibility && <InviteContactsModal onClose={()=>setInviteContactsModalVisibility(false)} visibility={inviteContactsModalVisibility} userName={userName} />}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -46,7 +48,7 @@ export default function NoResults ( {searchTerm} ) {
           transition={{ delay: 0.5, duration: 0.4 }}
           className="message"
         >
-          Couldn't find who you were looking for? Invite them to your school's network!
+          {customMessage || "Couldn't find who you were looking for? Invite them to your school's network!"}
         </motion.p>
         {/* <motion.ul
           initial={{ opacity: 0, y: 10 }}
@@ -59,7 +61,7 @@ export default function NoResults ( {searchTerm} ) {
           <li>Explore other filter options!</li>
         </motion.ul> */}
         <div style={{display: "flex", alignItems: "center", justifyContent: "center", paddingTop: "15px"}}>
-            <button onClick={()=>setInviteContactsModalVisibility(true)} className="btnInviteContacts" style={{}}>Invite Contacts</button>
+            <button onClick={()=>setInviteContactsModalVisibility(true)} className="btnInviteContacts" style={{}}>{customButtonText || "Invite Contacts"}</button>
         </div>
       </motion.div>
     </>
@@ -83,7 +85,9 @@ export function EmptyField () {
           We're in need of <span style={{fontWeight: "bolder", color: "var(--secondary)"}}>your</span> help! <br />
           Be the first to pave the futures <br /> of aspiring minds.
         </p>
-        <button className='btnSaveChanges' style={{padding: "10px", borderRadius: "10px", fontSize: "15px"}} onClick={() => (navigate("/profile"))}>
+        <button className='btnSaveChanges' style={{padding: "10px", borderRadius: "10px", fontSize: "15px"}} onClick={() => {
+          navigate("/profile", { state: { scrollToOpportunities: true } });
+        }}>
           Add one in your profile!
         </button>
       </motion.div>

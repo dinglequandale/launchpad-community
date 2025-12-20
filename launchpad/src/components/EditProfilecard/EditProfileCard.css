@@ -695,6 +695,47 @@
     top: 12px;
     right: 12px;
     z-index: 10;
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Resume header button styling */
+.v0-resume-header .v0-edit-btn,
+.v0-resume-header .v0-delete-btn {
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.v0-resume-header .v0-edit-btn:hover {
+    background: #f3f4f6;
+    border-color: #1157e2;
+    color: #1157e2;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(17, 87, 226, 0.15);
+}
+
+.v0-resume-header .v0-delete-btn:hover {
+    background: #fef2f2;
+    border-color: #ef4444;
+    color: #ef4444;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.15);
 }
 
 .v0-resume-viewer {
@@ -1716,6 +1757,101 @@
   outline: none;
   border-color: #1157e2;
   box-shadow: 0 0 0 3px rgba(17, 87, 226, 0.1);
+}
+
+/* Collaborators Section */
+.v0-modal-collaborators-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.v0-modal-help-text {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.v0-modal-collaborator-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.v0-modal-collaborator-inputs {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+}
+
+.v0-modal-collaborator-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  transition: all 0.2s ease;
+}
+
+.v0-modal-collaborator-input:focus {
+  outline: none;
+  border-color: #1157e2;
+  box-shadow: 0 0 0 3px rgba(17, 87, 226, 0.1);
+}
+
+.v0-modal-collaborator-input::placeholder {
+  color: #9ca3af;
+}
+
+.v0-modal-collaborator-remove-btn {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.v0-modal-collaborator-remove-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.v0-modal-collaborator-add-btn {
+  background: white;
+  border: 2px dashed #d1d5db;
+  color: #1157e2;
+  padding: 12px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.v0-modal-collaborator-add-btn:hover {
+  background: #f9fafb;
+  border-color: #1157e2;
 }
 
 .v0-modal-file-container {

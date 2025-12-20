@@ -50,17 +50,16 @@ export async function sendConnectMessageWithoutResume(message, currentUserId, co
     // TODO: add a check to see if the user has already received an email notification from this user
     console.log("push notif preference:" + pushNotifPreference)
     if(pushNotifPreference){
+        // Fire-and-forget email notification to avoid blocking the UI
         const sendEmailNotifications = httpsCallable(getFunctions(), "sendEmailNotifications");
-        try{
-            // Get current user's name from localStorage
-            const basicUserInfo = localStorage.getItem("basicUserInfo");
-            const senderName = basicUserInfo ? JSON.parse(basicUserInfo).userName : 'A Launchpad user';
+        // Get current user's name from localStorage
+        const basicUserInfo = localStorage.getItem("basicUserInfo");
+        const senderName = basicUserInfo ? JSON.parse(basicUserInfo).userName : 'A Launchpad user';
 
-            const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: senderName, messagePreview: message});
-            console.log('Email notification sent:', result);
-        }catch(error){
-            console.log('Email notification error:', error);
-        }
+        // Don't await - let it run in background
+        sendEmailNotifications({receiverId: connectingUserId, senderName: senderName, messagePreview: message})
+            .then(result => console.log('Email notification sent:', result))
+            .catch(error => console.log('Email notification error:', error));
     }
 }
 
@@ -104,16 +103,15 @@ export async function sendConnectMessageWithResume(message, resumeURL, metaData,
     setChannelId(newChannel.id);
 
     if(pushNotifPreference){
+        // Fire-and-forget email notification to avoid blocking the UI
         const sendEmailNotifications = httpsCallable(getFunctions(), "sendEmailNotifications");
-        try{
-            // Get current user's name from localStorage
-            const basicUserInfo = localStorage.getItem("basicUserInfo");
-            const senderName = basicUserInfo ? JSON.parse(basicUserInfo).userName : 'A Launchpad user';
+        // Get current user's name from localStorage
+        const basicUserInfo = localStorage.getItem("basicUserInfo");
+        const senderName = basicUserInfo ? JSON.parse(basicUserInfo).userName : 'A Launchpad user';
 
-            const result = await sendEmailNotifications({receiverId: connectingUserId, senderName: senderName, messagePreview: message});
-            console.log('Email notification sent:', result);
-        }catch(error){
-            console.log('Email notification error:', error);
-        }
+        // Don't await - let it run in background
+        sendEmailNotifications({receiverId: connectingUserId, senderName: senderName, messagePreview: message})
+            .then(result => console.log('Email notification sent:', result))
+            .catch(error => console.log('Email notification error:', error));
     }
 }

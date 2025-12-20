@@ -3,9 +3,25 @@ import EditProfileCard from "../../components/EditProfilecard/EditProfileCard"
 import TopBar from "../../components/Topbar/TopBar";
 import SideNav from "../../components/Sidenav/SideNav";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function EditProfilePage(){
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const location = useLocation();
+
+    // Scroll to opportunities section if navigated from Organizations page
+    useEffect(() => {
+        if (location.state?.scrollToOpportunities) {
+            // Wait for DOM to render
+            const timer = setTimeout(() => {
+                const section = document.getElementById('opportunities-section');
+                if (section) {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [location]);
 
     // Listen for sidebar state changes
     useEffect(() => {

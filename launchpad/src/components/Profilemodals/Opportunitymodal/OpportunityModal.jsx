@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import "./OpportunityModal.css";
 import OrganizationProfile from '../../Organizationprofile/OrganizationProfile';
 import ProgressBar from '../../Progressbar/ProgressBar';
+import ProfilePictureCropModal from '../../ProfilePictureCropModal/ProfilePictureCropModal';
 import { GrAdd } from 'react-icons/gr';
 import { LuMessagesSquare } from 'react-icons/lu';
 import { MdEmail } from 'react-icons/md';
@@ -54,6 +55,7 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
     apply: 'Email',
     organizationLogoPreview: null,
     createdByUserName: "",
+    collaborators: [], // Array of {name: string, email: string} objects
   });
 
   const [organizationLogo,setOrganizationLogo] = useState(null);
@@ -428,24 +430,27 @@ const publishOpportunityData = async () => {
               <div className="v0-modal-footer">
                 <div className="v0-modal-navigation">
                   {currentOpportunityPage > 1 && (
-                    <button 
-                      className="v0-btn-secondary" 
+                    <button
+                      type="button"
+                      className="v0-btn-secondary"
                       onClick={() => setCurrentOpportuntityPage(currentOpportunityPage - 1)}
                     >
                       Previous
                     </button>
                   )}
                   {currentOpportunityPage < 5 && (
-                    <button 
-                      className="v0-btn-primary" 
+                    <button
+                      type="button"
+                      className="v0-btn-primary"
                       onClick={() => setCurrentOpportuntityPage(currentOpportunityPage + 1)}
                     >
                       Next
                     </button>
                   )}
                   {currentOpportunityPage === 5 && (
-                    <button 
-                      className="v0-btn-primary" 
+                    <button
+                      type="button"
+                      className="v0-btn-primary"
                       onClick={publishOpportunityData}
                       disabled={isSaving}
                     >
@@ -545,22 +550,22 @@ function ApplicantionTimeline() {
             />
             <div className="v0-modal-date-overlay" style={{display: deadlineDisabled ? "" : "none"}}></div>
             <div className="v0-modal-date-toggle">
-              <button className={`v0-modal-date-toggle-btn ${deadlineDisabled ? "active" : ""}`} onClick={handleNoDeadlineDisabled}>
+              <button type="button" className={`v0-modal-date-toggle-btn ${deadlineDisabled ? "active" : ""}`} onClick={handleNoDeadlineDisabled}>
                 No deadline
               </button>
             </div>
           </div>
           <div className="v0-modal-date-container">
             <label className="v0-modal-date-label">Start date:</label>
-            <DatePicker 
-              selected={organizationData.startDate} 
+            <DatePicker
+              selected={organizationData.startDate}
               onChange={(date)=>handleDatesChanged(date, "startDate")}
               placeholderText="Select a date"
               customInput={<input className="v0-modal-date-input" />}
             />
             <div className="v0-modal-date-overlay" style={{display: startDateDisabled ? "" : "none"}}></div>
             <div className="v0-modal-date-toggle">
-              <button className={`v0-modal-date-toggle-btn ${startDateDisabled ? "active" : ""}`} onClick={handleNoStartDate}>
+              <button type="button" className={`v0-modal-date-toggle-btn ${startDateDisabled ? "active" : ""}`} onClick={handleNoStartDate}>
                 No set date
               </button>
             </div>
@@ -639,7 +644,7 @@ function ApplicantInfo({handleDropdownChange}){
               className="v0-modal-form-input"
               maxLength={80}
             />
-            <button className="v0-modal-add-btn" onClick={handleAddCustomRequirement}>
+            <button type="button" className="v0-modal-add-btn" onClick={handleAddCustomRequirement}>
               <GrAdd size={16}/>
             </button>
           </div>
@@ -731,6 +736,8 @@ function FinalInfo(){
   const [applyType, setApplyType] = useState("");
   const [learnMoreInputVisibility, setLearnMoreInputVisibility] = useState(false);
   const [applyInputVisibility, setApplyInputVisibility] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [selectedLogoFile, setSelectedLogoFile] = useState(null);
 
   useEffect(()=>{
     setLearnMoreType(organizationData.learnMore.split(": ")[0]);
@@ -767,17 +774,27 @@ function FinalInfo(){
     };
   }, [organizationData.logoPreviewURL]);
 
-  
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      console.log(file)
-      setOrganizationData(prevData => ({
-        ...prevData,
-        organizationLogoPreview: URL.createObjectURL(file)
-      }));
-      setOrganizationLogo(file);
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please upload an image file');
+        return;
+      }
+      setSelectedLogoFile(file);
+      setShowCropModal(true);
     }
+  }
+
+  const handleCroppedLogo = (croppedFile) => {
+    setShowCropModal(false);
+    setOrganizationData(prevData => ({
+      ...prevData,
+      organizationLogoPreview: URL.createObjectURL(croppedFile)
+    }));
+    setOrganizationLogo(croppedFile);
+    setSelectedLogoFile(null);
   }
 
   const handleChange = (event) => {
@@ -863,6 +880,66 @@ function FinalInfo(){
               ))}
           </div>
 
+          {/* Collaborators Section */}
+          <div className="v0-modal-collaborators-container">
+            <label className="v0-modal-form-label">
+              Collaborators (Optional)
+              <span className="v0-modal-help-text">Add team members or cofounders who work with you on this opportunity</span>
+            </label>
+            {(organizationData.collaborators || []).map((collaborator, index) => (
+              <div key={index} className="v0-modal-collaborator-item">
+                <div className="v0-modal-collaborator-inputs">
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={collaborator.name || ''}
+                    onChange={(e) => {
+                      const newCollaborators = [...(organizationData.collaborators || [])];
+                      newCollaborators[index] = { ...newCollaborators[index], name: e.target.value };
+                      setOrganizationData({ ...organizationData, collaborators: newCollaborators });
+                    }}
+                    className="v0-modal-collaborator-input"
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={collaborator.email || ''}
+                    onChange={(e) => {
+                      const newCollaborators = [...(organizationData.collaborators || [])];
+                      newCollaborators[index] = { ...newCollaborators[index], email: e.target.value };
+                      setOrganizationData({ ...organizationData, collaborators: newCollaborators });
+                    }}
+                    className="v0-modal-collaborator-input"
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="v0-modal-collaborator-remove-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const newCollaborators = (organizationData.collaborators || []).filter((_, i) => i !== index);
+                    setOrganizationData({ ...organizationData, collaborators: newCollaborators });
+                  }}
+                  title="Remove collaborator"
+                >
+                  <BiTrash size={18} />
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              className="v0-modal-collaborator-add-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                const newCollaborators = [...(organizationData.collaborators || []), { name: '', email: '' }];
+                setOrganizationData({ ...organizationData, collaborators: newCollaborators });
+              }}
+            >
+              <GrAdd size={16} />
+              <span>Add Collaborator</span>
+            </button>
+          </div>
+
           {/* Logo upload */}
           <div className="v0-modal-file-container">
             {questionsForPage
@@ -875,8 +952,9 @@ function FinalInfo(){
                       <div className="v0-modal-file-preview-container">
                         <img src={organizationData.organizationLogoPreview} alt="Logo" className="v0-modal-file-preview-img"/>
                         <div className="v0-modal-file-preview-actions">
-                          <button 
-                            className="v0-modal-file-edit-btn" 
+                          <button
+                            type="button"
+                            className="v0-modal-file-edit-btn"
                             onClick={(e) => {
                               logoRef.current.click();
                               e.preventDefault();
@@ -885,8 +963,9 @@ function FinalInfo(){
                           >
                             <BiEdit size={16}/>
                           </button>
-                          <button 
-                            className="v0-modal-file-remove-btn" 
+                          <button
+                            type="button"
+                            className="v0-modal-file-remove-btn"
                             onClick={(e) => {
                               e.preventDefault();
                               setOrganizationData(prev => ({
@@ -911,8 +990,9 @@ function FinalInfo(){
                         />
                       </div>
                     ) : (
-                      <button 
-                        className="v0-modal-file-btn" 
+                      <button
+                        type="button"
+                        className="v0-modal-file-btn"
                         onClick={(e) => {
                           logoRef.current.click();
                           e.preventDefault();
@@ -937,6 +1017,18 @@ function FinalInfo(){
           </div>
         </div>
     </main>
+
+    {/* Logo Crop Modal */}
+    {showCropModal && selectedLogoFile && (
+      <ProfilePictureCropModal
+        imageFile={selectedLogoFile}
+        onClose={() => {
+          setShowCropModal(false);
+          setSelectedLogoFile(null);
+        }}
+        onCropComplete={handleCroppedLogo}
+      />
+    )}
     </>
   )
 }

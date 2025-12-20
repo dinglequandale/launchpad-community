@@ -132,7 +132,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
         <div className="v0-ellipsed">
           <strong>{basicInfoContent.userFirstDesc.label}:</strong> {basicInfoContent.userFirstDesc.content}
         </div>
-        <div className="v0-ellipsed">
+        <div className="v0-ellipsed-single">
           <strong>{basicInfoContent.userSecondDesc.label}:</strong> {basicInfoContent.userSecondDesc.content}
         </div>
       </div>
