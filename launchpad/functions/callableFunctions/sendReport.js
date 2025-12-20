@@ -101,7 +101,7 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
                 subject: `🚨 New Report: ${reportTarget} - ${reportedUser}`,
                 html: emailTemplate,
             },
-            from: 'no-reply@launchpadhouston.com',
+            from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             status: 'pending',
             provider: 'mailgun',

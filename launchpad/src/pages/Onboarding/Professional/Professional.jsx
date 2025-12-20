@@ -19,7 +19,7 @@ const professionalQuestionsConfig = [
   {
     id: "userName",
     text: "Enter your full name:",
-    placeholder: "E.g. Jimmy Fallon",
+    placeholder: "E.g. Neil deGrasse Tyson",
     type: "text",
     page: 1
   },

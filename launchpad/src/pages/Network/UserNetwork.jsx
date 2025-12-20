@@ -25,6 +25,9 @@ import { useModal } from '../../contexts/ModalContext';
 import { useConnections } from "../../contexts/ConnectionContext";
 import { checkConnection, isConnectionApproved } from "../../services/connectionService";
 import { highSchools } from "../Onboarding/Options";
+import { motion } from 'framer-motion';
+import { FaUserFriends } from 'react-icons/fa';
+import InviteContactsModal from "../../components/InviteContactsmodal/InviteContactsModal";
 // import { checkConnection } from "../../services/connectionService";
 
 
@@ -60,6 +63,8 @@ export default function UserNetwork() {
   const { approved = [], parent_approved = [], loading: connectionsLoading } = useConnections();
 
   const [isRecommended, setIsRecommended] = useState("(recommended)");
+  const [inviteModalVisible, setInviteModalVisible] = useState(false);
+  const userName = JSON.parse(localStorage.getItem("basicUserInfo") || '{}').userName || '';
   
   // Listen for sidebar state changes
   useEffect(() => {
@@ -363,6 +368,13 @@ export default function UserNetwork() {
   return (
     <NetworkContext.Provider value={{handleOnProfileClick, handleConnectClick, loadLimit, filterChanged}}>
       <>
+        {inviteModalVisible && (
+          <InviteContactsModal
+            onClose={() => setInviteModalVisible(false)}
+            visibility={inviteModalVisible}
+            userName={userName}
+          />
+        )}
         {/* <Toaster position={'bottom-right'} reverseOrder={false}/> */}
         {/* All modals are now handled globally via ModalContext */}
         <div>
@@ -495,10 +507,7 @@ export default function UserNetwork() {
                   </div>
                 ) : (
                   <div className="v0-no-results-container">
-                    <NoResults
-                      customMessage="No users found with your interests. Invite colleagues, friends, or mentors who share your passions to grow your network!"
-                      customButtonText="Invite People with Your Interests"
-                    />
+                    <EmptyNetworkState onInviteClick={() => setInviteModalVisible(true)} />
                   </div>
                 )}
               </div>
@@ -625,40 +634,65 @@ function UserGrid({userNetworkData, loading, onEndReached, connectionRefreshKey,
         <h3 className="user-grid-title">{title}</h3>
         <span className="user-grid-count">{userNetworkData.length} users</span>
       </div>
-      
+
       <div className="user-grid" onScroll={handleScroll}>
-        {!loading ? (
-          <>
-            <div className="user-grid-content">
-              {userNetworkData.map((profile, index) => (
-                <div key={index} className="user-grid-item">
-                  <UserCard 
-                    userData={profile} 
-                    onProfileClick={() => handleOnProfileClick(profile.userId)} 
-                    onConnectClick={handleConnectClick}
-                    refreshKey={connectionRefreshKey}
-                  />
-                </div>
-              ))}
+        <div className="user-grid-content">
+          {userNetworkData.map((profile, index) => (
+            <div key={index} className="user-grid-item">
+              <UserCard
+                userData={profile}
+                onProfileClick={() => handleOnProfileClick(profile.userId)}
+                onConnectClick={handleConnectClick}
+                refreshKey={connectionRefreshKey}
+              />
             </div>
-            {hasMore && (
-              <div className="user-grid-load-more">
-                <button 
-                  className="load-more-button" 
-                  onClick={onEndReached}
-                  disabled={loading}
-                >
-                  {loading ? 'Loading...' : 'Load More'}
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="user-grid-loading">
-            <Loading/>
+          ))}
+        </div>
+
+        {loading && (
+          <div className="user-grid-loading-inline">
+            <Loading size={40} />
+          </div>
+        )}
+
+        {hasMore && !loading && (
+          <div className="user-grid-load-more">
+            <button
+              className="load-more-button"
+              onClick={onEndReached}
+            >
+              Load More
+            </button>
           </div>
         )}
       </div>
     </div>
+  );
+}
+
+// Empty state component for when no users are found
+function EmptyNetworkState({ onInviteClick }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="empty-field"
+    >
+      <FaUserFriends className="empty-icon" style={{ fontSize: '80px', color: 'var(--secondary)' }} />
+      <h3 className="empty-title">Nothing to see here ... yet!</h3>
+      <p className="empty-message">
+        Your network is waiting to grow! <br />
+        Invite colleagues, friends, or mentors <br />
+        who share your interests.
+      </p>
+      <button
+        className='btnSaveChanges'
+        style={{ padding: "10px", borderRadius: "10px", fontSize: "15px" }}
+        onClick={onInviteClick}
+      >
+        Invite to Launchpad
+      </button>
+    </motion.div>
   );
 }

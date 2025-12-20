@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
@@ -32,6 +32,7 @@ export default function ConnectionStatusModal({
   const modalRef = useRef(null);
   const connectModalOpenRef = useRef(false);
   const closeTimeoutRef = useRef(null);
+  const isFetchingRef = useRef(false); // Prevent duplicate fetches
   const userType = localStorage.getItem("basicUserInfo") ? JSON.parse(localStorage.getItem("basicUserInfo")).userType : "";
 
   // Track ConnectModal state
@@ -83,7 +84,11 @@ export default function ConnectionStatusModal({
     };
   }, []);
 
-  useEffect(() => {
+  // Memoize the sorted array of user IDs to prevent unnecessary re-fetches
+  // Using a sorted array instead of Set for better memoization
+  const requiredUserIds = useMemo(() => {
+    if (!currentUser?.uid) return [];
+
     const allConnections = [
       ...pending,
       ...pending_parental_approval,
@@ -91,35 +96,82 @@ export default function ConnectionStatusModal({
       ...approved,
       ...incomingRequests,
     ];
+
     const userIds = new Set();
     allConnections.forEach(conn => {
-      if (!currentUser?.uid) return;
       const otherId = conn.initiateUserId === currentUser.uid ? conn.targetUserId : conn.initiateUserId;
-      userIds.add(otherId);
+      if (otherId) userIds.add(otherId);
     });
-    if (userIds.size === 0) {
-      setUserMap({});
+
+    // Return sorted array for stable comparison
+    return Array.from(userIds).sort();
+  }, [pending, pending_parental_approval, parent_approved, approved, incomingRequests, currentUser?.uid]);
+
+  // Convert to string for stable dependency comparison
+  const userIdsKey = requiredUserIds.join(',');
+
+  // Fetch only users that aren't already cached
+  useEffect(() => {
+    if (requiredUserIds.length === 0) {
       return;
     }
+
+    // Prevent duplicate fetches
+    if (isFetchingRef.current) {
+      return;
+    }
+
+    // Find user IDs that aren't in the cache
+    const missingUserIds = requiredUserIds.filter(userId => !userMap[userId]);
+
+    if (missingUserIds.length === 0) {
+      return; // All users already cached
+    }
+
+    isFetchingRef.current = true;
+
     // COMMUNITY VERSION: Use flat collection path
     Promise.all(
-      Array.from(userIds).map(async userId => {
+      missingUserIds.map(async userId => {
         const userDoc = await getDoc(doc(db, 'users', userId));
         return userDoc.exists() ? { id: userId, ...userDoc.data() } : null;
       })
     ).then(users => {
-      const map = {};
+      const newUsers = {};
       users.forEach(user => {
-        if (user) map[user.id] = user;
+        if (user) newUsers[user.id] = user;
       });
-      setUserMap(map);
-    });
-  }, [pending, pending_parental_approval, parent_approved, approved, incomingRequests, currentUser?.uid]);
 
-  // Clear hiddenCards after backend data updates (when any connection array changes)
+      // Only update if we actually have new users
+      if (Object.keys(newUsers).length > 0) {
+        setUserMap(prev => ({ ...prev, ...newUsers }));
+      }
+      isFetchingRef.current = false;
+    }).catch(error => {
+      console.error('Error fetching users:', error);
+      isFetchingRef.current = false;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userIdsKey]); // Only re-run when the actual user IDs change
+
+  // Create stable key for connection data to detect actual changes
+  const connectionsKey = useMemo(() => {
+    const allConnections = [
+      ...pending,
+      ...pending_parental_approval,
+      ...parent_approved,
+      ...approved,
+      ...incomingRequests,
+    ];
+    // Create stable key from connection IDs
+    return allConnections.map(c => c.id).sort().join(',');
+  }, [pending, pending_parental_approval, parent_approved, approved, incomingRequests]);
+
+  // Clear hiddenCards after backend data updates (when connection IDs actually change)
   useEffect(() => {
     setHiddenCards(new Set());
-  }, [pending, pending_parental_approval, parent_approved, approved, incomingRequests]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connectionsKey]); // Only re-run when actual connection IDs change
 
   const getOtherUser = (conn) => {
     if (!currentUser?.uid) return null;

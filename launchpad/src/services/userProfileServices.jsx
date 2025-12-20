@@ -16,14 +16,21 @@ export const lowerAndCapitalize = (title) => {
 }
 
 export const displayShortenedName = (userName) => {
-    let firstLast;
-    try{
-        firstLast = userName.split(" ");
-        if(firstLast[1].length < 10){ return (firstLast[0] + " " + firstLast[1]); }
-        return firstLast[0] + " " + firstLast[1][0] + ".";}
-    catch{
+    try {
+        const nameParts = userName.split(" ");
+        if (nameParts.length === 0) return userName;
+        if (nameParts.length === 1) return userName;
+
+        const firstName = nameParts[0];
+        const lastName = nameParts[nameParts.length - 1]; // Get the actual last name
+
+        if (lastName.length < 10) {
+            return `${firstName} ${lastName}`;
+        }
+        return `${firstName} ${lastName[0]}.`;
+    } catch {
+        return userName;
     }
-    return userName;
 }
 
 export const displayShortenedLinkedin = (linkedInLink) => {

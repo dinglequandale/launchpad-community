@@ -55,8 +55,32 @@ export function ConnectionProvider({ children }) {
     }
   };
 
+  // Initial fetch on mount
   useEffect(() => {
     fetchAllConnections();
+    // eslint-disable-next-line
+  }, []);
+
+  // Refetch connections when user returns to the tab (handles cases where connections
+  // were updated while user was away or in another tab)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchAllConnections();
+      }
+    };
+
+    const handleFocus = () => {
+      fetchAllConnections();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+    };
     // eslint-disable-next-line
   }, []);
 

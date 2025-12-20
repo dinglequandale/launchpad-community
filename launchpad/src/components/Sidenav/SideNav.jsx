@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { IoHomeOutline } from "react-icons/io5";
 import { TbUserHexagon } from "react-icons/tb";
 import { GoOrganization } from "react-icons/go";
-import { LuMessagesSquare } from "react-icons/lu";
+import { LuMessagesSquare, LuMessageSquarePlus } from "react-icons/lu";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LuGraduationCap, LuSettings, LuLogOut, LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { doSignOut } from '../../firebase/auth';
@@ -26,7 +26,8 @@ export default function SideNav({show}){
         [<IoHomeOutline size={24}/>, "Home", "/Home"],
         [<TbUserHexagon size={24}/>, "Network", "/network"],
         [<GoOrganization size={24}/>, "Organizations", "/Organizations"],
-        [<LuMessagesSquare size={24}/>, "Messages", "/chat"]
+        [<LuMessagesSquare size={24}/>, "Messages", "/chat"],
+        [<LuMessageSquarePlus size={24}/>, "Feedback", "/feedback"]
     ];
 
     const [selectedNav, setSelectedNav] = useState(null);

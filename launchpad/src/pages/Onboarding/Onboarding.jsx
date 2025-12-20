@@ -9,6 +9,7 @@ import { BiBriefcase } from 'react-icons/bi';
 import { LuGraduationCap } from 'react-icons/lu';
 import ProgressBar from '../../components/Progressbar/ProgressBar';
 import Loading from '../../components/LoadingAnimation/Loading';
+import PageLoading from '../../components/LoadingAnimation/PageLoading';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { auth } from '../../firebase/firebaseConfig';
@@ -62,9 +63,11 @@ export default function Onboarding() {
 
     const handleSubmit = async () => {
         if (!canSubmit) return;
-        
+
         setIsSubmitting(true);
-        
+        const startTime = Date.now();
+        const minLoadingTime = 3000; // 3 seconds minimum
+
         try {
             // Get the user data from the appropriate component
             // COMMUNITY VERSION: Removed schoolId, keep userType as-is (no Alumni conversion)
@@ -79,30 +82,35 @@ export default function Onboarding() {
                     await saveHighSchooler(user, currentUserData, () => {
                         localStorage.removeItem('tempHighSchoolerInfo');
                         localStorage.removeItem('tempStudentInfo');
-                        navigate('/Home');
                     });
                     break;
                 case "College Student":
                     await saveCollegeStudent(user, currentUserData, () => {
                         localStorage.removeItem('tempCollegeStudentInfo');
-                        navigate('/Home');
                     });
                     break;
                 case "Professional":
                     await saveProfessional(user, currentUserData, () => {
                         localStorage.removeItem('tempProfessionalInfo');
-                        navigate('/Home');
                     });
                     break;
                 case "Staff":
                     await saveStaff(user, currentUserData, () => {
                         localStorage.removeItem('tempStaffInfo');
-                        navigate('/Home');
                     });
                     break;
                 default:
                     throw new Error('Invalid user type');
             }
+
+            // Ensure minimum loading time for animation
+            const elapsedTime = Date.now() - startTime;
+            const remainingTime = Math.max(0, minLoadingTime - elapsedTime);
+
+            await new Promise(resolve => setTimeout(resolve, remainingTime));
+
+            // Navigate after minimum time has passed
+            navigate('/Home');
         } catch (error) {
             console.error('Error saving user data:', error);
             setIsSubmitting(false);
@@ -111,6 +119,7 @@ export default function Onboarding() {
 
     return (
         <>
+            {isSubmitting && <PageLoading />}
             <div className='onboarding-container'>
                 <div className='background-blend'></div>
                 {/* COMMUNITY VERSION: Removed school signup redirect */}

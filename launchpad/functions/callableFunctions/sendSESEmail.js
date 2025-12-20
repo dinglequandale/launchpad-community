@@ -66,7 +66,7 @@ exports.sendSESEmail = functions.https.onCall(async (data, context) => {
                     html: personalizedTemplate,
                 },
                 // Mailgun specific fields
-                from: `Launchpad <${sender}>`,
+                from: `Launchpad Networks <${sender}>`,
                 // Additional metadata for tracking
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
                 status: 'pending',

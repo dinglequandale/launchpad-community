@@ -11,6 +11,7 @@ const {getEmail} = require("./callableFunctions/getEmail");
 // const {createSchoolClaim} = require("./callableFunctions/createSchoolClaim");
 const {sendEmailNotifications} = require("./callableFunctions/sendEmailNotifications");
 const {sendReport} = require("./callableFunctions/sendReport");
+const {sendFeedback} = require("./callableFunctions/sendFeedback");
 const {sendSESEmail} = require("./callableFunctions/sendSESEmail");
 // COMMUNITY VERSION: Removed parent verification functions
 // const {generateVerificationLink} = require("./callableFunctions/generateVerificationLink");
@@ -34,6 +35,7 @@ exports.getEmail = getEmail;
 // exports.createSchoolClaim = createSchoolClaim;
 exports.sendEmailNotifications = sendEmailNotifications;
 exports.sendReport = sendReport;
+exports.sendFeedback = sendFeedback;
 exports.sendSESEmail = sendSESEmail;
 // COMMUNITY VERSION: Removed parent verification exports
 // exports.generateVerificationLink = generateVerificationLink;

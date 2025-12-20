@@ -1,10 +1,10 @@
 import "./Loading.css";
 
-export default function Loading({style={}, size=30, className=""}){
+export default function Loading({style={}, size=40, className="", inline=false}){
     return(
-        <div className={`loading-spinner-container ${className}`} style={style}>
-            <div className="loading-spinner" style={{width: size && `${size}px`, height: size && `${size}px`}}>
-                <div className="spinner-accent"></div>
+        <div className={`loading-spinner-container ${inline ? 'loading-inline' : ''} ${className}`} style={style}>
+            <div className="loading-spinner" style={{width: `${size}px`, height: `${size}px`}}>
+                <div className="spinner-ring"></div>
             </div>
         </div>
     )

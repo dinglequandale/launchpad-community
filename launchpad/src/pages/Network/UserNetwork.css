@@ -309,6 +309,14 @@ body.modal-open {
     min-height: 200px;
 }
 
+.user-grid-loading-inline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 0;
+    border-top: 1px solid #e5e7eb;
+}
+
 /* Responsive grid adjustments */
 @media (max-width: 768px) {
     .user-grid-content {

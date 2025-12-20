@@ -247,7 +247,7 @@ exports.onOpportunityCreated = functions.firestore
                         subject: `New ${opportunityData.organizationType || 'opportunity'}: ${opportunityData.title || opportunityData.applicantPosition || 'Check it out'}!`,
                         html: emailHtml,
                     },
-                    from: 'no-reply@launchpadhouston.com',
+                    from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
                     createdAt: admin.firestore.FieldValue.serverTimestamp(),
                     status: 'pending',
                     provider: 'mailgun',

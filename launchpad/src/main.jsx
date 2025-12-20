@@ -34,6 +34,7 @@ import { ConnectionProvider } from './contexts/ConnectionContext';
 import { Toaster } from 'react-hot-toast';
 import ProfilePage from './pages/ProfilePage/ProfilePage.jsx';
 import OrganizationPage from './pages/OrganizationPage/OrganizationPage.jsx';
+import FeedbackPage from './pages/Feedback/FeedbackPage.jsx';
 
 const ErrorPage = () => {
   return (
@@ -234,6 +235,10 @@ const router = createBrowserRouter([
           {
             path: '/chat',
             element: <InitializeStream/>
+          },
+          {
+            path: '/feedback',
+            element: <FeedbackPage/>
           }
         ]
       }

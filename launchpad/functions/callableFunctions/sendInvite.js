@@ -183,7 +183,7 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
                     subject: `${senderName} invites you to join Launchpad, your school's networking app!`,
                     html: emailTemplate,
                 },
-                from: 'no-reply@launchpadhouston.com',
+                from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
                 status: 'pending',
                 provider: 'mailgun',
