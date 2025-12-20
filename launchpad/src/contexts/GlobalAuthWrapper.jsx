@@ -17,6 +17,7 @@ function GlobalAuthWrapper() {
   // COMMUNITY VERSION: Removed schoolId state (no longer needed)
   const { chatClient, isConnected, connectToStream } = useStreamConnection();
   const [isInitializing, setIsInitializing] = useState(true);
+  const [minLoadingTimeElapsed, setMinLoadingTimeElapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const [userData,setUserData] = useState(null);
@@ -26,6 +27,15 @@ function GlobalAuthWrapper() {
   const [showConnectionModal, setShowConnectionModal] = useState(false);
   const [connectedUserData, setConnectedUserData] = useState(null);
   const [showVerifiedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
+
+  // Ensure loading screen displays for minimum 3.5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinLoadingTimeElapsed(true);
+    }, 3500); // 3.5 seconds to enjoy the rocket animation
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Get connection data and modal functions
   // COMMUNITY VERSION: Removed parent approval states
@@ -151,7 +161,8 @@ function GlobalAuthWrapper() {
     initializeUser();
   }, [currentUser, isConnected, connectToStream, loading, fetchAndStoreConnections, navigate]);
 
-  if (loading || isInitializing) {
+  // Show loading screen if: still loading OR minimum display time hasn't elapsed
+  if (loading || isInitializing || !minLoadingTimeElapsed) {
     return <PageLoading />;
   }
 
