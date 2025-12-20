@@ -3,21 +3,72 @@ import { IoCloseOutline } from 'react-icons/io5';
 import { BiZoomIn, BiZoomOut, BiMove } from 'react-icons/bi';
 import './ProfilePictureCropModal.css';
 
-export default function ProfilePictureCropModal({ imageFile, onClose, onCropComplete }) {
+export default function ProfilePictureCropModal({ imageFile, onClose, onCropComplete, cropShape = 'circle', visibility = true }) {
   const [imageSrc, setImageSrc] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [minZoom, setMinZoom] = useState(0.5);
+  const [maxZoom, setMaxZoom] = useState(3);
   const canvasRef = useRef(null);
   const imageRef = useRef(null);
   const containerRef = useRef(null);
+  const modalRef = useRef(null);
+
+  // Handle outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (modalRef.current && !modalRef.current.contains(e.target)) {
+        onClose();
+      }
+    };
+
+    if (visibility) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [visibility, onClose]);
 
   useEffect(() => {
     if (imageFile) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImageSrc(e.target.result);
+        const result = e.target.result;
+        setImageSrc(result);
+
+        // Calculate dynamic zoom range based on image size
+        const img = new Image();
+        img.onload = () => {
+          const canvasSize = 300;
+          const imageAspect = img.width / img.height;
+          const maxDimension = Math.max(img.width, img.height);
+
+          // Calculate minimum zoom needed to fit entire image in canvas
+          let calculatedMinZoom;
+          if (img.width > img.height) {
+            calculatedMinZoom = canvasSize / img.width;
+          } else {
+            calculatedMinZoom = canvasSize / img.height;
+          }
+
+          // Set min zoom to allow seeing whole image (with some buffer)
+          const finalMinZoom = Math.max(0.1, calculatedMinZoom * 0.9);
+          setMinZoom(finalMinZoom);
+
+          // Set max zoom based on image size (larger images can zoom in more)
+          const finalMaxZoom = Math.max(3, maxDimension / canvasSize);
+          setMaxZoom(finalMaxZoom);
+
+          // Set initial zoom to fit image nicely
+          setZoom(Math.max(finalMinZoom, 1));
+        };
+        img.src = result;
       };
       reader.readAsDataURL(imageFile);
     }
@@ -55,10 +106,27 @@ export default function ProfilePictureCropModal({ imageFile, onClose, onCropComp
       const x = (size - scaledWidth) / 2 + position.x;
       const y = (size - scaledHeight) / 2 + position.y;
 
-      // Draw circular clip
+      // Draw clip path based on shape
       ctx.save();
       ctx.beginPath();
-      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+
+      if (cropShape === 'circle') {
+        // Draw circular clip for profile pictures
+        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      } else if (cropShape === 'rounded-rectangle') {
+        // Draw rounded rectangle for opportunity logos (14px border radius to match OrganizationProfile)
+        const radius = 14;
+        ctx.moveTo(radius, 0);
+        ctx.lineTo(size - radius, 0);
+        ctx.quadraticCurveTo(size, 0, size, radius);
+        ctx.lineTo(size, size - radius);
+        ctx.quadraticCurveTo(size, size, size - radius, size);
+        ctx.lineTo(radius, size);
+        ctx.quadraticCurveTo(0, size, 0, size - radius);
+        ctx.lineTo(0, radius);
+        ctx.quadraticCurveTo(0, 0, radius, 0);
+      }
+
       ctx.closePath();
       ctx.clip();
 
@@ -66,9 +134,22 @@ export default function ProfilePictureCropModal({ imageFile, onClose, onCropComp
       ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
       ctx.restore();
 
-      // Draw circle border
+      // Draw border based on shape
       ctx.beginPath();
-      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      if (cropShape === 'circle') {
+        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      } else if (cropShape === 'rounded-rectangle') {
+        const radius = 14;
+        ctx.moveTo(radius, 0);
+        ctx.lineTo(size - radius, 0);
+        ctx.quadraticCurveTo(size, 0, size, radius);
+        ctx.lineTo(size, size - radius);
+        ctx.quadraticCurveTo(size, size, size - radius, size);
+        ctx.lineTo(radius, size);
+        ctx.quadraticCurveTo(0, size, 0, size - radius);
+        ctx.lineTo(0, radius);
+        ctx.quadraticCurveTo(0, 0, radius, 0);
+      }
       ctx.strokeStyle = '#1976d2';
       ctx.lineWidth = 3;
       ctx.stroke();
@@ -96,7 +177,7 @@ export default function ProfilePictureCropModal({ imageFile, onClose, onCropComp
   };
 
   const handleZoomChange = (delta) => {
-    setZoom(prev => Math.max(0.5, Math.min(3, prev + delta)));
+    setZoom(prev => Math.max(minZoom, Math.min(maxZoom, prev + delta)));
   };
 
   const handleCropConfirm = async () => {
@@ -112,9 +193,11 @@ export default function ProfilePictureCropModal({ imageFile, onClose, onCropComp
     }, 'image/jpeg', 0.95);
   };
 
+  if (!visibility) return null;
+
   return (
-    <div className="crop-modal-overlay" onClick={onClose}>
-      <div className="crop-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="crop-modal-overlay">
+      <div className="crop-modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
         <div className="crop-modal-header">
           <h3>Adjust Your Profile Picture</h3>
           <button className="crop-modal-close-btn" onClick={onClose}>
@@ -145,15 +228,15 @@ export default function ProfilePictureCropModal({ imageFile, onClose, onCropComp
               type="button"
               className="crop-zoom-btn"
               onClick={() => handleZoomChange(-0.1)}
-              disabled={zoom <= 0.5}
+              disabled={zoom <= minZoom}
             >
               <BiZoomOut size={20} />
             </button>
             <input
               type="range"
-              min="0.5"
-              max="3"
-              step="0.1"
+              min={minZoom}
+              max={maxZoom}
+              step="0.01"
               value={zoom}
               onChange={(e) => setZoom(parseFloat(e.target.value))}
               className="crop-zoom-slider"
@@ -162,7 +245,7 @@ export default function ProfilePictureCropModal({ imageFile, onClose, onCropComp
               type="button"
               className="crop-zoom-btn"
               onClick={() => handleZoomChange(0.1)}
-              disabled={zoom >= 3}
+              disabled={zoom >= maxZoom}
             >
               <BiZoomIn size={20} />
             </button>

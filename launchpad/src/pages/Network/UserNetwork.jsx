@@ -466,7 +466,7 @@ export default function UserNetwork() {
                           </div>
                         </div>
                       )}
-                      {highSchoolers.length > 0 && userType !== "Professional" && (
+                      {highSchoolers.length > 0 && (
                         <div className="v0-network-section">
                           <div className="v0-network-section-header">
                             <h3 className="v0-network-section-title">High Schoolers</h3>

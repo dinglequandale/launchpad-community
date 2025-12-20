@@ -283,7 +283,7 @@ export const handleUserResumeUpdate = async (userData, resumeFile, currentUser, 
 
         return downloadURL;
     } catch (error) {
-      console.error(`Error uploading ${folderName}:`, error);
+      console.error(`Error uploading resume:`, error);
       return null;
     }
 }
@@ -299,7 +299,7 @@ export const handleUserProfileUpdate = async (userData, pfpFile, currentUser) =>
         updateLocalPfpPreview(downloadURL);
         return downloadURL;
     } catch (error) {
-      console.error(`Error uploading ${folderName}:`, error);
+      console.error(`Error uploading profile picture:`, error);
       return null;
     }
 }

@@ -830,6 +830,8 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
               setSelectedImageFile(null);
             }}
             onCropComplete={handleCroppedImage}
+            cropShape="circle"
+            visibility={showCropModal}
           />
         )}
         </>

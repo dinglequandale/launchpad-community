@@ -775,6 +775,8 @@ function FinalInfo(){
           setSelectedLogoFile(null);
         }}
         onCropComplete={handleCroppedLogo}
+        cropShape="rounded-rectangle"
+        visibility={showCropModal}
       />
     )}
     </>

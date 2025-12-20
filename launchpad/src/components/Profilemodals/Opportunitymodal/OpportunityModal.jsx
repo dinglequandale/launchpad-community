@@ -122,7 +122,7 @@ const publishOpportunityData = async () => {
       apply: 'Email',
       applicantRequirements: [],
       organizationLogoPreview: null,
-      createdByUserName: "", createdByUserName: userName});
+      createdByUserName: userName});
 
     }, [visibility]);
 
@@ -1027,6 +1027,8 @@ function FinalInfo(){
           setSelectedLogoFile(null);
         }}
         onCropComplete={handleCroppedLogo}
+        cropShape="rounded-rectangle"
+        visibility={showCropModal}
       />
     )}
     </>
