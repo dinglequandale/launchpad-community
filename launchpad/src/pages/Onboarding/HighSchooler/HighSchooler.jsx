@@ -124,9 +124,9 @@ const highSchoolQuestionsConfig = [
   },
   // Page 4
   {
-    id: "parentEmail",
-    text: "Invite Parent to Join Launchpad (Optional)",
-    type: "text",
+    id: "parentEmails",
+    text: "Invite Parents, Guardians, or Mentors to Join Launchpad",
+    type: "multi-email",
     optional: true,
     page: 4
   },
@@ -168,7 +168,7 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
       collegeInterestsOrDecision: [],
       schoolAttending: "",
       schoolId: "",
-      parentEmail: "",
+      parentEmails: [],
       userType: "High Schooler",
     };
   };
@@ -385,28 +385,46 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
 };
 
 const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) => {
-  const [parentEmail, setParentEmail] = useState(selectedOptions.parentEmail || '');
-  const [error, setError] = useState('');
+  const [parentEmails, setParentEmails] = useState(selectedOptions.parentEmails || []);
+  const [errors, setErrors] = useState({});
 
-  const validateParentEmail = () => {
-    if (!parentEmail) {
-      // Email is optional, so clear error if empty
-      setError('');
+  const validateEmail = (email, index) => {
+    if (!email || email.trim() === '') {
+      const newErrors = { ...errors };
+      delete newErrors[index];
+      setErrors(newErrors);
       return true;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(parentEmail)) {
-      setError('Please enter a valid email address');
+    if (!emailRegex.test(email)) {
+      setErrors({ ...errors, [index]: 'Please enter a valid email address' });
       return false;
     }
-    setError('');
+    const newErrors = { ...errors };
+    delete newErrors[index];
+    setErrors(newErrors);
     return true;
   };
 
-  const handleEmailChange = (e) => {
-    const email = e.target.value;
-    setParentEmail(email);
-    handleChange('parentEmail', email);
+  const handleEmailChange = (index, value) => {
+    const newEmails = [...parentEmails];
+    newEmails[index] = value;
+    setParentEmails(newEmails);
+    handleChange('parentEmails', newEmails);
+  };
+
+  const addEmailField = () => {
+    setParentEmails([...parentEmails, '']);
+    handleChange('parentEmails', [...parentEmails, '']);
+  };
+
+  const removeEmailField = (index) => {
+    const newEmails = parentEmails.filter((_, i) => i !== index);
+    setParentEmails(newEmails);
+    handleChange('parentEmails', newEmails);
+    const newErrors = { ...errors };
+    delete newErrors[index];
+    setErrors(newErrors);
   };
 
   return (
@@ -415,13 +433,10 @@ const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) =>
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>
           <FaShieldAlt className="parent-notice-icon" style={{ color: '#1976d2' }} />
           <div className="parent-notice-content">
-            <h3>Invite Your Parent to Join</h3>
+            <h3>Invite Parents, Guardians, or Mentors</h3>
             <p>
-              Help grow the Launchpad community! If your parent is a professional, they can join and mentor other students.
-              We'll send them an invitation email when you complete your onboarding.
-            </p>
-            <p style={{ marginTop: '8px', fontSize: '14px', fontStyle: 'italic' }}>
-              This is completely optional - you can skip this step if you prefer.
+              Help grow the Launchpad community! Invite parents, guardians, or mentors who are professionals to join and mentor other students.
+              We'll send them invitation emails when you complete your onboarding.
             </p>
           </div>
         </div>
@@ -429,42 +444,75 @@ const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) =>
 
       <div className="form-group">
         <label className="form-label">
-          Parent/Guardian Email (Optional)
+          Email Addresses
         </label>
-        <div className="input-group">
-          <input
-            type="email"
-            className="form-input form-shorter-input"
-            placeholder="Enter parent email to invite them"
-            value={parentEmail}
-            onChange={handleEmailChange}
-            onBlur={validateParentEmail}
-          />
-        </div>
-        {error && <div className="error-message">{error}</div>}
-        {parentEmail && !error && (
-          <div style={{ marginTop: '8px', fontSize: '14px', color: '#666' }}>
-            ✓ We'll send an invitation to {parentEmail} when you submit
+        {parentEmails.length === 0 ? (
+          <div style={{ marginBottom: '16px', color: '#666', fontSize: '14px' }}>
+            Click "Add Email" below to invite parents, guardians, or mentors to join Launchpad
           </div>
+        ) : (
+          parentEmails.map((email, index) => (
+            <div key={index} style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '12px', gap: '8px' }}>
+              <div style={{ flex: 1 }}>
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder={`Email ${index + 1}`}
+                  value={email}
+                  onChange={(e) => handleEmailChange(index, e.target.value)}
+                  onBlur={() => validateEmail(email, index)}
+                  style={{ width: '100%' }}
+                />
+                {errors[index] && (
+                  <div className="error-message" style={{ marginTop: '4px' }}>
+                    {errors[index]}
+                  </div>
+                )}
+                {email && !errors[index] && email.trim() !== '' && (
+                  <div style={{ marginTop: '4px', fontSize: '12px', color: '#4caf50' }}>
+                    ✓ Will send invitation to {email}
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => removeEmailField(index)}
+                style={{
+                  padding: '8px 12px',
+                  background: '#f44336',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  minWidth: '80px'
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          ))
         )}
+        <button
+          type="button"
+          onClick={addEmailField}
+          style={{
+            padding: '10px 16px',
+            background: '#1976d2',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+        >
+          <span style={{ fontSize: '18px' }}>+</span>
+          Add Email
+        </button>
       </div>
-{/* 
-      <div style={{
-        marginTop: '20px',
-        padding: '16px',
-        background: '#f8f9fa',
-        borderRadius: '8px',
-        fontSize: '14px',
-        color: '#666'
-      }}>
-        <strong>What happens next?</strong>
-        <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
-          <li>If you provide an email, we'll send your parent an invitation when you click Submit</li>
-          <li>The email will mention that you invited them to join Launchpad</li>
-          <li>They can choose to join or simply ignore the invitation</li>
-          <li>This won't affect your account in any way</li>
-        </ul>
-      </div> */}
     </div>
   );
 };

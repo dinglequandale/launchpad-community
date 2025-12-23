@@ -145,6 +145,12 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
         console.log('[filteringServices] UserTypes in results:', [...new Set(userTypes)]);
     }
 
+    // Create a map of document IDs to document references for pagination cursor tracking
+    const docMap = new Map();
+    querySnapshot.docs.forEach(doc => {
+        docMap.set(doc.id, doc);
+    });
+
     let results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     console.log('[filteringServices] Before currentUser filter:', results.length, 'results');
 
@@ -276,7 +282,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
         results.sort((a, b) => {
             const aInterests = collectionName === "opportunities" ? (a.organizationTags || []) : (a.areasOfInterest || []);
             const bInterests = collectionName === "opportunities" ? (b.organizationTags || []) : (b.areasOfInterest || []);
-            
+
             const aMatches = aInterests.filter(tag => originalInterests.has(tag)).length;
             const bMatches = bInterests.filter(tag => originalInterests.has(tag)).length;
             return bMatches - aMatches; // descending order
@@ -285,7 +291,12 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
         console.warn("Error sorting by relevance:", error);
     }
 
-    const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+    // Get the lastVisible cursor based on the actual last result returned (not the last doc from Firebase)
+    // This ensures pagination continues from where we actually stopped, not from where Firebase stopped
+    const lastResultId = results[results.length - 1]?.id;
+    const lastVisible = lastResultId ? docMap.get(lastResultId) : null;
+
+    console.log('[filteringServices] 📄 Returning', results.length, 'results. LastVisible:', lastVisible?.id);
     return {results, lastVisible};
 }
 

@@ -53,7 +53,7 @@ export default function UserNetwork() {
   const [professionals, setProfessionals] = useState([]);
   const [staff, setStaff] = useState([]);
 
-  const loadLimit = 6;
+  const loadLimit = 9;
   const [lastDocs, setLastDocs] = useState({ highSchool: null, college: null, professional: null, staff: null });
   const [loading, setLoading] = useState({ highSchool: false, college: false, professional: false, staff: false });
   const [overallLoading, setOverallLoading] = useState(false);
@@ -609,24 +609,40 @@ function UserCarousel({userNetworkData, loading, onEndReached, connectionRefresh
 
 function UserGrid({userNetworkData, loading, onEndReached, connectionRefreshKey, title}){
   const { handleOnProfileClick, handleConnectClick, loadLimit, filterChanged } = useContext(NetworkContext);
-  const [hasMore, setHasMore] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(loadLimit); // Start with loadLimit (9) visible items
 
-  // Check if we need to load more when scrolling
+  // Reset visible count when filter changes
   useEffect(() => {
-    if (userNetworkData.length > 0 && userNetworkData.length % loadLimit === 0) {
-      setHasMore(true);
-    } else {
-      setHasMore(false);
+    if (filterChanged) {
+      setVisibleCount(loadLimit);
+    }
+  }, [filterChanged, loadLimit]);
+
+  // Reset visible count when data changes significantly (new filter applied)
+  useEffect(() => {
+    if (userNetworkData.length <= loadLimit) {
+      setVisibleCount(userNetworkData.length);
     }
   }, [userNetworkData.length, loadLimit]);
 
-  // Load more when user scrolls near the bottom
-  const handleScroll = (e) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.target;
-    if (scrollTop + clientHeight >= scrollHeight - 100 && hasMore && !loading) {
+  // Check if there are more items to display (either in current data or to fetch)
+  const hasMoreToShow = visibleCount < userNetworkData.length;
+  const hasMoreToFetch = userNetworkData.length > 0 && userNetworkData.length % loadLimit === 0;
+
+  const handleLoadMore = () => {
+    // If we have more data already loaded, just show more of it
+    if (hasMoreToShow) {
+      setVisibleCount(prev => Math.min(prev + loadLimit, userNetworkData.length));
+    }
+    // If we've shown all loaded data and there might be more to fetch, fetch more
+    if (!hasMoreToShow && hasMoreToFetch && !loading) {
       onEndReached();
+      setVisibleCount(prev => prev + loadLimit);
     }
   };
+
+  // Only display the visible subset of users
+  const visibleUsers = userNetworkData.slice(0, visibleCount);
 
   return (
     <div className="user-grid-container">
@@ -635,9 +651,9 @@ function UserGrid({userNetworkData, loading, onEndReached, connectionRefreshKey,
         <span className="user-grid-count">{userNetworkData.length} users</span>
       </div>
 
-      <div className="user-grid" onScroll={handleScroll}>
+      <div className="user-grid">
         <div className="user-grid-content">
-          {userNetworkData.map((profile, index) => (
+          {visibleUsers.map((profile, index) => (
             <div key={index} className="user-grid-item">
               <UserCard
                 userData={profile}
@@ -655,11 +671,11 @@ function UserGrid({userNetworkData, loading, onEndReached, connectionRefreshKey,
           </div>
         )}
 
-        {hasMore && !loading && (
+        {(hasMoreToShow || hasMoreToFetch) && !loading && (
           <div className="user-grid-load-more">
             <button
               className="load-more-button"
-              onClick={onEndReached}
+              onClick={handleLoadMore}
             >
               Load More
             </button>

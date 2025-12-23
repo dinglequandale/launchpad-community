@@ -21,7 +21,7 @@
     flex-direction: column;
     align-items: center;
     gap: 16px;
-    padding: 16px 0;
+    padding: 7px 0;
     /* height: 100%; */
     justify-content: space-between;
     /* min-height: 200px; */
@@ -42,8 +42,8 @@
 }
 
 .v0-avatar-img {
-    width: 48px;
-    height: 48px;
+    width: 75px;
+    height: 75px;
     border-radius: 50%;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     object-fit: cover;

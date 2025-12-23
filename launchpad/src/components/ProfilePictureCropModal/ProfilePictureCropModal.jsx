@@ -196,8 +196,8 @@ export default function ProfilePictureCropModal({ imageFile, onClose, onCropComp
   if (!visibility) return null;
 
   return (
-    <div className="crop-modal-overlay">
-      <div className="crop-modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
+    <div className="v0-modal-overlay" onClick={onClose}>
+      <div className="v0-modal-container crop-modal" ref={modalRef} onClick={(e) => e.stopPropagation()}>
         <div className="crop-modal-header">
           <h3>Adjust Your Profile Picture</h3>
           <button className="crop-modal-close-btn" onClick={onClose}>

@@ -29,21 +29,31 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        // Send parent invitation email if email was provided
-        if (highSchoolerData.parentEmail && highSchoolerData.parentEmail.trim()) {
+        // Send parent invitation emails if any emails were provided
+        if (highSchoolerData.parentEmails && Array.isArray(highSchoolerData.parentEmails) && highSchoolerData.parentEmails.length > 0) {
             try {
                 const sendSESEmail = httpsCallable(getFunctions(), 'sendSESEmail');
-                await sendSESEmail({
-                    recipient: [highSchoolerData.parentEmail],
-                    subject: `${highSchoolerData.userName} invited you to join Launchpad`,
-                    htmlTemplate: parentInvitationTemplate({
-                        studentName: highSchoolerData.userName || 'Your child',
-                    }),
-                    emailType: "parent_invitation"
-                });
-                console.log('Parent invitation email sent to:', highSchoolerData.parentEmail);
-            } catch (emailError) {
-                console.error('Error sending parent invitation email:', emailError);
+                // Filter out empty emails and send to each valid email
+                const validEmails = highSchoolerData.parentEmails.filter(email => email && email.trim());
+
+                for (const email of validEmails) {
+                    try {
+                        await sendSESEmail({
+                            recipient: [email],
+                            subject: `${highSchoolerData.userName} invited you to join Launchpad`,
+                            htmlTemplate: parentInvitationTemplate({
+                                studentName: highSchoolerData.userName || 'Your child',
+                            }),
+                            emailType: "parent_invitation"
+                        });
+                        console.log('Parent invitation email sent to:', email);
+                    } catch (emailError) {
+                        console.error('Error sending parent invitation email to', email, ':', emailError);
+                        // Continue to next email if one fails
+                    }
+                }
+            } catch (error) {
+                console.error('Error in parent invitation email process:', error);
                 // Don't fail the onboarding if email fails
             }
         }
@@ -186,7 +196,7 @@ export const packageBasicUserInfoToLS = (userData) => {
         userSchool: userData.schoolName,
         isCommitted: (userData.userType === "High Schooler") ? !Array.isArray(userData.collegeInterestsOrDecision) : null,
         // COMMUNITY VERSION: Removed parent verification fields
-        parentEmail: (userData.userType === "High Schooler") ? userData.parentEmail : null,
+        parentEmails: (userData.userType === "High Schooler") ? userData.parentEmails : null,
     };
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));
