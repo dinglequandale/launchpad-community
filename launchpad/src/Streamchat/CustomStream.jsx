@@ -41,6 +41,12 @@ const ChannelListContainer = styled.div`
   min-width: 300px;
   flex-shrink: 0;
   z-index: 2;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    min-width: 100%;
+    display: ${props => props.$hideOnMobile ? 'none' : 'block'};
+  }
 `;
 
 const ChannelContainer = styled.div`
@@ -48,6 +54,39 @@ const ChannelContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 0;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    display: ${props => props.$hideOnMobile ? 'none' : 'flex'};
+  }
+`;
+
+const MobileBackButton = styled.button`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1157e2;
+    cursor: pointer;
+    padding: 12px 16px;
+    font-weight: 500;
+    font-size: 14px;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #f9fafb;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+  }
 `;
 
 // Add display name for memo component
@@ -57,7 +96,7 @@ CustomChannelPreview.displayName = 'CustomChannelPreview';
 
 export const CustomChat = ({ client, filters, sort, channels, activeChannel: initialActiveChannel }) => {
   const [activeChannel, setActiveChannel] = useState(initialActiveChannel);
-  
+
   // Update active channel when prop changes
   useEffect(() => {
     if (initialActiveChannel && initialActiveChannel !== activeChannel) {
@@ -70,16 +109,20 @@ export const CustomChat = ({ client, filters, sort, channels, activeChannel: ini
     const styleElement = document.createElement('style');
     styleElement.textContent = createCustomStylesheet();
     document.head.appendChild(styleElement);
-    
+
     return () => {
       document.head.removeChild(styleElement);
     };
   }, []);
 
+  const handleBackToChannelList = () => {
+    setActiveChannel(null);
+  };
+
   return (
     <ChatContainer>
       <Chat client={client} theme="messaging light">
-        <ChannelListContainer>
+        <ChannelListContainer $hideOnMobile={!!activeChannel}>
           {channels.length === 0 ? (
             <EmptyState
               title="No Contacts Yet"
@@ -91,8 +134,8 @@ export const CustomChat = ({ client, filters, sort, channels, activeChannel: ini
               sort={sort}
               options={{ state: true, presence: true, limit: 10 }}
               Preview={(previewProps) => (
-                <CustomChannelPreview 
-                  {...previewProps} 
+                <CustomChannelPreview
+                  {...previewProps}
                   activeChannel={activeChannel}
                   setActiveChannel={setActiveChannel}
                 />
@@ -100,16 +143,22 @@ export const CustomChat = ({ client, filters, sort, channels, activeChannel: ini
             />
           )}
         </ChannelListContainer>
-        
-        <ChannelContainer>
+
+        <ChannelContainer $hideOnMobile={!activeChannel}>
           {activeChannel ? (
-            <Channel 
+            <Channel
               channel={activeChannel}
               Message={MessageSimple} // Using default MessageSimple, but styled via CSS
             >
               <Window>
+                <MobileBackButton onClick={handleBackToChannelList}>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  </svg>
+                  Back to Conversations
+                </MobileBackButton>
                 <ChannelHeaderContainer>
-                  <ChannelHeader 
+                  <ChannelHeader
                 />
                 </ChannelHeaderContainer>
                 <MessageList />

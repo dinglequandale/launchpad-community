@@ -71,6 +71,30 @@ body.modal-open {
   right: 10px;
 }
 
+/* Mobile carousel styles */
+@media (max-width: 768px) {
+  .carousel {
+    width: 100% !important;
+    max-width: 400px;
+  }
+
+  .carousel-item {
+    flex: 0 0 100% !important;
+  }
+
+  .carousel-content {
+    justify-content: center !important;
+  }
+
+  .carousel-button.prev {
+    left: -20px;
+  }
+
+  .carousel-button.next {
+    right: -20px;
+  }
+}
+
 .slide-left, .slide-right {
   transition: transform 1s ease;
 }
@@ -132,7 +156,7 @@ body.modal-open {
 }
 
 .v0-network-section-title {
-    font-size: 18px;
+    font-size: clamp(16px, 3vw, 18px);
     font-weight: 600;
     color: #111827;
     margin: 0;
@@ -162,7 +186,7 @@ body.modal-open {
 }
 
 .v0-section-title {
-    font-size: 20px;
+    font-size: clamp(18px, 3.5vw, 20px);
     font-weight: 600;
     color: #111827;
     margin: 0;
@@ -239,7 +263,7 @@ body.modal-open {
 }
 
 .user-grid-title {
-    font-size: 20px;
+    font-size: clamp(18px, 3.5vw, 20px);
     font-weight: 600;
     color: #111827;
     margin: 0;
@@ -323,17 +347,29 @@ body.modal-open {
         grid-template-columns: 1fr;
         gap: 16px;
     }
-    
+
     .user-grid {
         padding: 16px;
     }
-    
+
     .user-grid-header {
         padding: 20px 20px 16px 20px;
     }
-    
+
     .v0-filtered-results {
         padding: 16px;
+    }
+
+    /* Touch-friendly buttons */
+    .load-more-button {
+        min-height: 44px;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .carousel-button {
+        min-width: 44px;
+        min-height: 44px;
     }
 }
 

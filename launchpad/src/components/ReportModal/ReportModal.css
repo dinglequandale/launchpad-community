@@ -192,3 +192,36 @@
   }
 }
 
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .report-modal {
+    width: 95%;
+    margin: 0 16px;
+  }
+
+  .report-modal-header,
+  .report-modal-content {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .report-modal-actions {
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .report-modal-btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .report-modal-close-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .report-modal-textarea {
+    min-height: 100px;
+  }
+}
+

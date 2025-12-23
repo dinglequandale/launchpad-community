@@ -255,13 +255,24 @@
     max-width: 100%;
     margin: 0 16px;
   }
-  
+
   .connect-modal-content {
     padding: 24px 24px 20px;
   }
-  
+
   .connect-modal-footer {
     flex-direction: column;
+  }
+
+  /* Touch-friendly buttons */
+  .connect-modal-cancel-button,
+  .connect-modal-send-button {
+    min-height: 44px;
+  }
+
+  .connect-modal-close-btn {
+    min-width: 44px;
+    min-height: 44px;
   }
 }
 

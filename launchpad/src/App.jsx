@@ -14,9 +14,9 @@ function App() {
   // TODO: later input logic for this boolean to check whether user finished onboarding
 
   return (
-    <MobileBlocker>
+    // <MobileBlocker>
       <LandingPageRevamped/>
-    </MobileBlocker>
+    // </MobileBlocker>
   )
 }
 

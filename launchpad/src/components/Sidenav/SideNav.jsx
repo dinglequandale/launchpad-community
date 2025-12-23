@@ -24,6 +24,9 @@ export default function SideNav({show}){
         return savedState === 'true';
     });
 
+    // Mobile menu open state
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
     const { openLogoutModal } = useModal();
     const [unreadCount, setUnreadCount] = useState(0);
     const navList = [
@@ -35,6 +38,31 @@ export default function SideNav({show}){
     ];
 
     const [selectedNav, setSelectedNav] = useState(null);
+
+    // Listen for mobile menu toggle events
+    useEffect(() => {
+        const handleMobileMenuToggle = () => {
+            setIsMobileMenuOpen(prev => !prev);
+        };
+
+        window.addEventListener('toggleMobileMenu', handleMobileMenuToggle);
+        return () => window.removeEventListener('toggleMobileMenu', handleMobileMenuToggle);
+    }, []);
+
+    // Close mobile menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (isMobileMenuOpen && window.innerWidth <= 1024) {
+                const sidebar = document.querySelector('.v0-sidebar');
+                if (sidebar && !sidebar.contains(e.target) && !e.target.closest('.v0-mobile-menu-btn')) {
+                    setIsMobileMenuOpen(false);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isMobileMenuOpen]);
 
     // Track unread messages from Stream Chat
     useEffect(() => {
@@ -97,6 +125,10 @@ export default function SideNav({show}){
     const handleNavClick = (label) => {
         setSelectedNav(label);
         sessionStorage.setItem('selectedNav', label);
+        // Close mobile menu when nav item is clicked
+        if (window.innerWidth <= 1024) {
+            setIsMobileMenuOpen(false);
+        }
     }
 
     const toggleSidebar = () => {
@@ -134,7 +166,7 @@ export default function SideNav({show}){
 
     return(
         <>
-            <div className={`v0-sidebar ${isCollapsed ? 'v0-sidebar-collapsed' : ''}`}>
+            <div className={`v0-sidebar ${isCollapsed ? 'v0-sidebar-collapsed' : ''} ${isMobileMenuOpen ? 'open' : ''}`}>
                 <div className="v0-sidebar-header">
                     <div className="v0-logo-section">
 
@@ -192,6 +224,12 @@ export default function SideNav({show}){
                     </div>
                 </div>
             </div>
+            {isMobileMenuOpen && (
+                <div
+                    className="v0-sidebar-overlay"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                ></div>
+            )}
         </>
     )
 }

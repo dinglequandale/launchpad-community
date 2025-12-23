@@ -192,7 +192,7 @@ export const getUserHS = (schoolName) => {
 
     if(hsAbbreviations[schoolName]) return hsAbbreviations[schoolName];
     const baseSchoolName = schoolName.replace(/(School|High School)$/i, "").trim();
-    return baseSchoolName + " H.S."
+    return baseSchoolName
 }
 
 export const displaySchools = (schools) => {

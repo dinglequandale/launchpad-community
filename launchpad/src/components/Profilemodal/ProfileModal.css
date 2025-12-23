@@ -421,25 +421,33 @@
     max-width: 100%;
     margin: 0 16px;
   }
-  
+
   .profile-modal-section {
     padding: 24px 24px 20px;
     flex-direction: column;
     text-align: center;
   }
-  
+
   .profile-modal-content {
     padding-left: 24px;
     padding-right: 24px;
   }
-  
+
   .profile-modal-detail-item {
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .profile-modal-connect-btn {
     max-width: 100%;
     margin-top: 12px;
+    min-height: 44px;
+  }
+
+  /* Touch-friendly close button */
+  .profile-modal-close-btn,
+  .profile-modal-action-btn {
+    min-width: 44px;
+    min-height: 44px;
   }
 }

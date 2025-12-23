@@ -9,7 +9,7 @@ import { useConnections } from '../../contexts/ConnectionContext';
 import DefaultIcon from '../DefaultIcon/DefaultIcon';
 import './TopBar.css';
 
-export default function TopBar({ isSidebarCollapsed }) {
+export default function TopBar({ isSidebarCollapsed, onToggleSidebar }) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [basicUserInfo, setBasicUserInfo] = useState(null);
     const [notificationClicked, setNotificationClicked] = useState(false);
@@ -19,6 +19,11 @@ export default function TopBar({ isSidebarCollapsed }) {
     const { openLogoutModal } = useModal();
     const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
     const [userPfp, setUserPfp] = useState(null);
+
+    const handleMenuToggle = () => {
+        // Dispatch event to toggle mobile menu
+        window.dispatchEvent(new CustomEvent('toggleMobileMenu'));
+    };
     
     // Get connection data for notifications
     const {
@@ -108,9 +113,13 @@ export default function TopBar({ isSidebarCollapsed }) {
     return (
         <div className={`v0-topbar ${isSidebarCollapsed ? 'v0-topbar-sidebar-collapsed' : 'v0-topbar-sidebar-expanded'}`}>
             <div className="v0-topbar-left">
-                {/* <button className="v0-mobile-menu-btn">
-                    <LuMenu size={20} />
-                </button> */}
+                <button
+                    className="v0-mobile-menu-btn"
+                    onClick={handleMenuToggle}
+                    aria-label="Toggle menu"
+                >
+                    <LuMenu size={24} />
+                </button>
                 {/* <div className="v0-logo-section">
                     <img
                         src="/assets/launchpad_logo_v2.png"
@@ -120,7 +129,7 @@ export default function TopBar({ isSidebarCollapsed }) {
                     />
                 </div> */}
             </div>
-            
+
             <div className="v0-topbar-right">
                 <button 
                     className="v0-notification-btn"

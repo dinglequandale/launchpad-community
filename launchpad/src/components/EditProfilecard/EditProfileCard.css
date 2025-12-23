@@ -403,9 +403,74 @@
     left: 0;
     padding: 16px;
   }
-  
+
   .v0-sidebar-collapsed ~ .complete-profile-container {
     left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .v0-profile-container {
+    padding: 16px;
+  }
+
+  .v0-profile-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .v0-back-btn {
+    order: 1;
+  }
+
+  .v0-profile-title {
+    order: 2;
+    text-align: center;
+    font-size: 24px;
+  }
+
+  .v0-connections-btn {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Fix hardcoded widths */
+  .edit-profile-opportunity-card {
+    min-width: 100%;
+  }
+
+  .v0-dream-universities-privacy {
+    width: 100%;
+  }
+
+  /* Make modal inputs full width on mobile */
+  .v0-modal-form-select-custom {
+    width: 100%;
+  }
+
+  .v0-modal-form-input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Stack contact items */
+  .v0-contact-item {
+    width: 100%;
+  }
+
+  /* Make resume viewer shorter on mobile */
+  .v0-resume-viewer {
+    height: 400px;
+  }
+
+  /* Touch-friendly buttons */
+  .v0-edit-btn,
+  .v0-add-btn,
+  .v0-delete-btn {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
 

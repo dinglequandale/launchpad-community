@@ -327,12 +327,12 @@
     max-width: none;
     max-height: 95vh;
   }
-  
+
   .v0-opportunity-apply-content {
     flex-direction: column;
     height: calc(95vh - 100px);
   }
-  
+
   .v0-opportunity-apply-sidebar {
     width: 100%;
     border-right: none;
@@ -340,15 +340,31 @@
     max-height: 200px;
     overflow-y: auto;
   }
-  
+
   .v0-opportunity-apply-details {
     flex-direction: row;
     overflow-x: auto;
     gap: 12px;
   }
-  
+
   .v0-opportunity-apply-detail-item {
     min-width: 200px;
     flex-shrink: 0;
+  }
+
+  /* Touch-friendly buttons */
+  .v0-opportunity-apply-submit-btn,
+  .v0-opportunity-apply-website-btn {
+    min-height: 44px;
+  }
+
+  .v0-opportunity-apply-close-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Touch-friendly form inputs */
+  .v0-form-textarea {
+    min-height: 100px;
   }
 }

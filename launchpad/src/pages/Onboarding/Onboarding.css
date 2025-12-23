@@ -37,9 +37,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 400px;
-  max-width: 100%;
-  min-width: 600px;
+  width: 100%;
+  max-width: 600px;
   background-color: white;
   padding: clamp(1rem, 2.5vw, 1.5rem);
   border-radius: 20px;
@@ -811,6 +810,7 @@ textarea.form-input {
   .prevButton {
     width: 100%;
     font-size: 16px;
+    min-height: 44px;
   }
 
   .userType-options-container {
@@ -819,15 +819,19 @@ textarea.form-input {
 
   .userType-option {
     padding: 16px;
+    min-height: 44px;
   }
 
   .onboarding-footer {
     flex-direction: column;
   }
-}
 
-@media screen and (min-width: 1440px) {
-  .onboarding-body {
-    width: 600px;
+  /* Touch-friendly form inputs */
+  .form-input {
+    min-height: 44px;
+  }
+
+  .request-btn {
+    min-height: 44px;
   }
 }

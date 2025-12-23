@@ -88,13 +88,20 @@
         margin-left: 0;
         padding: 16px;
     }
-    
+
     .v0-sidebar-collapsed ~ .organizationsContainer {
         margin-left: 0;
     }
-    
+
     .v0-organizations-content {
         padding: 16px;
         border-radius: 8px;
+    }
+
+    /* Touch-friendly buttons */
+    .v0-show-more-btn {
+        min-height: 44px;
+        width: 100%;
+        max-width: 300px;
     }
 }

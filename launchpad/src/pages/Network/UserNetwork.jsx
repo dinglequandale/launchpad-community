@@ -523,11 +523,27 @@ export default function UserNetwork() {
 
 function UserCarousel({userNetworkData, loading, onEndReached, connectionRefreshKey}){
   const { handleOnProfileClick,handleConnectClick,loadLimit, filterChanged } = useContext(NetworkContext);
-  const itemsPerPage = 3;
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const itemsPerPage = isMobile ? 1 : 3;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState('');
   const carouselRef = useRef(null);
-  const scrollAmount = 3;
+  const scrollAmount = isMobile ? 1 : 3;
+
+  // Listen for window resize to update mobile state
+  useEffect(() => {
+    const handleResize = () => {
+      const wasMobile = isMobile;
+      const nowMobile = window.innerWidth <= 768;
+      setIsMobile(nowMobile);
+      // Reset index when switching between mobile and desktop
+      if (wasMobile !== nowMobile) {
+        setCurrentIndex(0);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isMobile]);
 
   useEffect(()=>{
     console.log(filterChanged)
