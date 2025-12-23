@@ -61,6 +61,9 @@ export async function sendConnectMessageWithoutResume(message, currentUserId, co
             .then(result => console.log('Email notification sent:', result))
             .catch(error => console.log('Email notification error:', error));
     }
+
+    // Return the channel ID so it can be used for navigation
+    return newChannel.id;
 }
 
 export async function sendConnectMessageWithResume(message, resumeURL, metaData, currentUserId, connectingUserId, setChannelId, chat){
@@ -114,4 +117,7 @@ export async function sendConnectMessageWithResume(message, resumeURL, metaData,
             .then(result => console.log('Email notification sent:', result))
             .catch(error => console.log('Email notification error:', error));
     }
+
+    // Return the channel ID so it can be used for navigation
+    return newChannel.id;
 }

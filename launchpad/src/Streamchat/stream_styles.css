@@ -16,19 +16,20 @@
 /* Messages Container Styling */
 .v0-messages-container {
     margin-left: 240px;
-    margin-top: 64px;
-    padding: 24px;
-    min-height: calc(100vh - 64px);
+    margin-top: 50px;
+    padding: 16px;
+    height: 100vh;
     background: #f9fafb;
     transition: margin-left 0.3s ease-in-out;
+    overflow: hidden;
 }
 
 .v0-messages-sidebar-expanded {
-    margin-left: 240px;
+    margin-left: 225px;
 }
 
 .v0-messages-sidebar-collapsed {
-    margin-left: 64px;
+    margin-left: 55px;
 }
 
 /* Responsive Design */

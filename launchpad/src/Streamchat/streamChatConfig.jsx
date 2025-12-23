@@ -16,7 +16,7 @@ import './stream_styles.css';
 export default function InitializeStream() {
 
   const location = useLocation();
-  const selectedConnection = location.state;
+  const selectedChannelId = location.state; // Channel ID passed from navigation
 
   const [channels, setChannels] = useState(null)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -24,13 +24,15 @@ export default function InitializeStream() {
 
 
   const [activeChannel, setActiveChannel] = useState(null);
-  
+
   const [error, setError] = useState(null);
 
   const { chatClient, isConnected } = useOutletContext();
 
   const filters = { type: "messaging", members: { $in: [currentUser.uid] } };
   const sort = { last_message_at: -1 };
+
+  console.log('[InitializeStream] Received channel ID from navigation:', selectedChannelId);
 
   // Listen for sidebar state changes
   useEffect(() => {
@@ -53,6 +55,7 @@ export default function InitializeStream() {
       window.removeEventListener('sidebarToggle', handleSidebarToggle);
     };
   }, []);
+  // Initialize chat and load channels
   useEffect(() => {
     async function initializeChat() {
       if (!currentUser || !isConnected) {
@@ -61,7 +64,6 @@ export default function InitializeStream() {
       }
 
       try {
-        
         const channelResponse = await chatClient.queryChannels(filters, sort, {
           watch: true,
           state: true,
@@ -69,12 +71,6 @@ export default function InitializeStream() {
 
         console.log("Channels response:", channelResponse);
         setChannels(channelResponse);
-
-        if (selectedConnection) {
-          const channel = chatClient.channel('messaging', selectedConnection);
-          await channel.watch();
-          setActiveChannel(channel);
-        }
       } catch (err) {
         console.error("Initialization error:", err);
         setError(err.message);
@@ -84,34 +80,38 @@ export default function InitializeStream() {
     initializeChat();
   }, [currentUser, isConnected, chatClient]);
 
-
-  useEffect(()=>{
-    async function setExistingChannel(channelId){
-      try {
-        const channel = chatClient.channel('messaging', channelId);
-        
-        await channel.watch();
-  
-        setActiveChannel(channel);
-      } catch (error) {
-        console.error('Error opening channel:', error);
+  // Handle opening a specific channel (from navigation)
+  useEffect(() => {
+    async function openSpecificChannel() {
+      if (!selectedChannelId || !chatClient || !isConnected) {
+        console.log('[InitializeStream] Cannot open channel:', { selectedChannelId, chatClient: !!chatClient, isConnected });
+        return;
       }
-  
+
+      try {
+        console.log('[InitializeStream] Opening channel:', selectedChannelId);
+        const channel = chatClient.channel('messaging', selectedChannelId);
+        await channel.watch();
+        setActiveChannel(channel);
+        console.log('[InitializeStream] Channel opened successfully');
+      } catch (error) {
+        console.error('[InitializeStream] Error opening channel:', error);
+      }
     }
 
-    if(selectedConnection){
-      setExistingChannel(selectedConnection);
-    }
-  },[selectedConnection])
+    openSpecificChannel();
+  }, [selectedChannelId, chatClient, isConnected])
 
   if(!chatClient || !channels) return ( <PageLoading/> );
 
   return (
     <>
+      <div style={{height: "100vh", overflow: "hidden"}}>
       <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
       <SideNav/>
       <div className={`v0-messages-container ${isSidebarCollapsed ? 'v0-messages-sidebar-collapsed' : 'v0-messages-sidebar-expanded'}`}>
         <CustomChat client={chatClient} channels={channels} initialActiveChannel={activeChannel} filters={filters}/>
+      </div>
       </div>
     </>
   )

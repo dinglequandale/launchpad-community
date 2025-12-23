@@ -9,11 +9,14 @@ import { LuGraduationCap, LuSettings, LuLogOut, LuChevronLeft, LuChevronRight } 
 import { doSignOut } from '../../firebase/auth';
 import toast from 'react-hot-toast';
 import { useModal } from '../../contexts/ModalContext';
+import { StreamChat } from 'stream-chat';
+import { useAuth } from '../../contexts/auth/AuthContext';
 
 export default function SideNav({show}){
 
     const location = useLocation();
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
 
     // Initialize collapsed state from sessionStorage
     const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -22,6 +25,7 @@ export default function SideNav({show}){
     });
 
     const { openLogoutModal } = useModal();
+    const [unreadCount, setUnreadCount] = useState(0);
     const navList = [
         [<IoHomeOutline size={24}/>, "Home", "/Home"],
         [<TbUserHexagon size={24}/>, "Network", "/network"],
@@ -31,6 +35,50 @@ export default function SideNav({show}){
     ];
 
     const [selectedNav, setSelectedNav] = useState(null);
+
+    // Track unread messages from Stream Chat
+    useEffect(() => {
+        const chatClient = StreamChat.getInstance(import.meta.env.VITE_STREAM_API_KEY);
+
+        const updateUnreadCount = async () => {
+            if (chatClient.userID && currentUser) {
+                try {
+                    const filters = { type: 'messaging', members: { $in: [currentUser.uid] } };
+                    const channels = await chatClient.queryChannels(filters);
+
+                    let totalUnread = 0;
+                    channels.forEach(channel => {
+                        const unread = channel.countUnread();
+                        totalUnread += unread;
+                    });
+
+                    setUnreadCount(totalUnread);
+                } catch (error) {
+                    console.error('Error fetching unread count:', error);
+                }
+            }
+        };
+
+        // Initial count
+        updateUnreadCount();
+
+        // Listen for new messages
+        const handleEvent = () => {
+            updateUnreadCount();
+        };
+
+        if (chatClient.userID) {
+            chatClient.on('message.new', handleEvent);
+            chatClient.on('message.read', handleEvent);
+        }
+
+        return () => {
+            if (chatClient.userID) {
+                chatClient.off('message.new', handleEvent);
+                chatClient.off('message.read', handleEvent);
+            }
+        };
+    }, [currentUser]);
 
     // push the color state of current page option to session storage for persistence, check every location change
     useEffect(() => {
@@ -43,8 +91,8 @@ export default function SideNav({show}){
           setSelectedNav(initialLabel || null);
         }
       }, [location]);
-    
-    
+
+
 
     const handleNavClick = (label) => {
         setSelectedNav(label);
@@ -104,12 +152,19 @@ export default function SideNav({show}){
                 <nav className="v0-sidebar-nav">
                     {navList.map(([icon, label, path], index) => (
                         <Link to={path} style={{ color: 'inherit', textDecoration: 'none' }} key={index}>
-                            <div 
-                                className={`v0-nav-item ${selectedNav === label ? "v0-nav-selected" : ""}`} 
+                            <div
+                                className={`v0-nav-item ${selectedNav === label ? "v0-nav-selected" : ""}`}
                                 onClick={() => handleNavClick(label)}
                                 title={isCollapsed ? label : ""}
-                            > 
-                                {icon}
+                            >
+                                <div style={{ position: 'relative', display: 'inline-flex' }}>
+                                    {icon}
+                                    {label === "Messages" && unreadCount > 0 && (
+                                        <span className="v0-notification-badge">
+                                            {unreadCount > 9 ? '9+' : unreadCount}
+                                        </span>
+                                    )}
+                                </div>
                                 {!isCollapsed && <span className="v0-nav-label">{label}</span>}
                             </div>
                         </Link>

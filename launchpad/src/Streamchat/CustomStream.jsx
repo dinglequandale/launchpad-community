@@ -24,21 +24,22 @@ import { Avatar as StreamAvatar } from 'stream-chat-react';
 const ChannelHeaderContainer = styled.div`
   width: 100%;
   margin: 0 auto;
-  padding-top: 0px;
-  box-shadow: 2px 0 10px 5px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   z-index: 1;
 `;
 
 const ChatContainer = styled.div`
   display: flex;
-  height: 90vh;
+  height: 100%;
   width: 100%;
+  max-height: calc(100vh - 80px);
 `;
 
 const ChannelListContainer = styled.div`
-  width: 30%;
-  max-width: 300px;
-  // box-shadow: var(--shadowColor);
+  width: 300px;
+  min-width: 300px;
+  flex-shrink: 0;
   z-index: 2;
 `;
 
@@ -46,7 +47,7 @@ const ChannelContainer = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-bottom: 5px;
+  min-width: 0;
 `;
 
 // Add display name for memo component

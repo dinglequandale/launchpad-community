@@ -220,8 +220,28 @@
         gap: 15px;
         padding: 0.5rem 0;
     }
-    
+
     .destinationNav {
         padding: 0.25rem;
     }
+}
+
+/* Notification Badge */
+.v0-notification-badge {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: #ef4444;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }

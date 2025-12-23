@@ -181,14 +181,15 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
       const connectionResult = await createConnection();
       
       if (connectionResult.success) {
-        // Send message
+        // Send message and get the channel ID
+        let channelId;
         if (sendWithResume) {
           // Fetch resume data for sending with resume
           const resumeRef = ref(storage, `resumes/${currentUser.uid}`);
           const resumeURL = await getDownloadURL(resumeRef);
           const metaData = await getMetadata(resumeRef);
-          
-          await sendConnectMessageWithResume(
+
+          channelId = await sendConnectMessageWithResume(
             introMessage,
             resumeURL,
             metaData,
@@ -198,7 +199,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
             chat
           );
         } else {
-          await sendConnectMessageWithoutResume(
+          channelId = await sendConnectMessageWithoutResume(
             introMessage,
             currentUser.uid,
             targetUserId,
@@ -206,9 +207,11 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
             chat
           );
         }
-        
+
         toast.success('Message sent successfully!');
-        navigate('/chat');
+        // Navigate to chat with the channel ID so the conversation opens automatically
+        console.log('[ConnectModal] Navigating to chat with channel ID:', channelId);
+        navigate('/chat', { state: channelId });
         onClose();
       }
     } catch (error) {
