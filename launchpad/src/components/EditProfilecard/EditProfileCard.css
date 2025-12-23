@@ -472,6 +472,156 @@
     min-height: 44px;
     min-width: 44px;
   }
+
+  /* Modal improvements for mobile */
+  .v0-modal-container {
+    max-width: 95%;
+    margin: 0 auto;
+    max-height: 95vh;
+  }
+
+  .v0-modal-overlay {
+    padding: 10px;
+  }
+
+  /* Stack modal navigation buttons vertically on small screens */
+  .v0-modal-navigation {
+    flex-direction: column-reverse;
+  }
+
+  .v0-modal-navigation .v0-btn-primary,
+  .v0-modal-navigation .v0-btn-secondary {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  /* Make logistics items stack on mobile */
+  .v0-modal-logistics-container {
+    flex-direction: column;
+  }
+
+  .v0-modal-logistics-item {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  /* Full width file upload on mobile */
+  .v0-modal-file-upload {
+    width: 100%;
+  }
+
+  /* Stack collaborator inputs vertically */
+  .v0-modal-collaborator-inputs {
+    flex-direction: column;
+  }
+
+  /* Make skill items full width */
+  .v0-skill-item {
+    width: 100%;
+  }
+
+  /* Basic info card adjustments */
+  .basicInfo {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+    padding: 12px 0;
+  }
+
+  .file-upload-container {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cardNameDescription {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .cardName {
+    font-size: 20px;
+  }
+
+  .cardDescription {
+    font-size: 14px;
+  }
+
+  .userInfo {
+    width: 100%;
+    font-size: 14px;
+    text-align: left;
+  }
+
+  /* Make profile picture actions always visible on mobile (no hover needed) */
+  .preview-actions {
+    visibility: visible !important;
+    opacity: 0.9;
+  }
+
+  .action-button {
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  /* Improve v0-college-info-container spacing on mobile */
+  .v0-college-info-container {
+    width: 100%;
+  }
+
+  /* Better text wrapping on mobile */
+  .v0-section-content {
+    padding: 16px;
+  }
+
+  .v0-empty-text {
+    font-size: 13px;
+  }
+
+  /* Make opportunity cards full width on mobile */
+  .edit-profile-opportunity-card .v0-organization-card {
+    padding: 16px;
+  }
+
+  .edit-profile-opportunity-card .v0-organization-content {
+    padding-left: 0;
+    padding-top: 70px;
+  }
+
+  /* Improve dropdown visibility on mobile */
+  .dropdown-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Better spacing for privacy toggle on mobile */
+  .v0-privacy-description {
+    padding-left: 0;
+    font-size: 13px;
+  }
+
+  /* Improve modal form groups on mobile */
+  .v0-modal-form-group {
+    width: 100%;
+    padding: 12px;
+  }
+
+  /* Better date picker layout on mobile */
+  .v0-modal-date-container {
+    max-width: 100%;
+  }
+
+  /* Improve step bars on mobile */
+  .v0-step-bars {
+    min-width: 150px;
+    max-width: 250px;
+  }
+
+  /* Make links more tappable */
+  .v0-contact-link {
+    display: inline-block;
+    padding: 4px 0;
+  }
 }
 
 /* v0 Profile Container Styling */
@@ -860,6 +1010,118 @@
 .v0-contact-missing {
     color: #ef4444;
     font-weight: 400;
+}
+
+/* Basic Info Card Styles */
+.basicInfo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 0;
+    width: 100%;
+}
+
+.file-upload-container {
+    flex-shrink: 0;
+}
+
+.file-upload-preview {
+    position: relative;
+}
+
+.preview-container {
+    position: relative;
+    display: inline-block;
+}
+
+.preview-actions {
+    position: absolute;
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    top: -10px;
+    right: -10px;
+}
+
+.action-button {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 6px;
+    cursor: pointer;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.action-button:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.btnCircle {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btnFileUpload {
+    background: #f3f4f6;
+    border: 2px dashed #d1d5db;
+    color: #6b7280;
+}
+
+.btnFileUpload:hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+}
+
+.cardNameDescription {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.cardName {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    word-wrap: break-word;
+}
+
+.cardDescription {
+    font-size: 16px;
+    color: #6b7280;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.userInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 0;
+    color: #374151;
+}
+
+.userInfo span {
+    line-height: 1.6;
+}
+
+.v0-college-info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 /* Legacy styles for backward compatibility */

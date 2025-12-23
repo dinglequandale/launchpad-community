@@ -38,8 +38,65 @@
         margin-left: 0;
         padding: 16px;
     }
-    
+
     .v0-messages-sidebar-collapsed {
         margin-left: 0;
+    }
+}
+
+/* Mobile-specific chat styles */
+@media (max-width: 768px) {
+    .v0-messages-container {
+        padding: 8px;
+        margin-top: 60px;
+    }
+
+    /* Make Stream Chat components mobile-friendly */
+    .str-chat__channel-list {
+        width: 100% !important;
+    }
+
+    .str-chat__channel {
+        width: 100% !important;
+    }
+
+    .str-chat__main-panel {
+        width: 100% !important;
+    }
+
+    /* Improve message input on mobile */
+    .str-chat__input-flat {
+        padding: 8px;
+    }
+
+    .str-chat__input-flat-wrapper {
+        padding: 8px;
+    }
+
+    /* Make message list more compact on mobile */
+    .str-chat__message-list {
+        padding: 8px;
+    }
+
+    /* Improve touch targets */
+    .str-chat__message-simple__actions__action {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    /* Make channel preview items touch-friendly */
+    .str-chat__channel-preview-messenger {
+        padding: 12px 16px;
+        min-height: 60px;
+    }
+
+    /* Improve channel header on mobile */
+    .str-chat__channel-header {
+        padding: 12px 16px;
+    }
+
+    /* Make message actions more accessible */
+    .str-chat__message-simple-status {
+        font-size: 12px;
     }
 }
