@@ -10,10 +10,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { auth, db } from "../../firebase/firebaseConfig";
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
-import ParentalVerificationModal from '../../components/ParentalVerificationModal';
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { parentVerificationResendTemplate } from "../../utils/parentVerificationTemplates";
 import ConnectModal from "../../components/Connectmodal/ConnectModal";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useModal } from '../../contexts/ModalContext';
@@ -49,7 +46,6 @@ export default function Home(){
     const navigate = useNavigate();
 
     const [userBasicInfo, setUserBasicInfo] = useState(null);
-    const [showParentModal, setShowParentModal] = useState(false);
     const [showVerifedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
     const [showNetworkingCommitmentModal, setShowNetworkingCommitmentModal] = useState(false);
     const [connectedUserData, setConnectedUserData] = useState(null);
@@ -89,90 +85,12 @@ export default function Home(){
         };
     }, []);
 
-    const getUserData = async () => {
-      // COMMUNITY VERSION: Removed tenant-based architecture
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      unsubscribe = onSnapshot(userDocRef, (doc) => {
-          if (doc.exists()) {
-              return doc.data();
-          } else {
-              console.log("No such document!");
-              return null;
-          }
-      });
-    };
-
-    // COMMUNITY VERSION: Commented out parent verification logic
-    // const onUpdateParentEmail = async (newEmail) => {
-    //   const updatedBasicUserInfo = { ...userBasicInfo, parentEmail: newEmail };
-    //   localStorage.setItem('basicUserInfo', JSON.stringify(updatedBasicUserInfo));
-    //   setUserBasicInfo(updatedBasicUserInfo);
-    //   const userDocRef = doc(db, 'users', currentUser.uid);
-    //   try{
-    //     await updateDoc(userDocRef, {parentEmail: newEmail});
-    //   } catch (error) {
-    //     console.error("Error updating parent email:", error);
-    //   }
-    // };
-
-    // COMMUNITY VERSION: Commented out parent verification logic
-    // const onParentVerificationResend = async () => {
-    //   const generateVerificationLink = httpsCallable(getFunctions(), "generateVerificationLink");
-    //   const verificationLinkResult = await generateVerificationLink({
-    //     uid: currentUser.uid,
-    //     action: "verify_account",
-    //   });
-    //
-    //   // Extract the verification link from the result
-    //   const verificationLink = verificationLinkResult.data;
-    //
-    //   const sendSESEmail = httpsCallable(getFunctions(), "sendSESEmail");
-    //   const result = await sendSESEmail({
-    //     recipient: [ userBasicInfo.parentEmail ],
-    //     subject: "Verify Your Student's Account",
-    //     htmlTemplate: parentVerificationResendTemplate({
-    //       studentName: userBasicInfo.userName ? userBasicInfo.userName.split(" ")[0] : "",
-    //       parentName: "",
-    //       verificationLink: verificationLink}),
-    //     emailType: "parent_verification"});
-    // };
-
-    
-    const getUserTokenInfo = async () => {
-        if (currentUser) {
-            const idTokenResult = await currentUser.getIdTokenResult();
-            const schoolId = idTokenResult.claims.school_id;
-            console.log("School Id!!!!:", schoolId);
-
-            setUserBasicInfo((prev) => ({
-                ...prev, 
-                schoolId,
-            }));
-        }
-    };
 
     useEffect(() => {
       setUserBasicInfo(JSON.parse(storedUserBasicInfo));
 
-      // if(!schoolId){
-      getUserTokenInfo();
-      // }
-
-      const sessionFlag = sessionStorage.getItem('parentalModalShown');
-      if (
-        info &&
-        info.userType === 'High Schooler' &&
-        info.parentEmail &&
-        !info.parentVerified &&
-        !sessionFlag
-      ) {
-        setShowParentModal(true);
-        sessionStorage.setItem('parentalModalShown', 'true');
-        return;
-      }
-
       // Show networking commitment modal for professionals who haven't seen it
-      const networkingSessionFlag = sessionStorage.getItem('networkingCommitmentModalShown');
+      const networkingSessionFlag = localStorage.getItem('networkingCommitmentModalShown');
       if (
         info &&
         info.userType === 'Professional' &&
@@ -182,7 +100,7 @@ export default function Home(){
         // Delay showing modal slightly to let the page load
         setTimeout(() => {
           setShowNetworkingCommitmentModal(true);
-          sessionStorage.setItem('networkingCommitmentModalShown', 'true');
+          localStorage.setItem('networkingCommitmentModalShown', 'true');
         }, 1000);
       }
 
@@ -451,7 +369,7 @@ export default function Home(){
                                 <div className="v0-video-header">
                                     <LuPlay size={20} />
                                     <span>Getting Started</span>
-                                    <span className="v0-video-subtitle">Learn how to make the most of the {capitalizeFirstLetter(localStorage.getItem("schoolId") || "Awty")} Network</span>
+                                    <span className="v0-video-subtitle">Learn how to make the most of Launchpad</span>
                                 </div>
                                 <div className="v0-video-container">
                         <ErrorBoundary>

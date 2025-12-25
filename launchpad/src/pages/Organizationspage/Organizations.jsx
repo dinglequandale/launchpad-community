@@ -186,7 +186,7 @@ export default function Organizations(){
         setIsSearching(false);
         if (queryText) {
             // COMMUNITY VERSION: No tenantId needed for search
-            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText);
+            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText, currentUser.uid);
             setOrganizationsData(searchResults);
             console.log(searchResults);
         }

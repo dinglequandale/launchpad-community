@@ -1,17 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BiDownload } from 'react-icons/bi';
 import { CiWarning } from 'react-icons/ci';
 import { FiDelete } from 'react-icons/fi';
-import { doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebaseConfig';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast from 'react-hot-toast';
 import { CgClose } from 'react-icons/cg';
+import { BiGlobe, BiGroup } from 'react-icons/bi';
 
 const AccountSettings = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState('');
+  const [openToCrossSchoolConnections, setOpenToCrossSchoolConnections] = useState('no');
+  const [userType, setUserType] = useState('');
+  const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
+
+  // Load user data on mount
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setOpenToCrossSchoolConnections(userData.openToCrossSchoolConnections || 'no');
+          setUserType(userData.userType || '');
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUserData();
+  }, [currentUser]);
+
+  const handleUpdateCommunityPreference = async (value) => {
+    try {
+      const loadingToast = toast.loading('Updating preference...');
+      const userDoc = doc(db, "users", currentUser.uid);
+      await updateDoc(userDoc, {
+        openToCrossSchoolConnections: value
+      });
+      setOpenToCrossSchoolConnections(value);
+
+      // Update localStorage
+      const storedUserInfo = JSON.parse(localStorage.getItem('basicUserInfo') || '{}');
+      storedUserInfo.openToCrossSchoolConnections = value;
+      localStorage.setItem('basicUserInfo', JSON.stringify(storedUserInfo));
+
+      toast.success('Preference updated successfully!', { id: loadingToast });
+    } catch (error) {
+      console.error('Error updating community preference:', error);
+      toast.error('Failed to update preference. Please try again.');
+    }
+  };
 
   const handleExportData = async () => {
     try {
@@ -83,43 +127,39 @@ const AccountSettings = () => {
           </button>
         </div>
 
-        {/* Connected Services Section */}
-        {/* <div className="settings-card">
-          <h3 className="settings-card-title">Connected Services</h3>
-          <ul className="settings-list">
-            <li className="settings-list-item">
-              <div className="settings-list-content">
-                <h4 className="settings-list-title">Google Account</h4>
-                <p className="settings-list-description">Connected on Jan 1, 2024</p>
-              </div>
+        {/* Community Preference Section - Only for College Students and Professionals */}
+        {!loading && (userType === 'College Student' || userType === 'Professional') && (
+          <div className="settings-card">
+            <h3 className="settings-card-title">Networking Preference</h3>
+            <p className="settings-card-description">
+              {userType === 'College Student'
+                ? 'Choose whether you want to connect only with students from your school community or be open to connections from other schools.'
+                : 'Choose whether you prefer to connect with students from your affiliated school community only or be open to connections from all schools.'}
+            </p>
+            <div className="settings-toggle-group">
               <button
-                className="settings-button settings-button-error"
-                onClick={() => {
-                  // TODO: Implement disconnect logic
-                  console.log('Disconnect Google account');
-                }}
+                className={`settings-toggle-option ${openToCrossSchoolConnections === 'no' ? 'active' : ''}`}
+                onClick={() => handleUpdateCommunityPreference('no')}
               >
-                Disconnect
+                <BiGroup className="settings-toggle-icon" size={24} />
+                <div className="settings-toggle-text">
+                  <div className="settings-toggle-title">Community Only</div>
+                  <div className="settings-toggle-description">Connect with your school community</div>
+                </div>
               </button>
-            </li>
-            <div className="settings-divider" />
-            <li className="settings-list-item">
-              <div className="settings-list-content">
-                <h4 className="settings-list-title">GitHub</h4>
-                <p className="settings-list-description">Not connected</p>
-              </div>
               <button
-                className="settings-button settings-button-primary"
-                onClick={() => {
-                  // TODO: Implement connect logic
-                  console.log('Connect GitHub account');
-                }}
+                className={`settings-toggle-option ${openToCrossSchoolConnections === 'yes' ? 'active' : ''}`}
+                onClick={() => handleUpdateCommunityPreference('yes')}
               >
-                Connect
+                <BiGlobe className="settings-toggle-icon" size={24} />
+                <div className="settings-toggle-text">
+                  <div className="settings-toggle-title">Open to All</div>
+                  <div className="settings-toggle-description">Connect with students from all schools</div>
+                </div>
               </button>
-            </li>
-          </ul>
-        </div> */}
+            </div>
+          </div>
+        )}
 
         {/* Delete Account Section */}
         <div className="settings-card settings-card-danger">

@@ -222,10 +222,37 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
         });
     }
 
+    // Filter college students based on cross-school connection preferences
+    if (collectionName === "users" && (category === "College Student" || !category)) {
+        // Get current user's college for comparison
+        const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
+        const currentUserCollege = currentUserDoc.exists() ? currentUserDoc.data().collegeAttending : null;
+
+        results = results.filter(user => {
+            // Only apply this filter to college students
+            if (user.userType !== "College Student") return true;
+
+            // If college student has no preference set, or is open to all, show them to everyone
+            if (!user.openToCrossSchoolConnections || user.openToCrossSchoolConnections === 'yes') {
+                return true;
+            }
+
+            // If college student only wants connections from their school community
+            if (user.openToCrossSchoolConnections === 'no') {
+                // Show them only if current user's college matches their college
+                return user.collegeAttending && user.collegeAttending === currentUserCollege;
+            }
+
+            return true; // Default to showing
+        });
+    }
+
     // Filter opportunities based on owner's cross-school connection preferences
     if (collectionName === "opportunities") {
-        // Fetch all unique creator IDs
+        // Fetch all unique creator IDs and current user data
         const creatorIds = [...new Set(results.map(opp => opp.createdBy).filter(id => id))];
+        const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
+        const currentUserCollege = currentUserDoc.exists() ? currentUserDoc.data().collegeAttending : null;
 
         if (creatorIds.length > 0) {
             // Fetch creator data for all opportunities
@@ -252,23 +279,37 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
                 // If no creator data, show the opportunity (fail open)
                 if (!creator) return true;
 
-                // If creator is not a professional, show the opportunity
-                if (creator.userType !== "Professional") return true;
+                // Handle Professional creators
+                if (creator.userType === "Professional") {
+                    // If professional has no preference set, or is open to all, or N/A, show to everyone
+                    if (!creator.openToCrossSchoolConnections ||
+                        creator.openToCrossSchoolConnections === 'yes' ||
+                        creator.openToCrossSchoolConnections === 'not_applicable') {
+                        return true;
+                    }
 
-                // If professional has no preference set, or is open to all, or N/A, show to everyone
-                if (!creator.openToCrossSchoolConnections ||
-                    creator.openToCrossSchoolConnections === 'yes' ||
-                    creator.openToCrossSchoolConnections === 'not_applicable') {
-                    return true;
+                    // If professional only wants students from their affiliated school
+                    if (creator.openToCrossSchoolConnections === 'no') {
+                        // Show only if current user's school matches creator's affiliated school
+                        return creator.schoolAttending && creator.schoolAttending === userHS;
+                    }
                 }
 
-                // If professional only wants students from their affiliated school
-                if (creator.openToCrossSchoolConnections === 'no') {
-                    // Show only if current user's school matches creator's affiliated school
-                    return creator.schoolAttending && creator.schoolAttending === userHS;
+                // Handle College Student creators
+                if (creator.userType === "College Student") {
+                    // If college student has no preference set, or is open to all, show to everyone
+                    if (!creator.openToCrossSchoolConnections || creator.openToCrossSchoolConnections === 'yes') {
+                        return true;
+                    }
+
+                    // If college student only wants connections from their school community
+                    if (creator.openToCrossSchoolConnections === 'no') {
+                        // Show only if current user's college matches creator's college
+                        return creator.collegeAttending && creator.collegeAttending === currentUserCollege;
+                    }
                 }
 
-                return true; // Default to showing
+                return true; // Default to showing (for High Schoolers and Staff)
             });
         }
     }

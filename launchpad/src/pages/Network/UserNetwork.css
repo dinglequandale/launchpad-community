@@ -34,12 +34,15 @@ body.modal-open {
 .carousel-content {
   display: flex;
   transition: transform 0.5s ease;
-  width: 100%;
+  /* Width is set dynamically in JavaScript based on number of items */
   padding: 20px 0px;
 }
 
 .carousel-item {
-  flex: 0 0 calc(33.333%);    /* Adjust this value based on your itemsPerPage */
+  flex: 0 0 calc(33.333%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .carousel-button {
@@ -78,13 +81,7 @@ body.modal-open {
     max-width: 400px;
   }
 
-  .carousel-item {
-    flex: 0 0 100% !important;
-  }
-
-  .carousel-content {
-    justify-content: center !important;
-  }
+  /* Item widths are set dynamically in JavaScript for proper centering */
 
   .carousel-button.prev {
     left: -20px;

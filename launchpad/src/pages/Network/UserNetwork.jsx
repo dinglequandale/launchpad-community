@@ -300,7 +300,7 @@ export default function UserNetwork() {
     e.preventDefault();
     if (queryText) {
       // COMMUNITY VERSION: No tenantId needed for search
-      const searchResults = await searchDocuments('users', queryText);
+      const searchResults = await searchDocuments('users', queryText, currentUser.uid);
       setAllVisibleUserData(searchResults);
       // COMMUNITY VERSION: Removed parentVerified filter from search results
       setHighSchoolers(searchResults.filter((result) => result.userType === "High Schooler"));
@@ -556,15 +556,31 @@ function UserCarousel({userNetworkData, loading, onEndReached, connectionRefresh
 
   useEffect(() => {
     if (carouselRef.current) {
-      const itemWidth = carouselRef.current.offsetWidth / itemsPerPage;
-      const offset = currentIndex * (itemWidth);
+      // Calculate item width based on the visible container, not the content
+      const containerWidth = carouselRef.current.parentElement.offsetWidth;
+      // When there are fewer items than itemsPerPage, divide by actual number of items
+      const visibleItems = Math.min(itemsPerPage, userNetworkData.length);
+      const itemWidth = containerWidth / visibleItems;
+
+      // Set the carousel content width to hold all items side-by-side
+      carouselRef.current.style.width = `${userNetworkData.length * itemWidth}px`;
+
+      // Set each carousel item to have an explicit width
+      const items = carouselRef.current.querySelectorAll('.carousel-item');
+      items.forEach(item => {
+        item.style.width = `${itemWidth}px`;
+        item.style.flexBasis = `${itemWidth}px`;
+      });
+
+      // Calculate offset to show the current item
+      const offset = currentIndex * itemWidth;
       carouselRef.current.style.transform = `translateX(-${offset}px)`;
     }
     console.log(currentIndex)
     if((currentIndex % loadLimit) === (loadLimit - 3)) {
       onEndReached();
     }
-  }, [currentIndex, itemsPerPage]);
+  }, [currentIndex, itemsPerPage, userNetworkData.length]);
 
   const nextSlide = () => {
     setSlideDirection('slide-left');
@@ -596,7 +612,10 @@ function UserCarousel({userNetworkData, loading, onEndReached, connectionRefresh
       <div className="carousel-container">
         {!loading ? <div
           className={`carousel-content ${slideDirection}`}
-          style={{justifyContent: `${(isMobile || userNetworkData.length <= 3) ? "center" : ""}`, gap: `${userNetworkData.length < 3 ? "10px" : ""}`}}
+          style={{
+            justifyContent: userNetworkData.length <= 3 && !isMobile ? "center" : "flex-start",
+            gap: userNetworkData.length < 3 && !isMobile ? "10px" : "0"
+          }}
           onAnimationEnd={() => setSlideDirection('')}
           ref={carouselRef}
         >
@@ -623,7 +642,7 @@ function UserCarousel({userNetworkData, loading, onEndReached, connectionRefresh
           <GrPrevious color="var(--accent)"/>
         </button>
       )}
-      {currentIndex + itemsPerPage < userNetworkData.length && (
+      {currentIndex < userNetworkData.length - itemsPerPage && (
         <button
           className="carousel-button next"
           onClick={nextSlide}

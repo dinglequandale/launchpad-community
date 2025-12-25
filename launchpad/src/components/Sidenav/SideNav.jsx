@@ -33,8 +33,7 @@ export default function SideNav({show}){
         [<IoHomeOutline size={24}/>, "Home", "/Home"],
         [<TbUserHexagon size={24}/>, "Network", "/network"],
         [<GoOrganization size={24}/>, "Organizations", "/Organizations"],
-        [<LuMessagesSquare size={24}/>, "Messages", "/chat"],
-        [<LuMessageSquarePlus size={24}/>, "Feedback", "/feedback"]
+        [<LuMessagesSquare size={24}/>, "Messages", "/chat"]
     ];
 
     const [selectedNav, setSelectedNav] = useState(null);
@@ -204,8 +203,19 @@ export default function SideNav({show}){
                 </nav>
 
                 <div className="v0-sidebar-footer">
-                    <div 
-                        className="v0-nav-item" 
+                    <Link to="/feedback" style={{ color: 'inherit', textDecoration: 'none' }}>
+                        <div
+                            className={`v0-nav-item ${selectedNav === "Feedback" ? "v0-nav-selected" : ""}`}
+                            title={isCollapsed ? "Feedback" : ""}
+                            onClick={() => handleNavClick("Feedback")}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <LuMessageSquarePlus size={28} />
+                            {!isCollapsed && <span className="v0-nav-label">Feedback</span>}
+                        </div>
+                    </Link>
+                    <div
+                        className="v0-nav-item"
                         title={isCollapsed ? "Settings" : ""}
                         onClick={handleSettingsClick}
                         style={{ cursor: 'pointer' }}
@@ -213,8 +223,8 @@ export default function SideNav({show}){
                         <LuSettings size={28} />
                         {!isCollapsed && <span className="v0-nav-label">Settings</span>}
                     </div>
-                    <div 
-                        className="v0-nav-item" 
+                    <div
+                        className="v0-nav-item"
                         title={isCollapsed ? "Logout" : ""}
                         onClick={handleLogoutClick}
                         style={{ cursor: 'pointer' }}
