@@ -71,8 +71,10 @@ const migrationReminderEmailTemplate = (userName, schoolName, migrationLink) => 
   `;
 };
 
+// COMMUNITY VERSION: Send graduation emails to High Schoolers transitioning to College Students
+// and College Students transitioning to Professionals
 exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
-    const { schoolId, testMode = false } = data;
+    const { testMode = false } = data;
 
     // Ensure the user is authenticated and has admin privileges
     if (!context.auth) {
@@ -83,63 +85,33 @@ exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
         const currentYear = new Date().getFullYear();
         const currentMonth = new Date().getMonth() + 1; // 1-12
 
-        // Only send graduation emails in June (month 6)
-        if (!testMode && currentMonth !== 6) {
+        // Only send graduation emails in May (month 5)
+        if (!testMode && currentMonth !== 5) {
             return {
                 success: false,
-                message: `Graduation emails are only sent in June. Current month: ${currentMonth}`
+                message: `Graduation emails are only sent in May. Current month: ${currentMonth}`
             };
         }
 
-        /* 
-        ========================================
-        TESTING CODE - Uncomment sections below to test graduation emails without waiting for June:
-        ========================================
-        
-        // OPTION 1: Override the month check completely (easiest for testing)
-        // Comment out the month check above and uncomment this:
-        // console.log('TESTING MODE: Overriding month restriction');
-        
-        // OPTION 2: Test with a specific graduation year
-        // Uncomment this line to test with graduates from a specific year:
-        // const currentYear = 2024; // Change to any year you have test data for
-        
-        // OPTION 3: Test with a specific school ID
-        // Uncomment and modify this line to test with a specific school:
-        // const schoolId = 'awty'; // Change to your test school ID
-        
-        // OPTION 4: Test with specific user IDs (for targeted testing)
-        // Uncomment this section to test with specific users:
-        // const testUserIds = ['user1', 'user2', 'user3']; // Add your test user IDs
-        // const snapshot = await usersRef
-        //     .where('userType', '==', 'High Schooler')
-        //     .where('graduationYear', '==', currentYear.toString())
-        //     .where(admin.firestore.FieldPath.documentId(), 'in', testUserIds)
-        //     .get();
-        
-        // OPTION 5: Create test data (run this in Firebase console or admin SDK)
-        // Uncomment and run this to create test high schooler data:
-        // await admin.firestore().collection('tenants').doc('your-school-id').collection('users').doc('test-user-1').set({
-        //     userType: 'High Schooler',
-        //     graduationYear: '2024',
-        //     userName: 'Test Student',
-        //     email: 'test@example.com',
-        //     schoolAttending: 'Test High School',
-        //     schoolId: 'your-school-id'
-        // });
-        */
+        // COMMUNITY VERSION: Query flat users collection (not tenant-nested)
+        const usersRef = admin.firestore().collection('users');
 
-        // Query for high schoolers graduating this year
-        const usersRef = admin.firestore().collection('tenants').doc(schoolId).collection('users');
-        const snapshot = await usersRef
+        // Get High Schoolers graduating this year
+        const hsSnapshot = await usersRef
             .where('userType', '==', 'High Schooler')
             .where('graduationYear', '==', currentYear.toString())
             .get();
 
-        if (snapshot.empty) {
+        // Get College Students graduating this year
+        const collegeSnapshot = await usersRef
+            .where('userType', '==', 'College Student')
+            .where('collegeGraduationYear', '==', currentYear.toString())
+            .get();
+
+        if (hsSnapshot.empty && collegeSnapshot.empty) {
             return {
                 success: true,
-                message: 'No graduating high schoolers found for this year',
+                message: 'No graduating users found for this year',
                 recipientsCount: 0
             };
         }
@@ -147,7 +119,8 @@ exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
         const recipients = [];
         const emailPromises = [];
 
-        snapshot.forEach(doc => {
+        // Process High Schoolers -> College Students
+        hsSnapshot.forEach(doc => {
             const userData = doc.data();
             if (userData.email) {
                 recipients.push({
@@ -155,7 +128,24 @@ exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
                     email: userData.email,
                     userName: userData.userName,
                     schoolAttending: userData.schoolAttending,
-                    graduationYear: userData.graduationYear
+                    graduationYear: userData.graduationYear,
+                    transitionType: 'hs_to_college'
+                });
+            }
+        });
+
+        // Process College Students -> Professionals
+        collegeSnapshot.forEach(doc => {
+            const userData = doc.data();
+            if (userData.email) {
+                recipients.push({
+                    userId: doc.id,
+                    email: userData.email,
+                    userName: userData.userName,
+                    schoolAttending: userData.schoolAttending,
+                    collegeAttending: userData.collegeAttending,
+                    collegeGraduationYear: userData.collegeGraduationYear,
+                    transitionType: 'college_to_professional'
                 });
             }
         });
@@ -163,7 +153,7 @@ exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
         if (recipients.length === 0) {
             return {
                 success: true,
-                message: 'No valid email addresses found for graduating students',
+                message: 'No valid email addresses found for graduating users',
                 recipientsCount: 0
             };
         }
@@ -171,30 +161,35 @@ exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
         // Generate migration links for each recipient
         for (const recipient of recipients) {
             const migrationToken = admin.firestore().collection('migration_tokens').doc().id;
-            const migrationLink = `https://launchpadhouston.com/migrate-to-alumni?token=${migrationToken}&userId=${recipient.userId}`;
-            
+
+            // Different migration links based on transition type
+            const migrationPath = recipient.transitionType === 'hs_to_college'
+                ? 'migrate-to-alumni'
+                : 'migrate-to-professional';
+            const migrationLink = `https://launchpadhouston.com/${migrationPath}?token=${migrationToken}&userId=${recipient.userId}`;
+
             // Store migration token with expiration (30 days)
             await admin.firestore().collection('migration_tokens').doc(migrationToken).set({
                 userId: recipient.userId,
-                schoolId: schoolId,
                 email: recipient.email,
                 createdAt: admin.firestore.FieldValue.serverTimestamp(),
                 expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
                 used: false,
-                emailType: 'graduation'
+                emailType: 'graduation',
+                transitionType: recipient.transitionType
             });
 
             // Create email document for Mailgun
             const emailTemplate = graduationEmailTemplate(
                 recipient.userName,
-                recipient.schoolAttending,
+                recipient.schoolAttending || recipient.collegeAttending,
                 migrationLink
             );
 
             const emailDoc = admin.firestore().collection('mail').add({
                 to: recipient.email,
                 message: {
-                    subject: `🎓 Congratulations on Your Graduation! - Complete Your Alumni Migration`,
+                    subject: `🎓 Congratulations on Your Graduation! - Update Your Launchpad Profile`,
                     html: emailTemplate,
                 },
                 from: 'no-reply@launchpadhouston.com',
@@ -203,8 +198,8 @@ exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
                 provider: 'mailgun',
                 emailType: 'graduation',
                 userId: recipient.userId,
-                schoolId: schoolId,
-                migrationToken: migrationToken
+                migrationToken: migrationToken,
+                transitionType: recipient.transitionType
             });
 
             emailPromises.push(emailDoc);
@@ -215,18 +210,24 @@ exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
         // Log the graduation email batch
         await admin.firestore().collection('email_batches').add({
             type: 'graduation_emails',
-            schoolId: schoolId,
             year: currentYear,
             recipientsCount: recipients.length,
             sentAt: admin.firestore.FieldValue.serverTimestamp(),
-            testMode: testMode
+            testMode: testMode,
+            breakdown: {
+                hsToCollege: recipients.filter(r => r.transitionType === 'hs_to_college').length,
+                collegeToProfessional: recipients.filter(r => r.transitionType === 'college_to_professional').length
+            }
         });
 
         return {
             success: true,
             message: `Graduation emails queued for ${recipients.length} recipients`,
             recipientsCount: recipients.length,
-            recipients: recipients.map(r => ({ userId: r.userId, email: r.email }))
+            breakdown: {
+                hsToCollege: recipients.filter(r => r.transitionType === 'hs_to_college').length,
+                collegeToProfessional: recipients.filter(r => r.transitionType === 'college_to_professional').length
+            }
         };
 
     } catch (error) {

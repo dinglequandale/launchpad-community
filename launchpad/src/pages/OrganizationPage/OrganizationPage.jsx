@@ -426,12 +426,12 @@ export default function OrganizationPage() {
                       <span className="organization-page-contact-role">Organizer</span>
                     </div>
                     <div className="organization-page-contact-info">
-                      <button
+                      <span
                         className="organization-page-contact-name"
                         onClick={handleOrganizerClick}
                       >
                         {orgProfile.hostName}
-                      </button>
+                      </span>
                       {userData.email && (
                         <a
                           href={`mailto:${userData.email}`}

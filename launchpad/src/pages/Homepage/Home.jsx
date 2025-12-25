@@ -21,6 +21,7 @@ import ResourceCarousel from "./ResourceCarousel";
 import { LuPlay, LuUsers, LuGraduationCap, LuBriefcase, LuFileText, LuBookOpen, LuMapPin, LuCalendar, LuTarget, LuAward } from "react-icons/lu";
 import toast from "react-hot-toast";
 import OrganizationProfileModal from "../../components/Organizationprofile/OrganizationProfileModal";
+import NetworkingCommitmentModal from "../../components/NetworkingCommitmentModal/NetworkingCommitmentModal";
 
 
 class ErrorBoundary extends React.Component {
@@ -50,6 +51,7 @@ export default function Home(){
     const [userBasicInfo, setUserBasicInfo] = useState(null);
     const [showParentModal, setShowParentModal] = useState(false);
     const [showVerifedConnectionModal, setShowVerifiedConnectionModal] = useState(false);
+    const [showNetworkingCommitmentModal, setShowNetworkingCommitmentModal] = useState(false);
     const [connectedUserData, setConnectedUserData] = useState(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [selectedResource, setSelectedResource] = useState(null);
@@ -167,6 +169,21 @@ export default function Home(){
         setShowParentModal(true);
         sessionStorage.setItem('parentalModalShown', 'true');
         return;
+      }
+
+      // Show networking commitment modal for professionals who haven't seen it
+      const networkingSessionFlag = sessionStorage.getItem('networkingCommitmentModalShown');
+      if (
+        info &&
+        info.userType === 'Professional' &&
+        !info.hasSeenNetworkingCommitmentPopup &&
+        !networkingSessionFlag
+      ) {
+        // Delay showing modal slightly to let the page load
+        setTimeout(() => {
+          setShowNetworkingCommitmentModal(true);
+          sessionStorage.setItem('networkingCommitmentModalShown', 'true');
+        }, 1000);
       }
 
     }, []);
@@ -418,6 +435,7 @@ export default function Home(){
     return(
         <>
             {showVerifedConnectionModal && <ConnectModal onClose = {()=>setShowVerifiedConnectionModal(false)} userData={connectedUserData} visibility={showVerifedConnectionModal} chat={chatClient} userId = {connectedUserData.id}/>}
+            {showNetworkingCommitmentModal && <NetworkingCommitmentModal onClose={() => setShowNetworkingCommitmentModal(false)} userData={userBasicInfo} />}
 
             <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
             <SideNav/>

@@ -19,8 +19,8 @@ const {sendSESEmail} = require("./callableFunctions/sendSESEmail");
 const {deleteAuthUsers} = require("./callableFunctions/deleteAuthUsers");
 const {generateUnsubscribeLink, processUnsubscribe, checkUnsubscribeStatus} = require("./callableFunctions/generateUnsubscribeLink");
 const {manageConnections} = require("./callableFunctions/manageConnections");
-// COMMUNITY VERSION: Removed graduation/migration email functions
-// const {sendGraduationEmails, sendMigrationReminders, scheduledGraduationEmails} = require("./callableFunctions/sendGraduationEmails");
+// COMMUNITY VERSION: Re-enabled graduation/migration email functions for HS->College and College->Professional transitions
+const {sendGraduationEmails, sendMigrationReminders, scheduledGraduationEmails} = require("./callableFunctions/sendGraduationEmails");
 
 // Firestore triggers for connection notifications
 const {onConnectionCreated, onConnectionStatusUpdated} = require("./triggers/connectionNotifications");
@@ -45,10 +45,10 @@ exports.generateUnsubscribeLink = generateUnsubscribeLink;
 exports.processUnsubscribe = processUnsubscribe;
 exports.checkUnsubscribeStatus = checkUnsubscribeStatus;
 exports.manageConnections = manageConnections;
-// COMMUNITY VERSION: Removed graduation/migration email exports
-// exports.sendGraduationEmails = sendGraduationEmails;
-// exports.sendMigrationReminders = sendMigrationReminders;
-// exports.scheduledGraduationEmails = scheduledGraduationEmails;
+// COMMUNITY VERSION: Re-enabled graduation/migration email exports
+exports.sendGraduationEmails = sendGraduationEmails;
+exports.sendMigrationReminders = sendMigrationReminders;
+exports.scheduledGraduationEmails = scheduledGraduationEmails;
 
 // Connection notification triggers
 exports.onConnectionCreated = onConnectionCreated;

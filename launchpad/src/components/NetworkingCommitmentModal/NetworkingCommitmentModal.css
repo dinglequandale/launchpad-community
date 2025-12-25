@@ -1,0 +1,235 @@
+.networking-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.networking-modal-container {
+    background: white;
+    border-radius: 16px;
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.networking-modal-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    position: relative;
+}
+
+.networking-modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.networking-modal-close-btn:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.networking-modal-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+}
+
+.networking-modal-subtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.networking-modal-content {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.networking-intro {
+    margin-bottom: 24px;
+}
+
+.networking-intro-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    border-radius: 12px;
+    color: white;
+}
+
+.networking-intro-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+}
+
+.networking-intro-text {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 12px 0;
+    opacity: 0.95;
+}
+
+.networking-intro-text:last-child {
+    margin-bottom: 0;
+}
+
+.networking-intro-text strong {
+    font-weight: 600;
+    opacity: 1;
+}
+
+.networking-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.networking-option {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.2s ease;
+}
+
+.networking-option:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+.networking-checkbox-label {
+    display: flex;
+    gap: 12px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.networking-checkbox {
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #667eea;
+    flex-shrink: 0;
+}
+
+.networking-checkbox-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.networking-option-title {
+    font-weight: 600;
+    color: #111827;
+    font-size: 15px;
+}
+
+.networking-option-description {
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.networking-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.networking-btn-secondary {
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    color: #374151;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.networking-btn-secondary:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.networking-btn-primary {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.networking-btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.networking-btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .networking-modal-container {
+        max-height: 95vh;
+        border-radius: 12px;
+    }
+
+    .networking-modal-header,
+    .networking-modal-content,
+    .networking-modal-footer {
+        padding: 16px;
+    }
+
+    .networking-modal-title {
+        font-size: 20px;
+    }
+
+    .networking-intro-card {
+        padding: 16px;
+    }
+}

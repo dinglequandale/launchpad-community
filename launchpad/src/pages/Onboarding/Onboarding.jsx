@@ -43,9 +43,9 @@ export default function Onboarding() {
             case "High Schooler":
                 return 4;
             case "College Student":
-                return 3;
-            case "Professional":
                 return 4;
+            case "Professional":
+                return 5;
             case "Staff":
                 return 3;
             default:

@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { BiPlus, BiTrash } from 'react-icons/bi';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import EmailConfirmation from '../EmailConfirmation';
+import { FaShieldAlt } from 'react-icons/fa';
 
 // Move getEmail function creation outside component to prevent recreation on every render
 const getEmail = httpsCallable(getFunctions(), 'getEmail');
@@ -79,6 +80,17 @@ const collegeStudentQuestionsConfig = [
     options: graduationYears,
     page: 2,
   },
+  {
+    id: "openToCrossSchoolConnections",
+    text: "Do you want to connect with students from your school community only, or are you open to connecting with students from other schools as well?",
+    type: "select",
+    options: [
+      { value: "no", label: "My school community only" },
+      { value: "yes", label: "I'm open to connecting with students from any school" },
+    ],
+    placeholder: "Select your preference",
+    page: 2,
+  },
   // {
   //   id: "sectionAttending",
   //   text: "Were you part of the French or International Section?",
@@ -94,6 +106,14 @@ const collegeStudentQuestionsConfig = [
     text: "List out skills that make you standout to professionals:",
     page: 3,
     optional: true,
+  },
+  // Page 4
+  {
+    id: "collegeStudentEmails",
+    text: "Invite Fellow Students to Join Launchpad",
+    type: "multi-email",
+    optional: true,
+    page: 4
   },
 ];
 
@@ -128,7 +148,9 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
       schoolAttending: "",
       collegeAttending: "",
       graduationYear: "",
+      openToCrossSchoolConnections: "no", // Default to school community only
       userSkills: [],
+      collegeStudentEmails: [],
       userType: "College Student",
     };
   };
@@ -191,14 +213,14 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
       case 1:
         return <BasicUserInfo selectedOptions={collegeStudentData} questionsForPage={collegeStudentQuestionsConfig.filter((question)=>question.page === 1)} setSelectedOptions={setCollegeStudentData} handleChange={handleChange}/>
       case 2:
-        return <CollegeInfo 
+        return <CollegeInfo
         selectedOptions={collegeStudentData}
-        handleChange={handleChange} 
+        handleChange={handleChange}
         collegeStudentData={collegeStudentData}/>;
       case 3:
         return <UserSkills selectedOptions={collegeStudentData} setSelectedOptions={setCollegeStudentData} />;
-      // case 4:
-      //   return <EmailConfirmation selectedOptions={collegeStudentData} handleChange={handleChange} loginEmail={collegeStudentData.email}/>
+      case 4:
+        return <CollegeStudentInvitationPage selectedOptions={collegeStudentData} handleChange={handleChange} />;
       default:
         return null;
     }
@@ -337,7 +359,7 @@ const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
   const handleAddSkill = () => {
     setSkillData([...skillData, {id: skillData.length, skillCategory: "", skillDescription: ""}]);
   };
-  
+
   const handleRemoveSkill = (index) => {
       const updatedSkills = skillData.filter((_, i) => i !== index);
       setSkillData(updatedSkills);
@@ -354,7 +376,7 @@ const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
             </div>
           </label>
         </div>
-        
+
         <div className="skills-container">
           {selectedOptions.userSkills.map((skill, index) => (
             <div key={index} className="skill-item">
@@ -387,11 +409,160 @@ const UserSkills = ({ selectedOptions, setSelectedOptions }) => {
             </div>
           ))}
         </div>
-        
+
         <button className="request-btn skill-add-button" onClick={handleAddSkill}>
           <BiPlus size={18} /> Add Skill
         </button>
       </div>
+  );
+};
+
+const CollegeStudentInvitationPage = ({ selectedOptions, handleChange }) => {
+  const [collegeStudentEmails, setCollegeStudentEmails] = useState(selectedOptions.collegeStudentEmails || []);
+  const [errors, setErrors] = useState({});
+
+  const validateEmail = (email, index) => {
+    if (!email || email.trim() === '') {
+      const newErrors = { ...errors };
+      delete newErrors[index];
+      setErrors(newErrors);
+      return true;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrors({ ...errors, [index]: 'Please enter a valid email address' });
+      return false;
+    }
+    const newErrors = { ...errors };
+    delete newErrors[index];
+    setErrors(newErrors);
+    return true;
+  };
+
+  const handleEmailChange = (index, value) => {
+    const newEmails = [...collegeStudentEmails];
+    newEmails[index] = value;
+    setCollegeStudentEmails(newEmails);
+    handleChange('collegeStudentEmails', newEmails);
+  };
+
+  const addEmailField = () => {
+    setCollegeStudentEmails([...collegeStudentEmails, '']);
+    handleChange('collegeStudentEmails', [...collegeStudentEmails, '']);
+  };
+
+  const removeEmailField = (index) => {
+    const newEmails = collegeStudentEmails.filter((_, i) => i !== index);
+    setCollegeStudentEmails(newEmails);
+    handleChange('collegeStudentEmails', newEmails);
+    const newErrors = { ...errors };
+    delete newErrors[index];
+    setErrors(newErrors);
+  };
+
+  return (
+    <div className="form-section">
+      <h2 className="page-title">Invite Your Network</h2>
+      <div className="onboardingQuestions">
+        <div className="parent-notice" style={{ background: '#fff3e0', border: '1px solid #ffb74d' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <FaShieldAlt className="parent-notice-icon" style={{ color: '#f57c00' }} />
+            <div className="parent-notice-content">
+              <h3>Grow the Community</h3>
+              <p>
+                Help expand the Launchpad network! Invite fellow students, classmates, and friends to join the community.
+                We'll send them invitation emails when you complete your onboarding.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">
+            Email Addresses
+          </label>
+          {collegeStudentEmails.length === 0 ? (
+            <div style={{ marginBottom: '16px', color: '#666', fontSize: '14px' }}>
+              Click "Add Email" below to invite fellow students to join Launchpad
+            </div>
+          ) : (
+            collegeStudentEmails.map((email, index) => (
+              <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', gap: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="email"
+                    className="form-input"
+                    placeholder={`Email ${index + 1}`}
+                    value={email}
+                    onChange={(e) => handleEmailChange(index, e.target.value)}
+                    onBlur={() => validateEmail(email, index)}
+                    style={{ width: '93%' }}
+                  />
+                  {errors[index] && (
+                    <div className="error-message" style={{ marginTop: '4px' }}>
+                      {errors[index]}
+                    </div>
+                  )}
+                  {/* {email && !errors[index] && email.trim() !== '' && (
+                    <div style={{ marginTop: '4px', fontSize: '12px', color: '#4caf50' }}>
+                      ✓ Will send invitation to {email}
+                    </div>
+                  )} */}
+                </div>
+                <div style={{alignItems: "center"}}>
+                <button
+                  type="button"
+                  onClick={() => removeEmailField(index)}
+                  style={{
+                    padding: '8px',
+                    background: 'transparent',
+                    color: '#dc2626',
+                    border: '1px solid #fecaca',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s ease',
+                    alignSelf: 'flex-start'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = '#fef2f2';
+                    e.currentTarget.style.borderColor = '#dc2626';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = '#fecaca';
+                  }}
+                >
+                  <BiTrash size={18} />
+                </button>
+              </div>
+              </div>
+            ))
+          )}
+          <button
+            type="button"
+            onClick={addEmailField}
+            style={{
+              padding: '10px 16px',
+              background: '#f57c00',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>+</span>
+            Add Email
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -3,7 +3,7 @@ const admin = require('firebase-admin');
 const crypto = require('crypto');
 
 exports.sendSESEmail = functions.https.onCall(async (data, context) => {
-    const {recipient, subject, htmlTemplate, sender="no-reply@launchpadhouston.com", emailType="general"} = data;
+    const {recipient, subject, htmlTemplate, sender="Launchpad Networks <no-reply@launchpadhouston.com>", emailType="general"} = data;
 
     if (!recipient || !subject || !htmlTemplate) {
         throw new functions.https.HttpsError('invalid-argument', 'Missing required parameters: recipient, subject, and htmlTemplate are required');

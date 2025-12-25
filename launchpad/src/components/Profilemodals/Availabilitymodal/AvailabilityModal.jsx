@@ -115,12 +115,12 @@ export default function AvailabilityModal({visibility, onClose, userData, availa
                         </div>
                         
                         <div className="v0-modal-content">
-                            <div className="v0-availability-intro">
+                            {/* <div className="v0-availability-intro">
                                 <h3 className="v0-availability-title">
                                     {userType !== "Professional" ? "High schoolers" : "High schoolers and college students"} will have the opportunity to connect with you via Launchpad.
                                 </h3>
                                 <p className="v0-availability-subtitle">What are you open to doing for these students?</p>
-                            </div>
+                            </div> */}
                             
                             <div className="v0-availability-options">
                                 {userAvailabilityOptions.map((option) => (

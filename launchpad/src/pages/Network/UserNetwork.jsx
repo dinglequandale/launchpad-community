@@ -51,11 +51,11 @@ export default function UserNetwork() {
   const [highSchoolers, setHighSchoolers] = useState([]);
   const [collegeStudents, setCollegeStudents] = useState([]);
   const [professionals, setProfessionals] = useState([]);
-  const [staff, setStaff] = useState([]);
+  // const [staff, setStaff] = useState([]);
 
   const loadLimit = 9;
-  const [lastDocs, setLastDocs] = useState({ highSchool: null, college: null, professional: null, staff: null });
-  const [loading, setLoading] = useState({ highSchool: false, college: false, professional: false, staff: false });
+  const [lastDocs, setLastDocs] = useState({ highSchool: null, college: null, professional: null });
+  const [loading, setLoading] = useState({ highSchool: false, college: false, professional: false });
   const [overallLoading, setOverallLoading] = useState(false);
 
   const [allVisibleUserData, setAllVisibleUserData] = useState(null);
@@ -111,7 +111,7 @@ export default function UserNetwork() {
   const [filterChanged, setFilterChanged] = useState(false);
 
   const filterContent = {
-    userType: ["Any User", "Professionals", "College Students", "High Schoolers", "Staff"],
+    userType: ["Any User", "Professionals", "College Students", "High Schoolers"],
     collegeInterestsOrDecision:  (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]),
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
     networkingLevel: ["Any Availability", "Casual Connection", "General Inquiries", "Short Interview", "Project Support", "Mock Interview", "Workplace Opportunities"],
@@ -153,10 +153,11 @@ export default function UserNetwork() {
   },[filters]);
 
   useEffect(() => {
-    setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals, ...staff]);
+    setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals ]);
+    // setAllVisibleUserData([...highSchoolers, ...collegeStudents, ...professionals, ...staff]);
 
     console.log("All data:", allVisibleUserData)
-  },[collegeStudents, highSchoolers, professionals, staff]);
+  },[collegeStudents, highSchoolers, professionals]);
 
   const fetchAllUserTypes = async () => {
       console.log('fetchAllUserTypes called with filters:', filters);
@@ -167,7 +168,7 @@ export default function UserNetwork() {
               fetchUserType('High Schooler'),
               fetchUserType('College Student'),
               fetchUserType('Professional'),
-              fetchUserType('Staff')
+              // fetchUserType('Staff')
           ]);
       } else {
           console.log('Fetching specific user type:', filters.userType);
@@ -176,7 +177,7 @@ export default function UserNetwork() {
               'High Schoolers': 'High Schooler',
               'College Students': 'College Student',
               'Professionals': 'Professional',
-              'Staff': 'Staff'
+              // 'Staff': 'Staff'
           };
           
           const targetUserType = userTypeMap[filters.userType];
@@ -186,7 +187,7 @@ export default function UserNetwork() {
               if (targetUserType !== 'High Schooler') setHighSchoolers([]);
               if (targetUserType !== 'College Student') setCollegeStudents([]);
               if (targetUserType !== 'Professional') setProfessionals([]);
-              if (targetUserType !== 'Staff') setStaff([]);
+              // if (targetUserType !== 'Staff') setStaff([]);
               
               await fetchUserType(targetUserType);
           }
@@ -220,9 +221,9 @@ export default function UserNetwork() {
               case 'Professional':
                   setProfessionals(prev => isLoadMore ? [...prev, ...results] : results);
                   break;
-              case 'Staff':
-                  setStaff(prev => isLoadMore ? [...prev, ...results] : results);
-                  break;
+              // case 'Staff':
+              //     setStaff(prev => isLoadMore ? [...prev, ...results] : results);
+              //     break;
           }
       } catch (error) {
           console.error(`Error fetching ${category} data:`, error);
@@ -421,7 +422,7 @@ export default function UserNetwork() {
                           title="High Schoolers"
                         />
                       )}
-                      {filters.userType === 'Staff' && staff.length > 0 && (
+                      {/* {filters.userType === 'Staff' && staff.length > 0 && (
                         <UserGrid 
                           userNetworkData={staff}
                           onEndReached={() => loadMore('Staff')}
@@ -429,7 +430,7 @@ export default function UserNetwork() {
                           connectionRefreshKey={connectionRefreshKey}
                           title="Staff"
                         />
-                      )}
+                      )} */}
                     </div>
                   ) : (
                     // Show carousel view when showing all user types
@@ -482,7 +483,7 @@ export default function UserNetwork() {
                           </div>
                         </div>
                       )}
-                      {staff.length > 0 && (
+                      {/* {staff.length > 0 && (
                         <div className="v0-network-section">
                           <div className="v0-network-section-header">
                             <h3 className="v0-network-section-title">Staff</h3>
@@ -498,7 +499,7 @@ export default function UserNetwork() {
                             />
                           </div>
                         </div>
-                      )}
+                      )} */}
                     </>
                   )
                 ) : overallLoading ? (
@@ -579,20 +580,31 @@ function UserCarousel({userNetworkData, loading, onEndReached, connectionRefresh
     );
   };
 
+  // Calculate responsive width based on screen size and number of items
+  const getCarouselWidth = () => {
+    if (isMobile) {
+      return "100%"; // Full width on mobile
+    }
+    // Desktop widths
+    if (userNetworkData.length === 1) return "340.66px";
+    if (userNetworkData.length === 2) return "681.33px";
+    return "1022px";
+  };
+
   return (
-    <div className="carousel" style={{width: `${userNetworkData.length === 1 ? "340.66px" : userNetworkData.length === 2 ? "681.33px" : "1022px"}`, margin: "0 auto"}}>
+    <div className="carousel" style={{width: getCarouselWidth(), maxWidth: isMobile ? "400px" : "none", margin: "0 auto"}}>
       <div className="carousel-container">
         {!loading ? <div
           className={`carousel-content ${slideDirection}`}
-          style={{justifyContent: `${userNetworkData.length <= 3 ? "center" : ""}`, gap: `${userNetworkData.length < 3 ? "10px" : ""}`}}
+          style={{justifyContent: `${(isMobile || userNetworkData.length <= 3) ? "center" : ""}`, gap: `${userNetworkData.length < 3 ? "10px" : ""}`}}
           onAnimationEnd={() => setSlideDirection('')}
           ref={carouselRef}
         >
           {userNetworkData.map((profile, index) => (
             <div key={index} className="carousel-item">
-              <UserCard 
-                userData={profile} 
-                onProfileClick={() => handleOnProfileClick(profile.userId)} 
+              <UserCard
+                userData={profile}
+                onProfileClick={() => handleOnProfileClick(profile.userId)}
                 onConnectClick={handleConnectClick}
                 refreshKey={connectionRefreshKey}
               />
@@ -602,18 +614,18 @@ function UserCarousel({userNetworkData, loading, onEndReached, connectionRefresh
         : <Loading/>
         }
       </div>
-      
+
       {currentIndex > 0 && (
-        <button 
-          className="carousel-button prev" 
+        <button
+          className="carousel-button prev"
           onClick={prevSlide}
         >
           <GrPrevious color="var(--accent)"/>
         </button>
       )}
       {currentIndex + itemsPerPage < userNetworkData.length && (
-        <button 
-          className="carousel-button next" 
+        <button
+          className="carousel-button next"
           onClick={nextSlide}
         >
           <GrNext color="var(--accent)"/>

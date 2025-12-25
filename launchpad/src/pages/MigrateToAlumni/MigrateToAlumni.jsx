@@ -73,8 +73,8 @@ const MigrateToAlumni = () => {
 
             setIsValidToken(true);
 
-            // Load user data
-            const userDoc = await getDoc(doc(db, 'tenants', tokenData.schoolId, 'users', userId));
+            // COMMUNITY VERSION: Load user data from flat collection
+            const userDoc = await getDoc(doc(db, 'users', userId));
             if (!userDoc.exists()) {
                 toast.error('User data not found');
                 navigate('/Home');
@@ -138,8 +138,8 @@ const MigrateToAlumni = () => {
         try {
             setMigrating(true);
 
-            // Update user data to alumni
-            const userRef = doc(db, 'tenants', userData.schoolId, 'users', currentUser.uid);
+            // COMMUNITY VERSION: Update user data in flat collection
+            const userRef = doc(db, 'users', currentUser.uid);
             await updateDoc(userRef, {
                 userType: 'College Student',
                 collegeAttending: alumniData.collegeAttending,

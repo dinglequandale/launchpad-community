@@ -170,7 +170,7 @@ export default function EditProfileCard({ isSidebarCollapsed }) {
         {contactModalVisibility && <ContactInfoModal onClose={()=>setContactModalVisibility(false)} visibility={contactModalVisibility} userData={userData}/>}
         {aboutMeModalVisibility && <AboutMeModal onClose={()=>setAboutMeModalVisibility(false)} visibility={aboutMeModalVisibility} userData={userData}/>}
         {skillModalVisibility && <SkillModal onClose={()=>setSkillModalVisibility(false)} visibility={skillModalVisibility} userData={userData}/>}
-        {availabilityModalVisibility && <AvailabilityModal onClose={()=>setAvailabilityModalVisibility(false)} visibility={availabilityModalVisibility} userData={userData}/>}
+        {availabilityModalVisibility && <AvailabilityModal onClose={()=>setAvailabilityModalVisibility(false)} visibility={availabilityModalVisibility} userData={userData} availabilityData={userData?.networkingLevel}/>}
 
         <div className={`complete-profile-container ${isSidebarCollapsed ? 'complete-profile-container-sidebar-collapsed' : 'complete-profile-container-sidebar-expanded'}`}>
             <ProfileContext.Provider value={{currentUser, userData}}>
@@ -974,8 +974,15 @@ function ConnectionAvailability({ availabilityModalVisibility, setAvailabilityMo
     const { userData } = useContext(ProfileContext);
 
     useEffect(()=>{
+        // Check if userData exists before accessing networkingLevel
+        if (!userData) {
+            setAvailabilityData(null);
+            return;
+        }
+
         const storedAvailabilityData = userData.networkingLevel;
         if(!Array.isArray(storedAvailabilityData)){
+            setAvailabilityData(null);
             return;
         }
         if(storedAvailabilityData.length !== 0){

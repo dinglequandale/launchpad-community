@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { BiPlus, BiTrash } from 'react-icons/bi';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import EmailConfirmation from '../EmailConfirmation';
+import { FaShieldAlt } from 'react-icons/fa';
 
 // Move getEmail function creation outside component to prevent recreation on every render
 const getEmail = httpsCallable(getFunctions(), 'getEmail');
@@ -171,6 +172,14 @@ const professionalQuestionsConfig = [
     optional: true,
     page: 5
   },
+  // Page 6
+  {
+    id: "professionalEmails",
+    text: "Invite Colleagues and Fellow Professionals to Join Launchpad",
+    type: "multi-email",
+    optional: true,
+    page: 6
+  },
 ];
 
 export default function Professional({currentPage, isSubmitting, setCanSubmit, schoolInfo, setUserData}) {
@@ -203,7 +212,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
       email: "",
       schoolAttending: schoolInfo?.schoolDisplayName || "",
       schoolId: schoolInfo?.schoolId || "",
-      openToCrossSchoolConnections: "",
+      openToCrossSchoolConnections: "no", // Default to school community only
       userType: "Professional",
       // Professional status and work details
       retiredStatus: "",
@@ -213,6 +222,8 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
       yearsOfExperience: "",
       // Networking commitment
       networkingLevel: [],
+      // Invitations
+      professionalEmails: [],
     };
   };
 
@@ -282,8 +293,8 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
         return <RetiredStatus selectedOptions={professionalData} handleChange={handleChange} />;
       case 4:
         return <WorkDetails selectedOptions={professionalData} handleChange={handleChange} />;
-      // case 5:
-      //   return <ConnectionLevel selectedOptions={professionalData} setSelectedOptions={setProfessionalData} />;
+      case 5:
+        return <ProfessionalInvitationPage selectedOptions={professionalData} handleChange={handleChange} />;
       default:
         return null;
     }
@@ -412,14 +423,14 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
     return (
         <div className="form-section">
           <h2 className="page-title">Your Commitment Level</h2>
-          <div className="parent-notice">
+          {/* <div className="parent-notice">
             <div style={{ display: 'flex', alignItems: 'flex-start' }}>
               <div className="parent-notice-content">
                 <h3>Your knowledge and experiences</h3>
                 <p>are invaluable resources to the Awty community.</p>
               </div>
             </div>
-          </div>
+          </div> */}
           
           {questionsForPage.map((question) => (
             <div key={question.id} className="form-group">
@@ -464,6 +475,155 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
   };
   
 
+const ProfessionalInvitationPage = ({ selectedOptions, handleChange }) => {
+  const [professionalEmails, setProfessionalEmails] = useState(selectedOptions.professionalEmails || []);
+  const [errors, setErrors] = useState({});
+
+  const validateEmail = (email, index) => {
+    if (!email || email.trim() === '') {
+      const newErrors = { ...errors };
+      delete newErrors[index];
+      setErrors(newErrors);
+      return true;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrors({ ...errors, [index]: 'Please enter a valid email address' });
+      return false;
+    }
+    const newErrors = { ...errors };
+    delete newErrors[index];
+    setErrors(newErrors);
+    return true;
+  };
+
+  const handleEmailChange = (index, value) => {
+    const newEmails = [...professionalEmails];
+    newEmails[index] = value;
+    setProfessionalEmails(newEmails);
+    handleChange('professionalEmails', newEmails);
+  };
+
+  const addEmailField = () => {
+    setProfessionalEmails([...professionalEmails, '']);
+    handleChange('professionalEmails', [...professionalEmails, '']);
+  };
+
+  const removeEmailField = (index) => {
+    const newEmails = professionalEmails.filter((_, i) => i !== index);
+    setProfessionalEmails(newEmails);
+    handleChange('professionalEmails', newEmails);
+    const newErrors = { ...errors };
+    delete newErrors[index];
+    setErrors(newErrors);
+  };
+
+  return (
+    <div className="form-section">
+      <h2 className="page-title">Invite Your Network</h2>
+      <div className="onboardingQuestions">
+        <div className="parent-notice" style={{ background: '#e8f5e9', border: '1px solid #81c784' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <FaShieldAlt className="parent-notice-icon" style={{ color: '#388e3c' }} />
+            <div className="parent-notice-content">
+              <h3>Grow the Community</h3>
+              <p>
+                Help expand the Launchpad network! Invite colleagues and fellow professionals who can mentor students and contribute to the community.
+                We'll send them invitation emails when you complete your onboarding.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">
+            Email Addresses
+          </label>
+          {professionalEmails.length === 0 ? (
+            <div style={{ marginBottom: '16px', color: '#666', fontSize: '14px' }}>
+              Click "Add Email" below to invite colleagues and fellow professionals to join Launchpad
+            </div>
+          ) : (
+            professionalEmails.map((email, index) => (
+              <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', gap: '12px' }}>
+                <div style={{ flex: 1 }}>
+                  <input
+                    type="email"
+                    className="form-input"
+                    placeholder={`Email ${index + 1}`}
+                    value={email}
+                    onChange={(e) => handleEmailChange(index, e.target.value)}
+                    onBlur={() => validateEmail(email, index)}
+                    style={{ width: '93%' }}
+                  />
+                  {errors[index] && (
+                    <div className="error-message" style={{ marginTop: '4px' }}>
+                      {errors[index]}
+                    </div>
+                  )}
+                  {/* {email && !errors[index] && email.trim() !== '' && (
+                    <div style={{ marginTop: '4px', fontSize: '12px', color: '#4caf50' }}>
+                      ✓ Will send invitation to {email}
+                    </div>
+                  )} */}
+                </div>
+                <div style={{alignItems: "center"}}>
+                <button
+                  type="button"
+                  onClick={() => removeEmailField(index)}
+                  style={{
+                    padding: '13px',
+                    background: 'transparent',
+                    color: '#dc2626',
+                    border: '1px solid #fecaca',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.2s ease',
+                    alignSelf: 'flex-start'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = '#fef2f2';
+                    e.currentTarget.style.borderColor = '#dc2626';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.borderColor = '#fecaca';
+                  }}
+                >
+                  <BiTrash size={18} />
+                </button>
+                </div>
+              </div>
+            ))
+          )}
+          <button
+            type="button"
+            onClick={addEmailField}
+            style={{
+              padding: '10px 16px',
+              background: '#388e3c',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>+</span>
+            Add Email
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const FinalTouches = ({ selectedOptions, handleChange }) => {
 
   const OptionalLabel = () => (
@@ -481,10 +641,10 @@ const FinalTouches = ({ selectedOptions, handleChange }) => {
       </div>
       </div>
       <div style={{margin: "0 auto", marginTop: "10px"}}>
-        <textarea 
-        style={{width: "460px", height: "160px"}} 
-        placeholder='Introduce yourself to prospective students and other professionals' 
-        onChange={(e) => handleChange("userAboutMe",e.target.value)} 
+        <textarea
+        style={{width: "460px", height: "160px"}}
+        placeholder='Introduce yourself to prospective students and other professionals'
+        onChange={(e) => handleChange("userAboutMe",e.target.value)}
         value={selectedOptions["userAboutMe"]}></textarea>
       </div>
     </div>

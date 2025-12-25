@@ -452,7 +452,7 @@ const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) =>
           </div>
         ) : (
           parentEmails.map((email, index) => (
-            <div key={index} style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '12px', gap: '8px' }}>
+            <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', gap: '12px' }}>
               <div style={{ flex: 1 }}>
                 <input
                   type="email"
@@ -461,35 +461,48 @@ const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) =>
                   value={email}
                   onChange={(e) => handleEmailChange(index, e.target.value)}
                   onBlur={() => validateEmail(email, index)}
-                  style={{ width: '100%' }}
+                  style={{ width: '93%' }}
                 />
                 {errors[index] && (
                   <div className="error-message" style={{ marginTop: '4px' }}>
                     {errors[index]}
                   </div>
                 )}
-                {email && !errors[index] && email.trim() !== '' && (
+                {/* {email && !errors[index] && email.trim() !== '' && (
                   <div style={{ marginTop: '4px', fontSize: '12px', color: '#4caf50' }}>
                     ✓ Will send invitation to {email}
                   </div>
-                )}
+                )} */}
               </div>
+              <div style={{alignItems: "center"}}>
               <button
                 type="button"
                 onClick={() => removeEmailField(index)}
                 style={{
-                  padding: '8px 12px',
-                  background: '#f44336',
-                  color: 'white',
-                  border: 'none',
+                  padding: '13px',
+                  background: 'transparent',
+                  color: '#dc2626',
+                  border: '1px solid #fecaca',
                   borderRadius: '6px',
                   cursor: 'pointer',
-                  fontSize: '14px',
-                  minWidth: '80px'
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
+                  alignSelf: 'flex-start'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = '#fef2f2';
+                  e.currentTarget.style.borderColor = '#dc2626';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = '#fecaca';
                 }}
               >
-                Remove
+                <BiTrash size={18} />
               </button>
+              </div>
             </div>
           ))
         )}
