@@ -7,7 +7,13 @@ import { algoliaClient } from '../../typesense/typesenseClient';
 // import {algoliasearch} from 'algoliasearch/lite';
 import Loading from '../../components/LoadingAnimation/Loading';
 
+// Comprehensive list of high schools from major US cities
+// Users can search through this list or select "Other" to type manually
 const highSchools = [
+    // Manual entry option - FIRST for easy access
+    { "value": "OTHER_MANUAL_ENTRY", "label": "Other - Type your high school manually" },
+
+    // Houston, TX
     { "value": "awty_international", "label": "Awty International School" },
     { "value": "bellaire_high", "label": "Bellaire High School" },
     { "value": "lamar_high", "label": "Lamar High School" },
@@ -43,7 +49,81 @@ const highSchools = [
     { "value": "kipp_houston", "label": "KIPP Houston High School" },
     { "value": "spring_woods", "label": "Spring Woods High School" },
     { "value": "stratford", "label": "Stratford High School" },
-    { "value": "memorial", "label": "Memorial High School" }
+    { "value": "memorial", "label": "Memorial High School" },
+
+    // New York, NY
+    { "value": "stuyvesant", "label": "Stuyvesant High School" },
+    { "value": "bronx_science", "label": "Bronx High School of Science" },
+    { "value": "brooklyn_tech", "label": "Brooklyn Technical High School" },
+    { "value": "townsend_harris", "label": "Townsend Harris High School" },
+    { "value": "staten_island_tech", "label": "Staten Island Technical High School" },
+    { "value": "dalton_school", "label": "The Dalton School" },
+    { "value": "trinity_school_ny", "label": "Trinity School" },
+    { "value": "horace_mann", "label": "Horace Mann School" },
+    { "value": "collegiate_school", "label": "Collegiate School" },
+    { "value": "regis_high_school", "label": "Regis High School" },
+
+    // Los Angeles, CA
+    { "value": "harvard_westlake", "label": "Harvard-Westlake School" },
+    { "value": "marlborough_school", "label": "Marlborough School" },
+    { "value": "polytechnic_school", "label": "Polytechnic School" },
+    { "value": "crossroads_school", "label": "Crossroads School for Arts & Sciences" },
+    { "value": "los_angeles_high", "label": "Los Angeles High School" },
+    { "value": "brentwood_school", "label": "Brentwood School" },
+
+    // Chicago, IL
+    { "value": "walter_payton", "label": "Walter Payton College Prep" },
+    { "value": "northside_college_prep", "label": "Northside College Preparatory High School" },
+    { "value": "whitney_young", "label": "Whitney M. Young Magnet High School" },
+    { "value": "latin_school_chicago", "label": "The Latin School of Chicago" },
+    { "value": "university_chicago_lab", "label": "University of Chicago Laboratory Schools" },
+
+    // San Francisco Bay Area, CA
+    { "value": "lowell_high", "label": "Lowell High School" },
+    { "value": "palo_alto_high", "label": "Palo Alto High School" },
+    { "value": "mission_san_jose", "label": "Mission San Jose High School" },
+    { "value": "monta_vista", "label": "Monta Vista High School" },
+    { "value": "lynbrook_high", "label": "Lynbrook High School" },
+
+    // Boston, MA
+    { "value": "boston_latin", "label": "Boston Latin School" },
+    { "value": "boston_latin_academy", "label": "Boston Latin Academy" },
+    { "value": "phillips_academy", "label": "Phillips Academy Andover" },
+    { "value": "phillips_exeter", "label": "Phillips Exeter Academy" },
+    { "value": "noble_greenough", "label": "Noble and Greenough School" },
+
+    // Washington, DC
+    { "value": "sidwell_friends", "label": "Sidwell Friends School" },
+    { "value": "st_albans", "label": "St. Albans School" },
+    { "value": "georgetown_prep", "label": "Georgetown Preparatory School" },
+    { "value": "thomas_jefferson", "label": "Thomas Jefferson High School for Science and Technology" },
+
+    // Seattle, WA
+    { "value": "lakeside_school", "label": "Lakeside School" },
+    { "value": "garfield_high", "label": "Garfield High School" },
+    { "value": "roosevelt_high", "label": "Roosevelt High School" },
+
+    // Atlanta, GA
+    { "value": "westminster_atlanta", "label": "The Westminster Schools" },
+    { "value": "woodward_academy", "label": "Woodward Academy" },
+    { "value": "pace_academy", "label": "Pace Academy" },
+
+    // Dallas, TX
+    { "value": "st_marks_dallas", "label": "St. Mark's School of Texas" },
+    { "value": "hockaday_school", "label": "The Hockaday School" },
+    { "value": "highland_park", "label": "Highland Park High School" },
+
+    // Phoenix, AZ
+    { "value": "basis_scottsdale", "label": "BASIS Scottsdale" },
+    { "value": "brophy_prep", "label": "Brophy College Preparatory" },
+
+    // Philadelphia, PA
+    { "value": "central_high_philly", "label": "Central High School" },
+    { "value": "masterman_school", "label": "Julia R. Masterman School" },
+
+    // Miami, FL
+    { "value": "ransom_everglades", "label": "Ransom Everglades School" },
+    { "value": "gulliver_prep", "label": "Gulliver Preparatory School" }
 ];
 
 const careerInterests = [
@@ -287,4 +367,110 @@ const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, s
 };
 
 
-export { highSchools, careerInterests, graduationYears, getColleges, CollegeSearch };
+// High School Search Component with manual entry fallback
+const HighSchoolSearch = ({ selectedOptions, handleChange, field = "schoolAttending", showQuestion = true }) => {
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [manualSchoolName, setManualSchoolName] = useState('');
+
+  // Check if "Other" is selected on mount
+  useEffect(() => {
+    const currentValue = selectedOptions[field];
+    if (currentValue === "OTHER_MANUAL_ENTRY" ||
+        (currentValue && !highSchools.some(school => school.label === currentValue || school.value === currentValue))) {
+      setShowManualEntry(true);
+      // If it's not "OTHER_MANUAL_ENTRY" but also not in the list, it must be a manually entered name
+      if (currentValue !== "OTHER_MANUAL_ENTRY") {
+        setManualSchoolName(currentValue);
+      }
+    }
+  }, []);
+
+  const handleHighSchoolChange = (selectedOption) => {
+    const value = selectedOption ?
+      (typeof selectedOption === 'string' ? selectedOption : selectedOption.label || selectedOption.value)
+      : '';
+
+    // Check if user selected "Other - Type manually"
+    if (value === "Other - Type your high school manually" || value === "OTHER_MANUAL_ENTRY") {
+      setShowManualEntry(true);
+      handleChange(field, ''); // Clear the field value
+    } else {
+      setShowManualEntry(false);
+      setManualSchoolName('');
+      handleChange(field, value);
+    }
+  };
+
+  const handleManualEntryChange = (e) => {
+    const value = e.target.value;
+    setManualSchoolName(value);
+    handleChange(field, value);
+  };
+
+  // Get current value for display
+  const getCurrentValue = () => {
+    if (!selectedOptions) return '';
+    const currentValue = selectedOptions[field];
+
+    if (!currentValue) return '';
+
+    // If showing manual entry, don't show a value in the dropdown
+    if (showManualEntry) return '';
+
+    // Convert string to object format for CustomSelect
+    return currentValue ? { label: currentValue, value: currentValue } : '';
+  };
+
+  return (
+    <div>
+      <CustomSelect
+        options={highSchools}
+        value={getCurrentValue()}
+        onChange={handleHighSchoolChange}
+        placeholder="Start typing high school name..."
+        isMulti={false}
+        isSearchable={true}
+        noOptionsMessage="No high schools found - select 'Other' to type manually"
+      />
+
+      {showManualEntry && (
+        <div style={{ marginTop: '12px' }}>
+          <label className="form-label" style={{ fontSize: '14px', marginBottom: '8px', display: 'block' }}>
+            Type your high school name:
+          </label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="Enter your high school name"
+            value={manualSchoolName}
+            onChange={handleManualEntryChange}
+            style={{ width: '94%' }}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setShowManualEntry(false);
+              setManualSchoolName('');
+              handleChange(field, '');
+            }}
+            style={{
+              marginTop: '8px',
+              padding: '6px 12px',
+              background: 'transparent',
+              color: '#1976d2',
+              border: '1px solid #1976d2',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            ← Back to search
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+export { highSchools, careerInterests, graduationYears, getColleges, CollegeSearch, HighSchoolSearch };

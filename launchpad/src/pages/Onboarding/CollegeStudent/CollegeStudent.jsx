@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import CustomSelect from '../../../components/CustomSelect';
-import { highSchools, careerInterests, graduationYears, CollegeSearch } from './../Options';
+import { highSchools, careerInterests, graduationYears, CollegeSearch, HighSchoolSearch } from './../Options';
 import { requiredQuestionsAnswered } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
@@ -68,7 +68,7 @@ const collegeStudentQuestionsConfig = [
   },
   {
     id: "schoolAttending",
-    text: "What Houston high school did you attend?",
+    text: "What high school did you attend?",
     type: "select",
     options: highSchools,
     page: 2,
@@ -239,28 +239,44 @@ const CollegeInfo = ({ selectedOptions, handleChange, collegeStudentData }) => {
       <h2 className="page-title">College Information</h2>
       <div className="onboardingQuestions">
         {collegeStudentQuestionsConfig.filter(question => question.page === 2)
-          .map((question) => (
-            question.id === 'collegeAttending' ? (
-              <div className="form-group" key={question.id}>
-                <label className="form-label">{question.text}</label>
-                <CollegeSearch
-                  selectedOptions={selectedOptions}
-                  handleChange={handleChange}
-                  field="collegeAttending"
-                  isMultiSelect={false}
-                />
-              </div>
-            ) 
-            : <div className="form-group" key={question.id}>
-                <OnboardingDropdown
-                  question={question.text}
-                  options={question.options}
-                  selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
-                  onChange={(label) => handleChange(question.id, label)}
-                  type={question.type}
-                />
-              </div>
-          ))}
+          .map((question) => {
+            if (question.id === 'collegeAttending') {
+              return (
+                <div className="form-group" key={question.id}>
+                  <label className="form-label">{question.text}</label>
+                  <CollegeSearch
+                    selectedOptions={selectedOptions}
+                    handleChange={handleChange}
+                    field="collegeAttending"
+                    isMultiSelect={false}
+                  />
+                </div>
+              );
+            } else if (question.id === 'schoolAttending') {
+              return (
+                <div className="form-group" key={question.id}>
+                  <label className="form-label">{question.text}</label>
+                  <HighSchoolSearch
+                    selectedOptions={selectedOptions}
+                    handleChange={handleChange}
+                    field="schoolAttending"
+                  />
+                </div>
+              );
+            } else {
+              return (
+                <div className="form-group" key={question.id}>
+                  <OnboardingDropdown
+                    question={question.text}
+                    options={question.options}
+                    selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
+                    onChange={(label) => handleChange(question.id, label)}
+                    type={question.type}
+                  />
+                </div>
+              );
+            }
+          })}
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import OnboardingDropdown from '../../../components/OnboardingDropdown/OnboardingDropdown';
 import CustomSelect from '../../../components/CustomSelect';
-import { highSchools, careerInterests, graduationYears, CollegeSearch } from './../Options';
+import { highSchools, careerInterests, graduationYears, CollegeSearch, HighSchoolSearch } from './../Options';
 import { requiredQuestionsAnswered } from '../../../services/onboardingServices';
 import BasicUserInfo from '../../../components/OnboardingComponents/BasicUserInfo';
 import { useAuth } from '../../../contexts/auth/AuthContext';
@@ -254,12 +254,13 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
             <h2 className="page-title">High School Information</h2>
             <div className="onboardingQuestions">
               <div className="form-group">
-                <OnboardingDropdown
-                  question={highSchoolQuestionsConfig.find(q => q.id === 'schoolAttending')}
-                  options={highSchools}
-                  selectedOption={highSchoolerData.schoolAttending}
-                  onChange={(value) => handleChange('schoolAttending', value)}
-                  type="select"
+                <label className="form-label">
+                  What high school do you attend?
+                </label>
+                <HighSchoolSearch
+                  selectedOptions={highSchoolerData}
+                  handleChange={handleChange}
+                  field="schoolAttending"
                 />
               </div>
               <div className="form-group">
