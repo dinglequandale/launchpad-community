@@ -104,7 +104,7 @@ const WaitlistPage = () => {
         <div className="waitlist-page-header">
           <h1 className="waitlist-page-title">Join the Waitlist</h1>
           <p className="waitlist-page-subtitle">
-            Be the first to know when Launchpad launches in your area. Connect with peers, mentors, and opportunities.
+            Be the first to tap into high-level mentorship opportunities with the country's top academics.
           </p>
         </div>
 
