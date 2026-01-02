@@ -36,6 +36,7 @@ import ProfilePage from './pages/ProfilePage/ProfilePage.jsx';
 import OrganizationPage from './pages/OrganizationPage/OrganizationPage.jsx';
 import FeedbackPage from './pages/Feedback/FeedbackPage.jsx';
 import WaitlistPage from './pages/Waitlist/WaitlistPage.jsx';
+import SixDegreeApplicationPage from './pages/SixDegreeApplication/SixDegreeApplicationPage.jsx';
 
 const ErrorPage = () => {
   return (
@@ -244,6 +245,10 @@ const router = createBrowserRouter([
           {
             path: '/feedback',
             element: <FeedbackPage/>
+          },
+          {
+            path: '/6-degree-application',
+            element: <SixDegreeApplicationPage/>
           }
         ]
       }

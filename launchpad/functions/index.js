@@ -31,6 +31,9 @@ const {onOpportunityCreated} = require("./triggers/opportunityNotifications");
 // Firestore triggers for waitlist sync
 const {onWaitlistEntryCreated, resyncWaitlistToSheets} = require("./triggers/waitlistSync");
 
+// Firestore triggers for 6 degree application sync
+const {onSixDegreeApplicationCreated, resyncSixDegreeApplicationsToSheets} = require("./triggers/sixDegreeApplicationSync");
+
 exports.createStreamToken = createStreamToken;
 exports.sendInviteEmail = sendInviteEmail;
 exports.getEmail = getEmail;
@@ -63,3 +66,7 @@ exports.onOpportunityCreated = onOpportunityCreated;
 // Waitlist sync triggers
 exports.onWaitlistEntryCreated = onWaitlistEntryCreated;
 exports.resyncWaitlistToSheets = resyncWaitlistToSheets;
+
+// 6 Degree Application sync triggers
+exports.onSixDegreeApplicationCreated = onSixDegreeApplicationCreated;
+exports.resyncSixDegreeApplicationsToSheets = resyncSixDegreeApplicationsToSheets;

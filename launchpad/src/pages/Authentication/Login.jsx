@@ -121,8 +121,15 @@ export default function Login(){
                 
                 // Run profile completion logic for existing users
                 await runProfileCompletionLogic(userData);
-    
-                navigate('/Home');
+
+                // Check if user was trying to access a specific page before logging in
+                const intendedDestination = sessionStorage.getItem('intendedDestination');
+                if (intendedDestination) {
+                    sessionStorage.removeItem('intendedDestination');
+                    navigate(intendedDestination);
+                } else {
+                    navigate('/Home');
+                }
             } catch (error) {
                 console.error("Error logging in:", error);
                 // Error is already handled by toast.promise
@@ -178,8 +185,15 @@ export default function Login(){
                 
                 // Run profile completion logic for existing users
                 await runProfileCompletionLogic(userData);
-    
-                navigate('/Home');
+
+                // Check if user was trying to access a specific page before logging in
+                const intendedDestination = sessionStorage.getItem('intendedDestination');
+                if (intendedDestination) {
+                    sessionStorage.removeItem('intendedDestination');
+                    navigate(intendedDestination);
+                } else {
+                    navigate('/Home');
+                }
             } catch (error) {
                 console.error("Error signing in with Google:", error);
                 if (error.code === 'auth/popup-closed-by-user') {

@@ -115,7 +115,11 @@ function GlobalAuthWrapper() {
     let unsubscribe;
     const initializeUser = async () => {
       if (!currentUser) {
-        navigate("/");
+        // Store the current location before redirecting to signup
+        if (location.pathname !== '/' && location.pathname !== '/Login' && location.pathname !== '/Signup') {
+          sessionStorage.setItem('intendedDestination', location.pathname);
+        }
+        navigate("/Signup");
         return;
       }
 
@@ -167,7 +171,7 @@ function GlobalAuthWrapper() {
   }
 
   if (!currentUser) {
-    return <Navigate to="/" />;
+    return <Navigate to="/Signup" />;
   }
 
   if (!isConnected) {

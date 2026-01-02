@@ -109,8 +109,16 @@ export default function Onboarding() {
 
             await new Promise(resolve => setTimeout(resolve, remainingTime));
 
-            // Navigate after minimum time has passed
-            navigate('/Home');
+            // Check if user was trying to access a specific page before signing up
+            const intendedDestination = sessionStorage.getItem('intendedDestination');
+            if (intendedDestination) {
+                // Clear the stored destination and navigate there
+                sessionStorage.removeItem('intendedDestination');
+                navigate(intendedDestination);
+            } else {
+                // Default behavior: navigate to home
+                navigate('/Home');
+            }
         } catch (error) {
             console.error('Error saving user data:', error);
             setIsSubmitting(false);
