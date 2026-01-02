@@ -39,6 +39,29 @@
   .nav-link.active {
     color: #2c8bff;
     background-color: rgba(44, 139, 255, 0.15);
+    font-weight: 600;
+    border-bottom: 2px solid #2c8bff;
+    position: relative;
+  }
+
+  .nav-link.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #2c8bff 0%, #1976d2 100%);
+    animation: slideIn 0.3s ease;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
   }
   
   .page-content {

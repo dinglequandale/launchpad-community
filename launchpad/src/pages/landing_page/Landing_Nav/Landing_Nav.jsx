@@ -8,21 +8,33 @@ export default function Landing_Nav () {
   const location = useLocation();
 
   const navItems = [
-    { id: '?userType=professional', label: 'For Professionals' },
-    { id: '?userType=highschooler', label: 'For High Schoolers' },
-    { id: '?userType=alumni', label: 'For College Students' },
+    { id: 'for-professionals', label: 'For Professionals', path: '/for-professionals' },
+    { id: 'for-high-schoolers', label: 'For High Schoolers', path: '/for-high-schoolers' },
+    { id: 'for-college-students', label: 'For College Students', path: '/for-college-students' },
+    { id: 'six-degrees', label: '6 Degrees', path: '/six-degrees' },
   ];
 
-  
+
   useEffect(()=>{
     const pathname = window.location.pathname;
-    setActivePage(pathname.substring(1, pathname.length));
-    console.log(pathname.substring(1, pathname.length));
-  },[]);
 
-  const handleNavigation = (id) => {
-    setActivePage(id);
-    navigate(`/Landing${id}`);
+    // Map paths to nav item IDs
+    const pathToId = {
+      '/for-professionals': 'for-professionals',
+      '/for-high-schoolers': 'for-high-schoolers',
+      '/for-college-students': 'for-college-students',
+      '/six-degrees': 'six-degrees',
+    };
+
+    const activeId = pathToId[pathname];
+    if (activeId) {
+      setActivePage(activeId);
+    }
+  },[location]);
+
+  const handleNavigation = (item) => {
+    setActivePage(item.id);
+    navigate(item.path);
   };
 
   return (
@@ -34,7 +46,7 @@ export default function Landing_Nav () {
               <button
                 key={item.id}
                 className={`nav-link ${activePage === item.id ? 'active' : ''}`}
-                onClick={() => handleNavigation(item.id)}
+                onClick={() => handleNavigation(item)}
               >
                 {item.label}
               </button>

@@ -264,7 +264,7 @@
 .modern-section-subtitle {
   font-size: 1.125rem;
   color: #606060;
-  max-width: 600px;
+  max-width: 650px;
   margin: 0 auto;
 }
 
@@ -1544,4 +1544,292 @@ a:focus {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--highlight);
+}
+
+/* ===== 6 DEGREES SPECIFIC STYLES ===== */
+
+/* 6 Degrees Description Section */
+.six-degrees-description {
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.six-degrees-info-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 4px 24px rgba(44, 139, 255, 0.08);
+  border: 1px solid rgba(44, 139, 255, 0.1);
+}
+
+.six-degrees-intro {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #333;
+  margin-bottom: 1.5rem;
+}
+
+.six-degrees-offerings {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.six-degrees-offerings li {
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #2c8bff 0%, #1976d2 100%);
+  color: white;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.six-degrees-offerings li:hover {
+  transform: translateY(-2px);
+}
+
+.six-degrees-note {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #555;
+  background: #fff8e1;
+  border-left: 4px solid #ffa726;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.six-degrees-note strong {
+  color: #333;
+}
+
+/* Mentors Section */
+.six-degrees-mentors {
+  padding: 6rem 2rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 50%, #fef3f2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.six-degrees-mentors::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 60%;
+  height: 150%;
+  background: radial-gradient(circle, rgba(44, 139, 255, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.mentors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.mentor-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  border: 1px solid rgba(44, 139, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(44, 139, 255, 0.08);
+}
+
+.mentor-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, #2c8bff 0%, #1976d2 50%, #ff6b9d 100%);
+}
+
+.mentor-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(44, 139, 255, 0.03) 0%, rgba(255, 107, 157, 0.03) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 0;
+}
+
+.mentor-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(44, 139, 255, 0.2);
+  border-color: rgba(44, 139, 255, 0.3);
+}
+
+.mentor-card:hover::after {
+  opacity: 1;
+}
+
+.mentor-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #202020;
+  margin-bottom: 0.5rem;
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(135deg, #202020 0%, #1976d2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mentor-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c8bff;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.mentor-description {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: #555;
+  position: relative;
+  z-index: 1;
+}
+
+/* How To Apply Section */
+.six-degrees-how-to {
+  padding: 6rem 2rem;
+  background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.steps-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.step-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  border: 1px solid rgba(44, 139, 255, 0.1);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(44, 139, 255, 0.05);
+}
+
+.step-card:hover {
+  transform: translateX(8px);
+  box-shadow: 0 6px 24px rgba(44, 139, 255, 0.12);
+  border-color: rgba(44, 139, 255, 0.3);
+}
+
+.step-number {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #2c8bff 0%, #1976d2 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.step-content {
+  flex: 1;
+}
+
+.step-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #202020;
+  margin-bottom: 0.5rem;
+}
+
+.step-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* What Happens After Section */
+.six-degrees-after {
+  padding: 6rem 2rem;
+  background: white;
+}
+
+.after-process {
+  max-width: 900px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);
+  border-radius: 16px;
+  padding: 3rem;
+  box-shadow: 0 4px 24px rgba(44, 139, 255, 0.08);
+  border: 1px solid rgba(44, 139, 255, 0.1);
+}
+
+.process-list {
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.process-list li {
+  font-size: 1.125rem;
+  line-height: 2;
+  color: #333;
+  margin-bottom: 1.5rem;
+  padding-left: 0.5rem;
+}
+
+.process-list li::marker {
+  color: #2c8bff;
+  font-weight: 700;
+}
+
+/* Responsive adjustments for 6 Degrees */
+@media (max-width: 768px) {
+  .six-degrees-info-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .six-degrees-offerings {
+    grid-template-columns: 1fr;
+  }
+
+  .mentors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .step-card {
+    padding: 1.5rem;
+  }
+
+  .after-process {
+    padding: 2rem 1.5rem;
+  }
+
+  .process-list li {
+    font-size: 1rem;
+  }
 }

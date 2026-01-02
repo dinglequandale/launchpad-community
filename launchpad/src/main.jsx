@@ -156,6 +156,22 @@ const router = createBrowserRouter([
         element: <LandingPageRevamped/>
       },
       {
+        path: '/for-professionals',
+        element: <LandingPageRevamped/>
+      },
+      {
+        path: '/for-high-schoolers',
+        element: <LandingPageRevamped/>
+      },
+      {
+        path: '/for-college-students',
+        element: <LandingPageRevamped/>
+      },
+      {
+        path: '/six-degrees',
+        element: <LandingPageRevamped/>
+      },
+      {
         path: '/about-us',
         element: <AboutUs/>
       },

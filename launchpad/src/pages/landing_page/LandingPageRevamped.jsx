@@ -101,6 +101,33 @@ const createUserTypes = (schoolConfig) => ({
     ctaSection: schoolConfig.ctaButtonText,
     bgClass: "landing-page-professional",
   },
+  sixDegrees: {
+    featureCards: [
+      {
+        title: "World-Class Mentorship",
+        text: "Connect with leading economists, psychologists, and award-winning science writers for FREE mentorship",
+      },
+      {
+        title: "Research & Writing Support",
+        text: "Get expert guidance on research papers, independent projects, writing portfolios, and competition prep",
+      },
+      {
+        title: "Long-Term Academic Growth",
+        text: "Build lasting relationships with professors and writers who are invested in your academic journey",
+      },
+    ],
+    heroTitle: (
+      <>
+        Launchpad
+        <span className="modern-hero-gradient"> 6 Degrees</span>
+      </>
+    ),
+    subheader: "Connect with top university professors and award-winning writers. Receive FREE mentorship from experts in economics, psychology, philosophy, and science.",
+    cta: "Apply Now",
+    ctaSection: "Start Your Application",
+    bgClass: "landing-page-six-degrees",
+    is6Degrees: true,
+  },
 });
 
 const createStaticContent = (schoolConfig) => ({
@@ -156,8 +183,36 @@ export default function LandingPageRevamped() {
   const schoolConfig = useSchoolConfig();
   const USER_TYPES = createUserTypes(schoolConfig);
   const STATIC_CONTENT = createStaticContent(schoolConfig);
-  const userType = USER_TYPES[userTypeParam] ? userTypeParam : "highschooler";
+
+  // Map clean URLs to userTypes
+  const pathToUserType = {
+    '/six-degrees': 'sixDegrees',
+    '/for-professionals': 'professional',
+    '/for-high-schoolers': 'highschooler',
+    '/for-college-students': 'alumni',
+  };
+
+  const userTypeFromPath = pathToUserType[location.pathname];
+  const userType = userTypeFromPath || (USER_TYPES[userTypeParam] ? userTypeParam : "highschooler");
   const content = USER_TYPES[userType];
+
+  // Ref for the features section
+  const featuresRef = useRef(null);
+
+  // Auto-scroll to features section when navigating to user type routes
+  useEffect(() => {
+    const shouldScroll = ['/for-professionals', '/for-high-schoolers', '/for-college-students'].includes(location.pathname);
+
+    if (shouldScroll && featuresRef.current) {
+      // Small delay to ensure the page has loaded
+      setTimeout(() => {
+        featuresRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+  }, [location.pathname]);
 
   const handleJoin = (type="Signup") => {
     if (!userLoggedIn) {
@@ -225,17 +280,25 @@ export default function LandingPageRevamped() {
                 </motion.div> */}
 
                 <h1 className="modern-hero-title">
-                  Empowering Student
-                  <span className="modern-hero-gradient"> Excellence</span>
+                  {content.is6Degrees ? (
+                    <>
+                      {content.heroTitle}
+                    </>
+                  ) : (
+                    <>
+                      Empowering Student
+                      <span className="modern-hero-gradient"> Excellence</span>
+                    </>
+                  )}
                 </h1>
 
                 <p className="modern-hero-subtitle">
-                  Launching {schoolConfig.schoolShortName} youth into collegiate and professional success through meaningful connections and real opportunities.
+                  {content.is6Degrees ? content.subheader : `Launching ${schoolConfig.schoolShortName} youth into collegiate and professional success through meaningful connections and real opportunities.`}
                 </p>
 
                 <div className="modern-hero-buttons">
                   <button className="modern-hero-btn-primary" onClick={() => handleJoin("Signup")}>
-                    <span>Join the Network</span>
+                    <span>{content.is6Degrees ? content.cta : "Join the Network"}</span>
                     <PiArrowRight className="modern-btn-icon" />
                   </button>
                   {/* <button className="modern-hero-btn-secondary" onClick={() => handleJoin("Login")}>
@@ -265,7 +328,7 @@ export default function LandingPageRevamped() {
         </section>
 
         {/* Features Section */}
-        <section className="modern-features">
+        <section ref={featuresRef} className="modern-features">
           <div className="modern-container">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -274,9 +337,9 @@ export default function LandingPageRevamped() {
               transition={{ duration: 0.6 }}
               className="modern-section-header"
             >
-              <h2 className="modern-section-title">Why Choose Launchpad?</h2>
+              <h2 className="modern-section-title">{content.is6Degrees ? "What is Launchpad's 6 Degrees Program?" : "Why Choose Launchpad?"}</h2>
               <p className="modern-section-subtitle">
-                Everything you need to build your future, all in one platform
+                {content.is6Degrees ? "A FREE, application-based program connecting exceptional high school students with incredible mentors" : "Everything you need to build your future, all in one platform"}
               </p>
             </motion.div>
 
@@ -303,7 +366,160 @@ export default function LandingPageRevamped() {
           </div>
         </section>
 
+        {/* 6 Degrees Specific Content */}
+        {content.is6Degrees && (
+          <>
+            {/* Mentors Section */}
+            <section className="six-degrees-mentors">
+              <div className="modern-container">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                  className="modern-section-header"
+                >
+                  <h2 className="modern-section-title">Meet Your Potential Mentors</h2>
+                  <p className="modern-section-subtitle">
+                    We're starting with a small pilot group. Our list of potential mentors includes:
+                  </p>
+                </motion.div>
+
+                <div className="mentors-grid">
+                  {[
+                    {
+                      name: "Charles Calomiris",
+                      title: "Columbia Business School Economist",
+                      description: "One of the world's leading scholars on financial crises, banking systems, and economic history."
+                    },
+                    {
+                      name: "Roy Baumeister",
+                      title: "Social Psychologist",
+                      description: "Best known for foundational work on self-control, free will, identity, and human motivation; one of the most cited psychologists in the world."
+                    },
+                    {
+                      name: "Gary Taubes",
+                      title: "Investigative Science Journalist",
+                      description: "Bestselling author focused on nutrition science, obesity, and metabolism (Good Calories, Bad Calories, The Case for Keto)."
+                    },
+                    {
+                      name: "Andrew Shtulman",
+                      title: "Cognitive Scientist",
+                      description: "Occidental College professor specializing in how people learn science and how misconceptions form; widely published in cognitive psychology and education research."
+                    },
+                    {
+                      name: "Michael Moss",
+                      title: "Pulitzer Prize–winning Journalist",
+                      description: "Bestselling author known for exposing how the food industry engineers products around salt, sugar, and fat to drive consumption (Salt Sugar Fat, Hooked)."
+                    }
+                  ].map((mentor, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: idx * 0.1 }}
+                      className="mentor-card"
+                    >
+                      <h3 className="mentor-name">{mentor.name}</h3>
+                      <h4 className="mentor-title">{mentor.title}</h4>
+                      <p className="mentor-description">{mentor.description}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* How to Apply Section */}
+            <section className="six-degrees-how-to">
+              <div className="modern-container">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                  className="modern-section-header"
+                >
+                  <h2 className="modern-section-title">How Do I Take Part?</h2>
+                </motion.div>
+
+                <div className="steps-grid">
+                  {[
+                    {
+                      step: 1,
+                      title: "Create an Account",
+                      description: "Sign up at launchpadnetworks.com"
+                    },
+                    {
+                      step: 2,
+                      title: "Navigate to Academics",
+                      description: "Go to the 'academics' tab on your dashboard"
+                    },
+                    {
+                      step: 3,
+                      title: "Fill Out the Application",
+                      description: "Share your background, interests, the type of professor you'd like to connect with, and your mentorship goals"
+                    },
+                    {
+                      step: 4,
+                      title: "Wait for Response",
+                      description: "You'll receive a response within 1-3 days. If accepted, you'll get next steps via email"
+                    }
+                  ].map((step, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: -30 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: idx * 0.15 }}
+                      className="step-card"
+                    >
+                      <div className="step-number">{step.step}</div>
+                      <div className="step-content">
+                        <h3 className="step-title">{step.title}</h3>
+                        <p className="step-description">{step.description}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* What Happens After Section */}
+            <section className="six-degrees-after">
+              <div className="modern-container">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                  className="modern-section-header"
+                >
+                  <h2 className="modern-section-title">What Happens After I Apply?</h2>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                  className="after-process"
+                >
+                  <ol className="process-list">
+                    <li>We review your application and identify professors and writers who best match your interests, goals, and time commitment</li>
+                    <li>You receive an email with a short list of professors and writers we believe would be a strong fit</li>
+                    <li>You select your preferred professor(s)</li>
+                    <li>We'll send a warm introduction email to your selected mentor</li>
+                    <li>You and the professor connect directly to schedule calls and begin your informal mentorship</li>
+                  </ol>
+                </motion.div>
+              </div>
+            </section>
+          </>
+        )}
+
         {/* Stats Section with Rocket Background */}
+        {!content.is6Degrees && (
         <section className="modern-stats">
           <div className="modern-stats-background">
             <img src="/assets/rocket_landing.jpg" alt="Launch" className="modern-stats-image" />
@@ -336,8 +552,10 @@ export default function LandingPageRevamped() {
             </div>
           </div>
         </section>
+        )}
 
         {/* Mission Section */}
+        {!content.is6Degrees && (
         <section className="modern-mission">
           <div className="modern-container">
             <motion.div
@@ -356,6 +574,7 @@ export default function LandingPageRevamped() {
             </motion.div>
           </div>
         </section>
+        )}
 
         {/* Final CTA */}
         <section className="modern-cta">
@@ -367,12 +586,14 @@ export default function LandingPageRevamped() {
               transition={{ duration: 0.8 }}
               className="modern-cta-card"
             >
-              <h2 className="modern-cta-title">Ready to Launch Your Future?</h2>
+              <h2 className="modern-cta-title">{content.is6Degrees ? "Ready to Connect with World-Class Mentors?" : "Ready to Launch Your Future?"}</h2>
               <p className="modern-cta-subtitle">
-                Join our community of ambitious students, successful alumni, and industry professionals.
+                {content.is6Degrees
+                  ? "Apply now for FREE mentorship from top professors and award-winning writers."
+                  : "Join our community of ambitious students, successful alumni, and industry professionals."}
               </p>
               <button className="modern-cta-button" onClick={() => handleJoin("Signup")}>
-                <span>Get Started Today</span>
+                <span>{content.is6Degrees ? content.ctaSection : "Get Started Today"}</span>
                 <PiArrowRight className="modern-btn-icon" />
               </button>
             </motion.div>
