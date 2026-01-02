@@ -35,6 +35,7 @@ import { Toaster } from 'react-hot-toast';
 import ProfilePage from './pages/ProfilePage/ProfilePage.jsx';
 import OrganizationPage from './pages/OrganizationPage/OrganizationPage.jsx';
 import FeedbackPage from './pages/Feedback/FeedbackPage.jsx';
+import WaitlistPage from './pages/Waitlist/WaitlistPage.jsx';
 
 const ErrorPage = () => {
   return (
@@ -160,6 +161,10 @@ const router = createBrowserRouter([
       {
         path: '/faqs',
         element: <FAQs/>
+      },
+      {
+        path: '/waitlist',
+        element: <WaitlistPage/>
       },
       {
         path: '/highschoolers',

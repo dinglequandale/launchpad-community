@@ -28,6 +28,9 @@ const {onConnectionCreated, onConnectionStatusUpdated} = require("./triggers/con
 // Firestore triggers for opportunity notifications
 const {onOpportunityCreated} = require("./triggers/opportunityNotifications");
 
+// Firestore triggers for waitlist sync
+const {onWaitlistEntryCreated, resyncWaitlistToSheets} = require("./triggers/waitlistSync");
+
 exports.createStreamToken = createStreamToken;
 exports.sendInviteEmail = sendInviteEmail;
 exports.getEmail = getEmail;
@@ -56,3 +59,7 @@ exports.onConnectionStatusUpdated = onConnectionStatusUpdated;
 
 // Opportunity notification triggers
 exports.onOpportunityCreated = onOpportunityCreated;
+
+// Waitlist sync triggers
+exports.onWaitlistEntryCreated = onWaitlistEntryCreated;
+exports.resyncWaitlistToSheets = resyncWaitlistToSheets;
