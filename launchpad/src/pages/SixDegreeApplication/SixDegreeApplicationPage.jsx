@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './SixDegreeApplicationPage.css';
 import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig';
+import { db, storage } from '../../firebase/firebaseConfig';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import toast from 'react-hot-toast';
-import { IoCheckmarkCircle } from 'react-icons/io5';
+import { IoCheckmarkCircle, IoCloseCircle } from 'react-icons/io5';
 import CustomSelect from '../../components/CustomSelect/CustomSelect.jsx';
 import { careerInterests } from '../../pages/Onboarding/Options.jsx';
 import PageLoading from '../../components/LoadingAnimation/PageLoading';
@@ -22,11 +23,20 @@ const SixDegreeApplicationPage = () => {
   const [workDescription, setWorkDescription] = useState('');
   const [mentorInterest, setMentorInterest] = useState('');
   const [existingMaterials, setExistingMaterials] = useState([]);
-  const [resumeFile, setResumeFile] = useState(null);
-  const [resumePreview, setResumePreview] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState([]); // Array of files to upload
+  const [existingResumeUrl, setExistingResumeUrl] = useState(''); // User's existing resume from profile
   const [interests, setInterests] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // File upload constants
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB per file
+  const MAX_TOTAL_FILES = 5; // Maximum 5 files total
+  const ALLOWED_FILE_TYPES = [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ];
 
   const mentorOptions = [
     { value: 'charles_calomiris', label: 'Charles Calomiris' },
@@ -58,7 +68,7 @@ const SixDegreeApplicationPage = () => {
 
           // Pre-populate resume if it exists
           if (data.userResumePreview) {
-            setResumePreview(data.userResumePreview);
+            setExistingResumeUrl(data.userResumePreview);
           }
 
           // Don't pre-populate interests - encourage fresh, thoughtful responses
@@ -93,25 +103,73 @@ const SixDegreeApplicationPage = () => {
     });
   };
 
-  const handleResumeUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      if (!validTypes.includes(file.type)) {
-        toast.error('Please upload a PDF or Word document');
-        return;
-      }
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
 
-      // Validate file size (5MB max)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('File size must be less than 5MB');
-        return;
-      }
+    if (files.length === 0) return;
 
-      setResumeFile(file);
-      setResumePreview(file.name);
+    // Check total file count
+    if (uploadedFiles.length + files.length > MAX_TOTAL_FILES) {
+      toast.error(`You can upload a maximum of ${MAX_TOTAL_FILES} files`);
+      return;
     }
+
+    // Validate each file
+    const validFiles = [];
+    for (const file of files) {
+      // Validate file type
+      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+        toast.error(`${file.name}: Please upload only PDF or Word documents`);
+        continue;
+      }
+
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`${file.name}: File size must be less than ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
+        continue;
+      }
+
+      validFiles.push(file);
+    }
+
+    if (validFiles.length > 0) {
+      setUploadedFiles(prev => [...prev, ...validFiles]);
+      toast.success(`${validFiles.length} file(s) added successfully`);
+    }
+
+    // Clear the input so the same file can be re-uploaded if removed
+    e.target.value = '';
+  };
+
+  const handleRemoveFile = (index) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+    toast.success('File removed');
+  };
+
+  // Upload files to Firebase Storage and return download URLs
+  const uploadFilesToStorage = async (files) => {
+    const uploadPromises = files.map(async (file, index) => {
+      const timestamp = Date.now();
+      const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const fileName = `${currentUser.uid}_${timestamp}_${index}_${sanitizedFileName}`;
+      const storageRef = ref(storage, `6_degree_applications/${fileName}`);
+
+      try {
+        const snapshot = await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        return {
+          url: downloadURL,
+          name: file.name,
+          size: file.size,
+          type: file.type
+        };
+      } catch (error) {
+        console.error(`Error uploading ${file.name}:`, error);
+        throw new Error(`Failed to upload ${file.name}`);
+      }
+    });
+
+    return await Promise.all(uploadPromises);
   };
 
   const handleSubmit = async () => {
@@ -142,8 +200,8 @@ const SixDegreeApplicationPage = () => {
         return;
       }
 
-      if (!resumePreview && !resumeFile) {
-        toast.error('Please upload your résumé');
+      if (!existingResumeUrl && uploadedFiles.length === 0) {
+        toast.error('Please upload at least one file');
         return;
       }
 
@@ -159,8 +217,8 @@ const SixDegreeApplicationPage = () => {
         return;
       }
 
-      if (!resumePreview && !resumeFile) {
-        toast.error('Please upload your résumé');
+      if (!existingResumeUrl && uploadedFiles.length === 0) {
+        toast.error('Please upload at least one file');
         return;
       }
 
@@ -173,7 +231,35 @@ const SixDegreeApplicationPage = () => {
     setIsSubmitting(true);
 
     try {
-      toast.loading('Submitting your application...');
+      toast.loading('Uploading files and submitting your application...');
+
+      // Upload new files to Firebase Storage
+      let uploadedFileUrls = [];
+      if (uploadedFiles.length > 0) {
+        try {
+          uploadedFileUrls = await uploadFilesToStorage(uploadedFiles);
+        } catch (error) {
+          toast.dismiss();
+          toast.error('Failed to upload files. Please try again.');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // Combine existing resume URL with newly uploaded file URLs
+      const allFileUrls = [];
+
+      // Add existing resume if present
+      if (existingResumeUrl) {
+        allFileUrls.push({
+          url: extractPureUrl(existingResumeUrl),
+          name: 'Resume (from profile)',
+          isExisting: true
+        });
+      }
+
+      // Add newly uploaded files
+      allFileUrls.push(...uploadedFileUrls);
 
       const applicationData = {
         userId: currentUser.uid,
@@ -181,6 +267,9 @@ const SixDegreeApplicationPage = () => {
         userName: userData?.userName || '',
         selectedPath,
         createdAt: serverTimestamp(),
+        uploadedFiles: allFileUrls, // Array of file objects with URLs
+        hasNewUploads: uploadedFiles.length > 0,
+        hasExistingResume: !!existingResumeUrl,
       };
 
       if (selectedPath === 'existing') {
@@ -188,16 +277,12 @@ const SixDegreeApplicationPage = () => {
         applicationData.workDescription = workDescription;
         applicationData.mentorInterest = mentorInterest;
         applicationData.existingMaterials = existingMaterials;
-        applicationData.resumeUrl = extractPureUrl(resumePreview);
         applicationData.interests = interests;
-        applicationData.newResumeUploaded = !!resumeFile;
       }
 
       if (selectedPath === 'new') {
         applicationData.workDescription = workDescription;
-        applicationData.resumeUrl = extractPureUrl(resumePreview);
         applicationData.interests = interests;
-        applicationData.newResumeUploaded = !!resumeFile;
       }
 
       // Save to Firestore
@@ -241,7 +326,7 @@ const SixDegreeApplicationPage = () => {
         <div className="six-degree-form">
           {/* Choose Your Path */}
           <div className="six-degree-section">
-            <h2 className="six-degree-section-title">Choose Your Path</h2>
+            <h2 className="six-degree-section-title">Choose Your Path<span className="six-degree-required">*</span></h2>
             <p className="six-degree-section-subtitle">Which best describes what you're looking for?</p>
 
             <div className="six-degree-radio-group">
@@ -278,7 +363,7 @@ const SixDegreeApplicationPage = () => {
 
               {/* Question 1: Mentor Selection */}
               <div className="six-degree-field">
-                <label className="six-degree-label">1. Which mentor are you interested in?</label>
+                <label className="six-degree-label">1. Which mentor are you interested in?<span className="six-degree-required">*</span></label>
                 <CustomSelect
                   options={mentorOptions}
                   value={selectedMentor}
@@ -290,7 +375,7 @@ const SixDegreeApplicationPage = () => {
 
               {/* Question 2: Work Description */}
               <div className="six-degree-field">
-                <label className="six-degree-label">2. What would you like to work on with this mentor?</label>
+                <label className="six-degree-label">2. What would you like to work on with this mentor?<span className="six-degree-required">*</span></label>
                 <p className="six-degree-field-hint">Example: research paper, book project, competition prep, personal study track, etc.</p>
                 <input
                   type="text"
@@ -304,7 +389,7 @@ const SixDegreeApplicationPage = () => {
 
               {/* Question 3: Why This Mentor */}
               <div className="six-degree-field">
-                <label className="six-degree-label">3. Why are you specifically interested in this mentor?</label>
+                <label className="six-degree-label">3. Why are you specifically interested in this mentor?<span className="six-degree-required">*</span></label>
                 <textarea
                   className="six-degree-textarea"
                   placeholder="Explain your interest in this mentor..."
@@ -317,7 +402,7 @@ const SixDegreeApplicationPage = () => {
 
               {/* Question 4: Existing Materials */}
               <div className="six-degree-field">
-                <label className="six-degree-label">4. What do you already have related to this project?</label>
+                <label className="six-degree-label">4. What do you already have related to this project?<span className="six-degree-required">*</span></label>
                 <p className="six-degree-field-hint">Check all that apply</p>
                 <div className="six-degree-checkbox-group">
                   {materialOptions.map(option => (
@@ -334,36 +419,62 @@ const SixDegreeApplicationPage = () => {
                 </div>
               </div>
 
-              {/* Question 5: Resume Upload */}
+              {/* Question 5: File Upload */}
               <div className="six-degree-field">
-                <label className="six-degree-label">5. Upload your résumé (required)</label>
-                {resumePreview && !resumeFile && (
+                <label className="six-degree-label">5. Please upload any relevant files here<span className="six-degree-required">*</span></label>
+                <p className="six-degree-field-hint">E.g. resume, research abstract, publications</p>
+
+                {existingResumeUrl && (
                   <div className="six-degree-resume-status">
                     <IoCheckmarkCircle className="six-degree-resume-icon" />
                     <span>Resume already on file</span>
                   </div>
                 )}
+
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
-                  onChange={handleResumeUpload}
+                  onChange={handleFileUpload}
                   disabled={isSubmitting}
                   className="six-degree-file-input"
+                  multiple
                 />
-                {resumeFile && (
-                  <div className="six-degree-file-preview">
-                    <span>Selected: {resumeFile.name}</span>
+                <p className="six-degree-field-hint" style={{ marginTop: '4px' }}>
+                  Max {MAX_TOTAL_FILES} files, {MAX_FILE_SIZE / (1024 * 1024)}MB per file. PDF or Word documents only.
+                </p>
+
+                {uploadedFiles.length > 0 && (
+                  <div className="six-degree-files-list">
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="six-degree-file-item">
+                        <div className="six-degree-file-info">
+                          <span className="six-degree-file-name">{file.name}</span>
+                          <span className="six-degree-file-size">
+                            ({(file.size / 1024).toFixed(1)} KB)
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFile(index)}
+                          disabled={isSubmitting}
+                          className="six-degree-file-remove"
+                          aria-label="Remove file"
+                        >
+                          <IoCloseCircle />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
               {/* Question 6: Academic Interests */}
               <div className="six-degree-field">
-                <label className="six-degree-label">6. What are your top academic interests?</label>
+                <label className="six-degree-label">6. Please describe your interest in this field and how you intend to pursue it professionally.<span className="six-degree-required">*</span></label>
                 <input
                   type="text"
                   className="six-degree-input"
-                  placeholder="e.g., Cognitive Psychology, Climate Science, Renaissance Literature"
+                  placeholder="Type here..."
                   value={interests}
                   onChange={(e) => setInterests(e.target.value)}
                   disabled={isSubmitting}
@@ -379,7 +490,7 @@ const SixDegreeApplicationPage = () => {
 
               {/* Question 1: Work Description */}
               <div className="six-degree-field">
-                <label className="six-degree-label">1. What do you want to work on?</label>
+                <label className="six-degree-label">1. What do you want to work on?<span className="six-degree-required">*</span></label>
                 <p className="six-degree-field-hint">Example: research paper, book project, competition prep, personal study track, etc.</p>
                 <textarea
                   className="six-degree-textarea"
@@ -391,36 +502,62 @@ const SixDegreeApplicationPage = () => {
                 />
               </div>
 
-              {/* Question 2: Resume Upload */}
+              {/* Question 2: File Upload */}
               <div className="six-degree-field">
-                <label className="six-degree-label">2. Upload your résumé (required)</label>
-                {resumePreview && !resumeFile && (
+                <label className="six-degree-label">2. Please upload any relevant files here<span className="six-degree-required">*</span></label>
+                <p className="six-degree-field-hint">E.g. resume, research abstract, publications</p>
+
+                {existingResumeUrl && (
                   <div className="six-degree-resume-status">
                     <IoCheckmarkCircle className="six-degree-resume-icon" />
                     <span>Resume already on file</span>
                   </div>
                 )}
+
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
-                  onChange={handleResumeUpload}
+                  onChange={handleFileUpload}
                   disabled={isSubmitting}
                   className="six-degree-file-input"
+                  multiple
                 />
-                {resumeFile && (
-                  <div className="six-degree-file-preview">
-                    <span>Selected: {resumeFile.name}</span>
+                <p className="six-degree-field-hint" style={{ marginTop: '4px' }}>
+                  Max {MAX_TOTAL_FILES} files, {MAX_FILE_SIZE / (1024 * 1024)}MB per file. PDF or Word documents only.
+                </p>
+
+                {uploadedFiles.length > 0 && (
+                  <div className="six-degree-files-list">
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="six-degree-file-item">
+                        <div className="six-degree-file-info">
+                          <span className="six-degree-file-name">{file.name}</span>
+                          <span className="six-degree-file-size">
+                            ({(file.size / 1024).toFixed(1)} KB)
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFile(index)}
+                          disabled={isSubmitting}
+                          className="six-degree-file-remove"
+                          aria-label="Remove file"
+                        >
+                          <IoCloseCircle />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
 
               {/* Question 3: Academic Interests */}
               <div className="six-degree-field">
-                <label className="six-degree-label">3. What are your top academic interests?</label>
+                <label className="six-degree-label">3. Please describe your interest in this field and how you intend to pursue it professionally.<span className="six-degree-required">*</span></label>
                 <input
                   type="text"
                   className="six-degree-input"
-                  placeholder="e.g., Cognitive Psychology, Climate Science, Renaissance Literature"
+                  placeholder="Type here..."
                   value={interests}
                   onChange={(e) => setInterests(e.target.value)}
                   disabled={isSubmitting}

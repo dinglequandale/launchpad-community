@@ -155,6 +155,11 @@
   color: #374151;
 }
 
+.six-degree-required {
+  color: #dc2626;
+  margin-left: 4px;
+}
+
 .six-degree-field-hint {
   font-size: 14px;
   color: #6b7280;
@@ -316,6 +321,72 @@
   font-size: 15px;
   color: #047857;
   font-weight: 500;
+}
+
+/* Files List */
+.six-degree-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.six-degree-file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #f0f7ff;
+  border: 1px solid var(--secondary);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.six-degree-file-item:hover {
+  background: #e0f0ff;
+}
+
+.six-degree-file-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.six-degree-file-name {
+  font-size: 14px;
+  color: var(--secondary);
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.six-degree-file-size {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.six-degree-file-remove {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.six-degree-file-remove:hover:not(:disabled) {
+  color: #991b1b;
+  transform: scale(1.1);
+}
+
+.six-degree-file-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Coming Soon */

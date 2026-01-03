@@ -43,6 +43,7 @@ export default function Login(){
         }
 
         packageBasicUserInfoToLS(newUserData);
+        return newUserData; // Return the loaded user data
     };
 
     // COMMUNITY VERSION: Check if user exists in Firebase collection
@@ -117,10 +118,10 @@ export default function Login(){
                 );
     
                 const user = userCredential.user;
-                await updateBasicUserData(user);
-                
+                const loadedUserData = await updateBasicUserData(user);
+
                 // Run profile completion logic for existing users
-                await runProfileCompletionLogic(userData);
+                await runProfileCompletionLogic(loadedUserData);
 
                 // Check if user was trying to access a specific page before logging in
                 const intendedDestination = sessionStorage.getItem('intendedDestination');
@@ -181,10 +182,10 @@ export default function Login(){
                     return;
                 }
     
-                await updateBasicUserData(user);
-                
+                const loadedUserData = await updateBasicUserData(user);
+
                 // Run profile completion logic for existing users
-                await runProfileCompletionLogic(userData);
+                await runProfileCompletionLogic(loadedUserData);
 
                 // Check if user was trying to access a specific page before logging in
                 const intendedDestination = sessionStorage.getItem('intendedDestination');

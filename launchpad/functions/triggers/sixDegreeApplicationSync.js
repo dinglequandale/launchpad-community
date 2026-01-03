@@ -25,8 +25,8 @@ const db = admin.firestore();
  * firebase functions:config:set google.sheets.applications_spreadsheet_id="YOUR_SPREADSHEET_ID"
  * firebase functions:config:set google.service_account='{"type":"service_account",...}'
  *
- * Note: The resume PDF is not embedded directly - instead, the Firebase Storage URL
- * is included as a clickable link in the spreadsheet.
+ * Note: Multiple uploaded files are supported. Each file's name and Firebase Storage URL
+ * are included in the spreadsheet, with each file on a new line within the cell.
  */
 exports.onSixDegreeApplicationCreated = functions.firestore
     .document('6_degree_applications/{applicationId}')
@@ -75,6 +75,22 @@ exports.onSixDegreeApplicationCreated = functions.firestore
 
             const path = applicationData.selectedPath === 'existing' ? 'Existing Mentor' : 'New Mentor';
 
+            // Format uploaded files as clickable links (new format with array of file objects)
+            let fileLinks = '';
+            if (applicationData.uploadedFiles && Array.isArray(applicationData.uploadedFiles)) {
+                // New format: array of file objects with url, name, etc.
+                fileLinks = applicationData.uploadedFiles
+                    .map(file => {
+                        const fileName = file.name || 'File';
+                        const fileUrl = file.url || '';
+                        return `${fileName}: ${fileUrl}`;
+                    })
+                    .join('\n');
+            } else if (applicationData.resumeUrl) {
+                // Legacy format: single resume URL (for backwards compatibility)
+                fileLinks = applicationData.resumeUrl;
+            }
+
             // Prepare row data based on path
             let rowData;
 
@@ -93,11 +109,12 @@ exports.onSixDegreeApplicationCreated = functions.firestore
                     applicationData.workDescription || '',      // F: What to work on
                     applicationData.mentorInterest || '',       // G: Why this mentor (PATH 1 only)
                     materials,                                  // H: Existing materials (PATH 1 only)
-                    applicationData.resumeUrl || '',            // I: Resume URL (clickable link)
+                    fileLinks,                                  // I: File URLs (one per line with file names)
                     interests,                                  // J: Academic interests
-                    applicationData.newResumeUploaded ? 'Yes' : 'No', // K: New resume uploaded?
-                    applicationData.userId || '',               // L: User ID
-                    applicationId                               // M: Application ID
+                    applicationData.hasNewUploads ? 'Yes' : 'No', // K: New files uploaded?
+                    applicationData.hasExistingResume ? 'Yes' : 'No', // L: Has existing resume?
+                    applicationData.userId || '',               // M: User ID
+                    applicationId                               // N: Application ID
                 ];
             } else {
                 // PATH 2: New Mentor
@@ -110,18 +127,19 @@ exports.onSixDegreeApplicationCreated = functions.firestore
                     applicationData.workDescription || '',      // F: What to work on
                     'N/A',                                      // G: Why this mentor (PATH 2 doesn't have this)
                     'N/A',                                      // H: Existing materials (PATH 2 doesn't have this)
-                    applicationData.resumeUrl || '',            // I: Resume URL (clickable link)
+                    fileLinks,                                  // I: File URLs (one per line with file names)
                     interests,                                  // J: Academic interests
-                    applicationData.newResumeUploaded ? 'Yes' : 'No', // K: New resume uploaded?
-                    applicationData.userId || '',               // L: User ID
-                    applicationId                               // M: Application ID
+                    applicationData.hasNewUploads ? 'Yes' : 'No', // K: New files uploaded?
+                    applicationData.hasExistingResume ? 'Yes' : 'No', // L: Has existing resume?
+                    applicationData.userId || '',               // M: User ID
+                    applicationId                               // N: Application ID
                 ];
             }
 
             // Append the row to the sheet
             await sheets.spreadsheets.values.append({
                 spreadsheetId: spreadsheetId,
-                range: 'Sheet1!A:M', // 13 columns: A through M
+                range: 'Sheet1!A:N', // 14 columns: A through N
                 valueInputOption: 'RAW',
                 insertDataOption: 'INSERT_ROWS',
                 resource: {
