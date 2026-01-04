@@ -33,6 +33,7 @@ export default function SideNav({show}){
         [<IoHomeOutline size={24}/>, "Home", "/Home"],
         [<TbUserHexagon size={24}/>, "Network", "/network"],
         [<GoOrganization size={24}/>, "Organizations", "/Organizations"],
+        [<LuGraduationCap size={24}/>, "Academics", "/academics"],
         [<LuMessagesSquare size={24}/>, "Messages", "/chat"]
     ];
 

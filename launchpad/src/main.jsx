@@ -38,6 +38,7 @@ import FeedbackPage from './pages/Feedback/FeedbackPage.jsx';
 import WaitlistPage from './pages/Waitlist/WaitlistPage.jsx';
 import SixDegreeApplicationPage from './pages/SixDegreeApplication/SixDegreeApplicationPage.jsx';
 import SixDegreeOnboardingPage from './pages/SixDegreeOnboarding/SixDegreeOnboardingPage.jsx';
+import Academics from './pages/Academics/Academics.jsx';
 
 const ErrorPage = () => {
   return (
@@ -254,6 +255,10 @@ const router = createBrowserRouter([
           {
             path: '/organization/:organizationId',
             element: <OrganizationPage/>
+          },
+          {
+            path: '/academics',
+            element: <Academics/>
           },
           {
             path: '/settings',
