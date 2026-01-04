@@ -19,6 +19,7 @@ import { LuPlay, LuUsers, LuGraduationCap, LuBriefcase, LuFileText, LuBookOpen, 
 import toast from "react-hot-toast";
 import OrganizationProfileModal from "../../components/Organizationprofile/OrganizationProfileModal";
 import NetworkingCommitmentModal from "../../components/NetworkingCommitmentModal/NetworkingCommitmentModal";
+import SixDegreesWelcomeModal from "../../components/SixDegreesWelcomeModal/SixDegreesWelcomeModal";
 
 
 class ErrorBoundary extends React.Component {
@@ -55,6 +56,7 @@ export default function Home(){
         const saved = localStorage.getItem('launchpadOrganizationFavorites');
         return saved ? JSON.parse(saved) : [];
     });
+    const [showSixDegreesWelcome, setShowSixDegreesWelcome] = useState(false);
     const {openProfileModal, openApplyModal, openConnectModal} = useModal();
 
     const { chatClient } = useOutletContext();
@@ -88,6 +90,15 @@ export default function Home(){
 
     useEffect(() => {
       setUserBasicInfo(JSON.parse(storedUserBasicInfo));
+
+      // Check for Six Degrees welcome modal flag
+      const sixDegreesFlag = localStorage.getItem('showSixDegreesWelcome');
+      if (sixDegreesFlag === 'true') {
+        // Delay slightly to let page load
+        setTimeout(() => {
+          setShowSixDegreesWelcome(true);
+        }, 500);
+      }
 
       // Show networking commitment modal for professionals who haven't seen it
       const networkingSessionFlag = localStorage.getItem('networkingCommitmentModalShown');
@@ -354,6 +365,7 @@ export default function Home(){
         <>
             {showVerifedConnectionModal && <ConnectModal onClose = {()=>setShowVerifiedConnectionModal(false)} userData={connectedUserData} visibility={showVerifedConnectionModal} chat={chatClient} userId = {connectedUserData.id}/>}
             {showNetworkingCommitmentModal && <NetworkingCommitmentModal onClose={() => setShowNetworkingCommitmentModal(false)} userData={userBasicInfo} />}
+            {showSixDegreesWelcome && <SixDegreesWelcomeModal isOpen={showSixDegreesWelcome} onClose={() => setShowSixDegreesWelcome(false)} />}
 
             <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
             <SideNav/>

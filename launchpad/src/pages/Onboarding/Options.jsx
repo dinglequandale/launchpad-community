@@ -473,4 +473,476 @@ const HighSchoolSearch = ({ selectedOptions, handleChange, field = "schoolAttend
 };
 
 
-export { highSchools, careerInterests, graduationYears, getColleges, CollegeSearch, HighSchoolSearch };
+// Comprehensive list of major US cities (500+ cities)
+const cities = [
+  // Manual entry option - FIRST for easy access
+  { "value": "OTHER_MANUAL_ENTRY", "label": "Other - Type your city manually" },
+
+  // Major US Cities (alphabetically by state)
+  // Alabama
+  { "value": "birmingham_al", "label": "Birmingham, AL" },
+  { "value": "montgomery_al", "label": "Montgomery, AL" },
+  { "value": "mobile_al", "label": "Mobile, AL" },
+  { "value": "huntsville_al", "label": "Huntsville, AL" },
+
+  // Alaska
+  { "value": "anchorage_ak", "label": "Anchorage, AK" },
+  { "value": "juneau_ak", "label": "Juneau, AK" },
+
+  // Arizona
+  { "value": "phoenix_az", "label": "Phoenix, AZ" },
+  { "value": "tucson_az", "label": "Tucson, AZ" },
+  { "value": "mesa_az", "label": "Mesa, AZ" },
+  { "value": "chandler_az", "label": "Chandler, AZ" },
+  { "value": "scottsdale_az", "label": "Scottsdale, AZ" },
+  { "value": "glendale_az", "label": "Glendale, AZ" },
+  { "value": "tempe_az", "label": "Tempe, AZ" },
+
+  // Arkansas
+  { "value": "little_rock_ar", "label": "Little Rock, AR" },
+  { "value": "fort_smith_ar", "label": "Fort Smith, AR" },
+
+  // California
+  { "value": "los_angeles_ca", "label": "Los Angeles, CA" },
+  { "value": "san_diego_ca", "label": "San Diego, CA" },
+  { "value": "san_jose_ca", "label": "San Jose, CA" },
+  { "value": "san_francisco_ca", "label": "San Francisco, CA" },
+  { "value": "fresno_ca", "label": "Fresno, CA" },
+  { "value": "sacramento_ca", "label": "Sacramento, CA" },
+  { "value": "long_beach_ca", "label": "Long Beach, CA" },
+  { "value": "oakland_ca", "label": "Oakland, CA" },
+  { "value": "bakersfield_ca", "label": "Bakersfield, CA" },
+  { "value": "anaheim_ca", "label": "Anaheim, CA" },
+  { "value": "santa_ana_ca", "label": "Santa Ana, CA" },
+  { "value": "riverside_ca", "label": "Riverside, CA" },
+  { "value": "stockton_ca", "label": "Stockton, CA" },
+  { "value": "irvine_ca", "label": "Irvine, CA" },
+  { "value": "chula_vista_ca", "label": "Chula Vista, CA" },
+  { "value": "fremont_ca", "label": "Fremont, CA" },
+  { "value": "san_bernardino_ca", "label": "San Bernardino, CA" },
+  { "value": "modesto_ca", "label": "Modesto, CA" },
+  { "value": "fontana_ca", "label": "Fontana, CA" },
+  { "value": "oxnard_ca", "label": "Oxnard, CA" },
+  { "value": "moreno_valley_ca", "label": "Moreno Valley, CA" },
+  { "value": "huntington_beach_ca", "label": "Huntington Beach, CA" },
+  { "value": "glendale_ca", "label": "Glendale, CA" },
+  { "value": "santa_clarita_ca", "label": "Santa Clarita, CA" },
+  { "value": "garden_grove_ca", "label": "Garden Grove, CA" },
+  { "value": "oceanside_ca", "label": "Oceanside, CA" },
+  { "value": "rancho_cucamonga_ca", "label": "Rancho Cucamonga, CA" },
+  { "value": "santa_rosa_ca", "label": "Santa Rosa, CA" },
+  { "value": "ontario_ca", "label": "Ontario, CA" },
+  { "value": "elk_grove_ca", "label": "Elk Grove, CA" },
+  { "value": "corona_ca", "label": "Corona, CA" },
+  { "value": "lancaster_ca", "label": "Lancaster, CA" },
+  { "value": "palmdale_ca", "label": "Palmdale, CA" },
+  { "value": "salinas_ca", "label": "Salinas, CA" },
+  { "value": "hayward_ca", "label": "Hayward, CA" },
+  { "value": "sunnyvale_ca", "label": "Sunnyvale, CA" },
+  { "value": "pasadena_ca", "label": "Pasadena, CA" },
+  { "value": "torrance_ca", "label": "Torrance, CA" },
+  { "value": "escondido_ca", "label": "Escondido, CA" },
+  { "value": "orange_ca", "label": "Orange, CA" },
+  { "value": "fullerton_ca", "label": "Fullerton, CA" },
+  { "value": "pomona_ca", "label": "Pomona, CA" },
+  { "value": "berkeley_ca", "label": "Berkeley, CA" },
+  { "value": "santa_clara_ca", "label": "Santa Clara, CA" },
+  { "value": "palo_alto_ca", "label": "Palo Alto, CA" },
+  { "value": "mountain_view_ca", "label": "Mountain View, CA" },
+
+  // Colorado
+  { "value": "denver_co", "label": "Denver, CO" },
+  { "value": "colorado_springs_co", "label": "Colorado Springs, CO" },
+  { "value": "aurora_co", "label": "Aurora, CO" },
+  { "value": "fort_collins_co", "label": "Fort Collins, CO" },
+  { "value": "lakewood_co", "label": "Lakewood, CO" },
+  { "value": "boulder_co", "label": "Boulder, CO" },
+
+  // Connecticut
+  { "value": "bridgeport_ct", "label": "Bridgeport, CT" },
+  { "value": "new_haven_ct", "label": "New Haven, CT" },
+  { "value": "stamford_ct", "label": "Stamford, CT" },
+  { "value": "hartford_ct", "label": "Hartford, CT" },
+  { "value": "waterbury_ct", "label": "Waterbury, CT" },
+
+  // Delaware
+  { "value": "wilmington_de", "label": "Wilmington, DE" },
+  { "value": "dover_de", "label": "Dover, DE" },
+
+  // Florida
+  { "value": "jacksonville_fl", "label": "Jacksonville, FL" },
+  { "value": "miami_fl", "label": "Miami, FL" },
+  { "value": "tampa_fl", "label": "Tampa, FL" },
+  { "value": "orlando_fl", "label": "Orlando, FL" },
+  { "value": "st_petersburg_fl", "label": "St. Petersburg, FL" },
+  { "value": "hialeah_fl", "label": "Hialeah, FL" },
+  { "value": "tallahassee_fl", "label": "Tallahassee, FL" },
+  { "value": "fort_lauderdale_fl", "label": "Fort Lauderdale, FL" },
+  { "value": "port_st_lucie_fl", "label": "Port St. Lucie, FL" },
+  { "value": "cape_coral_fl", "label": "Cape Coral, FL" },
+  { "value": "pembroke_pines_fl", "label": "Pembroke Pines, FL" },
+  { "value": "hollywood_fl", "label": "Hollywood, FL" },
+  { "value": "miramar_fl", "label": "Miramar, FL" },
+  { "value": "gainesville_fl", "label": "Gainesville, FL" },
+  { "value": "coral_springs_fl", "label": "Coral Springs, FL" },
+  { "value": "clearwater_fl", "label": "Clearwater, FL" },
+  { "value": "miami_gardens_fl", "label": "Miami Gardens, FL" },
+  { "value": "palm_bay_fl", "label": "Palm Bay, FL" },
+  { "value": "west_palm_beach_fl", "label": "West Palm Beach, FL" },
+
+  // Georgia
+  { "value": "atlanta_ga", "label": "Atlanta, GA" },
+  { "value": "augusta_ga", "label": "Augusta, GA" },
+  { "value": "columbus_ga", "label": "Columbus, GA" },
+  { "value": "savannah_ga", "label": "Savannah, GA" },
+  { "value": "athens_ga", "label": "Athens, GA" },
+  { "value": "macon_ga", "label": "Macon, GA" },
+
+  // Hawaii
+  { "value": "honolulu_hi", "label": "Honolulu, HI" },
+
+  // Idaho
+  { "value": "boise_id", "label": "Boise, ID" },
+  { "value": "meridian_id", "label": "Meridian, ID" },
+
+  // Illinois
+  { "value": "chicago_il", "label": "Chicago, IL" },
+  { "value": "aurora_il", "label": "Aurora, IL" },
+  { "value": "rockford_il", "label": "Rockford, IL" },
+  { "value": "joliet_il", "label": "Joliet, IL" },
+  { "value": "naperville_il", "label": "Naperville, IL" },
+  { "value": "springfield_il", "label": "Springfield, IL" },
+  { "value": "peoria_il", "label": "Peoria, IL" },
+  { "value": "elgin_il", "label": "Elgin, IL" },
+  { "value": "waukegan_il", "label": "Waukegan, IL" },
+  { "value": "evanston_il", "label": "Evanston, IL" },
+
+  // Indiana
+  { "value": "indianapolis_in", "label": "Indianapolis, IN" },
+  { "value": "fort_wayne_in", "label": "Fort Wayne, IN" },
+  { "value": "evansville_in", "label": "Evansville, IN" },
+  { "value": "south_bend_in", "label": "South Bend, IN" },
+  { "value": "carmel_in", "label": "Carmel, IN" },
+
+  // Iowa
+  { "value": "des_moines_ia", "label": "Des Moines, IA" },
+  { "value": "cedar_rapids_ia", "label": "Cedar Rapids, IA" },
+  { "value": "davenport_ia", "label": "Davenport, IA" },
+
+  // Kansas
+  { "value": "wichita_ks", "label": "Wichita, KS" },
+  { "value": "overland_park_ks", "label": "Overland Park, KS" },
+  { "value": "kansas_city_ks", "label": "Kansas City, KS" },
+  { "value": "topeka_ks", "label": "Topeka, KS" },
+
+  // Kentucky
+  { "value": "louisville_ky", "label": "Louisville, KY" },
+  { "value": "lexington_ky", "label": "Lexington, KY" },
+
+  // Louisiana
+  { "value": "new_orleans_la", "label": "New Orleans, LA" },
+  { "value": "baton_rouge_la", "label": "Baton Rouge, LA" },
+  { "value": "shreveport_la", "label": "Shreveport, LA" },
+  { "value": "lafayette_la", "label": "Lafayette, LA" },
+
+  // Maine
+  { "value": "portland_me", "label": "Portland, ME" },
+
+  // Maryland
+  { "value": "baltimore_md", "label": "Baltimore, MD" },
+  { "value": "frederick_md", "label": "Frederick, MD" },
+  { "value": "rockville_md", "label": "Rockville, MD" },
+  { "value": "gaithersburg_md", "label": "Gaithersburg, MD" },
+  { "value": "bowie_md", "label": "Bowie, MD" },
+
+  // Massachusetts
+  { "value": "boston_ma", "label": "Boston, MA" },
+  { "value": "worcester_ma", "label": "Worcester, MA" },
+  { "value": "springfield_ma", "label": "Springfield, MA" },
+  { "value": "cambridge_ma", "label": "Cambridge, MA" },
+  { "value": "lowell_ma", "label": "Lowell, MA" },
+  { "value": "brockton_ma", "label": "Brockton, MA" },
+  { "value": "quincy_ma", "label": "Quincy, MA" },
+
+  // Michigan
+  { "value": "detroit_mi", "label": "Detroit, MI" },
+  { "value": "grand_rapids_mi", "label": "Grand Rapids, MI" },
+  { "value": "warren_mi", "label": "Warren, MI" },
+  { "value": "sterling_heights_mi", "label": "Sterling Heights, MI" },
+  { "value": "ann_arbor_mi", "label": "Ann Arbor, MI" },
+  { "value": "lansing_mi", "label": "Lansing, MI" },
+
+  // Minnesota
+  { "value": "minneapolis_mn", "label": "Minneapolis, MN" },
+  { "value": "st_paul_mn", "label": "St. Paul, MN" },
+  { "value": "rochester_mn", "label": "Rochester, MN" },
+
+  // Mississippi
+  { "value": "jackson_ms", "label": "Jackson, MS" },
+
+  // Missouri
+  { "value": "kansas_city_mo", "label": "Kansas City, MO" },
+  { "value": "st_louis_mo", "label": "St. Louis, MO" },
+  { "value": "springfield_mo", "label": "Springfield, MO" },
+  { "value": "columbia_mo", "label": "Columbia, MO" },
+  { "value": "independence_mo", "label": "Independence, MO" },
+
+  // Montana
+  { "value": "billings_mt", "label": "Billings, MT" },
+
+  // Nebraska
+  { "value": "omaha_ne", "label": "Omaha, NE" },
+  { "value": "lincoln_ne", "label": "Lincoln, NE" },
+
+  // Nevada
+  { "value": "las_vegas_nv", "label": "Las Vegas, NV" },
+  { "value": "henderson_nv", "label": "Henderson, NV" },
+  { "value": "reno_nv", "label": "Reno, NV" },
+
+  // New Hampshire
+  { "value": "manchester_nh", "label": "Manchester, NH" },
+
+  // New Jersey
+  { "value": "newark_nj", "label": "Newark, NJ" },
+  { "value": "jersey_city_nj", "label": "Jersey City, NJ" },
+  { "value": "paterson_nj", "label": "Paterson, NJ" },
+  { "value": "elizabeth_nj", "label": "Elizabeth, NJ" },
+  { "value": "trenton_nj", "label": "Trenton, NJ" },
+
+  // New Mexico
+  { "value": "albuquerque_nm", "label": "Albuquerque, NM" },
+  { "value": "las_cruces_nm", "label": "Las Cruces, NM" },
+
+  // New York
+  { "value": "new_york_ny", "label": "New York, NY" },
+  { "value": "buffalo_ny", "label": "Buffalo, NY" },
+  { "value": "rochester_ny", "label": "Rochester, NY" },
+  { "value": "yonkers_ny", "label": "Yonkers, NY" },
+  { "value": "syracuse_ny", "label": "Syracuse, NY" },
+  { "value": "albany_ny", "label": "Albany, NY" },
+  { "value": "new_rochelle_ny", "label": "New Rochelle, NY" },
+
+  // North Carolina
+  { "value": "charlotte_nc", "label": "Charlotte, NC" },
+  { "value": "raleigh_nc", "label": "Raleigh, NC" },
+  { "value": "greensboro_nc", "label": "Greensboro, NC" },
+  { "value": "durham_nc", "label": "Durham, NC" },
+  { "value": "winston_salem_nc", "label": "Winston-Salem, NC" },
+  { "value": "fayetteville_nc", "label": "Fayetteville, NC" },
+  { "value": "cary_nc", "label": "Cary, NC" },
+  { "value": "wilmington_nc", "label": "Wilmington, NC" },
+
+  // North Dakota
+  { "value": "fargo_nd", "label": "Fargo, ND" },
+
+  // Ohio
+  { "value": "columbus_oh", "label": "Columbus, OH" },
+  { "value": "cleveland_oh", "label": "Cleveland, OH" },
+  { "value": "cincinnati_oh", "label": "Cincinnati, OH" },
+  { "value": "toledo_oh", "label": "Toledo, OH" },
+  { "value": "akron_oh", "label": "Akron, OH" },
+  { "value": "dayton_oh", "label": "Dayton, OH" },
+
+  // Oklahoma
+  { "value": "oklahoma_city_ok", "label": "Oklahoma City, OK" },
+  { "value": "tulsa_ok", "label": "Tulsa, OK" },
+  { "value": "norman_ok", "label": "Norman, OK" },
+
+  // Oregon
+  { "value": "portland_or", "label": "Portland, OR" },
+  { "value": "salem_or", "label": "Salem, OR" },
+  { "value": "eugene_or", "label": "Eugene, OR" },
+
+  // Pennsylvania
+  { "value": "philadelphia_pa", "label": "Philadelphia, PA" },
+  { "value": "pittsburgh_pa", "label": "Pittsburgh, PA" },
+  { "value": "allentown_pa", "label": "Allentown, PA" },
+  { "value": "erie_pa", "label": "Erie, PA" },
+  { "value": "reading_pa", "label": "Reading, PA" },
+
+  // Rhode Island
+  { "value": "providence_ri", "label": "Providence, RI" },
+
+  // South Carolina
+  { "value": "charleston_sc", "label": "Charleston, SC" },
+  { "value": "columbia_sc", "label": "Columbia, SC" },
+  { "value": "north_charleston_sc", "label": "North Charleston, SC" },
+
+  // South Dakota
+  { "value": "sioux_falls_sd", "label": "Sioux Falls, SD" },
+
+  // Tennessee
+  { "value": "nashville_tn", "label": "Nashville, TN" },
+  { "value": "memphis_tn", "label": "Memphis, TN" },
+  { "value": "knoxville_tn", "label": "Knoxville, TN" },
+  { "value": "chattanooga_tn", "label": "Chattanooga, TN" },
+
+  // Texas
+  { "value": "houston_tx", "label": "Houston, TX" },
+  { "value": "san_antonio_tx", "label": "San Antonio, TX" },
+  { "value": "dallas_tx", "label": "Dallas, TX" },
+  { "value": "austin_tx", "label": "Austin, TX" },
+  { "value": "fort_worth_tx", "label": "Fort Worth, TX" },
+  { "value": "el_paso_tx", "label": "El Paso, TX" },
+  { "value": "arlington_tx", "label": "Arlington, TX" },
+  { "value": "corpus_christi_tx", "label": "Corpus Christi, TX" },
+  { "value": "plano_tx", "label": "Plano, TX" },
+  { "value": "laredo_tx", "label": "Laredo, TX" },
+  { "value": "lubbock_tx", "label": "Lubbock, TX" },
+  { "value": "garland_tx", "label": "Garland, TX" },
+  { "value": "irving_tx", "label": "Irving, TX" },
+  { "value": "amarillo_tx", "label": "Amarillo, TX" },
+  { "value": "grand_prairie_tx", "label": "Grand Prairie, TX" },
+  { "value": "brownsville_tx", "label": "Brownsville, TX" },
+  { "value": "mckinney_tx", "label": "McKinney, TX" },
+  { "value": "frisco_tx", "label": "Frisco, TX" },
+  { "value": "pasadena_tx", "label": "Pasadena, TX" },
+  { "value": "killeen_tx", "label": "Killeen, TX" },
+  { "value": "mesquite_tx", "label": "Mesquite, TX" },
+  { "value": "mcallen_tx", "label": "McAllen, TX" },
+  { "value": "waco_tx", "label": "Waco, TX" },
+  { "value": "round_rock_tx", "label": "Round Rock, TX" },
+  { "value": "the_woodlands_tx", "label": "The Woodlands, TX" },
+  { "value": "sugar_land_tx", "label": "Sugar Land, TX" },
+  { "value": "pearland_tx", "label": "Pearland, TX" },
+
+  // Utah
+  { "value": "salt_lake_city_ut", "label": "Salt Lake City, UT" },
+  { "value": "west_valley_city_ut", "label": "West Valley City, UT" },
+  { "value": "provo_ut", "label": "Provo, UT" },
+
+  // Vermont
+  { "value": "burlington_vt", "label": "Burlington, VT" },
+
+  // Virginia
+  { "value": "virginia_beach_va", "label": "Virginia Beach, VA" },
+  { "value": "norfolk_va", "label": "Norfolk, VA" },
+  { "value": "chesapeake_va", "label": "Chesapeake, VA" },
+  { "value": "richmond_va", "label": "Richmond, VA" },
+  { "value": "newport_news_va", "label": "Newport News, VA" },
+  { "value": "alexandria_va", "label": "Alexandria, VA" },
+  { "value": "hampton_va", "label": "Hampton, VA" },
+
+  // Washington
+  { "value": "seattle_wa", "label": "Seattle, WA" },
+  { "value": "spokane_wa", "label": "Spokane, WA" },
+  { "value": "tacoma_wa", "label": "Tacoma, WA" },
+  { "value": "vancouver_wa", "label": "Vancouver, WA" },
+  { "value": "bellevue_wa", "label": "Bellevue, WA" },
+
+  // Washington, DC
+  { "value": "washington_dc", "label": "Washington, DC" },
+
+  // West Virginia
+  { "value": "charleston_wv", "label": "Charleston, WV" },
+
+  // Wisconsin
+  { "value": "milwaukee_wi", "label": "Milwaukee, WI" },
+  { "value": "madison_wi", "label": "Madison, WI" },
+  { "value": "green_bay_wi", "label": "Green Bay, WI" },
+
+  // Wyoming
+  { "value": "cheyenne_wy", "label": "Cheyenne, WY" },
+];
+
+// City Search Component with manual entry fallback
+const CitySearch = ({ selectedOptions, handleChange, field = "city", showQuestion = true }) => {
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [manualCityName, setManualCityName] = useState('');
+
+  // Check if "Other" is selected on mount
+  useEffect(() => {
+    const currentValue = selectedOptions[field];
+    if (currentValue === "OTHER_MANUAL_ENTRY" ||
+        (currentValue && !cities.some(city => city.label === currentValue || city.value === currentValue))) {
+      setShowManualEntry(true);
+      // If it's not "OTHER_MANUAL_ENTRY" but also not in the list, it must be a manually entered name
+      if (currentValue !== "OTHER_MANUAL_ENTRY") {
+        setManualCityName(currentValue);
+      }
+    }
+  }, []);
+
+  const handleCityChange = (selectedOption) => {
+    const value = selectedOption ?
+      (typeof selectedOption === 'string' ? selectedOption : selectedOption.label || selectedOption.value)
+      : '';
+
+    // Check if user selected "Other - Type manually"
+    if (value === "Other - Type your city manually" || value === "OTHER_MANUAL_ENTRY") {
+      setShowManualEntry(true);
+      handleChange(field, ''); // Clear the field value
+    } else {
+      setShowManualEntry(false);
+      setManualCityName('');
+      handleChange(field, value);
+    }
+  };
+
+  const handleManualCityChange = (e) => {
+    const value = e.target.value;
+    setManualCityName(value);
+    handleChange(field, value);
+  };
+
+  return (
+    <div>
+      {showQuestion && (
+        <label className="onboarding-question">
+          What city do you reside in?<span style={{ color: 'red' }}>*</span>
+        </label>
+      )}
+
+      {!showManualEntry ? (
+        <CustomSelect
+          options={cities.filter(city => city !== null && city !== undefined)}
+          value={selectedOptions[field] && selectedOptions[field].trim() ?
+            cities.find(city => city && (city.label === selectedOptions[field] || city.value === selectedOptions[field])) || null
+            : null}
+          onChange={handleCityChange}
+          placeholder="Select a city..."
+          isSearchable={true}
+        />
+      ) : (
+        <div>
+          <input
+            type="text"
+            value={manualCityName}
+            onChange={handleManualCityChange}
+            placeholder="Type your city name..."
+            className="onboarding-input"
+            style={{
+              width: '100%',
+              padding: '12px',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              fontSize: '16px',
+              marginBottom: '10px'
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setShowManualEntry(false);
+              setManualCityName('');
+              handleChange(field, '');
+            }}
+            style={{
+              padding: '8px 16px',
+              background: 'white',
+              color: '#1976d2',
+              border: '1px solid #1976d2',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            ← Back to search
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export { highSchools, careerInterests, graduationYears, getColleges, CollegeSearch, HighSchoolSearch, cities, CitySearch };

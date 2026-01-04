@@ -313,18 +313,18 @@ export default function CustomSelect({
                 {filteredOptions.map((option, index) => {
                   const optionLabel = getOptionLabel(option);
                   const optionValue = getOptionValue(option);
-                  const isSelected = isMulti 
+                  const isSelected = isMulti
                     ? Array.isArray(value) && value.some(v => {
                         if (typeof v === 'string' && typeof option === 'string') {
                           return v === option;
-                        } else if (typeof v === 'object' && typeof option === 'object') {
+                        } else if (typeof v === 'object' && v !== null && typeof option === 'object' && option !== null) {
                           return (v.value || v.label) === (option.value || option.label);
                         }
                         return false;
                       })
-                    : (typeof value === 'string' && typeof option === 'string' 
-                        ? value === option 
-                        : typeof value === 'object' && typeof option === 'object'
+                    : (typeof value === 'string' && typeof option === 'string'
+                        ? value === option
+                        : typeof value === 'object' && value !== null && typeof option === 'object' && option !== null
                         ? (value.value || value.label) === (option.value || option.label)
                         : false);
                   const isFocused = index === focusedIndex;

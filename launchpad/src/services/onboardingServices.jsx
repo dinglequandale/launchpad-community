@@ -4,6 +4,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { getBasicUserDescription } from './userProfileServices';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { parentInvitationTemplate } from '../utils/parentVerificationTemplates';
+import { doCreateUserWithEmailAndPassword } from '../firebase/auth';
 // import { updateTypesense } from '../typesense/typesenseClient';
 
 export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess) => {
@@ -146,6 +147,57 @@ export const saveStaff = async (currentUser, staffData, onSuccess) => {
         console.error("Error adding document: ", e);
     }
 }
+
+// Six Degrees Application Onboarding - Creates account and minimal profile
+export const saveSixDegreesOnboarding = async (email, password, userData, onSuccess) => {
+    try {
+        // 1. Create Firebase Auth account
+        const userCredential = await doCreateUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // 2. Calculate graduation year from grade level
+        const currentYear = new Date().getFullYear();
+        const gradeLevel = parseInt(userData.gradeLevel);
+        const graduationYear = currentYear + (13 - gradeLevel);
+
+        // 3. Prepare minimal user data with Six Degrees flag
+        const dataToSave = {
+            userName: userData.userName,
+            email: email,
+            userType: "High Schooler",
+            schoolAttending: userData.highSchool,
+            schoolId: "", // Empty but required for packageBasicUserInfoToLS
+            graduationYear: graduationYear,
+            city: userData.city,
+            sixDegreesApplicant: true, // Flag for tracking
+            userId: user.uid,
+            emailNotificationsEnabled: true,
+            // Fields from onboarding form
+            areasOfInterest: userData.areasOfInterest || [],
+            // College decision logic
+            collegeDecision: userData.hasCollegeDecision === 'yes' ? userData.collegeDecision : "",
+            collegeInterestsOrDecision: userData.hasCollegeDecision === 'yes' ? userData.collegeDecision : [],
+            // Empty/default fields for consistency with standard onboarding
+            linkedinLink: "",
+            parentEmails: [],
+            userPfpPreview: null,
+            userResumePreview: null,
+        };
+
+        // 4. Save to Firestore
+        await setDoc(doc(db, 'users', user.uid), dataToSave);
+
+        // 5. Package data to localStorage
+        pushInitialProfileCompletion(dataToSave);
+        packageBasicUserInfoToLS(dataToSave);
+
+        // 6. Call success callback
+        onSuccess(user);
+    } catch (e) {
+        console.error("Error in Six Degrees onboarding:", e);
+        throw e; // Re-throw to allow component to handle error
+    }
+};
 
 export const requiredQuestionsAnswered = (questionConfig, userData) => {
     const requiredQuestions = questionConfig.filter((question)=>!question.optional);
