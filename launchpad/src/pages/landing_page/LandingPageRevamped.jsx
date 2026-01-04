@@ -316,7 +316,7 @@ export default function LandingPageRevamped() {
               >
                 <div className="modern-hero-image-wrapper">
                   <img
-                    src="/assets/earth_connect_landing.jpg"
+                    src={!content.is6Degrees ? "/assets/earth_connect_landing.jpg" : "/assets/6-degrees-pic.jpg"}
                     alt="Global Network"
                     className="modern-hero-image"
                   />
