@@ -15,13 +15,13 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../firebase/firebaseConfig";
 import { useModal } from '../../contexts/ModalContext';
-// import jsonData from "../Onboarding/tempInitialOrgData.json";
-// import { addDoc, collection, doc, setDoc } from "firebase/firestore";
-// import { db } from "../../firebase/firebaseConfig";
+import { populateOpportunitiesCollection } from '../../utils/populateOpportunities';
+import { updateOpportunitiesLocation } from '../../utils/updateOpportunitiesLocation';
 
 const filterContent = {
     organizationType: ["Any Category", "Clubs", "Workplace Opportunities", "Nonprofits", "Businesses", "Community Service", "Leadership"],
-    areasOfInterestOrExpertise: ["Any Subject Matter", "My Interests"]
+    areasOfInterestOrExpertise: ["Any Subject Matter", "My Interests"],
+    location: ["Any Location"]
 };
 
 export default function Organizations(){
@@ -44,8 +44,22 @@ export default function Organizations(){
 
     const [filters, setFilters] = useState({
         organizationType: 'Any Category',
-        areasOfInterestOrExpertise: 'Any Subject Matter'
+        areasOfInterestOrExpertise: 'Any Subject Matter',
+        location: 'Any Location'
     });
+
+    // Admin function to populate opportunities - call this once
+    const handlePopulateOpportunities = async () => {
+        if (window.confirm('Are you sure you want to populate the opportunities collection? This should only be done once.')) {
+            try {
+                const result = await populateOpportunitiesCollection();
+                toast.success(`Successfully uploaded ${result.successCount} opportunities!`);
+            } catch (error) {
+                console.error('Population failed:', error);
+                toast.error('Failed to populate opportunities');
+            }
+        }
+    };
 
     // Listen for sidebar state changes
     useEffect(() => {
@@ -68,14 +82,35 @@ export default function Organizations(){
             window.removeEventListener('sidebarToggle', handleSidebarToggle);
         };
     }, []);
-    
-        // useEffect(() => {
-        // jsonData.map(async (org, index) => {
-        //     await setDoc(doc(db, "tenants", "awty", "opportunities", org.organizationName), org);
-        //     // print("Org ", index + 1, " uploaded")
-        // })
-        // },[]);
-      useEffect(() => {
+
+    // UNCOMMENT THIS USEEFFECT TO POPULATE OPPORTUNITIES COLLECTION WITH INITIAL DATA
+    // Run this once, then comment it out again to avoid re-uploading
+    // useEffect(() => {
+    //     populateOpportunitiesCollection()
+    //         .then((result) => {
+    //             console.log('Population complete:', result);
+    //             toast.success(`Successfully uploaded ${result.successCount} opportunities!`);
+    //         })
+    //         .catch((error) => {
+    //             console.error('Population failed:', error);
+    //             toast.error('Failed to populate opportunities');
+    //         });
+    // }, []);
+
+    // UNCOMMENT TO UPDATE LOCATION FIELD - Run once to update all opportunities
+    // useEffect(() => {
+    //     updateOpportunitiesLocation()
+    //         .then((result) => {
+    //             console.log('Location update complete:', result);
+    //             toast.success(`Successfully updated ${result.successCount} opportunities!`);
+    //         })
+    //         .catch((error) => {
+    //             console.error('Location update failed:', error);
+    //             toast.error('Failed to update opportunity locations');
+    //         });
+    // }, []);
+
+    useEffect(() => {
         setlastDoc(null);
         setHasMore(true);
         const fetchInitial = async () => {
@@ -173,7 +208,8 @@ export default function Organizations(){
     const clearAllFilters = () => {
         setFilters({
             organizationType: 'Any Category',
-            areasOfInterestOrExpertise: 'Any Subject Matter'
+            areasOfInterestOrExpertise: 'Any Subject Matter',
+            location: 'Any Location'
         });
     };
 

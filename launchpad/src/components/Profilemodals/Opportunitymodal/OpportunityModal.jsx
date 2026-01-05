@@ -14,7 +14,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { saveOpportunity } from '../../../services/opportunityServices';
 import OnboardingDropdown from '../../OnboardingDropdown/OnboardingDropdown';
 import CustomSelect from '../../CustomSelect/CustomSelect';
-import { careerInterests } from '../../../pages/Onboarding/Options';
+import { careerInterests, CitySearch } from '../../../pages/Onboarding/Options';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import SaveChanges from '../../Makechanges/SaveChanges';
@@ -50,6 +50,7 @@ export default function OpportunityModal({visibility, onClose, opportunityData, 
     isPaid: 'Unpaid',
     applicants: 'High Schoolers/College Students',
     workLocation: 'On-site',
+    location: '',
     timeFrame: 'One Week',
     learnMore: 'Email',
     apply: 'Email',
@@ -117,6 +118,7 @@ const publishOpportunityData = async () => {
       isPaid: 'Unpaid',
       applicants: 'High Schoolers/College Students',
       workLocation: 'On-site',
+      location: '',
       timeFrame: 'One Week',
       learnMore: 'Email',
       apply: 'Email',
@@ -258,7 +260,15 @@ const publishOpportunityData = async () => {
       options: ["On-site", "Remote", "Hybrid"],
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
       required: true,
-      page: 3, 
+      page: 3,
+    },
+    {
+      id: "location",
+      text: "Where is this opportunity located?",
+      type: "city",
+      includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
+      required: (orgData) => orgData.workLocation === "On-site" || orgData.workLocation === "Hybrid",
+      page: 3,
     },
     {
       id: "applicants",
@@ -267,7 +277,7 @@ const publishOpportunityData = async () => {
       options: ["High Schoolers/College Students", "High Schoolers", "College Students"],
       includers: ["Job", "Internship", "Shadowing", "Community Service", ""],
       required: true,
-      page: 3, 
+      page: 3,
     },
     {
       id: "timeFrame",
@@ -1036,9 +1046,16 @@ function FinalInfo(){
 }
 
 function BasicLogistics(){
-  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
+  const { organizationData, setOrganizationData, handleChange, organizationQuestionsConfig } = useContext(OpportunityContext);
 
   const questionsForPage = organizationQuestionsConfig.filter((question)=>(question.page === 3 && question.includers.includes(organizationData.organizationType)))
+
+  const handleLocationChange = (fieldId, value) => {
+    setOrganizationData(prevState => ({
+      ...prevState,
+      [fieldId]: value,
+    }));
+  };
 
   return(
     <>
@@ -1049,13 +1066,22 @@ function BasicLogistics(){
           {questionsForPage.map((question) => (
             <div key={question.id} className="v0-modal-logistics-item">
               <label htmlFor={question.id} className="v0-modal-logistics-label">{question.text}</label>
-              <CustomSelect
-                options={Array.isArray(question.options) ? question.options : []}
-                value={organizationData[question.id] || ""}
-                onChange={(value) => handleChange({ target: { name: question.id, value } })}
-                placeholder="Select option"
-                className="v0-modal-logistics-select-custom"
-              />
+              {question.type === "city" ? (
+                <CitySearch
+                  selectedOptions={organizationData}
+                  handleChange={handleLocationChange}
+                  field="location"
+                  showQuestion={false}
+                />
+              ) : (
+                <CustomSelect
+                  options={Array.isArray(question.options) ? question.options : []}
+                  value={organizationData[question.id] || ""}
+                  onChange={(value) => handleChange({ target: { name: question.id, value } })}
+                  placeholder="Select option"
+                  className="v0-modal-logistics-select-custom"
+                />
+              )}
             </div>
           ))}
         </div>

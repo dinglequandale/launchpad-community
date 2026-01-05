@@ -13,7 +13,7 @@ import { BiEdit, BiTrash } from 'react-icons/bi';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast, { Toaster } from 'react-hot-toast';
 import { saveOpportunity } from '../../../services/opportunityServices';
-import { careerInterests } from '../../../pages/Onboarding/Options';
+import { careerInterests, CitySearch } from '../../../pages/Onboarding/Options';
 import OnboardingDropdown from '../../OnboardingDropdown/OnboardingDropdown';
 import CustomSelect from '../../CustomSelect/CustomSelect';
 import SaveChanges from '../../Makechanges/SaveChanges';
@@ -87,6 +87,7 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     organizationHostStudent: "",
     organizationMission: "",
     organizationTags: [],
+    location: "",
     learnMore: 'Email',
     apply: 'Email',
     organizationLogoPreview: null,
@@ -135,6 +136,14 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
       required: true,
       page: 1,
       placeholder: "E.g. 'Founder'",
+    },
+    {
+      id: "location",
+      text: "Where is this initiative located?",
+      type: "city",
+      includers: ["Nonprofit", "Club", "Business", ""],
+      required: true,
+      page: 1,
     },
 
     // Page 2
@@ -357,9 +366,16 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
 };
 
 function InitiativeType(){
-  const { organizationData, handleChange, organizationQuestionsConfig } = useContext(InitiativeContext);
+  const { organizationData, setOrganizationData, handleChange, organizationQuestionsConfig } = useContext(InitiativeContext);
 
   const questionsForPage = organizationQuestionsConfig.filter((question) => (question.page === 1));
+
+  const handleLocationChange = (fieldId, value) => {
+    setOrganizationData(prevState => ({
+      ...prevState,
+      [fieldId]: value,
+    }));
+  };
 
   return(
     <>
@@ -379,6 +395,13 @@ function InitiativeType(){
                   onChange={(value) => handleChange({ target: { name: question.id, value } })}
                   placeholder="Select Type"
                   className="v0-modal-form-select-custom"
+                />)
+            : question.type === "city" ?
+                (<CitySearch
+                  selectedOptions={organizationData}
+                  handleChange={handleLocationChange}
+                  field="location"
+                  showQuestion={false}
                 />)
             :
                 (<input

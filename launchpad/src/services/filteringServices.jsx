@@ -6,7 +6,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     // COMMUNITY VERSION: Removed tenant-based architecture
     let q = collection(db, collectionName);
 
-    const {userInterests, userColleges, userHS } = await getUserData("areasOfInterest", currentUserId);
+    const {userInterests, userColleges, userHS, userCity } = await getUserData("areasOfInterest", currentUserId);
 
     // Separate array filters from other filters to avoid Firebase conflicts
     const arrayFilters = [];
@@ -76,7 +76,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
         else if (key === "organizationType") {
             // Handle organization type filtering
             if (value === "Any Category") return null;
-            
+
             // Map filter options to actual organization types
             const organizationTypeMap = {
                 "Clubs": "Club",
@@ -86,7 +86,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
                 "Community Service": "Community Service",
                 "Leadership": "Leadership"
             };
-            
+
             const mappedType = organizationTypeMap[value];
             if (mappedType) {
                 if (Array.isArray(mappedType)) {
@@ -94,6 +94,23 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
                 } else {
                     return { key: "organizationType", operation: "==", value: mappedType };
                 }
+            }
+        }
+        else if (key === "location") {
+            // Handle location filtering
+            if (value === "Any Location" || (Array.isArray(value) && value.includes("Any Location"))) {
+                return null;
+            }
+
+            if (Array.isArray(value)) {
+                const specificLocations = value.filter(v => !v.includes("Any"));
+                if (specificLocations.length > 0) {
+                    // Use 'in' operator for multiple locations
+                    return { key: "location", operation: "in", value: specificLocations };
+                }
+            } else if (value && value !== "Any Location") {
+                // Filter by specific location (single value)
+                return { key: "location", operation: "==", value: value };
             }
         }
         else if (key === "networkingLevel") {
@@ -348,7 +365,8 @@ const getUserData = async (dataType, currentUserId) => {
         return {
             userInterests: userSnap.data()[dataType],
             userColleges: userSnap.data()["collegeInterestsOrDecision"],
-            userHS: userSnap.data()["schoolAttending"]
+            userHS: userSnap.data()["schoolAttending"],
+            userCity: userSnap.data()["city"]
         };
     } else {
         console.log("User not found!");

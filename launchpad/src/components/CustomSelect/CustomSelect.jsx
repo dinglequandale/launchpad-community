@@ -301,7 +301,6 @@ export default function CustomSelect({
           {isLoading ? (
             <div className="select-loading">
               <Loading size={16} />
-              {/* <span>{loadingMessage}</span> */}
             </div>
           ) : filteredOptions.length === 0 ? (
             <div className="select-no-options">

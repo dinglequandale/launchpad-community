@@ -4,7 +4,7 @@ import CollegeSearchFilter from "../Contentfilter/CollegeSearchFilter";
 import "./SearchBar.css";
 import { CiSearch } from "react-icons/ci";
 import { capitalizeFirstLetter } from '../../pages/Homepage/Home';
-import { careerInterests } from '../../pages/Onboarding/Options';
+import { careerInterests, cities } from '../../pages/Onboarding/Options';
 
 export default function SearchBar({filters, currentFilters = null, pageName, handleFilterChange, handleSearch, clearAllFilters}) {
     const searchType = () => {
@@ -61,6 +61,14 @@ export default function SearchBar({filters, currentFilters = null, pageName, han
                     maxSelections: 3,
                     allowAnyOption: true
                 };
+            case 'location':
+                return {
+                    title: "Location",
+                    isMultiSelect: true,
+                    showSearch: true,
+                    maxSelections: 10,
+                    allowAnyOption: true
+                };
             default:
                 return {
                     title: filterKey,
@@ -84,6 +92,15 @@ export default function SearchBar({filters, currentFilters = null, pageName, han
             // For college search, we'll use the existing college search functionality
             // This will be populated dynamically when user types
             return currentContent;
+        } else if (filterKey === 'location') {
+            // Add all cities from Options.jsx (excluding the manual entry option)
+            const cityLabels = cities
+                .filter(city => city.value !== "OTHER_MANUAL_ENTRY")
+                .map(city => city.label);
+            return [
+                ...currentContent,
+                ...cityLabels
+            ];
         }
         return currentContent;
     };
