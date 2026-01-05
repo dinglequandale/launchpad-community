@@ -175,7 +175,7 @@ export const saveSixDegreesOnboarding = async (email, password, userData, onSucc
             // Fields from onboarding form
             areasOfInterest: userData.areasOfInterest || [],
             // College decision logic
-            collegeDecision: userData.hasCollegeDecision === 'yes' ? userData.collegeDecision : "",
+            collegeDecision: userData.hasCollegeDecision === 'yes' ? userData.collegeDecision : "No",
             collegeInterestsOrDecision: userData.hasCollegeDecision === 'yes' ? userData.collegeDecision : [],
             // Empty/default fields for consistency with standard onboarding
             linkedinLink: "",

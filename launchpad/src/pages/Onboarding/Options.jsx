@@ -6,6 +6,8 @@ import CustomSelect from '../../components/CustomSelect';
 import { algoliaClient } from '../../typesense/typesenseClient';
 // import {algoliasearch} from 'algoliasearch/lite';
 import Loading from '../../components/LoadingAnimation/Loading';
+import { loadHighSchools, addHighSchool } from '../../services/highSchoolService';
+import toast from 'react-hot-toast';
 
 // Comprehensive list of high schools from major US cities
 // Users can search through this list or select "Other" to type manually
@@ -367,23 +369,50 @@ const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, s
 };
 
 
-// High School Search Component with manual entry fallback
+// High School Search Component with dynamic Firebase list and manual entry
 const HighSchoolSearch = ({ selectedOptions, handleChange, field = "schoolAttending", showQuestion = true }) => {
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [manualSchoolName, setManualSchoolName] = useState('');
+  const [dynamicHighSchools, setDynamicHighSchools] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isAddingSchool, setIsAddingSchool] = useState(false);
+
+  // Load high schools from Firebase on mount
+  useEffect(() => {
+    const fetchHighSchools = async () => {
+      try {
+        const schools = await loadHighSchools();
+        // Add "Other" option at the beginning
+        const schoolsWithOther = [
+          { "value": "OTHER_MANUAL_ENTRY", "label": "Other - Type your high school manually" },
+          ...schools
+        ];
+        setDynamicHighSchools(schoolsWithOther);
+      } catch (error) {
+        console.error('Error loading high schools:', error);
+        // Fallback to static list on error
+        setDynamicHighSchools(highSchools);
+        toast.error('Could not load high schools from database, using default list');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHighSchools();
+  }, []);
 
   // Check if "Other" is selected on mount
   useEffect(() => {
     const currentValue = selectedOptions[field];
     if (currentValue === "OTHER_MANUAL_ENTRY" ||
-        (currentValue && !highSchools.some(school => school.label === currentValue || school.value === currentValue))) {
+        (currentValue && !dynamicHighSchools.some(school => school.label === currentValue || school.value === currentValue))) {
       setShowManualEntry(true);
       // If it's not "OTHER_MANUAL_ENTRY" but also not in the list, it must be a manually entered name
       if (currentValue !== "OTHER_MANUAL_ENTRY") {
         setManualSchoolName(currentValue);
       }
     }
-  }, []);
+  }, [dynamicHighSchools]);
 
   const handleHighSchoolChange = (selectedOption) => {
     const value = selectedOption ?
@@ -407,6 +436,38 @@ const HighSchoolSearch = ({ selectedOptions, handleChange, field = "schoolAttend
     handleChange(field, value);
   };
 
+  const handleAddSchool = async () => {
+    if (!manualSchoolName.trim()) {
+      toast.error('Please enter a high school name');
+      return;
+    }
+
+    setIsAddingSchool(true);
+    try {
+      // Add to Firebase
+      const newSchool = await addHighSchool(manualSchoolName);
+
+      // Update local state
+      const updatedSchools = [...dynamicHighSchools, newSchool].sort((a, b) =>
+        a.label === "Other - Type your high school manually" ? -1 :
+        b.label === "Other - Type your high school manually" ? 1 :
+        a.label.localeCompare(b.label)
+      );
+      setDynamicHighSchools(updatedSchools);
+
+      // Close manual entry and select the newly added school
+      setShowManualEntry(false);
+      handleChange(field, newSchool.label);
+
+      toast.success(`Added "${newSchool.label}" to high school list!`);
+    } catch (error) {
+      console.error('Error adding high school:', error);
+      toast.error('Failed to add high school');
+    } finally {
+      setIsAddingSchool(false);
+    }
+  };
+
   // Get current value for display
   const getCurrentValue = () => {
     if (!selectedOptions) return '';
@@ -421,16 +482,20 @@ const HighSchoolSearch = ({ selectedOptions, handleChange, field = "schoolAttend
     return currentValue ? { label: currentValue, value: currentValue } : '';
   };
 
+  if (loading) {
+    return <div style={{ padding: '20px', textAlign: 'center' }}>Loading high schools...</div>;
+  }
+
   return (
     <div>
       <CustomSelect
-        options={highSchools}
+        options={dynamicHighSchools}
         value={getCurrentValue()}
         onChange={handleHighSchoolChange}
         placeholder="Start typing high school name..."
         isMulti={false}
         isSearchable={true}
-        noOptionsMessage="No high schools found - select 'Other' to type manually"
+        noOptionsMessage="No high schools found - select 'Other' to add yours"
       />
 
       {showManualEntry && (
@@ -444,28 +509,55 @@ const HighSchoolSearch = ({ selectedOptions, handleChange, field = "schoolAttend
             placeholder="Enter your high school name"
             value={manualSchoolName}
             onChange={handleManualEntryChange}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleAddSchool();
+              }
+            }}
             style={{ width: '94%' }}
           />
-          <button
-            type="button"
-            onClick={() => {
-              setShowManualEntry(false);
-              setManualSchoolName('');
-              handleChange(field, '');
-            }}
-            style={{
-              marginTop: '8px',
-              padding: '6px 12px',
-              background: 'transparent',
-              color: '#1976d2',
-              border: '1px solid #1976d2',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '14px'
-            }}
-          >
-            ← Back to search
-          </button>
+          <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
+            <button
+              type="button"
+              onClick={handleAddSchool}
+              disabled={isAddingSchool || !manualSchoolName.trim()}
+              style={{
+                padding: '6px 16px',
+                background: isAddingSchool || !manualSchoolName.trim() ? '#ccc' : '#1976d2',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: isAddingSchool || !manualSchoolName.trim() ? 'not-allowed' : 'pointer',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
+            >
+              {isAddingSchool ? 'Adding...' : 'Add School'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowManualEntry(false);
+                setManualSchoolName('');
+                handleChange(field, '');
+              }}
+              style={{
+                padding: '6px 12px',
+                background: 'transparent',
+                color: '#1976d2',
+                border: '1px solid #1976d2',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              ← Back to search
+            </button>
+          </div>
+          <p style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+            Click "Add School" or press Enter to add this school to the database for future users.
+          </p>
         </div>
       )}
     </div>

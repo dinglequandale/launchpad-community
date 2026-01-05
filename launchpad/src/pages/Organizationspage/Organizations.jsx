@@ -17,6 +17,7 @@ import { auth } from "../../firebase/firebaseConfig";
 import { useModal } from '../../contexts/ModalContext';
 import { populateOpportunitiesCollection } from '../../utils/populateOpportunities';
 import { updateOpportunitiesLocation } from '../../utils/updateOpportunitiesLocation';
+import { seedHighSchools } from '../../utils/seedHighSchools';
 
 const filterContent = {
     organizationType: ["Any Category", "Clubs", "Workplace Opportunities", "Nonprofits", "Businesses", "Community Service", "Leadership"],
@@ -107,6 +108,20 @@ export default function Organizations(){
     //         .catch((error) => {
     //             console.error('Location update failed:', error);
     //             toast.error('Failed to update opportunity locations');
+    //         });
+    // }, []);
+
+    // UNCOMMENT TO SEED HIGH SCHOOLS COLLECTION - Run once to populate initial high schools
+    // After seeding, the dynamic high school system will take over
+    // useEffect(() => {
+    //     seedHighSchools()
+    //         .then((result) => {
+    //             console.log('High school seeding complete:', result);
+    //             toast.success(`Successfully seeded ${result.successCount} high schools!`);
+    //         })
+    //         .catch((error) => {
+    //             console.error('High school seeding failed:', error);
+    //             toast.error('Failed to seed high schools');
     //         });
     // }, []);
 

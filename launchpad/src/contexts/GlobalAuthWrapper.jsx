@@ -11,6 +11,7 @@ import ConnectionStatusModal from '../components/ConnectionStatusModal';
 import ConnectModal from '../components/Connectmodal/ConnectModal';
 import { useConnections } from './ConnectionContext';
 import { ModalProvider } from './ModalContext';
+import { loadHighSchools } from '../services/highSchoolService';
 
 function GlobalAuthWrapper() {
   const { currentUser, loading } = useAuth();
@@ -35,6 +36,20 @@ function GlobalAuthWrapper() {
     }, 3500); // 3.5 seconds to enjoy the rocket animation
 
     return () => clearTimeout(timer);
+  }, []);
+
+  // Initialize high school list cache on app load
+  useEffect(() => {
+    const initializeHighSchools = async () => {
+      try {
+        await loadHighSchools();
+        console.log('✓ High schools loaded and cached');
+      } catch (error) {
+        console.error('Failed to load high schools:', error);
+      }
+    };
+
+    initializeHighSchools();
   }, []);
 
   // Get connection data and modal functions

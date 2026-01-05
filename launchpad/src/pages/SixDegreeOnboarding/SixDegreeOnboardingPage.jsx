@@ -365,6 +365,11 @@ const SixDegreeOnboardingPage = () => {
           // Auth state is ready, navigate to Home
           unsubscribe(); // Clean up the listener
           navigate('/Home');
+
+          // Force page reload after 5 seconds to ensure all data is fresh
+          setTimeout(() => {
+            window.location.reload();
+          }, 5000);
         }
       });
 
@@ -492,7 +497,7 @@ const SixDegreeOnboardingPage = () => {
                     checked={formData.hasCollegeDecision === 'no'}
                     onChange={(e) => {
                       handleInputChange('hasCollegeDecision', e.target.value);
-                      handleInputChange('collegeDecision', ''); // Clear college name if selecting "no"
+                      handleInputChange('collegeDecision', 'No'); // Set to "No" instead of empty string
                     }}
                     disabled={isSubmitting}
                   />

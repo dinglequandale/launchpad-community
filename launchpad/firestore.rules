@@ -42,5 +42,17 @@ service cloud.firestore {
     match /mail/{emailId} {
       allow read, write: if request.auth != null;
     }
+
+    // High schools collection - dynamic, user-contributed
+    match /high_schools/{schoolId} {
+      // Anyone authenticated can read all high schools
+      allow read: if request.auth != null;
+      // Anyone authenticated can create new high schools (for adding unlisted schools)
+      // But cannot update or delete existing ones (prevent vandalism)
+      allow create: if request.auth != null
+                    && request.resource.data.label is string
+                    && request.resource.data.label.size() > 0
+                    && request.resource.data.value is string;
+    }
   }
 }
