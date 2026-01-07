@@ -217,9 +217,12 @@ export default function LandingPageRevamped() {
   const handleJoin = (type="Signup") => {
     if (!userLoggedIn) {
       // TODO: Remove this
-      localStorage.clear();
+      // localStorage.clear();
       if(type === "Signup"){
         navigate("/Signup");
+      }
+      else if(type === "Six-degrees") {
+        navigate("/six-degrees-application-onboarding");
       }
       else{
         navigate("/Login");
@@ -297,7 +300,11 @@ export default function LandingPageRevamped() {
                 </p>
 
                 <div className="modern-hero-buttons">
-                  <button className="modern-hero-btn-primary" onClick={() => handleJoin("Signup")}>
+                  <button className="modern-hero-btn-primary" onClick={() => 
+                  {
+                    !content.is6Degrees ? handleJoin("Signup") : handleJoin("Six-degrees")
+                  }
+                    }>
                     <span>{content.is6Degrees ? content.cta : "Join the Network"}</span>
                     <PiArrowRight className="modern-btn-icon" />
                   </button>
@@ -592,7 +599,11 @@ export default function LandingPageRevamped() {
                   ? "Apply now for FREE mentorship from top professors and award-winning writers."
                   : "Join our community of ambitious students, successful alumni, and industry professionals."}
               </p>
-              <button className="modern-cta-button" onClick={() => handleJoin("Signup")}>
+              <button className="modern-cta-button" onClick={() => 
+                  {
+                    !content.is6Degrees ? handleJoin("Signup") : handleJoin("Six-degrees")
+                  }
+                    }>
                 <span>{content.is6Degrees ? content.ctaSection : "Get Started Today"}</span>
                 <PiArrowRight className="modern-btn-icon" />
               </button>
