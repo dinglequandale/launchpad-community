@@ -10,6 +10,7 @@ import {
   displayColleges,
   displayFieldsOfInterest,
   getBasicUserDescription,
+  formatLinkedInUrl,
 } from '../../services/userProfileServices';
 import DefaultIcon from '../../components/DefaultIcon/DefaultIcon';
 import OrganizationProfile from '../../components/Organizationprofile/OrganizationProfile';
@@ -334,7 +335,7 @@ export default function ProfilePage() {
                     <span className="profile-page-detail-label">LinkedIn</span>
                     <span className="profile-page-detail-value">
                       <a
-                        href={userData.linkedinLink}
+                        href={formatLinkedInUrl(userData.linkedinLink)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="profile-page-linkedin-link"

@@ -6,7 +6,7 @@ import { storage } from '../../firebase/firebaseConfig';
 import toast, { Toaster } from 'react-hot-toast';
 import { getDownloadURL, getMetadata, ref } from 'firebase/storage';
 import { IoCloseOutline } from 'react-icons/io5';
-import { displayShortenedLinkedin } from '../../services/userProfileServices';
+import { displayShortenedLinkedin, formatLinkedInUrl } from '../../services/userProfileServices';
 import { addOrUpdateConnection } from '../../services/connectionService';
 import Loading from '../LoadingAnimation/Loading';
 import './ConnectModal.css';
@@ -143,9 +143,9 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
     try {
       // Create connection when LinkedIn is clicked
       await createConnection();
-      
-      // Open LinkedIn in new tab
-      window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer');
+
+      // Open LinkedIn in new tab with properly formatted URL
+      window.open(formatLinkedInUrl(userData.linkedinLink), '_blank', 'noopener,noreferrer');
     } catch (error) {
       console.error('Error handling LinkedIn click:', error);
       toast.error('Failed to create connection');

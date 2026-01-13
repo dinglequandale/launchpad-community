@@ -13,6 +13,7 @@ import {
   displayColleges,
   displayFieldsOfInterest,
   getBasicUserDescription,
+  formatLinkedInUrl,
 } from '../../services/userProfileServices'
 import DefaultIcon from '../DefaultIcon/DefaultIcon'
 import OrganizationProfile from '../Organizationprofile/OrganizationProfile'
@@ -289,9 +290,9 @@ export default function ProfileModal({
                   <div className="profile-modal-detail-content">
                     <span className="profile-modal-detail-label">LinkedIn</span>
                     <span className="profile-modal-detail-value">
-                      <a 
-                        href={userData.linkedinLink} 
-                        target="_blank" 
+                      <a
+                        href={formatLinkedInUrl(userData.linkedinLink)}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="profile-modal-linkedin-link"
                       >

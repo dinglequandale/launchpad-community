@@ -17,17 +17,25 @@ export const lowerAndCapitalize = (title) => {
 
 export const displayShortenedName = (userName) => {
     try {
-        const nameParts = userName.split(" ");
+        // Sanitize: trim leading/trailing spaces and replace multiple spaces with single space
+        const sanitizedName = userName.trim().replace(/\s+/g, ' ');
+
+        // Split and filter out any empty strings
+        const nameParts = sanitizedName.split(" ").filter(part => part.length > 0);
+
+        // Handle edge cases
         if (nameParts.length === 0) return userName;
-        if (nameParts.length === 1) return userName;
+        if (nameParts.length === 1) return nameParts[0];
 
         const firstName = nameParts[0];
         const lastName = nameParts[nameParts.length - 1]; // Get the actual last name
+        const fullName = `${firstName} ${lastName}`;
 
-        if (lastName.length < 10) {
-            return `${firstName} ${lastName}`;
+        // If the total length of first + last name is more than 15 characters, use last initial
+        if (fullName.length > 15) {
+            return `${firstName} ${lastName[0]}.`;
         }
-        return `${firstName} ${lastName[0]}.`;
+        return fullName;
     } catch {
         return userName;
     }
@@ -40,6 +48,26 @@ export const displayShortenedLinkedin = (linkedInLink) => {
     else{
         return linkedInLink;
     }
+}
+
+export const formatLinkedInUrl = (linkedInLink) => {
+    // Return empty string if no link provided
+    if (!linkedInLink || linkedInLink.trim() === '') {
+        return '';
+    }
+
+    // Check if URL already has a protocol
+    if (linkedInLink.startsWith('http://') || linkedInLink.startsWith('https://')) {
+        return linkedInLink;
+    }
+
+    // Check if URL starts with www. but no protocol
+    if (linkedInLink.startsWith('www.')) {
+        return `https://${linkedInLink}`;
+    }
+
+    // Otherwise, add https://www. prefix
+    return `https://www.${linkedInLink}`;
 }
 
 export const displayFieldsOfInterest = (fieldsOfInterest, length = "shorter") => {

@@ -54,5 +54,17 @@ service cloud.firestore {
                     && request.resource.data.label.size() > 0
                     && request.resource.data.value is string;
     }
+
+    // Onboarding analytics collection
+    match /onboarding_analytics/{dateId} {
+      // Allow authenticated users to read analytics
+      allow read: if request.auth != null;
+      // Allow authenticated users to create and update daily analytics
+      // This is needed for the trackOnboardingSubmission function
+      allow create, update: if request.auth != null
+                            && request.resource.data.date is string
+                            && request.resource.data.count is number
+                            && request.resource.data.firstNames is list;
+    }
   }
 }
