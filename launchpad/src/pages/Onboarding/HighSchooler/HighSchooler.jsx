@@ -12,6 +12,7 @@ import { FaExclamationTriangle, FaShieldAlt } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import { parentInvitationTemplate } from '../../../utils/parentVerificationTemplates';
 import Loading from '../../../components/LoadingAnimation/Loading';
+import { BiTrash } from 'react-icons/bi';
 
 // Move getEmail function creation outside component to prevent recreation on every render
 const getEmail = httpsCallable(getFunctions(), 'getEmail');
