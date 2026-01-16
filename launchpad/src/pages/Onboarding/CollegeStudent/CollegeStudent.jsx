@@ -148,7 +148,7 @@ export default function CollegeStudent({currentPage, isSubmitting, setCanSubmit,
       schoolAttending: "",
       collegeAttending: "",
       graduationYear: "",
-      openToCrossSchoolConnections: "no", // Default to school community only
+      openToCrossSchoolConnections: "", // No default - user should choose
       userSkills: [],
       collegeStudentEmails: [],
       userType: "College Student",
@@ -243,7 +243,10 @@ const CollegeInfo = ({ selectedOptions, handleChange, collegeStudentData }) => {
             if (question.id === 'collegeAttending') {
               return (
                 <div className="form-group" key={question.id}>
-                  <label className="form-label">{question.text}</label>
+                  <label className="form-label">
+                    {question.text}
+                    {!question.optional && <span className="required">*</span>}
+                  </label>
                   <CollegeSearch
                     selectedOptions={selectedOptions}
                     handleChange={handleChange}
@@ -255,7 +258,10 @@ const CollegeInfo = ({ selectedOptions, handleChange, collegeStudentData }) => {
             } else if (question.id === 'schoolAttending') {
               return (
                 <div className="form-group" key={question.id}>
-                  <label className="form-label">{question.text}</label>
+                  <label className="form-label">
+                    {question.text}
+                    {!question.optional && <span className="required">*</span>}
+                  </label>
                   <HighSchoolSearch
                     selectedOptions={selectedOptions}
                     handleChange={handleChange}
@@ -266,12 +272,17 @@ const CollegeInfo = ({ selectedOptions, handleChange, collegeStudentData }) => {
             } else {
               return (
                 <div className="form-group" key={question.id}>
+                  <label className="form-label">
+                    {question.text}
+                    {!question.optional && <span className="required">*</span>}
+                  </label>
                   <OnboardingDropdown
                     question={question.text}
                     options={question.options}
                     selectedOption={selectedOptions[question.id] || (question.type === 'multi-select' ? [] : '')}
                     onChange={(label) => handleChange(question.id, label)}
                     type={question.type}
+                    showQuestion={false}
                   />
                 </div>
               );

@@ -89,8 +89,11 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
   return (
     <div className="onboarding-basic-info-container">
       <div>
-        <label className="onboardingQuestion">{questionsForPage[0].text}</label>
-        <input 
+        <label className="onboardingQuestion">
+          {questionsForPage[0].text}
+          {!questionsForPage[0].optional && <span className="required">*</span>}
+        </label>
+        <input
           type="text"
           onChange={(e) => handleChange(questionsForPage[0].id, e.target.value)}
           className="onboardingInput"
@@ -125,7 +128,10 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
       </div>
 
       <div className="onboarding-dropdown-container-secondary">
-        <label className="onboardingQuestion">{questionsForPage[2].text}</label>
+        <label className="onboardingQuestion">
+          {questionsForPage[2].text}
+          {!questionsForPage[2].optional && <span className="required">*</span>}
+        </label>
         <CustomSelect
           options={questionsForPage[2].options}
           value={selectedOptions[questionsForPage[2].id] || []}

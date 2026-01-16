@@ -212,7 +212,7 @@ export default function Professional({currentPage, isSubmitting, setCanSubmit, s
       email: "",
       schoolAttending: schoolInfo?.schoolDisplayName || "",
       schoolId: schoolInfo?.schoolId || "",
-      openToCrossSchoolConnections: "no", // Default to school community only
+      openToCrossSchoolConnections: "", // No default - user should choose
       userType: "Professional",
       // Professional status and work details
       retiredStatus: "",
@@ -317,6 +317,7 @@ const SchoolAffiliation = ({ selectedOptions, handleChange }) => {
           <div className="form-group" key={question.id}>
             <label className="form-label">
               {question.text}
+              {!question.optional && <span className="required">*</span>}
               {question.optional && (
                 <div className="onboarding-optional-label-container">
                   <span className="optional-label">(Optional)</span>
@@ -346,6 +347,10 @@ const RetiredStatus = ({ selectedOptions, handleChange }) => {
       <div className="onboardingQuestions">
         {questionsForPage.map((question) => (
           <div className="form-group" key={question.id}>
+            <label className="form-label">
+              {question.text}
+              {!question.optional && <span className="required">*</span>}
+            </label>
             {question.type === "text-box" ? (
               <input
                 type="text"
@@ -380,17 +385,18 @@ const WorkDetails = ({selectedOptions, handleChange}) => {
       <div className="onboardingQuestions">
         {questionsForPage.map((question) => (
           <div className="form-group" key={question.id}>
+            <label className="form-label">
+              {question.text}
+              {!question.optional && <span className="required">*</span>}
+            </label>
             {question.type === 'text-box' ? (
-              <>
-                <label className="form-label">{question.text}</label>
-                <input
-                  type={`${question.id === "yearsOfExperience" ? "number" : "text"}`}
-                  value={selectedOptions[question.id] || ''}
-                  onChange={(e) => handleChange(question.id, e.target.value)}
-                  className="form-input form-shorter-input"
-                  placeholder={question.placeholder}
-                />
-              </>
+              <input
+                type={`${question.id === "yearsOfExperience" ? "number" : "text"}`}
+                value={selectedOptions[question.id] || ''}
+                onChange={(e) => handleChange(question.id, e.target.value)}
+                className="form-input form-shorter-input"
+                placeholder={question.placeholder}
+              />
             ) : (
               <CustomSelect
                 options={question.options}

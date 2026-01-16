@@ -17,6 +17,7 @@ import { GrOrganization } from 'react-icons/gr';
 import UserType from './UserType';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import { saveHighSchooler, saveCollegeStudent, saveProfessional, saveStaff } from '../../services/onboardingServices';
+import toast from 'react-hot-toast';
 
 export default function Onboarding() {
     const [numOfSections, setNumOfSections] = useState(0);
@@ -62,7 +63,10 @@ export default function Onboarding() {
     }
 
     const handleSubmit = async () => {
-        if (!canSubmit) return;
+        if (!canSubmit) {
+            toast.error('Please fill out all required fields before submitting.');
+            return;
+        }
 
         setIsSubmitting(true);
         const startTime = Date.now();
@@ -200,34 +204,41 @@ export default function Onboarding() {
                         </main>
                         
                         <footer className="onboarding-footer">
-                            <button 
+                            <button
                                 className={`prevButton ${currentPage < 2 ? 'hidden' : ''}`}
                                 onClick={handlePrev}
                             >
                                 Previous
                             </button>
-                            
-                            {(currentPage !== numOfSections || numOfSections === 0) ? (
-                                <button 
-                                    className="continueButton" 
-                                    onClick={handleContinue}
-                                >
-                                    Continue
-                                </button>
-                            ) : (
-                                <button 
-                                    className={`continueButton ${!canSubmit ? 'disabled' : ''}`}
-                                    onClick={handleSubmit}
-                                    disabled={isSubmitting || !canSubmit}
-                                >
-                                    {!isSubmitting ? "Submit" : (
-                                        <>
-                                            <Loading />
-                                            {/* <span style={{ marginLeft: '8px' }}>Saving...</span> */}
-                                        </>
-                                    )}
-                                </button>
-                            )}
+
+                            <div className="footer-right">
+                                {currentPage === numOfSections && !canSubmit && (
+                                    <p className="validation-message">
+                                        Please complete all required fields (*)
+                                    </p>
+                                )}
+                                {(currentPage !== numOfSections || numOfSections === 0) ? (
+                                    <button
+                                        className="continueButton"
+                                        onClick={handleContinue}
+                                    >
+                                        Continue
+                                    </button>
+                                ) : (
+                                    <button
+                                        className={`continueButton ${!canSubmit ? 'disabled' : ''}`}
+                                        onClick={handleSubmit}
+                                        disabled={isSubmitting || !canSubmit}
+                                    >
+                                        {!isSubmitting ? "Submit" : (
+                                            <>
+                                                <Loading />
+                                                {/* <span style={{ marginLeft: '8px' }}>Saving...</span> */}
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                            </div>
                         </footer>
                     </div>
                 </div>

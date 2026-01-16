@@ -105,9 +105,25 @@
 .onboarding-footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   gap: 16px;
   margin-top: auto;
+}
+
+.footer-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.validation-message {
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+  text-align: right;
 }
 
 .onboarding-page {
@@ -439,17 +455,21 @@
 }
 
 .continueButton:disabled {
-  background: #9ca3af;
+  background: #d1d5db;
+  color: #6b7280;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  opacity: 0.6;
 }
 
 .continueButton.disabled {
-  background: #9ca3af;
+  background: #d1d5db;
+  color: #6b7280;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  opacity: 0.6;
 }
 
 .prevButton {

@@ -126,9 +126,9 @@ const highSchoolQuestionsConfig = [
   // Page 4
   {
     id: "parentEmails",
-    text: "Invite Parents, Guardians, or Mentors to Join Launchpad",
+    text: "Invite at least one parent, guardian, or mentor to join Launchpad",
     type: "multi-email",
-    optional: true,
+    optional: false,
     page: 4
   },
 ]
@@ -256,7 +256,7 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
             <div className="onboardingQuestions">
               <div className="form-group">
                 <label className="form-label">
-                  What high school do you attend?
+                  What high school do you attend?<span className="required">*</span>
                 </label>
                 <HighSchoolSearch
                   selectedOptions={highSchoolerData}
@@ -265,12 +265,16 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
                 />
               </div>
               <div className="form-group">
+                <label className="form-label">
+                  What year do you graduate?<span className="required">*</span>
+                </label>
                 <OnboardingDropdown
                   question={highSchoolQuestionsConfig.find(q => q.id === 'graduationYear')}
                   options={graduationYears}
                   selectedOption={highSchoolerData.graduationYear}
                   onChange={(value) => handleChange('graduationYear', value)}
                   type="select"
+                  showQuestion={false}
                 />
               </div>
             </div>
@@ -289,7 +293,7 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
       case 4:
         return (
           <div className="form-section">
-            <h2 className="page-title">Invite Your Parent</h2>
+            <h2 className="page-title">Invite a Parent or Mentor<span className="required">*</span></h2>
             <ParentInvitationPage
               selectedOptions={highSchoolerData}
               handleChange={handleChange}
@@ -303,7 +307,13 @@ export default function HighSchooler({ schoolInfo, currentPage, isSubmitting, se
   };
 
   useEffect(() => {
-    const canSubmit = requiredQuestionsAnswered(highSchoolQuestionsConfig, highSchoolerData);
+    // Custom validation for parentEmails - filter out empty emails
+    const validatedData = {
+      ...highSchoolerData,
+      parentEmails: highSchoolerData.parentEmails?.filter(email => email && email.trim() !== '') || []
+    };
+
+    const canSubmit = requiredQuestionsAnswered(highSchoolQuestionsConfig, validatedData);
     setCanSubmit(canSubmit);
   }, [highSchoolerData, currentPage, setCanSubmit]);
 
@@ -340,7 +350,7 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
     <div className="onboardingQuestions">
       <div className="form-group">
         <label className="form-label">
-          Have you decided on a college yet?
+          Have you decided on a college yet?<span className="required">*</span>
         </label>
         <div className="input-group">
           <CustomSelect
@@ -387,8 +397,20 @@ const HSCollegeInfo = ({ selectedOptions, handleChange }) => {
 };
 
 const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) => {
-  const [parentEmails, setParentEmails] = useState(selectedOptions.parentEmails || []);
+  // Start with one empty email field visible
+  const [parentEmails, setParentEmails] = useState(
+    selectedOptions.parentEmails && selectedOptions.parentEmails.length > 0
+      ? selectedOptions.parentEmails
+      : ['']
+  );
   const [errors, setErrors] = useState({});
+
+  // Initialize parent data with the initial email array
+  useEffect(() => {
+    if (!selectedOptions.parentEmails || selectedOptions.parentEmails.length === 0) {
+      handleChange('parentEmails', ['']);
+    }
+  }, []);
 
   const validateEmail = (email, index) => {
     if (!email || email.trim() === '') {
@@ -435,10 +457,10 @@ const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) =>
         <div style={{ display: 'flex', alignItems: 'flex-start' }}>
           <FaShieldAlt className="parent-notice-icon" style={{ color: '#1976d2' }} />
           <div className="parent-notice-content">
-            <h3>Invite Parents, Guardians, or Mentors</h3>
+            <h3>Invite Parents, Guardians, or Mentors (Required)</h3>
             <p>
-              Help grow the Launchpad community! Invite parents, guardians, or mentors who are professionals to join and mentor other students.
-              We'll send them invitation emails when you complete your onboarding.
+              To join Launchpad, please invite at least one parent, guardian, or mentor who is a professional.
+              This helps ensure a safe and supportive community. We'll send them an invitation email when you complete your onboarding.
             </p>
           </div>
         </div>
@@ -446,14 +468,9 @@ const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) =>
 
       <div className="form-group">
         <label className="form-label">
-          Email Addresses
+          Email Addresses<span className="required">*</span>
         </label>
-        {parentEmails.length === 0 ? (
-          <div style={{ marginBottom: '16px', color: '#666', fontSize: '14px' }}>
-            Click "Add Email" below to invite parents, guardians, or mentors to join Launchpad
-          </div>
-        ) : (
-          parentEmails.map((email, index) => (
+        {parentEmails.map((email, index) => (
             <div key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '12px', gap: '12px' }}>
               <div style={{ flex: 1 }}>
                 <input
@@ -476,10 +493,11 @@ const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) =>
                   </div>
                 )} */}
               </div>
-              <div style={{alignItems: "center"}}>
-              <button
-                type="button"
-                onClick={() => removeEmailField(index)}
+              {parentEmails.length > 1 && (
+                <div style={{alignItems: "center"}}>
+                <button
+                  type="button"
+                  onClick={() => removeEmailField(index)}
                 style={{
                   padding: '13px',
                   background: 'transparent',
@@ -504,10 +522,10 @@ const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) =>
               >
                 <BiTrash size={18} />
               </button>
-              </div>
+                </div>
+              )}
             </div>
-          ))
-        )}
+          ))}
         <button
           type="button"
           onClick={addEmailField}
@@ -521,12 +539,16 @@ const ParentInvitationPage = ({ selectedOptions, handleChange, currentUser }) =>
             fontSize: '14px',
             display: 'flex',
             alignItems: 'center',
-            gap: '8px'
+            gap: '8px',
+            marginBottom: '8px'
           }}
         >
           <span style={{ fontSize: '18px' }}>+</span>
           Add Email
         </button>
+        <div style={{ fontSize: '13px', color: '#6b7280', fontStyle: 'italic' }}>
+          You must provide at least one valid email address to continue
+        </div>
       </div>
     </div>
   );

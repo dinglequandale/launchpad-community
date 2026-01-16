@@ -188,7 +188,10 @@ export default function Staff({currentPage, isSubmitting, setCanSubmit, schoolIn
             <div className="onboardingQuestions">
               {staffQuestionsConfig.filter(q => q.page === 2).map(question => (
                 <div key={question.id} className="form-group">
-                  <label className="form-label">{question.text}</label>
+                  <label className="form-label">
+                    {question.text}
+                    {!question.optional && <span className="required">*</span>}
+                  </label>
                   {question.type === 'text' ? (
                     <input
                       type="text"
