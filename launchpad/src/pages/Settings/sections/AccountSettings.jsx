@@ -9,6 +9,16 @@ import toast from 'react-hot-toast';
 import { CgClose } from 'react-icons/cg';
 import { BiGlobe, BiGroup } from 'react-icons/bi';
 
+// Normalize legacy label strings to short values
+const normalizeCrossSchoolPref = (val) => {
+    if (!val) return 'no';
+    const lower = val.toLowerCase();
+    if (lower === 'yes' || lower.includes("i'm open to connecting") || lower.includes("yes, i'm open")) return 'yes';
+    if (lower === 'no' || lower.includes('my school community only') || lower.includes('no, i prefer')) return 'no';
+    if (lower === 'not_applicable' || lower.includes('not applicable')) return 'not_applicable';
+    return val;
+};
+
 const AccountSettings = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState('');
@@ -24,7 +34,7 @@ const AccountSettings = () => {
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          setOpenToCrossSchoolConnections(userData.openToCrossSchoolConnections || 'no');
+          setOpenToCrossSchoolConnections(normalizeCrossSchoolPref(userData.openToCrossSchoolConnections));
           setUserType(userData.userType || '');
         }
       } catch (error) {
@@ -127,13 +137,15 @@ const AccountSettings = () => {
           </button>
         </div>
 
-        {/* Community Preference Section - Only for College Students and Professionals */}
-        {!loading && (userType === 'College Student' || userType === 'Professional') && (
+        {/* Community Preference Section - For College Students, Professionals, and High Schoolers */}
+        {!loading && (userType === 'College Student' || userType === 'Professional' || userType === 'High Schooler') && (
           <div className="settings-card">
             <h3 className="settings-card-title">Networking Preference</h3>
             <p className="settings-card-description">
               {userType === 'College Student'
                 ? 'Choose whether you want to connect only with students from your school community or be open to connections from other schools.'
+                : userType === 'High Schooler'
+                ? 'Choose whether you want to connect only with people from your school community or be open to connections from other schools.'
                 : 'Choose whether you prefer to connect with students from your affiliated school community only or be open to connections from all schools.'}
             </p>
             <div className="settings-toggle-group">

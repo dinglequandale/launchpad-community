@@ -17,7 +17,6 @@ import CustomSelect from '../../CustomSelect/CustomSelect';
 import { careerInterests, CitySearch } from '../../../pages/Onboarding/Options';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import SaveChanges from '../../Makechanges/SaveChanges';
 
 const OpportunityContext = createContext({
   organizationData: {},
@@ -32,11 +31,9 @@ const OpportunityContext = createContext({
 });
 
 export default function OpportunityModal({visibility, onClose, opportunityData, isEditing, opportunityId, isPublished}){
-  const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentOpportunityPage, setCurrentOpportuntityPage] = useState(1);
   const [showLast, setShowLast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [changesMade, setChangesMade] = useState(false);
 
   const { currentUser } = useAuth();
   // console.log("Opportunity data:", opportunityData);
@@ -337,7 +334,6 @@ const publishOpportunityData = async () => {
       ...organizationData,
       [name]: value
     });
-    setChangesMade(true);
   };
 
   const handleDropdownChange = (id, label) => {
@@ -373,15 +369,6 @@ const publishOpportunityData = async () => {
     style={{zIndex: 9999}}
     /> */}
     <div>
-      <SaveChanges visibility={makeChangesVisibility} onCancel={ ()=>{
-              // saveOpportunityData();
-              setMakeChangesVisibility(false);
-              onClose();
-            }} onVerify={() => {
-                saveOpportunityData();
-                setMakeChangesVisibility(false);
-                onClose();
-              }}/>
       <OpportunityContext.Provider 
       value={{
         organizationData,
@@ -395,24 +382,10 @@ const publishOpportunityData = async () => {
         currentUser,
         }}> 
         {visibility && (
-          <div className="v0-modal-overlay" onClick={() => {
-            if(changesMade){
-              setMakeChangesVisibility(true);
-            }
-            else{
-              onClose();
-            }
-          }}>
+          <div className="v0-modal-overlay" onClick={onClose}>
             <div className="v0-modal-container opportunity-modal" onClick={(e) => e.stopPropagation()}>
               <div className="v0-modal-header">
-                <button className="v0-modal-close-btn" onClick={() => {
-                  if(changesMade){
-                    setMakeChangesVisibility(true);
-                  }
-                  else{
-                    onClose();
-                  }
-                }}>
+                <button className="v0-modal-close-btn" onClick={onClose}>
                   <CgClose size={20} />
                 </button>
                 <div style={{marginTop: "30px"}}>

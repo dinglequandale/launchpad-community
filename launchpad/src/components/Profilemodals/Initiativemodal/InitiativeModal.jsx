@@ -16,7 +16,6 @@ import { saveOpportunity } from '../../../services/opportunityServices';
 import { careerInterests, CitySearch } from '../../../pages/Onboarding/Options';
 import OnboardingDropdown from '../../OnboardingDropdown/OnboardingDropdown';
 import CustomSelect from '../../CustomSelect/CustomSelect';
-import SaveChanges from '../../Makechanges/SaveChanges';
 
 
 const InitiativeContext = createContext({
@@ -33,11 +32,9 @@ const InitiativeContext = createContext({
 });
 
 export default function InitiativeModal({visibility, onClose, opportunityData, isEditing, opportunityId}){
-  const [makeChangesVisibility, setMakeChangesVisibility] = useState(false);
   const [currentInitiativePage, setCurrentInitiativePage] = useState(1);
   const [showLast, setShowLast] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [changesMade, setChangesMade] = useState(false);
   
   const [organizationLogo, setOrganizationLogo] = useState(null);
 
@@ -224,7 +221,6 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
       ...organizationData,
       [name]: type === 'file' ? files[0] : value
     });
-    setChangesMade(true);
   };
 
   const saveInitiativeData = () => {
@@ -261,15 +257,6 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
     position="bottom-right"
     reverseOrder={false}/> */}
     <div>
-      <SaveChanges visibility={makeChangesVisibility} onCancel={ ()=>{
-        // saveInitiativeData();
-        setMakeChangesVisibility(false);
-        onClose();
-      }} onVerify={() => {
-          saveInitiativeData();
-          setMakeChangesVisibility(false);
-          onClose();
-        }}/>
       <InitiativeContext.Provider 
       value={{
         organizationData,
@@ -284,24 +271,10 @@ export default function InitiativeModal({visibility, onClose, opportunityData, i
         currentUser,
         }}> 
         {visibility && (
-          <div className="v0-modal-overlay" onClick={() => {
-            if(changesMade){
-              setMakeChangesVisibility(true);
-            }
-            else{
-              onClose();
-            }
-          }}>
+          <div className="v0-modal-overlay" onClick={onClose}>
             <div className="v0-modal-container opportunity-modal" onClick={(e) => e.stopPropagation()}>
               <div className="v0-modal-header">
-                <button className="v0-modal-close-btn" onClick={() => {
-                  if(changesMade){
-                    setMakeChangesVisibility(true);
-                  }
-                  else{
-                    onClose();
-                  }
-                }}>
+                <button className="v0-modal-close-btn" onClick={onClose}>
                   <CgClose size={20} />
                 </button>
                 <h2 className="v0-modal-title">Your Initiative</h2>

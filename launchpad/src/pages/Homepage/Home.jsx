@@ -20,6 +20,7 @@ import toast from "react-hot-toast";
 import OrganizationProfileModal from "../../components/Organizationprofile/OrganizationProfileModal";
 import NetworkingCommitmentModal from "../../components/NetworkingCommitmentModal/NetworkingCommitmentModal";
 import SixDegreesWelcomeModal from "../../components/SixDegreesWelcomeModal/SixDegreesWelcomeModal";
+import HSWelcomeModal from "../../components/HSWelcomeModal/HSWelcomeModal";
 
 
 class ErrorBoundary extends React.Component {
@@ -57,6 +58,8 @@ export default function Home(){
         return saved ? JSON.parse(saved) : [];
     });
     const [showSixDegreesWelcome, setShowSixDegreesWelcome] = useState(false);
+    const [showHSWelcome, setShowHSWelcome] = useState(false);
+    const [isLegacyHSUser, setIsLegacyHSUser] = useState(false);
     const {openProfileModal, openApplyModal, openConnectModal} = useModal();
 
     const { chatClient } = useOutletContext();
@@ -98,6 +101,29 @@ export default function Home(){
         setTimeout(() => {
           setShowSixDegreesWelcome(true);
         }, 500);
+      }
+
+      // Check for High Schooler welcome modal flag (new onboarding or legacy user)
+      const hsWelcomeFlag = localStorage.getItem('showHSWelcomeModal');
+      const hsWelcomeDismissed = localStorage.getItem('hsWelcomeModalDismissed');
+      if (hsWelcomeFlag === 'true') {
+        setTimeout(() => setShowHSWelcome(true), 500);
+      } else if (info && info.userType === 'High Schooler' && !hsWelcomeDismissed) {
+        // Legacy HS user without the preference set — check Firestore
+        const checkLegacyHS = async () => {
+          try {
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+            if (userDoc.exists() && !userDoc.data().openToCrossSchoolConnections) {
+              // Set default to 'yes' for legacy user
+              await updateDoc(doc(db, 'users', currentUser.uid), { openToCrossSchoolConnections: 'yes' });
+              setIsLegacyHSUser(true);
+              setTimeout(() => setShowHSWelcome(true), 500);
+            }
+          } catch (error) {
+            console.error('Error checking legacy HS user:', error);
+          }
+        };
+        checkLegacyHS();
       }
 
       // Show networking commitment modal for professionals who haven't seen it
@@ -366,6 +392,7 @@ export default function Home(){
             {showVerifedConnectionModal && <ConnectModal onClose = {()=>setShowVerifiedConnectionModal(false)} userData={connectedUserData} visibility={showVerifedConnectionModal} chat={chatClient} userId = {connectedUserData.id}/>}
             {showNetworkingCommitmentModal && <NetworkingCommitmentModal onClose={() => setShowNetworkingCommitmentModal(false)} userData={userBasicInfo} />}
             {showSixDegreesWelcome && <SixDegreesWelcomeModal isOpen={showSixDegreesWelcome} onClose={() => setShowSixDegreesWelcome(false)} />}
+            {showHSWelcome && <HSWelcomeModal isOpen={showHSWelcome} onClose={() => setShowHSWelcome(false)} isLegacyUser={isLegacyHSUser} />}
 
             <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
             <SideNav/>

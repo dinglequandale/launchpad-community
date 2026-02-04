@@ -401,16 +401,22 @@ const HighSchoolSearch = ({ selectedOptions, handleChange, field = "schoolAttend
     fetchHighSchools();
   }, []);
 
-  // Check if "Other" is selected on mount
+  // Check if "Other" is selected on mount (only after schools have loaded)
   useEffect(() => {
+    if (dynamicHighSchools.length === 0) return;
+
     const currentValue = selectedOptions[field];
+    if (!currentValue) return;
+
     if (currentValue === "OTHER_MANUAL_ENTRY" ||
-        (currentValue && !dynamicHighSchools.some(school => school.label === currentValue || school.value === currentValue))) {
+        !dynamicHighSchools.some(school => school.label === currentValue || school.value === currentValue)) {
       setShowManualEntry(true);
-      // If it's not "OTHER_MANUAL_ENTRY" but also not in the list, it must be a manually entered name
       if (currentValue !== "OTHER_MANUAL_ENTRY") {
         setManualSchoolName(currentValue);
       }
+    } else {
+      setShowManualEntry(false);
+      setManualSchoolName('');
     }
   }, [dynamicHighSchools]);
 

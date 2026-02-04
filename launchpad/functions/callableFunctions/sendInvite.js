@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 
 exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
-    const { recipientData, senderName } = data;
+    const { recipientData, senderName, schoolName } = data;
 
     // Ensure the user is authenticated
     if (!context.auth) {
@@ -11,7 +11,15 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
 
     try {
         // Create email template
-        const createInviteEmailTemplate = (recipientName, senderName) => {
+        const createInviteEmailTemplate = (recipientName, senderName, schoolName) => {
+            // Build school-aware text with fallbacks
+            const communityText = schoolName
+                ? `${schoolName}'s networking community`
+                : `the Launchpad networking community`;
+            const schoolCommunityText = schoolName
+                ? `the ${schoolName} community`
+                : `your school's community`;
+
             return `
             <!DOCTYPE html>
             <html lang="en">
@@ -119,47 +127,43 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
                     <div class="logo">
                         <img src="https://launchpadhouston.com/assets/launchpad_logo.png" alt="Launchpad Logo">
                     </div>
-                    
+
                     <div class="header">
-                        <h1>Welcome to Launchpad!</h1>
+                        <h1>${senderName} invited you to join Launchpad</h1>
                     </div>
-                    
+
                     <div class="content">
-                        <p>Greetings ${recipientName},</p>
-                        
-                        <p>${senderName} has invited you to Launchpad, your school's digital community network hosting students, alumni, parents, and professionals!</p>
-                        
+                        <p>Hi there,</p>
+
+                        <p>${senderName} has joined Launchpad and invited you to become part of ${communityText}!</p>
+
                         <div class="highlight">
-                            <strong>Join our mission!</strong> Launchpad aims to foster a school networking platform that supports students' potential and passion, propelling them into college and beyond.
+                            <strong>What is Launchpad?</strong> Launchpad is a networking platform that connects Houston high schools' students, alumni, and parents. As a professional, you can offer mentorship, share career insights, and help students discover opportunities in your field. You can choose to connect only with students from ${schoolCommunityText}, or you can make your profile public to users from other Houston high school communities.
                         </div>
-                        
-                        <p>By harnessing your school's network of experienced alumni and parents, we empower our students to receive real-world insights, gain workplace experience, and explore college & career paths.</p>
-                        
+
                         <div class="benefits">
-                            <h3>🌟 What You'll Get:</h3>
+                            <h3>Benefits of Joining:</h3>
                             <ul>
-                                <li><strong>Connect with Your Community:</strong> Build meaningful relationships with fellow students, alumni, and professionals</li>
-                                <li><strong>Mentorship Opportunities:</strong> Get guidance from experienced professionals in your field of interest</li>
-                                <li><strong>Career Insights:</strong> Discover internships, job opportunities, and career paths</li>
-                                <li><strong>Academic Support:</strong> Connect with alumni who can help with college applications and academic decisions</li>
-                                <li><strong>Give Back:</strong> Share your knowledge and experiences with the next generation</li>
+                                <li>Share your professional expertise with motivated students</li>
+                                <li>Make a difference in students' career development</li>
+                                <li>Connect with other professionals and parents</li>
                             </ul>
                         </div>
-                        
-                        <p>We're excited to have you join us in this mission to support our students' success!</p>
+
+                        <p><strong>Ready to join?</strong></p>
                     </div>
-                    
+
                     <div class="button-container">
-                        <a href="https://launchpadhouston.com" class="button">Join Launchpad</a>
+                        <a href="https://launchpadhouston.com" class="button">Join Launchpad Today</a>
                     </div>
-                    
+
                     <div class="content">
                         <p>If you have any questions, feel free to reach out to our support team at <a href="mailto:launchpadhelpline@gmail.com">launchpadhelpline@gmail.com</a>.</p>
-                        
+
                         <p>Best regards,<br>
                         <strong>The Launchpad Team</strong></p>
                     </div>
-                    
+
                     <div class="footer">
                         <p>This invitation was sent by ${senderName} through Launchpad.</p>
                     </div>
@@ -169,18 +173,24 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
             `;
         };
 
+        // Build subject line with school name fallback
+        const emailSubject = schoolName
+            ? `${senderName} invited you to join ${schoolName}'s network on Launchpad!`
+            : `${senderName} invited you to join Launchpad!`;
+
         // Process each recipient
         const emailPromises = recipientData.map(async (recipient, index) => {
             const emailTemplate = createInviteEmailTemplate(
-                recipient.userName.split(" ")[0], 
-                senderName
+                recipient.userName.split(" ")[0],
+                senderName,
+                schoolName || ''
             );
 
             // Create email document for MailGun
             return admin.firestore().collection('mail').add({
                 to: recipient.email,
                 message: {
-                    subject: `${senderName} invites you to join Launchpad, your school's networking app!`,
+                    subject: emailSubject,
                     html: emailTemplate,
                 },
                 from: 'Launchpad Networks <no-reply@launchpadhouston.com>',

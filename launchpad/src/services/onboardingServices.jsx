@@ -56,6 +56,7 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         userResumePreview: resumeURL,
         userId: currentUser.uid,
         emailNotificationsEnabled: true, // Default to enabled for email notifications
+        openToCrossSchoolConnections: 'yes', // Default to open; can be changed in Settings
         // COMMUNITY VERSION: Removed parent verification fields
         };
 
@@ -66,31 +67,36 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        // Send parent invitation emails if any emails were provided
+        // Send invitation emails if any emails were provided
+        const schoolName = highSchoolerData.schoolAttending || '';
         if (highSchoolerData.parentEmails && Array.isArray(highSchoolerData.parentEmails) && highSchoolerData.parentEmails.length > 0) {
             try {
                 const sendSESEmail = httpsCallable(getFunctions(), 'sendSESEmail');
                 // Filter out empty emails and send to each valid email
                 const validEmails = highSchoolerData.parentEmails.filter(email => email && email.trim());
+                const emailSubject = schoolName
+                    ? `${highSchoolerData.userName} invited you to join ${schoolName}'s network on Launchpad!`
+                    : `${highSchoolerData.userName} invited you to join Launchpad!`;
 
                 for (const email of validEmails) {
                     try {
                         await sendSESEmail({
                             recipient: [email],
-                            subject: `${highSchoolerData.userName} invited you to join Launchpad`,
+                            subject: emailSubject,
                             htmlTemplate: parentInvitationTemplate({
-                                studentName: highSchoolerData.userName || 'Your child',
+                                studentName: highSchoolerData.userName || 'A Launchpad user',
+                                schoolName: schoolName,
                             }),
                             emailType: "parent_invitation"
                         });
-                        console.log('Parent invitation email sent to:', email);
+                        console.log('Invitation email sent to:', email);
                     } catch (emailError) {
-                        console.error('Error sending parent invitation email to', email, ':', emailError);
+                        console.error('Error sending invitation email to', email, ':', emailError);
                         // Continue to next email if one fails
                     }
                 }
             } catch (error) {
-                console.error('Error in parent invitation email process:', error);
+                console.error('Error in invitation email process:', error);
                 // Don't fail the onboarding if email fails
             }
         }
@@ -99,6 +105,9 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
 
         // Track onboarding analytics
         await trackOnboardingSubmission(highSchoolerData.userName);
+
+        // Show welcome modal on first login
+        localStorage.setItem('showHSWelcomeModal', 'true');
 
         onSuccess();
     } catch (e) {
@@ -128,6 +137,37 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         // console.log("College Student info saved -- written with ID: ", docRef.id);
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
+
+        // Send invitation emails if any emails were provided
+        const schoolName = collegeStudentData.schoolAttending || '';
+        if (collegeStudentData.collegeStudentEmails && Array.isArray(collegeStudentData.collegeStudentEmails) && collegeStudentData.collegeStudentEmails.length > 0) {
+            try {
+                const sendSESEmail = httpsCallable(getFunctions(), 'sendSESEmail');
+                const validEmails = collegeStudentData.collegeStudentEmails.filter(email => email && email.trim());
+                const emailSubject = schoolName
+                    ? `${collegeStudentData.userName} invited you to join ${schoolName}'s network on Launchpad!`
+                    : `${collegeStudentData.userName} invited you to join Launchpad!`;
+
+                for (const email of validEmails) {
+                    try {
+                        await sendSESEmail({
+                            recipient: [email],
+                            subject: emailSubject,
+                            htmlTemplate: parentInvitationTemplate({
+                                studentName: collegeStudentData.userName || 'A Launchpad user',
+                                schoolName: schoolName,
+                            }),
+                            emailType: "invitation"
+                        });
+                        console.log('Invitation email sent to:', email);
+                    } catch (emailError) {
+                        console.error('Error sending invitation email to', email, ':', emailError);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in invitation email process:', error);
+            }
+        }
 
         // await updateTypesense('users', currentUser.uid, dataToSave);
 
@@ -163,6 +203,37 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
 
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
+
+        // Send invitation emails if any emails were provided
+        const schoolName = professionalData.schoolAttending || '';
+        if (professionalData.professionalEmails && Array.isArray(professionalData.professionalEmails) && professionalData.professionalEmails.length > 0) {
+            try {
+                const sendSESEmail = httpsCallable(getFunctions(), 'sendSESEmail');
+                const validEmails = professionalData.professionalEmails.filter(email => email && email.trim());
+                const emailSubject = schoolName
+                    ? `${professionalData.userName} invited you to join ${schoolName}'s network on Launchpad!`
+                    : `${professionalData.userName} invited you to join Launchpad!`;
+
+                for (const email of validEmails) {
+                    try {
+                        await sendSESEmail({
+                            recipient: [email],
+                            subject: emailSubject,
+                            htmlTemplate: parentInvitationTemplate({
+                                studentName: professionalData.userName || 'A Launchpad user',
+                                schoolName: schoolName,
+                            }),
+                            emailType: "invitation"
+                        });
+                        console.log('Invitation email sent to:', email);
+                    } catch (emailError) {
+                        console.error('Error sending invitation email to', email, ':', emailError);
+                    }
+                }
+            } catch (error) {
+                console.error('Error in invitation email process:', error);
+            }
+        }
 
         // await updateTypesense('users', currentUser.uid, dataToSave);
 
@@ -234,6 +305,7 @@ export const saveSixDegreesOnboarding = async (email, password, userData, onSucc
             parentEmails: [],
             userPfpPreview: null,
             userResumePreview: null,
+            openToCrossSchoolConnections: 'yes', // Default to open; can be changed in Settings
         };
 
         // 4. Save to Firestore
@@ -245,6 +317,9 @@ export const saveSixDegreesOnboarding = async (email, password, userData, onSucc
 
         // Track onboarding analytics
         await trackOnboardingSubmission(userData.userName);
+
+        // Show welcome modal on first login
+        localStorage.setItem('showHSWelcomeModal', 'true');
 
         // 6. Call success callback
         onSuccess(user);
@@ -300,10 +375,11 @@ export const packageBasicUserInfoToLS = (userData) => {
         userShortDescription: userShortDescription,
         userHighSchoolType: (userData.userType === "High Schooler") ? userHighSchoolType(userData.graduationYear) : null,
         userSchoolId: userData.schoolId,
-        userSchool: userData.schoolName,
+        userSchool: userData.schoolAttending || userData.schoolName || '',
         isCommitted: (userData.userType === "High Schooler") ? !Array.isArray(userData.collegeInterestsOrDecision) : null,
         // COMMUNITY VERSION: Removed parent verification fields
         parentEmails: (userData.userType === "High Schooler") ? userData.parentEmails : null,
+        openToCrossSchoolConnections: userData.openToCrossSchoolConnections || null,
     };
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));

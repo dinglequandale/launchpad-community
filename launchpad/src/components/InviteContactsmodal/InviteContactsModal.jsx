@@ -9,6 +9,7 @@ import './InviteContactsModal.css';
 export default function InviteContactsModal({ visibility, onClose, userName }) {
   const [recipients, setRecipients] = useState([{ id: 0, userName: "", email: "" }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const schoolName = JSON.parse(localStorage.getItem("basicUserInfo") || '{}').userSchool || '';
 
   const handleInputChange = (key, value, id) => {
     setRecipients(recipients.map((recipient) =>
@@ -61,7 +62,7 @@ export default function InviteContactsModal({ visibility, onClose, userName }) {
 
     // Send invitations in background (fire-and-forget)
     const sendInvitations = httpsCallable(getFunctions(), "sendInviteEmail");
-    sendInvitations({ recipientData: recipientDataToSend, senderName: userName })
+    sendInvitations({ recipientData: recipientDataToSend, senderName: userName, schoolName })
       .then(() => {
         toast.success(`Successfully sent ${inviteCount} invitation${inviteCount > 1 ? 's' : ''}!`);
       })

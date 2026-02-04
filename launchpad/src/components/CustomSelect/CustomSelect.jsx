@@ -84,23 +84,23 @@ export default function CustomSelect({
   const handleOptionSelect = (option) => {
     if (isMulti) {
       const currentValues = Array.isArray(value) ? value : [];
-      const optionValue = typeof option === 'string' ? option : option.label || option.value;
-      
-      if (currentValues.includes(optionValue)) {
+      const optionLabel = typeof option === 'string' ? option : option.label || option.value;
+
+      if (currentValues.includes(optionLabel)) {
         // Remove if already selected
-        const newValues = currentValues.filter(v => v !== optionValue);
+        const newValues = currentValues.filter(v => v !== optionLabel);
         onChange(newValues);
       } else {
         // Add if not selected
-        const newValues = [...currentValues, optionValue];
+        const newValues = [...currentValues, optionLabel];
         onChange(newValues);
       }
       // Clear search input for multiselect but keep dropdown open
       setInputValue('');
       setSearchQuery('');
     } else {
-      const optionValue = typeof option === 'string' ? option : option.label || option.value;
-      onChange(optionValue);
+      const optionLabel = typeof option === 'string' ? option : option.label || option.value;
+      onChange(optionLabel);
       setIsOpen(false);
       setSearchQuery('');
       setInputValue('');
@@ -312,20 +312,16 @@ export default function CustomSelect({
                 {filteredOptions.map((option, index) => {
                   const optionLabel = getOptionLabel(option);
                   const optionValue = getOptionValue(option);
-                  const isSelected = isMulti
-                    ? Array.isArray(value) && value.some(v => {
-                        if (typeof v === 'string' && typeof option === 'string') {
-                          return v === option;
-                        } else if (typeof v === 'object' && v !== null && typeof option === 'object' && option !== null) {
-                          return (v.value || v.label) === (option.value || option.label);
-                        }
+                  const matchValues = (a, b) => {
+                        if (typeof a === 'string' && typeof b === 'string') return a === b;
+                        if (typeof a === 'object' && a !== null && typeof b === 'object' && b !== null) return (a.value || a.label) === (b.value || b.label);
+                        if (typeof a === 'string' && typeof b === 'object' && b !== null) return a === b.value || a === b.label;
+                        if (typeof a === 'object' && a !== null && typeof b === 'string') return a.value === b || a.label === b;
                         return false;
-                      })
-                    : (typeof value === 'string' && typeof option === 'string'
-                        ? value === option
-                        : typeof value === 'object' && value !== null && typeof option === 'object' && option !== null
-                        ? (value.value || value.label) === (option.value || option.label)
-                        : false);
+                      };
+                  const isSelected = isMulti
+                    ? Array.isArray(value) && value.some(v => matchValues(v, option))
+                    : matchValues(value, option);
                   const isFocused = index === focusedIndex;
 
                   return (

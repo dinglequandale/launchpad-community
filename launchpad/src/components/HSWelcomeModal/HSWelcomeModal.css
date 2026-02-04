@@ -1,0 +1,171 @@
+.hs-welcome-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+  animation: hsWelcomeFadeIn 0.3s ease;
+}
+
+.hs-welcome-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  animation: hsWelcomeSlideUp 0.3s ease-out;
+}
+
+.hs-welcome-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.05);
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6b7280;
+  z-index: 10;
+}
+
+.hs-welcome-close-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: #111827;
+}
+
+.hs-welcome-content {
+  padding: 40px 32px 32px;
+  text-align: center;
+}
+
+.hs-welcome-emoji {
+  font-size: 48px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.hs-welcome-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 16px 0;
+}
+
+.hs-welcome-message {
+  font-size: 15px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0 0 8px 0;
+  text-align: center;
+}
+
+.hs-welcome-message:last-of-type {
+  margin-bottom: 24px;
+}
+
+.hs-welcome-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.hs-welcome-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.hs-welcome-option:hover {
+  border-color: #1976d2;
+  background: #eff6ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+}
+
+.hs-welcome-option:active {
+  transform: translateY(0);
+}
+
+.hs-welcome-option-icon {
+  color: #1976d2;
+  flex-shrink: 0;
+}
+
+.hs-welcome-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hs-welcome-option-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.hs-welcome-option-desc {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.hs-welcome-footnote {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+@keyframes hsWelcomeFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hsWelcomeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .hs-welcome-modal {
+    max-width: 100%;
+    margin: 0 16px;
+  }
+
+  .hs-welcome-content {
+    padding: 36px 24px 28px;
+  }
+
+  .hs-welcome-title {
+    font-size: 20px;
+  }
+
+  .hs-welcome-close-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

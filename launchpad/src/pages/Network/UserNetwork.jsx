@@ -132,14 +132,19 @@ export default function UserNetwork() {
   }
 
   // COMMUNITY VERSION: Removed parentVerified - no longer needed without parent verification system
-  const { userType, isCommitted } = JSON.parse(localStorage.getItem("basicUserInfo"));
+  const basicUserInfo = JSON.parse(localStorage.getItem("basicUserInfo"));
+  const { userType, isCommitted } = basicUserInfo;
+  const crossSchoolPref = basicUserInfo.openToCrossSchoolConnections;
+  const isCommunityOnly = crossSchoolPref === 'no' ||
+    (crossSchoolPref && crossSchoolPref.toLowerCase().includes('my school community only')) ||
+    (crossSchoolPref && crossSchoolPref.toLowerCase().includes('no, i prefer'));
   const [filters, setFilters] = useState({
     userType: 'Any User',
     collegeInterestsOrDecision: userType === "High Schooler" ? "Any College" : null,
     // Default to "My Interests" to show relevant users
     areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
     networkingLevel: 'Any Availability',
-    schoolAttending: 'Any High School',
+    schoolAttending: isCommunityOnly ? null : 'Any High School',
   });
   const [filterChanged, setFilterChanged] = useState(false);
 
@@ -150,9 +155,11 @@ export default function UserNetwork() {
       collegeInterestsOrDecision:  (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]),
       areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
       networkingLevel: ["Any Availability", "Casual Connection", "General Inquiries", "Short Interview", "Project Support", "Mock Interview", "Workplace Opportunities"],
-      schoolAttending: ["Any High School", "My High School", ...dynamicHighSchools.map(school => school.label)],
+      ...(isCommunityOnly ? {} : {
+        schoolAttending: ["Any High School", "My High School", ...dynamicHighSchools.map(school => school.label)],
+      }),
     };
-    console.log('🔄 Network filterContent updated. High schools in filter:', content.schoolAttending.length);
+    console.log('🔄 Network filterContent updated. High schools in filter:', content.schoolAttending?.length ?? 'hidden');
     return content;
   }, [dynamicHighSchools, isCommitted, userType]);
 
@@ -296,7 +303,7 @@ export default function UserNetwork() {
       // Reset to "My Interests" to show relevant users
       areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
       networkingLevel: 'Any Availability',
-      schoolAttending: 'Any High School',
+      schoolAttending: isCommunityOnly ? null : 'Any High School',
     });
     setFilterChanged(true);
   };
