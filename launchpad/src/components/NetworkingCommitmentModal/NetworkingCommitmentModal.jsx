@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { CgClose } from "react-icons/cg";
 import { editUserData } from "../../services/userProfileServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import "./NetworkingCommitmentModal.css";
@@ -20,14 +19,6 @@ export default function NetworkingCommitmentModal({ onClose, userData }) {
     const handleSave = async () => {
         await editUserData({
             networkingLevel: selectedOptions,
-            hasSeenNetworkingCommitmentPopup: true
-        }, currentUser, userData);
-        onClose();
-    };
-
-    const handleSkip = async () => {
-        // Mark as seen even if skipped
-        await editUserData({
             hasSeenNetworkingCommitmentPopup: true
         }, currentUser, userData);
         onClose();
@@ -70,9 +61,6 @@ export default function NetworkingCommitmentModal({ onClose, userData }) {
         <div className="networking-modal-overlay" onClick={(e) => e.stopPropagation()}>
             <div className="networking-modal-container">
                 <div className="networking-modal-header">
-                    <button className="networking-modal-close-btn" onClick={handleSkip}>
-                        <CgClose size={20} />
-                    </button>
                     <h2 className="networking-modal-title">Welcome to Launchpad! 🎉</h2>
                     <p className="networking-modal-subtitle">Help us understand how you'd like to mentor students</p>
                 </div>
@@ -113,12 +101,6 @@ export default function NetworkingCommitmentModal({ onClose, userData }) {
                 </div>
 
                 <div className="networking-modal-footer">
-                    <button
-                        className="networking-btn-secondary"
-                        onClick={handleSkip}
-                    >
-                        Skip for now
-                    </button>
                     <button
                         className="networking-btn-primary"
                         onClick={handleSave}

@@ -42,24 +42,6 @@
     position: relative;
 }
 
-.networking-modal-close-btn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    background: transparent;
-    border: none;
-    color: #6b7280;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-.networking-modal-close-btn:hover {
-    background: #f3f4f6;
-    color: #111827;
-}
-
 .networking-modal-title {
     font-size: 24px;
     font-weight: 700;
@@ -172,23 +154,6 @@
     display: flex;
     gap: 12px;
     justify-content: flex-end;
-}
-
-.networking-btn-secondary {
-    padding: 10px 20px;
-    background: white;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    color: #374151;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
-}
-
-.networking-btn-secondary:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
 }
 
 .networking-btn-primary {
