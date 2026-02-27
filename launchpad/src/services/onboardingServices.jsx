@@ -380,6 +380,9 @@ export const packageBasicUserInfoToLS = (userData) => {
         // COMMUNITY VERSION: Removed parent verification fields
         parentEmails: (userData.userType === "High Schooler") ? userData.parentEmails : null,
         openToCrossSchoolConnections: userData.openToCrossSchoolConnections || null,
+        // Society membership — required so editUserData routes writes to the correct collection
+        societyPrimary: userData.societyPrimary || null,
+        societies: userData.societies || null,
     };
 
     localStorage.setItem("basicUserInfo", JSON.stringify(basicUserInfo));
