@@ -4,18 +4,27 @@ import { BsBackpack } from 'react-icons/bs';
 import { BiBriefcase } from 'react-icons/bi';
 import { LuGraduationCap } from 'react-icons/lu';
 import { GrOrganization } from 'react-icons/gr';
+import { useSociety } from '../../contexts/SocietyContext';
+import { getSocietyConfig } from '../../utils/subdomainUtils';
 
 export default function UserType() {
     const navigate = useNavigate();
+    const { currentSociety } = useSociety();
+    const societyConfig = currentSociety ? getSocietyConfig(currentSociety) : null;
     const [selectedOption, setSelectedOption] = useState(() => localStorage.getItem('userType') || '');
     const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-    const userTypes = [
+    const allUserTypes = [
         { id: 'highschool', label: 'High Schooler', icon: <BsBackpack size={25}/> },
         { id: 'college', label: 'College Student', icon: <LuGraduationCap size={30}/> },
         { id: 'professional', label: 'Professional', icon: <BiBriefcase size={25}/> },
         // { id: 'staff', label: 'Staff', icon: <GrOrganization size={25}/> },
     ];
+
+    // Filter user types based on society config
+    const userTypes = societyConfig
+        ? allUserTypes.filter(type => societyConfig.userTypes.includes(type.label))
+        : allUserTypes;
 
     const handleUserTypeSelection = (userType) => {
         setSelectedOption(userType);
@@ -38,9 +47,9 @@ export default function UserType() {
                 <div className='onboarding-body'>
                     <header className="onboarding-header">
                         <div className="onboarding-logo-container">
-                            <img 
-                                src="/assets/launchpad_logo_v2.png" 
-                                alt="Launchpad Logo" 
+                            <img
+                                src={societyConfig?.logo || "/assets/launchpad_logo_v2.png"}
+                                alt={societyConfig ? `${societyConfig.shortName} Logo` : "Launchpad Logo"}
                                 className="onboarding-logo"
                             />
                         </div>

@@ -8,10 +8,16 @@ import { useAuth } from "./contexts/auth/AuthContext";
 import MobileBlocker from "./contexts/MobileBlocker";
 import LegalityFooter from "./components/Legality Footer/LegalityFooter";
 import LandingPageRevamped from "./pages/landing_page/LandingPageRevamped";
+import HSFSLandingPage from "./pages/Societies/HSFS/HSFSLandingPage";
+import { useSociety } from "./contexts/SocietyContext";
 // import { ConnectionProvider } from "./contexts/ConnectionContext";
 
 function App() {
-  // TODO: later input logic for this boolean to check whether user finished onboarding
+  const { currentSociety } = useSociety();
+
+  if (currentSociety === 'hsfs') {
+    return <HSFSLandingPage />;
+  }
 
   return (
     // <MobileBlocker>

@@ -133,9 +133,31 @@ export const getSchoolConfig = (subdomain) => {
     },
   };
 
-  const config = configs[subdomain] || configs.default;
-  
-  return config;
+  // Check for society configs first
+  if (configs[subdomain]) {
+    return configs[subdomain];
+  }
+
+  return configs.default;
+};
+
+// Society-specific configuration
+export const getSocietyConfig = (societyId) => {
+  const societyConfigs = {
+    hsfs: {
+      societyId: "hsfs",
+      isSociety: true,
+      name: "Houston Finance Society",
+      shortName: "HSFS",
+      networkName: "HSFS Network",
+      logo: "", // Placeholder until HSFS logo is provided
+      tagline: "Connecting Houston's Young Finance Leaders",
+      contactEmail: "houstonstudentfinancesociety@gmail.com",
+      userTypes: ["High Schooler", "Professional"], // Only 2 user types
+    },
+  };
+
+  return societyConfigs[societyId] || null;
 };
 
 export const useSchoolConfig = () => {

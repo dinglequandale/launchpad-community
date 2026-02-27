@@ -3,7 +3,7 @@ import { Outlet, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext';
 import { useStreamConnection } from '../Streamchat/chatFunctions/setUpUser';
 import PageLoading from '../components/LoadingAnimation/PageLoading';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../firebase/firebaseConfig';
 import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from '../services/onboardingServices';
 import { getConnectionsByStatus } from '../services/connectionService';
@@ -144,14 +144,34 @@ function GlobalAuthWrapper() {
         const userRef = doc(db, 'users', currentUser.uid);
         async function initializeApp() {
           if (currentUser && !isConnected) {
-            unsubscribe = onSnapshot(userRef, (doc) => {
-              if (!doc.exists()) {
+            unsubscribe = onSnapshot(userRef, async (docSnap) => {
+              if (!docSnap.exists()) {
                 navigate("/Onboarding");
                 return;
               }
 
-              packageBasicUserInfoToLS(doc.data());
-              pushInitialProfileCompletion(doc.data());
+              let data = docSnap.data();
+
+              // Set active society from user's societies field
+              if (data.societies && data.societies.length > 0) {
+                const primarySociety = data.societyPrimary || data.societies[0];
+                localStorage.setItem('activeSociety', primarySociety);
+              }
+
+              // For society users, fetch full data from society subcollection
+              if (data.societyPrimary) {
+                try {
+                  const societyDoc = await getDoc(doc(db, 'societies', data.societyPrimary, 'users', currentUser.uid));
+                  if (societyDoc.exists()) {
+                    data = societyDoc.data();
+                  }
+                } catch (err) {
+                  console.error('Error fetching society user data:', err);
+                }
+              }
+
+              packageBasicUserInfoToLS(data);
+              pushInitialProfileCompletion(data);
 
               // connections population logic
               fetchAndStoreConnections();

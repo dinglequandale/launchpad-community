@@ -12,9 +12,27 @@ const normalizeCrossSchoolPref = (val) => {
     return val;
 };
 
-export async function getFilteredData(collectionName, filters, currentUserId, category = null, lastDoc = null, maxLimit = 6) {
+export async function getFilteredData(collectionName, filters, currentUserId, category = null, lastDoc = null, maxLimit = 6, societyFilter = null) {
     // COMMUNITY VERSION: Removed tenant-based architecture
+    // Determine collection type for filter logic (handles subcollection paths like 'societies/hsfs/opportunities')
+    const isOpportunities = collectionName === 'opportunities' || collectionName.endsWith('/opportunities');
+    const isUsers = collectionName === 'users' || collectionName.endsWith('/users');
+
+    // Detect if querying a society-specific subcollection (e.g. 'societies/hsfs/users').
+    // Society members store custom interest labels (e.g. HSFS finance industries) that don't
+    // exist in the generic careerInterests map, so we must not run getExtendedInterests on them.
+    const societyIdInPath = (() => {
+        const parts = collectionName.split('/');
+        if (parts[0] === 'societies' && parts.length === 3) return parts[1];
+        return null;
+    })();
+
     let q = collection(db, collectionName);
+
+    // Apply society filter if specified (e.g., 'hsfs' for HSFS society)
+    if (societyFilter) {
+        q = query(q, where('societies', 'array-contains', societyFilter));
+    }
 
     const {userInterests, userColleges, userHS, userCity, userCollege, userType, openToCrossSchoolConnections } = await getUserData("areasOfInterest", currentUserId);
 
@@ -29,19 +47,27 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
         if (key === "areasOfInterestOrExpertise") {
             // Handle interest filtering - this field maps to areasOfInterest in user data
             if (value.includes("My Interests") || value.includes("My Fields of Expertise")) {
-                const userInterestsExtended = getExtendedInterests(userInterests);
-                
-                if (collectionName === "opportunities") {
-                    arrayFilters.push({ key: "organizationTags", operation: "array-contains-any", value: userInterestsExtended });
-                } else {
-                    arrayFilters.push({ key: "areasOfInterest", operation: "array-contains-any", value: userInterestsExtended });
+                // Society-specific subcollections (e.g. HSFS) store custom interest labels
+                // (e.g. "Banking", "Capital Markets & Investment Banking") that have no
+                // equivalent in the generic careerInterests group map. Use them directly.
+                // Standard collections use getExtendedInterests to broaden matches within groups.
+                const interestValues = societyIdInPath
+                    ? (userInterests || [])
+                    : getExtendedInterests(userInterests);
+
+                if (interestValues.length > 0) {
+                    if (isOpportunities) {
+                        arrayFilters.push({ key: "organizationTags", operation: "array-contains-any", value: interestValues });
+                    } else {
+                        arrayFilters.push({ key: "areasOfInterest", operation: "array-contains-any", value: interestValues });
+                    }
                 }
                 return null; // Don't apply this filter directly
             } else if (Array.isArray(value)) {
                 // Handle specific interest selections
                 const specificInterests = value.filter(v => !v.includes("My") && !v.includes("Any"));
                 if (specificInterests.length > 0) {
-                    if (collectionName === "opportunities") {
+                    if (isOpportunities) {
                         arrayFilters.push({ key: "organizationTags", operation: "array-contains-any", value: specificInterests });
                     } else {
                         arrayFilters.push({ key: "areasOfInterest", operation: "array-contains-any", value: specificInterests });
@@ -152,7 +178,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     });
   
     // Add category filter if specified
-    if (category && collectionName === "users") {
+    if (category && isUsers) {
         console.log('[filteringServices] ⚠️  QUERYING FOR userType ==', category);
         q = query(q, where('userType', '==', category));
         q = query(q, orderBy('userName'));
@@ -227,7 +253,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     }
 
     // Filter professionals based on cross-school connection preferences
-    if (collectionName === "users" && (category === "Professional" || !category)) {
+    if (isUsers && (category === "Professional" || !category)) {
         results = results.filter(user => {
             if (user.userType !== "Professional") return true;
             const pref = normalizeCrossSchoolPref(user.openToCrossSchoolConnections);
@@ -238,7 +264,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     }
 
     // Filter college students based on cross-school connection preferences
-    if (collectionName === "users" && (category === "College Student" || !category)) {
+    if (isUsers && (category === "College Student" || !category)) {
         const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
         const currentUserCollege = currentUserDoc.exists() ? currentUserDoc.data().collegeAttending : null;
 
@@ -252,7 +278,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     }
 
     // Filter high schoolers based on cross-school connection preferences
-    if (collectionName === "users" && (category === "High Schooler" || !category)) {
+    if (isUsers && (category === "High Schooler" || !category)) {
         results = results.filter(user => {
             if (user.userType !== "High Schooler") return true;
             const pref = normalizeCrossSchoolPref(user.openToCrossSchoolConnections);
@@ -265,7 +291,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     // Reverse filter: if the CURRENT user has openToCrossSchoolConnections === 'no',
     // restrict what they can see to users from their own school community
     const normalizedCurrentPref = normalizeCrossSchoolPref(openToCrossSchoolConnections);
-    if (collectionName === "users" && normalizedCurrentPref === 'no') {
+    if (isUsers && normalizedCurrentPref === 'no') {
         results = results.filter(user => {
             if (user.userId === currentUserId || user.id === currentUserId) return true;
 
@@ -290,7 +316,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     }
 
     // Filter opportunities based on owner's cross-school connection preferences
-    if (collectionName === "opportunities") {
+    if (isOpportunities) {
         // Fetch all unique creator IDs and current user data
         const creatorIds = [...new Set(results.map(opp => opp.createdBy).filter(id => id))];
         const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
@@ -338,7 +364,7 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
 
     // Reverse filter for opportunities: if current user has 'no', only show opportunities
     // from creators in their school community
-    if (collectionName === "opportunities" && normalizedCurrentPref === 'no') {
+    if (isOpportunities && normalizedCurrentPref === 'no') {
         const creatorIds = [...new Set(results.map(opp => opp.createdBy).filter(id => id))];
         if (creatorIds.length > 0) {
             const creatorDataPromises = creatorIds.map(async (creatorId) => {
@@ -382,8 +408,8 @@ export async function getFilteredData(collectionName, filters, currentUserId, ca
     try {
         const originalInterests = new Set(userInterests);
         results.sort((a, b) => {
-            const aInterests = collectionName === "opportunities" ? (a.organizationTags || []) : (a.areasOfInterest || []);
-            const bInterests = collectionName === "opportunities" ? (b.organizationTags || []) : (b.areasOfInterest || []);
+            const aInterests = isOpportunities ? (a.organizationTags || []) : (a.areasOfInterest || []);
+            const bInterests = isOpportunities ? (b.organizationTags || []) : (b.areasOfInterest || []);
 
             const aMatches = aInterests.filter(tag => originalInterests.has(tag)).length;
             const bMatches = bInterests.filter(tag => originalInterests.has(tag)).length;

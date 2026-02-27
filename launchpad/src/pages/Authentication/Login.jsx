@@ -9,9 +9,13 @@ import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from "../../se
 import { doc, getDoc } from "firebase/firestore";
 import { db, auth } from "../../firebase/firebaseConfig";
 import { getConnectionsByStatus } from "../../services/connectionService";
+import { useSociety } from "../../contexts/SocietyContext";
+import { getSocietyConfig } from "../../utils/subdomainUtils";
 
 export default function Login(){
     const { userLoggedIn, currentUser } = useAuth();
+    const { currentSociety } = useSociety();
+    const societyConfig = currentSociety ? getSocietyConfig(currentSociety) : null;
     const navigate = useNavigate();
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
@@ -123,6 +127,19 @@ export default function Login(){
                 // Run profile completion logic for existing users
                 await runProfileCompletionLogic(loadedUserData);
 
+                // Check if this is an existing Launchpad user joining HSFS for the first time.
+                // If activeSociety is 'hsfs' but the loaded profile has no HSFS membership,
+                // route them to the lightweight HSFS enrollment page instead of Home.
+                const isHSFSActive = currentSociety === 'hsfs';
+                const isAlreadyHSFS =
+                    loadedUserData?.societyPrimary === 'hsfs' ||
+                    (Array.isArray(loadedUserData?.societies) && loadedUserData.societies.includes('hsfs'));
+
+                if (isHSFSActive && !isAlreadyHSFS) {
+                    navigate('/hsfs-join');
+                    return;
+                }
+
                 // Check if user was trying to access a specific page before logging in
                 const intendedDestination = sessionStorage.getItem('intendedDestination');
                 if (intendedDestination) {
@@ -187,6 +204,17 @@ export default function Login(){
                 // Run profile completion logic for existing users
                 await runProfileCompletionLogic(loadedUserData);
 
+                // Same HSFS detection as email/password login
+                const isHSFSActive = currentSociety === 'hsfs';
+                const isAlreadyHSFS =
+                    loadedUserData?.societyPrimary === 'hsfs' ||
+                    (Array.isArray(loadedUserData?.societies) && loadedUserData.societies.includes('hsfs'));
+
+                if (isHSFSActive && !isAlreadyHSFS) {
+                    navigate('/hsfs-join');
+                    return;
+                }
+
                 // Check if user was trying to access a specific page before logging in
                 const intendedDestination = sessionStorage.getItem('intendedDestination');
                 if (intendedDestination) {
@@ -227,14 +255,18 @@ export default function Login(){
                 <div className="auth-body">
                     <header className="auth-header">
                         <div className="auth-logo-container">
-                            <img 
-                                src="/assets/launchpad_logo_v2.png" 
-                                alt="Launchpad Logo" 
+                            <img
+                                src={societyConfig?.logo || "/assets/launchpad_logo_v2.png"}
+                                alt={societyConfig ? `${societyConfig.shortName} Logo` : "Launchpad Logo"}
                                 className="auth-logo"
                             />
                         </div>
-                        <h1 className="auth-title">Welcome back to Launchpad</h1>
-                        <p className="auth-subtitle">Empowering Student Excellence</p>
+                        <h1 className="auth-title">
+                            {societyConfig ? `Welcome back to ${societyConfig.shortName}` : "Welcome back to Launchpad"}
+                        </h1>
+                        <p className="auth-subtitle">
+                            {societyConfig?.tagline || "Empowering Student Excellence"}
+                        </p>
                     </header>
                     
                     <main className="auth-main">

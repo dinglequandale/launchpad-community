@@ -253,8 +253,11 @@ export const getBasicUserDescription = (userData, shortened=true) => {
 
 export const editUserData = async (newData, currentUser, origUserData) => {
     try{
-        // COMMUNITY VERSION: Removed tenant-based architecture
-        const userRef = doc(db, "users", currentUser.uid);
+        // Write to society subcollection if user belongs to a society, otherwise main users collection
+        const societyId = origUserData?.societyPrimary;
+        const userRef = societyId
+            ? doc(db, "societies", societyId, "users", currentUser.uid)
+            : doc(db, "users", currentUser.uid);
         await updateDoc(userRef, newData);
         console.log("Updated user data!!!");
         pushInitialProfileCompletion({... origUserData, ...newData});

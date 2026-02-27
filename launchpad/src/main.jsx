@@ -9,6 +9,7 @@ import Organizations from './pages/Organizationspage/Organizations.jsx';
 import EditProfilePage from './pages/Editprofilepage/EditProfilePage.jsx';
 import Home from './pages/Homepage/Home.jsx';
 import { AuthProvider } from './contexts/auth/AuthContext.jsx';
+import { SocietyProvider } from './contexts/SocietyContext.jsx';
 import { ReportProvider } from './contexts/report/ReportContext.jsx';
 import SignUp from './pages/Authentication/Signup.jsx';
 import Login from './pages/Authentication/Login.jsx';
@@ -39,6 +40,9 @@ import WaitlistPage from './pages/Waitlist/WaitlistPage.jsx';
 import SixDegreeApplicationPage from './pages/SixDegreeApplication/SixDegreeApplicationPage.jsx';
 import SixDegreeOnboardingPage from './pages/SixDegreeOnboarding/SixDegreeOnboardingPage.jsx';
 import Academics from './pages/Academics/Academics.jsx';
+import HSFSLandingPage from './pages/Societies/HSFS/HSFSLandingPage.jsx';
+import HSFSAccessCodePage from './pages/Societies/HSFS/HSFSAccessCodePage.jsx';
+import HSFSJoinPage from './pages/Societies/HSFS/HSFSJoinPage.jsx';
 
 const ErrorPage = () => {
   return (
@@ -226,6 +230,26 @@ const router = createBrowserRouter([
         element: <PrivateKeyPage/>
       },
       {
+        path: '/hsfs',
+        element: <HSFSLandingPage/>
+      },
+      {
+        path: '/hsfs/for-professionals',
+        element: <HSFSLandingPage/>
+      },
+      {
+        path: '/hsfs/for-high-schoolers',
+        element: <HSFSLandingPage/>
+      },
+      {
+        path: '/hsfs-access',
+        element: <HSFSAccessCodePage/>
+      },
+      {
+        path: '/hsfs-join',
+        element: <HSFSJoinPage/>
+      },
+      {
         path: '/Onboarding',
         element: <Onboarding/>
       },
@@ -284,8 +308,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <SocietyProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </SocietyProvider>
   </React.StrictMode>,
 )

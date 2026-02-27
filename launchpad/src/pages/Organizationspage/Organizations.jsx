@@ -18,6 +18,7 @@ import { useModal } from '../../contexts/ModalContext';
 import { populateOpportunitiesCollection } from '../../utils/populateOpportunities';
 import { updateOpportunitiesLocation } from '../../utils/updateOpportunitiesLocation';
 import { seedHighSchools } from '../../utils/seedHighSchools';
+import { useSociety } from "../../contexts/SocietyContext";
 
 const filterContent = {
     organizationType: ["Any Category", "Clubs", "Workplace Opportunities", "Nonprofits", "Businesses", "Community Service", "Leadership"],
@@ -30,6 +31,12 @@ export default function Organizations(){
     const {currentUser} = useAuth();
     const navigate = useNavigate();
     const { openConnectModal, isProfileModalOpen, isConnectModalOpen } = useModal();
+    const { currentSociety } = useSociety();
+
+    // Use society-scoped subcollection when in a society context
+    const opportunitiesCollection = currentSociety
+        ? `societies/${currentSociety}/opportunities`
+        : 'opportunities';
     const [organizationsData, setOrganizationsData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [initLoading, setInitLoading] = useState(false);
@@ -141,7 +148,7 @@ export default function Organizations(){
 
             try {
                 const { results, lastVisible } = await getFilteredData(
-                    'opportunities',
+                    opportunitiesCollection,
                     filters,
                     currentUser.uid,
                     null,

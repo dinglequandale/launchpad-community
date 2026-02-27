@@ -4,9 +4,9 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
 // import { deleteFromTypesense, updateTypesense } from '../typesense/typesenseClient';
 
-export const saveOpportunity = async (opportunityData, organizationLogo, currentUser, isEditing, opportunityId) => {
+export const saveOpportunity = async (opportunityData, organizationLogo, currentUser, isEditing, opportunityId, collectionPath = "opportunities") => {
   // COMMUNITY VERSION: Removed tenant-based architecture
-  const opportunitiesCollectionRef = collection(db, "opportunities");
+  const opportunitiesCollectionRef = collection(db, collectionPath);
   let opportunityRef;
 
   try {
@@ -25,7 +25,7 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
       //     createdAt: new Date(),
       //   });
     } else {
-      opportunityRef = doc(db, "opportunities", opportunityId);
+      opportunityRef = doc(db, collectionPath, opportunityId);
       await updateDoc(opportunityRef, opportunityData);
       // await updateTypesense('opportunities', opportunityId, opportunityData);
     }
@@ -58,9 +58,9 @@ const uploadImage = async (file, opportunityId) => {
   return getDownloadURL(storageRef);
 };
 
-export const loadOpportunities = (user, setLoading, setOpportunities) => {
+export const loadOpportunities = (user, setLoading, setOpportunities, collectionPath = "opportunities") => {
   // COMMUNITY VERSION: Removed tenant-based architecture
-  const opportunitiesRef = collection(db, "opportunities");
+  const opportunitiesRef = collection(db, collectionPath);
   const qUserOpportunity = query(opportunitiesRef, where("createdBy", "==", user.uid));
   
   return onSnapshot(qUserOpportunity, async (querySnapshot) => {
@@ -97,9 +97,9 @@ const loadOpportunityLogo = async (opportunityId) => {
   }
 };
 
-export const handleDeleteOpportunity = async (opportunityId) => {
+export const handleDeleteOpportunity = async (opportunityId, collectionPath = "opportunities") => {
     // COMMUNITY VERSION: Removed tenant-based architecture
-    const opportunityDoc = doc(db, "opportunities", opportunityId);
+    const opportunityDoc = doc(db, collectionPath, opportunityId);
     try {
         await deleteDoc(opportunityDoc);
         // await deleteFromTypesense('opportunities', opportunityId);

@@ -9,11 +9,15 @@ import OnboardingDropdown from "../OnboardingDropdown/OnboardingDropdown";
 import CustomSelect from "../CustomSelect";
 import { editUserData } from "../../services/userProfileServices";
 import { useAuth } from "../../contexts/auth/AuthContext";
+import { useSociety } from "../../contexts/SocietyContext";
+import { HSFS_INDUSTRIES } from "../../utils/hsfsConstants";
 import { CgClose } from "react-icons/cg";
 
 export default function BasicInfoModal({visibility,onClose,userType,userData}){
 
   const {currentUser} = useAuth();
+  const { currentSociety } = useSociety();
+  const isSocietyMember = !!(userData?.societyPrimary);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -167,7 +171,20 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
   // Add safety check for userType
   const safeUserType = userType || "High Schooler"; // Default fallback
 
-  const questionsForUser = basicInfoQuestionsConfig.filter((question) => question.userTypeIncluders.includes(safeUserType));
+  let questionsForUser = basicInfoQuestionsConfig.filter((question) => question.userTypeIncluders.includes(safeUserType));
+
+  // For society members, remove college-related questions and use society-specific interest options
+  if (isSocietyMember) {
+    questionsForUser = questionsForUser.filter(q =>
+      q.id !== "collegeInterestsOrDecision" && q.id !== "collegeAttending" && q.id !== "acceptedColleges"
+    );
+    questionsForUser = questionsForUser.map(q => {
+      if (q.id === "areasOfInterest" && currentSociety === 'hsfs') {
+        return { ...q, options: HSFS_INDUSTRIES };
+      }
+      return q;
+    });
+  }
   
   // Debug logging for college question
   const collegeQuestion = questionsForUser.find(q => q.id === "collegeInterestsOrDecision");
@@ -285,7 +302,7 @@ export default function BasicInfoModal({visibility,onClose,userType,userData}){
               </button>
               <h2 className="v0-modal-title">My Introduction</h2>
               <p className="v0-modal-subtitle">
-                Enlighten us with your {safeUserType==="Professional" ? "expertise" : "interests"} and {safeUserType==="Professional" ? "work experience" : safeUserType==="College Student" ? "education" : "dream colleges"}!
+                Enlighten us with your {safeUserType==="Professional" ? "expertise" : "interests"} and {safeUserType==="Professional" ? "work experience" : safeUserType==="College Student" ? "education" : isSocietyMember ? "school info" : "dream colleges"}!
               </p>
             </div>
             

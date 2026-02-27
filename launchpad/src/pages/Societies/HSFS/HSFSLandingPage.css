@@ -1,0 +1,125 @@
+/* HSFS-specific overrides - extends modern-landing from LandingPage.css */
+
+.hsfs-landing .modern-hero-gradient {
+  background: linear-gradient(135deg, #1a365d 0%, #2c5282 50%, #3182ce 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hsfs-landing .modern-hero-btn-primary {
+  background: linear-gradient(135deg, #1a365d, #2c5282);
+}
+
+.hsfs-landing .modern-hero-btn-primary:hover {
+  background: linear-gradient(135deg, #2c5282, #3182ce);
+}
+
+.hsfs-landing .modern-feature-icon {
+  color: #1a365d;
+  background: rgba(26, 54, 93, 0.08);
+}
+
+.hsfs-landing .modern-cta-button {
+  background: linear-gradient(135deg, #1a365d, #2c5282);
+  color: white;
+}
+
+.hsfs-landing .modern-cta-button:hover {
+  background: linear-gradient(135deg, #2c5282, #3182ce);
+}
+
+/* White text inside the CTA card's access section */
+.modern-cta-card .hsfs-access-section p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.modern-cta-card .hsfs-access-section a {
+  color: white;
+}
+
+/* Subtabs navigation */
+.hsfs-subtabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Reset margin when subtabs are inside the navbar */
+.modern-navbar-container .hsfs-subtabs {
+  margin-bottom: 0;
+}
+
+.hsfs-subtab {
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #4a5568;
+  transition: all 0.3s ease;
+}
+
+.hsfs-subtab:hover {
+  border-color: #1a365d;
+  color: #1a365d;
+}
+
+.hsfs-subtab.active {
+  background: #1a365d;
+  color: white;
+  border-color: #1a365d;
+}
+
+/* Access code section on landing page */
+.hsfs-access-section {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: rgba(26, 54, 93, 0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(26, 54, 93, 0.1);
+  text-align: center;
+}
+
+.hsfs-access-section p {
+  color: #4a5568;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.hsfs-access-section a {
+  color: #2c5282;
+  text-decoration: underline;
+}
+
+/* Vision section */
+.hsfs-vision {
+  padding: 4rem 0;
+  background: rgba(26, 54, 93, 0.02);
+}
+
+.hsfs-vision-card {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.hsfs-vision-card h2 {
+  font-size: 1.5rem;
+  color: #1a365d;
+  margin-bottom: 1rem;
+}
+
+.hsfs-vision-card p {
+  color: #4a5568;
+  line-height: 1.8;
+  font-size: 1rem;
+}

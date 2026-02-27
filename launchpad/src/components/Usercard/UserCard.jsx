@@ -14,6 +14,7 @@ import { useModal } from "../../contexts/ModalContext";
 import { useAuth } from "../../contexts/auth/AuthContext";
 import { isConnectionApproved } from "../../services/connectionService";
 import { useOutletContext } from "react-router-dom";
+import { useSociety } from "../../contexts/SocietyContext";
 
 /**
   Modernized User Card (v0 styling)
@@ -26,6 +27,8 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
   const { currentUser } = useAuth();
   const { openParentalConnectionModal, openConnectModal } = useModal();
   const { chatClient } = useOutletContext();
+  const { currentSociety } = useSociety();
+  const isHSFS = currentSociety === 'hsfs';
 
   const connectionStatus =
     approved.some((conn) => conn.targetUserId === userData.userId || conn.initiateUserId === userData.userId) ||
@@ -42,6 +45,8 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
   };
 
   const descType = () => {
+    // HSFS: High Schoolers show their school, not college data
+    if (isHSFS && userData.userType === 'High Schooler') return 'High School';
     switch (userData.userType) {
       case 'High Schooler':
         return userData.collegeDecision === 'No' ? 'Dream Colleges' : 'Committed College';
@@ -55,6 +60,19 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
   };
 
   const userType = userData.userType;
+
+  const getSecondDescContent = () => {
+    // HSFS: High Schoolers show their high school instead of college info
+    if (isHSFS && userType === 'High Schooler') {
+      return userData.schoolAttending || 'N/A';
+    }
+    if (userType === 'Professional') return userData.industryPosition || 'None';
+    if (userType === 'College Student') return displayColleges([userData.collegeAttending], 'shorter');
+    return Array.isArray(userData.collegeInterestsOrDecision)
+      ? displayColleges([...userData.collegeInterestsOrDecision], 'shorter')
+      : displayColleges([userData.collegeInterestsOrDecision]);
+  };
+
   const basicInfoContent = {
     userPreface: userType === 'College Student' ? getBasicUserDescription(userData) : getBasicUserDescription(userData).split(' in ')[0],
     userFirstDesc: {
@@ -66,14 +84,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
     },
     userSecondDesc: {
       label: descType(),
-      content:
-        userType === 'Professional'
-          ? userData.industryPosition || 'None'
-          : userType === 'College Student'
-          ? displayColleges([userData.collegeAttending], 'shorter')
-          : Array.isArray(userData.collegeInterestsOrDecision)
-          ? displayColleges([...userData.collegeInterestsOrDecision], 'shorter')
-          : displayColleges([userData.collegeInterestsOrDecision]),
+      content: getSecondDescContent(),
     },
   };
 

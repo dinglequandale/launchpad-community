@@ -4,6 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import { useAuth } from '../../contexts/auth/AuthContext';
 import { useModal } from '../../contexts/ModalContext';
+import { useSociety } from '../../contexts/SocietyContext';
 import { useReport } from '../../contexts/report/ReportContext';
 import { displayFieldsOfInterest } from '../../services/userProfileServices';
 import { stableLinkCheck } from '../../services/opportunityServices';
@@ -22,6 +23,12 @@ export default function OrganizationPage() {
   const { openApplyModal, openConnectModal } = useModal();
   const { setReportVisibility, setReportTarget, setReportedUser, setShowReportUserName } = useReport();
   const { chatClient } = useOutletContext() || {};
+  const { currentSociety } = useSociety();
+
+  // Use society-scoped subcollection when in a society context
+  const opportunitiesCollection = currentSociety
+    ? `societies/${currentSociety}/opportunities`
+    : 'opportunities';
 
   const [organization, setOrganization] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -64,7 +71,7 @@ export default function OrganizationPage() {
 
       try {
         setLoading(true);
-        const orgDoc = await getDoc(doc(db, 'opportunities', organizationId));
+        const orgDoc = await getDoc(doc(db, opportunitiesCollection, organizationId));
 
         if (orgDoc.exists()) {
           const orgData = { id: organizationId, ...orgDoc.data() };

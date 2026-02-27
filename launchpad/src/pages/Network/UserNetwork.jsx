@@ -28,6 +28,9 @@ import { loadHighSchools } from "../../services/highSchoolService";
 import { motion } from 'framer-motion';
 import { FaUserFriends } from 'react-icons/fa';
 import InviteContactsModal from "../../components/InviteContactsmodal/InviteContactsModal";
+import { useSociety } from "../../contexts/SocietyContext";
+import { getSocietyConfig } from "../../utils/subdomainUtils";
+import { HSFS_INDUSTRIES, HSFS_SCHOOLS } from "../../utils/hsfsConstants";
 // import { checkConnection } from "../../services/connectionService";
 
 
@@ -37,11 +40,14 @@ export default function UserNetwork() {
 
   const {currentUser} = useAuth();
   const navigate = useNavigate();
+  const { currentSociety } = useSociety();
+  const societyConfig = currentSociety ? getSocietyConfig(currentSociety) : null;
+  const isHSFS = currentSociety === 'hsfs';
 
   const { chatClient, isConnected } = useOutletContext();
 
-  // COMMUNITY VERSION: Generic network name instead of school-specific
-  const pageName = "Launchpad Network";
+  // Use society-specific network name if available
+  const pageName = societyConfig?.networkName || "Launchpad Network";
 
   // COMMUNITY VERSION: Removed tenantId - no longer needed without multi-tenant architecture
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -150,6 +156,15 @@ export default function UserNetwork() {
 
   // Make filterContent reactive to dynamicHighSchools changes
   const filterContent = useMemo(() => {
+    if (isHSFS) {
+      // HSFS: Only 2 user types, HSFS-specific schools and industries
+      return {
+        userType: ["Any User", "Professionals", "High Schoolers"],
+        areasOfInterestOrExpertise: [`My ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`, `Any ${userType === "Professional" ? "Fields of Expertise" : "Interests"}`],
+        networkingLevel: ["Any Availability", "Casual Connection", "General Inquiries", "Short Interview", "Project Support", "Mock Interview", "Workplace Opportunities"],
+        schoolAttending: ["Any High School", "My High School", ...HSFS_SCHOOLS.map(school => school.label)],
+      };
+    }
     const content = {
       userType: ["Any User", "Professionals", "College Students", "High Schoolers"],
       collegeInterestsOrDecision:  (!isCommitted ? ["Any College", "My Dream Colleges"] : ["Any College", "My College"]),
@@ -161,7 +176,7 @@ export default function UserNetwork() {
     };
     console.log('🔄 Network filterContent updated. High schools in filter:', content.schoolAttending?.length ?? 'hidden');
     return content;
-  }, [dynamicHighSchools, isCommitted, userType]);
+  }, [dynamicHighSchools, isCommitted, userType, isHSFS]);
 
   useEffect(()=>{
     setOverallLoading(true);
@@ -209,12 +224,21 @@ export default function UserNetwork() {
       // Only fetch user types based on the userType filter
       if (filters.userType === 'Any User') {
           console.log('Fetching all user types');
-          await Promise.all([
-              fetchUserType('High Schooler'),
-              fetchUserType('College Student'),
-              fetchUserType('Professional'),
-              // fetchUserType('Staff')
-          ]);
+          if (isHSFS) {
+              // HSFS: Only fetch High Schoolers and Professionals
+              setCollegeStudents([]);
+              await Promise.all([
+                  fetchUserType('High Schooler'),
+                  fetchUserType('Professional'),
+              ]);
+          } else {
+              await Promise.all([
+                  fetchUserType('High Schooler'),
+                  fetchUserType('College Student'),
+                  fetchUserType('Professional'),
+                  // fetchUserType('Staff')
+              ]);
+          }
       } else {
           console.log('Fetching specific user type:', filters.userType);
           // Map filter values to actual user types
@@ -224,7 +248,7 @@ export default function UserNetwork() {
               'Professionals': 'Professional',
               // 'Staff': 'Staff'
           };
-          
+
           const targetUserType = userTypeMap[filters.userType];
           if (targetUserType) {
               console.log('Target user type:', targetUserType);
@@ -233,7 +257,7 @@ export default function UserNetwork() {
               if (targetUserType !== 'College Student') setCollegeStudents([]);
               if (targetUserType !== 'Professional') setProfessionals([]);
               // if (targetUserType !== 'Staff') setStaff([]);
-              
+
               await fetchUserType(targetUserType);
           }
       }
@@ -243,8 +267,11 @@ export default function UserNetwork() {
       setLoading(prev => ({ ...prev, [category]: true }));
       console.log(`[UserNetwork] Fetching ${category} with filters:`, filters);
       try {
+          const usersCollection = currentSociety
+              ? `societies/${currentSociety}/users`
+              : 'users';
           const { results, lastVisible } = await getFilteredData(
-              'users',
+              usersCollection,
               filters,
               currentUser.uid,
               category,
@@ -345,11 +372,18 @@ export default function UserNetwork() {
     e.preventDefault();
     if (queryText) {
       // COMMUNITY VERSION: No tenantId needed for search
-      const searchResults = await searchDocuments('users', queryText, currentUser.uid);
+      let searchResults = await searchDocuments('users', queryText, currentUser.uid);
+
+      // Filter search results to only include society members if in a society
+      if (currentSociety) {
+        searchResults = searchResults.filter(result =>
+          result.societies && result.societies.includes(currentSociety)
+        );
+      }
+
       setAllVisibleUserData(searchResults);
-      // COMMUNITY VERSION: Removed parentVerified filter from search results
       setHighSchoolers(searchResults.filter((result) => result.userType === "High Schooler"));
-      setCollegeStudents(searchResults.filter((result) => result.userType === "College Student"));
+      setCollegeStudents(isHSFS ? [] : searchResults.filter((result) => result.userType === "College Student"));
       setProfessionals(searchResults.filter((result) => result.userType === "Professional"));
     }
   };
@@ -427,13 +461,14 @@ export default function UserNetwork() {
             <TopBar isSidebarCollapsed={isSidebarCollapsed}/>
             <SideNav/>
             <div className={`networkContainer ${isSidebarCollapsed ? 'network-sidebar-collapsed' : 'network-sidebar-expanded'}`} id="networkContainer">
-              <SearchBar 
-  filters={filterContent} 
+              <SearchBar
+  filters={filterContent}
   currentFilters={filters}
-  pageName={pageName} 
-  handleFilterChange={handleFilterChange} 
+  pageName={pageName}
+  handleFilterChange={handleFilterChange}
   handleSearch={handleSearch}
   clearAllFilters={clearAllFilters}
+  societyInterestOptions={isHSFS ? HSFS_INDUSTRIES.map(i => i.label) : null}
 />
               <div className="v0-network-content">
                 {allVisibleUserData && allVisibleUserData.length > 0 ? (

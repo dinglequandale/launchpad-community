@@ -8,9 +8,13 @@ import emailData from "../../json_data/studentEmailData.json";
 import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from "../../services/onboardingServices";
 import { getConnectionsByStatus } from "../../services/connectionService";
 import { capitalizeFirstLetter } from "../Homepage/Home";
+import { useSociety } from "../../contexts/SocietyContext";
+import { getSocietyConfig } from "../../utils/subdomainUtils";
 
 export default function SignUp(){
     const { userLoggedIn } = useAuth();
+    const { currentSociety } = useSociety();
+    const societyConfig = currentSociety ? getSocietyConfig(currentSociety) : null;
     const [userEmail, setUserEmail] = useState("");
     const [userPassword, setUserPassword] = useState("");
     const [confirmedPassword, setConfirmedPassword] = useState("");
@@ -133,13 +137,15 @@ export default function SignUp(){
                 <div className="auth-body">
                     <header className="auth-header">
                         <div className="auth-school-branding">
-                            <img 
-                                src="/assets/launchpad_logo.png" 
-                                alt="Launchpad Logo" 
+                            <img
+                                src={societyConfig?.logo || "/assets/launchpad_logo.png"}
+                                alt={societyConfig ? `${societyConfig.shortName} Logo` : "Launchpad Logo"}
                                 className="auth-school-logo"
                             />
                             {/* <h1 className="auth-title">Launchpad Network</h1> */}
-                            <p className="auth-subtitle">Your journey beyond the classroom starts here</p>
+                            <p className="auth-subtitle">
+                                {societyConfig?.tagline || "Your journey beyond the classroom starts here"}
+                            </p>
                         </div>
                         <div className="auth-powered-by">
                             <span>Powered by Launchpad Networks</span>

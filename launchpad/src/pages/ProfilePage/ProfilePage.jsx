@@ -76,10 +76,19 @@ export default function ProfilePage() {
 
       try {
         setLoading(true);
-        const userDoc = await getDoc(doc(db, 'users', userId));
+        let userDoc = await getDoc(doc(db, 'users', userId));
+        let data = userDoc.exists() ? userDoc.data() : null;
 
-        if (userDoc.exists()) {
-          setUserData({ id: userId, userId: userId, ...userDoc.data() });
+        // If user belongs to a society, fetch full data from society subcollection
+        if (data?.societyPrimary) {
+          const societyDoc = await getDoc(doc(db, 'societies', data.societyPrimary, 'users', userId));
+          if (societyDoc.exists()) {
+            data = societyDoc.data();
+          }
+        }
+
+        if (data) {
+          setUserData({ id: userId, userId: userId, ...data });
         } else {
           setError('User not found');
         }

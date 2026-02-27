@@ -15,6 +15,7 @@ import InitiativeModal from '../Profilemodals/Initiativemodal/InitiativeModal';
 import DeleteWarningModal from '../DeleteWarningmodal/DeleteWarningModal';
 import AvailabilityModal from '../Profilemodals/Availabilitymodal/AvailabilityModal';
 import { useAuth } from '../../contexts/auth/AuthContext';
+import { useSociety } from '../../contexts/SocietyContext';
 import { handleDeleteOpportunity, loadOpportunities } from '../../services/opportunityServices';
 import Loading from '../LoadingAnimation/Loading';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -44,6 +45,7 @@ export default function EditProfileCard({ isSidebarCollapsed }) {
     const [showConnectionsModal, setShowConnectionsModal] = useState(false);
 
     const { currentUser } = useAuth();
+    const { currentSociety } = useSociety();
     const [loading, setLoading] = useState(false);
     
     const [opportunitiesData, setOpportunitiesData] = useState([]);
@@ -74,8 +76,10 @@ export default function EditProfileCard({ isSidebarCollapsed }) {
         setLoading(true);
 
         if (currentUser) {
-            // COMMUNITY VERSION: Removed tenant-based architecture
-            const userDocRef = doc(db, 'users', currentUser.uid);
+            // Use society subcollection for society members, main collection otherwise
+            const userDocRef = currentSociety
+                ? doc(db, 'societies', currentSociety, 'users', currentUser.uid)
+                : doc(db, 'users', currentUser.uid);
             unsubscribe = onSnapshot(userDocRef, (doc) => {
                 if (doc.exists()) {
                     setUserData(doc.data());
@@ -118,9 +122,12 @@ export default function EditProfileCard({ isSidebarCollapsed }) {
         alum: "Do you currently lead an out-of-school student initiative, such as a nonprofit?",
         professional: "Do you currently have an available workplace opportunity at your organization for high school or college students?"
     };
+    const isSocietyMember = !!(userData?.societyPrimary);
+
     const descType = () => {
         switch(userData.userType){
             case "High Schooler":
+                if (isSocietyMember) return "High School";
                 return userData.collegeDecision === "No" ? "Dream Colleges" : "Committed College";
             case "College Student":
                 return "College Attending";
@@ -742,7 +749,23 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
             sponsoredClubs = {desc1: "Sponsored Clubs", desc2: userData.sponsoredClubs}
         } else {
             userFirstDesc = {desc1: `Fields of ${userType !== "Professional" ? "Interest" : "Expertise"}`, desc2: (userData.areasOfInterest && userData.areasOfInterest.length > 0) ? displayFieldsOfInterest(userData.areasOfInterest, "longer") : ""};
-            userSecondDesc = {desc1: `${descType}`, desc2: `${userType === "Professional" ? userData.industryPosition : userType === "College Student" ? (userData.collegeAttending ? displayColleges([userData.collegeAttending]) : "Not specified") : Array.isArray(userData.collegeInterestsOrDecision) ? (userData.collegeInterestsOrDecision && userData.collegeInterestsOrDecision.length > 0 ? displayColleges([...userData.collegeInterestsOrDecision]) : "Not specified") : (userData.collegeInterestsOrDecision ? displayColleges([userData.collegeInterestsOrDecision]) : "Not specified")}`};
+
+            // Determine second description based on user type
+            let secondDescValue;
+            if (userType === "Professional") {
+                secondDescValue = userData.industryPosition || "Not specified";
+            } else if (userData.societyPrimary && userType === "High Schooler") {
+                // Society high schoolers show their school, not college info
+                secondDescValue = userData.schoolAttending || "Not specified";
+            } else if (userType === "College Student") {
+                secondDescValue = userData.collegeAttending ? displayColleges([userData.collegeAttending]) : "Not specified";
+            } else {
+                // Regular high schoolers show college info
+                secondDescValue = Array.isArray(userData.collegeInterestsOrDecision)
+                    ? (userData.collegeInterestsOrDecision.length > 0 ? displayColleges([...userData.collegeInterestsOrDecision]) : "Not specified")
+                    : (userData.collegeInterestsOrDecision ? displayColleges([userData.collegeInterestsOrDecision]) : "Not specified");
+            }
+            userSecondDesc = {desc1: `${descType}`, desc2: secondDescValue};
         }
         setBasicInfoContent({
             userPreface: getBasicUserDescription(userData, false),
@@ -812,11 +835,11 @@ function BasicInfoCard({descType, basicInfoModalVisibility, setBasicInfoModalVis
                 <span><span style={{fontWeight: "500"}}>{basicInfoContent.userFirstDesc.desc1}</span>: {basicInfoContent.userFirstDesc.desc2}</span>
                 <div className="v0-college-info-container">
                     {userData.userType !== "Staff" && <span><span style={{fontWeight: "500"}}>{basicInfoContent.userSecondDesc.desc1}</span>: {basicInfoContent.userSecondDesc.desc2}</span>}
-                    {userData.userType === "High Schooler" && userData.collegeDecision === "No" && (
+                    {!userData.societyPrimary && userData.userType === "High Schooler" && userData.collegeDecision === "No" && (
                         <DreamUniversitiesPrivacyToggle />
                     )}
                 </div>
-                {userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
+                {!userData.societyPrimary && userData.acceptedColleges && userData.acceptedColleges.length > 0 && <><span><span style={{fontWeight: "bolder"}}>{basicInfoContent.acceptedColleges.desc1}</span>: {basicInfoContent.acceptedColleges.desc2}</span></>}
                 {userData.sponsoredClubs && <><span><span style={{fontWeight: "500"}}>{basicInfoContent.sponsoredClubs.desc1}</span>: {basicInfoContent.sponsoredClubs.desc2}</span></>}
             </div>
 

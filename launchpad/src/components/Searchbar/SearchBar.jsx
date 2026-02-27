@@ -6,7 +6,7 @@ import { CiSearch } from "react-icons/ci";
 import { capitalizeFirstLetter } from '../../pages/Homepage/Home';
 import { careerInterests, cities } from '../../pages/Onboarding/Options';
 
-export default function SearchBar({filters, currentFilters = null, pageName, handleFilterChange, handleSearch, clearAllFilters}) {
+export default function SearchBar({filters, currentFilters = null, pageName, handleFilterChange, handleSearch, clearAllFilters, societyInterestOptions = null}) {
     const searchType = () => {
         switch(pageName){
             case `The ${capitalizeFirstLetter(localStorage.getItem("schoolId"))} Network`: 
@@ -82,7 +82,12 @@ export default function SearchBar({filters, currentFilters = null, pageName, han
     // Enhanced filter content with specific interests and colleges
     const getEnhancedFilterContent = (filterKey, currentContent) => {
         if (filterKey === 'areasOfInterestOrExpertise') {
-            // Add specific career interests from Options.jsx
+            if (societyInterestOptions) {
+                // Society mode: only show the society's custom interest options (e.g. HSFS finance industries).
+                // Do NOT mix in generic careerInterests — they are irrelevant for society members.
+                return [...currentContent, ...societyInterestOptions];
+            }
+            // Standard mode: add all generic career interests from Options.jsx
             const specificInterests = careerInterests.map(ci => ci.label);
             return [
                 ...currentContent,
