@@ -1,4 +1,5 @@
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const functions = require('firebase-functions');
 const { requireAuth, toHttpsError } = require('../utils/security');
 const {
@@ -49,7 +50,7 @@ exports.processUnsubscribe = functions.https.onCall(async (data) => {
             if (t.used) {
                 throw new functions.https.HttpsError('failed-precondition', 'Unsubscribe token has already been used');
             }
-            tx.update(tokenRef, { used: true, usedAt: admin.firestore.FieldValue.serverTimestamp() });
+            tx.update(tokenRef, { used: true, usedAt: FieldValue.serverTimestamp() });
             return t;
         });
 

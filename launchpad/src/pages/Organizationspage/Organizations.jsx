@@ -229,9 +229,9 @@ export default function Organizations(){
         setIsSearching(false);
         if (queryText) {
             // COMMUNITY VERSION: No tenantId needed for search
-            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText, currentUser.uid);
+            // Search the same collection the page lists (society-scoped for HSFS).
+            const searchResults = await searchDocuments(opportunitiesCollection, queryText, currentUser.uid);
             setOrganizationsData(searchResults);
-            console.log(searchResults);
         }
     };
 

@@ -10,6 +10,7 @@
  */
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { Timestamp } = require('firebase-admin/firestore');
 
 if (!admin.apps.length) {
     admin.initializeApp();
@@ -88,7 +89,7 @@ async function enforceRateLimit(key, { limit, windowSeconds, cost = 1 }) {
         tx.set(ref, {
             count: used + cost,
             // Lets a Firestore TTL policy on `expiresAt` clean these up automatically.
-            expiresAt: admin.firestore.Timestamp.fromMillis((windowId + 2) * windowSeconds * 1000),
+            expiresAt: Timestamp.fromMillis((windowId + 2) * windowSeconds * 1000),
         }, { merge: true });
     });
 }

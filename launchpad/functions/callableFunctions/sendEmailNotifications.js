@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { requireAuth, sanitizeHeader, enforceRateLimit, toHttpsError } = require('../utils/security');
 const {
     generateUnsubscribeLink,
@@ -83,7 +84,7 @@ exports.sendEmailNotifications = functions.https.onCall(async (data, context) =>
                 html: newMessageEmailTemplate(recipientName, senderName, preview, unsubscribeLink),
             },
             from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             provider: 'mailgun',
             emailType: 'new_message',

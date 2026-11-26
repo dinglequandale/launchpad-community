@@ -3,8 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
 import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
 import CustomSelect from '../../components/CustomSelect';
-import { algoliaClient } from '../../services/searchClient';
-// import {algoliasearch} from 'algoliasearch/lite';
+import { searchColleges } from '../../services/collegeSearch';
 import Loading from '../../components/LoadingAnimation/Loading';
 import { loadHighSchools, addHighSchool } from '../../services/highSchoolService';
 import toast from 'react-hot-toast';
@@ -204,60 +203,19 @@ const careerInterests = [
   {"value": "visual_arts", "label": "Visual Arts", "group": "Arts & Humanities"}
 ]
 
-const client = algoliaClient;
 
 const graduationYears = [];
 for (let year = 2030; year >= 1990; year--) {
     graduationYears.push({ value: year, label: year.toString() });
 }
 
-// Refactored getColleges to be a regular async function instead of a hook
+// College lookup is now local (bundled IPEDS list); the Algolia index it used is gone.
 const getColleges = async (searchQuery = '') => {
-  if (searchQuery.length < 1) {
-    // Return some popular colleges as default results when no search query
-    try {
-      const {results} = await client.search({
-        requests: [{ indexName: 'colleges', query: '', hitsPerPage: 5 }],
-      });
-      const hits = results[0].hits;
-      const colleges = hits.map(hit => ({
-        label: hit.label,
-        value: hit.value || hit.objectID, // Fallback to Algolia's ID
-      }));
-      
-      // If no results from empty search, try with a common term to get some colleges
-      if (colleges.length === 0) {
-        const fallbackResults = await client.search({
-          requests: [{ indexName: 'colleges', query: 'university', hitsPerPage: 5 }],
-        });
-        const fallbackHits = fallbackResults.results[0].hits;
-        const fallbackColleges = fallbackHits.map(hit => ({
-          label: hit.label,
-          value: hit.value || hit.objectID,
-        }));
-        return { colleges: fallbackColleges, loading: false };
-      }
-      
-      return { colleges, loading: false };
-    } catch (error) {
-      console.error('Algolia search error:', error);
-      // Fallback to empty array if search fails
-      return { colleges: [], loading: false };
-    }
-  }
-
   try {
-    const {results} = await client.search({
-      requests: [{ indexName: 'colleges', query: searchQuery, hitsPerPage: 5 }],
-    });
-    const hits = results[0].hits;
-    const colleges = hits.map(hit => ({
-      label: hit.label,
-      value: hit.value || hit.objectID, // Fallback to Algolia's ID
-    }));
-    return { colleges, loading: false };
+    const names = await searchColleges(searchQuery);
+    return { colleges: names.map((name) => ({ label: name, value: name })), loading: false };
   } catch (error) {
-    console.error('Algolia search error:', error);
+    console.error('College search error:', error);
     return { colleges: [], loading: false };
   }
 };
@@ -295,13 +253,17 @@ const CollegeSearch = ({ selectedOptions, handleChange, isMultiSelect = false, s
     }
 
     setLoading(true);
-    const searchColleges = async () => {
+    const runSearch = async () => {
       const { colleges } = await getColleges(inputValue);
-      setOptions(colleges);
+      const typed = inputValue.trim();
+      const exact = colleges.some((c) => c.label.toLowerCase() === typed.toLowerCase());
+      // Never leave the user stuck: offer exactly what they typed as a choice.
+      // (Its label must contain the typed text, because CustomSelect filters on it.)
+      setOptions(exact || !typed ? colleges : [...colleges, { label: typed, value: typed, isCustom: true }]);
       setLoading(false);
     };
 
-    const debouncedSearch = setTimeout(searchColleges, 300);
+    const debouncedSearch = setTimeout(runSearch, 150);
     return () => clearTimeout(debouncedSearch);
   }, [inputValue]);
 

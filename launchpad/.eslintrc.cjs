@@ -33,7 +33,7 @@ module.exports = {
     },
     {
       // One-off admin/seed scripts.
-      files: ['src/utils/populateOpportunities.js', 'src/utils/seedHighSchools.js', 'src/utils/updateOpportunitiesLocation.js'],
+      files: ['src/utils/populateOpportunities.js', 'src/utils/seedHighSchools.js', 'src/utils/updateOpportunitiesLocation.js', 'rules-tests/**'],
       env: { node: true },
     },
   ],

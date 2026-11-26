@@ -46,5 +46,25 @@ clients cannot write to that collection.
 
 ## Search
 
-Search is served by Algolia with a **search-only** key. The old self-hosted Typesense server
-(and its `populate` script) has been removed from this repository.
+Search is in-house; there is no external search service.
+- **People and opportunities:** each document carries a `searchTokens` array (word prefixes of
+  its searchable fields), maintained by Cloud Functions (`functions/triggers/searchIndex.js`).
+  The client queries it with `array-contains` (`src/services/searchServices.jsx`), so reads go
+  through the normal security rules.
+- **Colleges:** a bundled list from the U.S. Department of Education IPEDS directory
+  (`src/data/colleges.json`, loaded lazily) searched locally (`src/services/collegeSearch.js`);
+  users can also type a school that is not listed.
+
+To (re)build the index for existing data, create a document in Firestore from the console:
+`admin_tasks/<any id>` with `{ type: "rebuildSearchIndex" }`. The function writes its status and
+counts back to that document.
+
+## Tests
+
+Requires Java 11+ and the Firebase CLI.
+
+```bash
+cd launchpad
+npm run test:rules       # Firestore + Storage security rules (emulators)
+npm run test:functions   # end-to-end Cloud Functions tests (emulators)
+```

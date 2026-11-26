@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const {
     generateUnsubscribeLink,
     isUnsubscribed,
@@ -121,7 +122,7 @@ exports.onConnectionCreated = functions.firestore
                     html: emailHtml,
                 },
                 from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                createdAt: FieldValue.serverTimestamp(),
                 status: 'pending',
                 provider: 'mailgun',
                 emailType: 'connection_request',
@@ -220,7 +221,7 @@ exports.onConnectionStatusUpdated = functions.firestore
                         html: emailHtml,
                     },
                     from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
-                    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                    createdAt: FieldValue.serverTimestamp(),
                     status: 'pending',
                     provider: 'mailgun',
                     emailType: 'connection_accepted',

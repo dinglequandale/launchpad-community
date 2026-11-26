@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue, Timestamp } = require('firebase-admin/firestore');
 const { escapeHtml, requireAdmin, toHttpsError } = require('../utils/security');
 const { isUnsubscribed } = require('../utils/unsubscribe');
 
@@ -163,8 +164,8 @@ async function runGraduationEmails({ testMode = false } = {}) {
             email: recipient.email,
             userName: recipient.userName || null,
             schoolName: recipient.schoolName || null,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            expiresAt: admin.firestore.Timestamp.fromMillis(Date.now() + TOKEN_TTL_MS),
+            createdAt: FieldValue.serverTimestamp(),
+            expiresAt: Timestamp.fromMillis(Date.now() + TOKEN_TTL_MS),
             used: false,
             emailType: 'graduation',
             transitionType: recipient.transitionType,
@@ -182,7 +183,7 @@ async function runGraduationEmails({ testMode = false } = {}) {
                 ),
             },
             from: FROM_ADDRESS,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             provider: 'mailgun',
             emailType: 'graduation',
@@ -203,7 +204,7 @@ async function runGraduationEmails({ testMode = false } = {}) {
         year: currentYear,
         eligibleCount: recipients.length,
         recipientsCount: sent,
-        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        sentAt: FieldValue.serverTimestamp(),
         testMode,
         breakdown,
     });
@@ -251,7 +252,7 @@ exports.sendMigrationReminders = functions.https.onCall(async (data, context) =>
         const snapshot = await db.collection('migration_tokens')
             .where('used', '==', false)
             .where('emailType', '==', 'graduation')
-            .where('createdAt', '<=', admin.firestore.Timestamp.fromDate(cutoffDate))
+            .where('createdAt', '<=', Timestamp.fromDate(cutoffDate))
             .get();
 
         let sent = 0;
@@ -274,14 +275,14 @@ exports.sendMigrationReminders = functions.https.onCall(async (data, context) =>
                     ),
                 },
                 from: FROM_ADDRESS,
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                createdAt: FieldValue.serverTimestamp(),
                 status: 'pending',
                 provider: 'mailgun',
                 emailType: 'migration_reminder',
                 userId: tokenData.userId,
                 migrationToken: doc.id,
             });
-            await doc.ref.update({ reminderSentAt: admin.firestore.FieldValue.serverTimestamp() });
+            await doc.ref.update({ reminderSentAt: FieldValue.serverTimestamp() });
             sent++;
         }
 

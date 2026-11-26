@@ -8,6 +8,7 @@
  *   - emailType (legacy)   -> older docs stored a single type; still honoured
  */
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const crypto = require('crypto');
 
 if (!admin.apps.length) {
@@ -28,7 +29,7 @@ async function generateUnsubscribeLink(email, emailType = 'general') {
         emailType,
         expiresAt: Date.now() + TOKEN_TTL_MS,
         used: false,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
     });
     return `${UNSUBSCRIBE_BASE_URL}?token=${token}`;
 }
@@ -55,13 +56,13 @@ async function recordUnsubscribe(email, emailType, tokenUsed) {
     const ref = db().collection('unsubscribed_emails').doc(email.toLowerCase());
     const update = {
         email: email.toLowerCase(),
-        unsubscribedAt: admin.firestore.FieldValue.serverTimestamp(),
+        unsubscribedAt: FieldValue.serverTimestamp(),
         tokenUsed,
     };
     if (!emailType || emailType === 'general') {
         update.all = true;
     } else {
-        update.types = admin.firestore.FieldValue.arrayUnion(emailType);
+        update.types = FieldValue.arrayUnion(emailType);
     }
     await ref.set(update, { merge: true });
 }

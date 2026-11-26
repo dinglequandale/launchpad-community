@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { google } = require('googleapis');
 const { requireAdmin, toHttpsError } = require('../utils/security');
 
@@ -48,7 +49,7 @@ exports.onSixDegreeApplicationCreated = functions.firestore
                 await snap.ref.update({
                     syncedToSheets: false,
                     syncError: 'Google Sheets configuration missing',
-                    lastSyncAttempt: admin.firestore.FieldValue.serverTimestamp()
+                    lastSyncAttempt: FieldValue.serverTimestamp()
                 });
                 return;
             }
@@ -151,7 +152,7 @@ exports.onSixDegreeApplicationCreated = functions.firestore
             // Update Firestore document to mark as synced
             await snap.ref.update({
                 syncedToSheets: true,
-                syncedAt: admin.firestore.FieldValue.serverTimestamp()
+                syncedAt: FieldValue.serverTimestamp()
             });
 
             console.log(`Successfully synced 6 degree application ${applicationId} to Google Sheets`);
@@ -163,7 +164,7 @@ exports.onSixDegreeApplicationCreated = functions.firestore
             await snap.ref.update({
                 syncedToSheets: false,
                 syncError: error.message,
-                lastSyncAttempt: admin.firestore.FieldValue.serverTimestamp()
+                lastSyncAttempt: FieldValue.serverTimestamp()
             });
         }
     });

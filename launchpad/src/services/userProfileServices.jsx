@@ -261,7 +261,6 @@ export const editUserData = async (newData, currentUser, origUserData) => {
         console.log("Updated user data!!!");
         pushInitialProfileCompletion({... origUserData, ...newData});
 
-        // await updateTypesense('users', currentUser.uid, {... origUserData, ...newData});
     }catch(error){console.log(error)};
 }
 

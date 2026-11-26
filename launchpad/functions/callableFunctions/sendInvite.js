@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const {
     escapeHtml,
     sanitizeHeader,
@@ -226,7 +227,7 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
                     html: emailTemplate,
                 },
                 from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                createdAt: FieldValue.serverTimestamp(),
                 status: 'pending',
                 provider: 'mailgun',
                 emailType: 'invitation',
@@ -247,7 +248,7 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
             recipientsCount: recipientData.length,
             recipients: recipientData.map(r => ({ name: r.userName, email: r.email })),
             emailIds: emailIds,
-            sentAt: admin.firestore.FieldValue.serverTimestamp(),
+            sentAt: FieldValue.serverTimestamp(),
             status: 'pending'
         });
 

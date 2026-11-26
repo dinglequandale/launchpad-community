@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { google } = require('googleapis');
 const { requireAdmin, toHttpsError } = require('../utils/security');
 
@@ -90,7 +91,7 @@ exports.onWaitlistEntryCreated = functions.firestore
             // Update Firestore document to mark as synced
             await snap.ref.update({
                 syncedToSheets: true,
-                syncedAt: admin.firestore.FieldValue.serverTimestamp()
+                syncedAt: FieldValue.serverTimestamp()
             });
 
             console.log(`Successfully synced waitlist entry ${waitlistId} to Google Sheets`);
@@ -102,7 +103,7 @@ exports.onWaitlistEntryCreated = functions.firestore
             await snap.ref.update({
                 syncedToSheets: false,
                 syncError: error.message,
-                lastSyncAttempt: admin.firestore.FieldValue.serverTimestamp()
+                lastSyncAttempt: FieldValue.serverTimestamp()
             });
         }
     });

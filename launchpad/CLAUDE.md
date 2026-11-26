@@ -255,8 +255,6 @@ VITE_STORAGE_BUCKET=     # Firebase Storage Bucket
 VITE_MESSAGING_SENDER_ID=# Firebase Messaging Sender ID
 VITE_APP_ID=             # Firebase App ID
 VITE_STREAM_API_KEY=     # Stream Chat API Key
-VITE_ALGOLIA_APP_ID=     # Algolia Search App ID
-VITE_ALGOLIA_SEARCH_KEY= # Algolia Search API Key
 ```
 
 ## Migration Context
@@ -280,7 +278,11 @@ This codebase contains extensive "COMMUNITY VERSION" comments marking changes fr
 ## Testing
 
 ### Running Tests
-Currently no automated test suite. Manual testing recommended for:
+- `npm run test:rules` -- Firestore/Storage rules against the emulators (`rules-tests/*.test.mjs`)
+- `npm run test:functions` -- Cloud Functions end-to-end against the emulators
+  (`rules-tests/functions.integration.mjs`; needs `functions/.env.local`, see `functions/.env.example`)
+
+Both need Java 11+ and the Firebase CLI. Manual testing still recommended for:
 - User onboarding flow for all four user types
 - Connection creation and approval
 - Stream Chat initialization
@@ -323,13 +325,20 @@ Never loosen a rule "temporarily" for a data migration -- run migrations with th
 
 4. **localStorage Usage**: Connection states are cached in localStorage for performance. Clear on logout or data changes.
 
-5. **User-supplied links**: always pass them through `src/utils/safeUrl.js`
+5. **Search**: there is no external search service. `searchTokens` (maintained by
+   `functions/triggers/searchIndex.js`) + `array-contains` queries; client tokenizer in
+   `src/utils/searchTokens.js` must match `functions/utils/searchTokens.js`. Colleges come from
+   the bundled `src/data/colleges.json`. Use `FieldValue`/`Timestamp` from
+   `firebase-admin/firestore` in functions (the namespaced `admin.firestore.FieldValue` is
+   undefined in the emulator).
+
+6. **User-supplied links**: always pass them through `src/utils/safeUrl.js`
    (`toSafeHttpUrl`, `openExternalUrl`, `toSafeMailto`) before using them in `href` or
    `window.open` -- React 18 still executes `javascript:` URLs.
 
-6. **College Student vs Alumni**: Frontend may still reference "Alumni" in old code. Prefer "College Student" in new code.
+7. **College Student vs Alumni**: Frontend may still reference "Alumni" in old code. Prefer "College Student" in new code.
 
-7. **Email System**: All emails use Firebase Auto Send + MailGun. Never use Gmail OAuth2 (legacy system).
+8. **Email System**: All emails use Firebase Auto Send + MailGun. Never use Gmail OAuth2 (legacy system).
 
 ## File Organization
 

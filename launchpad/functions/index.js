@@ -23,6 +23,7 @@ const {onConnectionCreated, onConnectionStatusUpdated} = require("./triggers/con
 const {onOpportunityCreated} = require("./triggers/opportunityNotifications");
 const {onWaitlistEntryCreated, resyncWaitlistToSheets} = require("./triggers/waitlistSync");
 const {onSixDegreeApplicationCreated, resyncSixDegreeApplicationsToSheets} = require("./triggers/sixDegreeApplicationSync");
+const {indexUserForSearch, indexOpportunityForSearch, indexSocietyOpportunityForSearch, onAdminTaskCreated} = require("./triggers/searchIndex");
 
 // SECURITY: `deleteAuthUsers` (an unauthenticated HTTP endpoint that deleted every
 // Firebase Auth user) has been removed. If it is still deployed, delete it with:
@@ -55,3 +56,9 @@ exports.onWaitlistEntryCreated = onWaitlistEntryCreated;
 exports.resyncWaitlistToSheets = resyncWaitlistToSheets;
 exports.onSixDegreeApplicationCreated = onSixDegreeApplicationCreated;
 exports.resyncSixDegreeApplicationsToSheets = resyncSixDegreeApplicationsToSheets;
+
+// In-house search index (replaces Algolia/Typesense)
+exports.indexUserForSearch = indexUserForSearch;
+exports.indexOpportunityForSearch = indexOpportunityForSearch;
+exports.indexSocietyOpportunityForSearch = indexSocietyOpportunityForSearch;
+exports.onAdminTaskCreated = onAdminTaskCreated;

@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { requireAuth, enforceRateLimit, toHttpsError } = require('../utils/security');
 
 if (!admin.apps.length) {
@@ -110,14 +111,19 @@ exports.redeemSocietyAccessCode = functions.https.onCall(async (data, context) =
 
             const today = todayKey();
             tx.update(societyRef, {
-                last_used: admin.firestore.FieldValue.serverTimestamp(),
-                usages_count: admin.firestore.FieldValue.increment(1),
-                [`daily_usage_tracker.${today}`]: admin.firestore.FieldValue.increment(1),
+                last_used: FieldValue.serverTimestamp(),
+                usages_count: FieldValue.increment(1),
+                // Keys look like "11/26/2026" (the historical format); "/" is not allowed in a
+                // dotted field path, so rewrite the map (safe: we read it in this transaction).
+                daily_usage_tracker: {
+                    ...(society.daily_usage_tracker || {}),
+                    [today]: ((society.daily_usage_tracker && society.daily_usage_tracker[today]) || 0) + 1,
+                },
             });
             tx.set(grantRef, {
                 uid,
                 keyType: result.keyType,
-                grantedAt: admin.firestore.FieldValue.serverTimestamp(),
+                grantedAt: FieldValue.serverTimestamp(),
             });
             return { success: true, alreadyMember: false };
         });

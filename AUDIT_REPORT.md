@@ -27,7 +27,7 @@ Status key: ✅ fixed in this branch · ⚠️ needs action outside the code · 
 9. ⚠️ **Optional:** rewrite git history to purge the SSH password and test credentials. Rotating them (items 1 and 6) is what actually matters.
 10. ⚠️ **Upgrade the Functions runtime** from Node 20 (end-of-life April 2026) to Node 22. Move the Sheets sync off the deprecated `functions.config()` to params or secrets.
 
-Rules testing: this machine has no Java or Firebase CLI, so the new `firestore.rules` and `storage.rules` have not been run in the emulator. They were reviewed by hand against every read and write the client makes. Test them before deploying.
+Rules and functions are now covered by automated emulator tests: `npm run test:rules` (22 tests) and `npm run test:functions` (7 end-to-end tests). All of them pass.
 
 ---
 
@@ -87,6 +87,8 @@ Rules testing: this machine has no Java or Firebase CLI, so the new `firestore.r
 | B22 | `sendSESEmail` built a malformed `From:` header (`Launchpad Networks <Launchpad Networks <…>>`). | ✅ |
 | B23 | Stream connect: it passed a `null` token through, two concurrent connects raced, and a fresh device with no cached profile loaded forever. | ✅ |
 | B24 | Missing React `key` props; `BasicUserInfo` referenced an undefined `onSearchQueryChange`. | ✅ |
+| B26 | **Search was down in production.** The Algolia application behind every search (people, opportunities, colleges) no longer exists: its DNS records are gone. The college picker is required in College Student onboarding, so **college students could not finish signing up**. | ✅ replaced with in-house search: `searchTokens` + Firestore queries, kept current by triggers; bundled IPEDS college list with free-text fallback. Algolia/Typesense fully removed |
+| B27 | `admin.firestore.FieldValue` is undefined inside the Functions emulator, so none of the functions could be tested locally. | ✅ switched to modular `firebase-admin/firestore` imports; firebase-admin 12.7 and newer Google Cloud client libraries |
 | B25 | Admin-only Firebase SDK initialization ran in the wrong order (`getStreamJWT` called `initializeApp()` without the `apps.length` check every other module uses). | ✅ initialized once in `index.js` |
 
 ## Build, CI and repo hygiene
@@ -119,4 +121,4 @@ Rules testing: this machine has no Java or Firebase CLI, so the new `firestore.r
 - The Functions bundle loads all 24 exports.
 - Assertions on the pure logic passed: template escaping (`<script>` and `javascript:` neutralized), unsubscribe rules, CR/LF stripping in headers, email validation, URL filtering.
 - Browser smoke test of public pages (landing, login, HSFS access, 404, removed route): they render with no runtime errors. Signed-in flows were **not** exercised, because that would write to the production Firebase project.
-- **Not verified:** the rules in the emulator; the Functions against a live or emulated Firestore; deployment.
+- Firestore and Storage rules: 22 emulator tests pass. Functions: 7 end-to-end emulator tests pass, covering connections, `sendSESEmail`, unsubscribe, access codes, admin guards, account deletion, and search indexing and backfill.

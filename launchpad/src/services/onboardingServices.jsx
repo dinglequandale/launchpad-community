@@ -84,7 +84,6 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
             }
         }
 
-        // await updateTypesense('users', currentUser.uid, dataToSave);
 
         // Track onboarding analytics
         await trackOnboardingSubmission(highSchoolerData.userName);
@@ -153,7 +152,6 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
             }
         }
 
-        // await updateTypesense('users', currentUser.uid, dataToSave);
 
         // Track onboarding analytics
         await trackOnboardingSubmission(collegeStudentData.userName);
@@ -220,7 +218,6 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
             }
         }
 
-        // await updateTypesense('users', currentUser.uid, dataToSave);
 
         // Track onboarding analytics
         await trackOnboardingSubmission(professionalData.userName);
@@ -246,7 +243,6 @@ export const saveStaff = async (currentUser, staffData, onSuccess) => {
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
 
-        // await updateTypesense('users', currentUser.uid, dataToSave);
 
         // Track onboarding analytics
         await trackOnboardingSubmission(staffData.userName);

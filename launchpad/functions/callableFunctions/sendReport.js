@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { escapeHtml, sanitizeHeader, enforceRateLimit, toHttpsError } = require('../utils/security');
 
 exports.sendReport = functions.https.onCall(async (data, context) => {
@@ -114,7 +115,7 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
                 html: emailTemplate,
             },
             from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             provider: 'mailgun',
             emailType: 'report',
@@ -130,7 +131,7 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
             reportTarget: reportTarget,
             reportReason: reportReason,
             reporterId: context.auth.uid,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             emailId: emailDoc.id
         });

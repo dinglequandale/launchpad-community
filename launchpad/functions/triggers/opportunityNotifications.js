@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const {
     generateUnsubscribeLink,
     isUnsubscribed,
@@ -217,7 +218,7 @@ exports.onOpportunityCreated = functions.firestore
                         html: emailHtml,
                     },
                     from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
-                    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                    createdAt: FieldValue.serverTimestamp(),
                     status: 'pending',
                     provider: 'mailgun',
                     emailType: 'opportunity_match',

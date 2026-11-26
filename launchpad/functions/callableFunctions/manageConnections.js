@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { requireAuth, enforceRateLimit, toHttpsError } = require('../utils/security');
 
 if (!admin.apps.length) {
@@ -116,7 +117,7 @@ async function createConnection(currentUserId, targetUserId) {
         initiateUserId: currentUserId,
         targetUserId,
         status: 'pending',
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
     });
 
     return {
@@ -184,7 +185,7 @@ async function approveConnection(currentUserId, connectionId) {
         }
         tx.update(connectionRef, {
             status: 'approved',
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: FieldValue.serverTimestamp(),
         });
     });
 

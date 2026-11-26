@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { escapeHtml, sanitizeHeader, enforceRateLimit, toHttpsError } = require('../utils/security');
 
 const ALLOWED_FEEDBACK_TYPES = new Set(['Bug', 'Inconvenience', 'Suggestion', 'Other']);
@@ -166,7 +167,7 @@ exports.sendFeedback = functions.https.onCall(async (data, context) => {
                 html: emailTemplate,
             },
             from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             provider: 'mailgun',
             emailType: 'feedback',
@@ -186,7 +187,7 @@ exports.sendFeedback = functions.https.onCall(async (data, context) => {
             userId: context.auth.uid,
             userName: userName,
             userEmail: userEmail,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             emailId: emailDoc.id
         });

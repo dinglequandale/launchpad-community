@@ -88,6 +88,8 @@ service cloud.firestore {
     match /unsubscribe_tokens/{id}    { allow read, write: if false; }
     match /unsubscribed_emails/{id}   { allow read, write: if false; }
     match /rate_limits/{id}           { allow read, write: if false; }
+    // Maintenance jobs, created from the Firebase console only (see triggers/searchIndex.js).
+    match /admin_tasks/{id}           { allow read: if isAdmin(); }
 
     // --------------------------------------------------------- high schools
     // User-contributed list: anyone signed in can add a school, nobody can edit.
