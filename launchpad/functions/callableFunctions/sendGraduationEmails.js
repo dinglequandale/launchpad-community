@@ -1,8 +1,10 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { escapeHtml, requireAdmin, toHttpsError } = require('../utils/security');
+const { isUnsubscribed } = require('../utils/unsubscribe');
 
 // Email templates are defined inline to avoid import issues
-const graduationEmailTemplate = (userName, schoolName, migrationLink) => {
+const rawGraduationEmailTemplate = (userName, schoolName, migrationLink) => {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -37,7 +39,7 @@ const graduationEmailTemplate = (userName, schoolName, migrationLink) => {
   `;
 };
 
-const migrationReminderEmailTemplate = (userName, schoolName, migrationLink) => {
+const rawMigrationReminderEmailTemplate = (userName, schoolName, migrationLink) => {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -71,372 +73,226 @@ const migrationReminderEmailTemplate = (userName, schoolName, migrationLink) => 
   `;
 };
 
-// COMMUNITY VERSION: Send graduation emails to High Schoolers transitioning to College Students
-// and College Students transitioning to Professionals
-exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
-    const { testMode = false } = data;
 
-    // Ensure the user is authenticated and has admin privileges
-    if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'Only authenticated users can send graduation emails.');
-    }
+// User-controlled values (names, school names) must be escaped before going into HTML.
+const graduationEmailTemplate = (userName, schoolName, migrationLink) =>
+    rawGraduationEmailTemplate(escapeHtml(userName), escapeHtml(schoolName), escapeHtml(migrationLink));
+const migrationReminderEmailTemplate = (userName, schoolName, migrationLink) =>
+    rawMigrationReminderEmailTemplate(escapeHtml(userName), escapeHtml(schoolName), escapeHtml(migrationLink));
 
-    try {
-        const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth() + 1; // 1-12
+const SITE_URL = 'https://launchpadhouston.com';
+const FROM_ADDRESS = 'Launchpad Networks <no-reply@launchpadhouston.com>';
+const GRADUATION_MONTH = 5; // May
+const TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
-        // Only send graduation emails in May (month 5)
-        if (!testMode && currentMonth !== 5) {
-            return {
-                success: false,
-                message: `Graduation emails are only sent in May. Current month: ${currentMonth}`
-            };
-        }
+const MIGRATION_PATHS = {
+    hs_to_college: 'migrate-to-alumni',
+    college_to_professional: 'migrate-to-professional',
+};
 
-        // COMMUNITY VERSION: Query flat users collection (not tenant-nested)
-        const usersRef = admin.firestore().collection('users');
+function migrationLinkFor(transitionType, token, userId) {
+    const path = MIGRATION_PATHS[transitionType] || MIGRATION_PATHS.hs_to_college;
+    return `${SITE_URL}/${path}?token=${encodeURIComponent(token)}&userId=${encodeURIComponent(userId)}`;
+}
 
-        // Get High Schoolers graduating this year
-        const hsSnapshot = await usersRef
-            .where('userType', '==', 'High Schooler')
-            .where('graduationYear', '==', currentYear.toString())
-            .get();
+/**
+ * Core graduation-email job, shared by the admin callable and the scheduled run.
+ * Idempotent per user per year: a user who already has a graduation token for the
+ * current year is skipped, so re-running the job never double-emails anyone.
+ */
+async function runGraduationEmails({ testMode = false } = {}) {
+    const db = admin.firestore();
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
 
-        // Get College Students graduating this year
-        const collegeSnapshot = await usersRef
-            .where('userType', '==', 'College Student')
-            .where('collegeGraduationYear', '==', currentYear.toString())
-            .get();
-
-        if (hsSnapshot.empty && collegeSnapshot.empty) {
-            return {
-                success: true,
-                message: 'No graduating users found for this year',
-                recipientsCount: 0
-            };
-        }
-
-        const recipients = [];
-        const emailPromises = [];
-
-        // Process High Schoolers -> College Students
-        hsSnapshot.forEach(doc => {
-            const userData = doc.data();
-            if (userData.email) {
-                recipients.push({
-                    userId: doc.id,
-                    email: userData.email,
-                    userName: userData.userName,
-                    schoolAttending: userData.schoolAttending,
-                    graduationYear: userData.graduationYear,
-                    transitionType: 'hs_to_college'
-                });
-            }
-        });
-
-        // Process College Students -> Professionals
-        collegeSnapshot.forEach(doc => {
-            const userData = doc.data();
-            if (userData.email) {
-                recipients.push({
-                    userId: doc.id,
-                    email: userData.email,
-                    userName: userData.userName,
-                    schoolAttending: userData.schoolAttending,
-                    collegeAttending: userData.collegeAttending,
-                    collegeGraduationYear: userData.collegeGraduationYear,
-                    transitionType: 'college_to_professional'
-                });
-            }
-        });
-
-        if (recipients.length === 0) {
-            return {
-                success: true,
-                message: 'No valid email addresses found for graduating users',
-                recipientsCount: 0
-            };
-        }
-
-        // Generate migration links for each recipient
-        for (const recipient of recipients) {
-            const migrationToken = admin.firestore().collection('migration_tokens').doc().id;
-
-            // Different migration links based on transition type
-            const migrationPath = recipient.transitionType === 'hs_to_college'
-                ? 'migrate-to-alumni'
-                : 'migrate-to-professional';
-            const migrationLink = `https://launchpadhouston.com/${migrationPath}?token=${migrationToken}&userId=${recipient.userId}`;
-
-            // Store migration token with expiration (30 days)
-            await admin.firestore().collection('migration_tokens').doc(migrationToken).set({
-                userId: recipient.userId,
-                email: recipient.email,
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-                used: false,
-                emailType: 'graduation',
-                transitionType: recipient.transitionType
-            });
-
-            // Create email document for Mailgun
-            const emailTemplate = graduationEmailTemplate(
-                recipient.userName,
-                recipient.schoolAttending || recipient.collegeAttending,
-                migrationLink
-            );
-
-            const emailDoc = admin.firestore().collection('mail').add({
-                to: recipient.email,
-                message: {
-                    subject: `🎓 Congratulations on Your Graduation! - Update Your Launchpad Profile`,
-                    html: emailTemplate,
-                },
-                from: 'no-reply@launchpadhouston.com',
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                status: 'pending',
-                provider: 'mailgun',
-                emailType: 'graduation',
-                userId: recipient.userId,
-                migrationToken: migrationToken,
-                transitionType: recipient.transitionType
-            });
-
-            emailPromises.push(emailDoc);
-        }
-
-        await Promise.all(emailPromises);
-
-        // Log the graduation email batch
-        await admin.firestore().collection('email_batches').add({
-            type: 'graduation_emails',
-            year: currentYear,
-            recipientsCount: recipients.length,
-            sentAt: admin.firestore.FieldValue.serverTimestamp(),
-            testMode: testMode,
-            breakdown: {
-                hsToCollege: recipients.filter(r => r.transitionType === 'hs_to_college').length,
-                collegeToProfessional: recipients.filter(r => r.transitionType === 'college_to_professional').length
-            }
-        });
-
+    if (!testMode && currentMonth !== GRADUATION_MONTH) {
         return {
-            success: true,
-            message: `Graduation emails queued for ${recipients.length} recipients`,
-            recipientsCount: recipients.length,
-            breakdown: {
-                hsToCollege: recipients.filter(r => r.transitionType === 'hs_to_college').length,
-                collegeToProfessional: recipients.filter(r => r.transitionType === 'college_to_professional').length
-            }
+            success: false,
+            message: `Graduation emails are only sent in May. Current month: ${currentMonth}`,
+            recipientsCount: 0,
         };
-
-    } catch (error) {
-        console.error('Error sending graduation emails:', error);
-        throw new functions.https.HttpsError('internal', 'Error sending graduation emails: ' + error.message);
     }
-});
 
-// Scheduled function to send graduation emails automatically in June
-exports.scheduledGraduationEmails = functions.pubsub.schedule('0 9 1 6 *') // 9 AM on June 1st
-    .timeZone('America/Chicago')
-    .onRun(async (context) => {
-        console.log('Running scheduled graduation emails...');
-        
-        try {
-            // Get all schools
-            const schoolsSnapshot = await admin.firestore().collection('tenants').get();
-            const results = [];
+    const usersRef = db.collection('users');
+    const [hsSnapshot, collegeSnapshot] = await Promise.all([
+        usersRef.where('userType', '==', 'High Schooler').where('graduationYear', '==', currentYear.toString()).get(),
+        usersRef.where('userType', '==', 'College Student').where('collegeGraduationYear', '==', currentYear.toString()).get(),
+    ]);
 
-            for (const schoolDoc of schoolsSnapshot.docs) {
-                const schoolId = schoolDoc.id;
-                console.log(`Processing graduation emails for school: ${schoolId}`);
-                
-                try {
-                    // Call the sendGraduationEmails function for each school
-                    const result = await exports.sendGraduationEmails.run({
-                        schoolId: schoolId,
-                        testMode: false
-                    });
-                    
-                    results.push({
-                        schoolId: schoolId,
-                        success: result.success,
-                        message: result.message,
-                        recipientsCount: result.recipientsCount
-                    });
-                } catch (error) {
-                    console.error(`Error processing school ${schoolId}:`, error);
-                    results.push({
-                        schoolId: schoolId,
-                        success: false,
-                        error: error.message
-                    });
-                }
-            }
-
-            console.log('Scheduled graduation emails completed:', results);
-            return results;
-        } catch (error) {
-            console.error('Error in scheduled graduation emails:', error);
-            throw error;
+    const recipients = [];
+    hsSnapshot.forEach((doc) => {
+        const u = doc.data();
+        if (u.email) {
+            recipients.push({
+                userId: doc.id,
+                email: u.email,
+                userName: u.userName,
+                schoolName: u.schoolAttending,
+                transitionType: 'hs_to_college',
+            });
+        }
+    });
+    collegeSnapshot.forEach((doc) => {
+        const u = doc.data();
+        if (u.email) {
+            recipients.push({
+                userId: doc.id,
+                email: u.email,
+                userName: u.userName,
+                schoolName: u.collegeAttending || u.schoolAttending,
+                transitionType: 'college_to_professional',
+            });
         }
     });
 
-// Function to send migration reminder emails
-exports.sendMigrationReminders = functions.https.onCall(async (data, context) => {
-    const { schoolId, daysAfterGraduation = 7 } = data;
+    let sent = 0;
+    for (const recipient of recipients) {
+        if (await isUnsubscribed(recipient.email, 'graduation')) continue;
 
-    if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'Only authenticated users can send migration reminders.');
+        const existing = await db.collection('migration_tokens')
+            .where('userId', '==', recipient.userId)
+            .where('emailType', '==', 'graduation')
+            .where('year', '==', currentYear)
+            .limit(1)
+            .get();
+        if (!existing.empty) continue;
+
+        const tokenRef = db.collection('migration_tokens').doc();
+        await tokenRef.set({
+            userId: recipient.userId,
+            email: recipient.email,
+            userName: recipient.userName || null,
+            schoolName: recipient.schoolName || null,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            expiresAt: admin.firestore.Timestamp.fromMillis(Date.now() + TOKEN_TTL_MS),
+            used: false,
+            emailType: 'graduation',
+            transitionType: recipient.transitionType,
+            year: currentYear,
+        });
+
+        await db.collection('mail').add({
+            to: recipient.email,
+            message: {
+                subject: '🎓 Congratulations on Your Graduation! - Update Your Launchpad Profile',
+                html: graduationEmailTemplate(
+                    recipient.userName || 'Graduate',
+                    recipient.schoolName || 'your school',
+                    migrationLinkFor(recipient.transitionType, tokenRef.id, recipient.userId),
+                ),
+            },
+            from: FROM_ADDRESS,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            status: 'pending',
+            provider: 'mailgun',
+            emailType: 'graduation',
+            userId: recipient.userId,
+            migrationToken: tokenRef.id,
+            transitionType: recipient.transitionType,
+        });
+        sent++;
     }
 
+    const breakdown = {
+        hsToCollege: recipients.filter((r) => r.transitionType === 'hs_to_college').length,
+        collegeToProfessional: recipients.filter((r) => r.transitionType === 'college_to_professional').length,
+    };
+
+    await db.collection('email_batches').add({
+        type: 'graduation_emails',
+        year: currentYear,
+        eligibleCount: recipients.length,
+        recipientsCount: sent,
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        testMode,
+        breakdown,
+    });
+
+    return {
+        success: true,
+        message: `Graduation emails queued for ${sent} recipients (${recipients.length} eligible)`,
+        recipientsCount: sent,
+        breakdown,
+    };
+}
+
+// Admin-only. (Previously ANY signed-in user could trigger a mass email, and
+// `testMode: true` bypassed the May-only guard.)
+exports.sendGraduationEmails = functions.https.onCall(async (data, context) => {
+    await requireAdmin(context);
     try {
+        return await runGraduationEmails({ testMode: Boolean(data && data.testMode) });
+    } catch (error) {
+        throw toHttpsError(error, 'Error sending graduation emails');
+    }
+});
+
+// Runs at 9 AM Central on May 15th. (The old schedule ran on June 1st -- outside the
+// May-only window, so it never sent anything -- and iterated a `tenants` collection
+// that no longer exists in the community version.)
+exports.scheduledGraduationEmails = functions.pubsub.schedule('0 9 15 5 *')
+    .timeZone('America/Chicago')
+    .onRun(async () => {
+        const result = await runGraduationEmails();
+        console.log('Scheduled graduation emails completed:', result);
+        return null;
+    });
+
+// Admin-only reminder for graduates who have not completed their migration.
+exports.sendMigrationReminders = functions.https.onCall(async (data, context) => {
+    await requireAdmin(context);
+    const daysAfterGraduation = Number((data && data.daysAfterGraduation) || 7);
+
+    try {
+        const db = admin.firestore();
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - daysAfterGraduation);
 
-        // Find migration tokens that haven't been used and are older than the cutoff date
-        const migrationTokensSnapshot = await admin.firestore()
-            .collection('migration_tokens')
+        const snapshot = await db.collection('migration_tokens')
             .where('used', '==', false)
             .where('emailType', '==', 'graduation')
             .where('createdAt', '<=', admin.firestore.Timestamp.fromDate(cutoffDate))
             .get();
 
-        if (migrationTokensSnapshot.empty) {
-            return {
-                success: true,
-                message: 'No pending migrations found for reminder emails',
-                recipientsCount: 0
-            };
+        let sent = 0;
+        for (const doc of snapshot.docs) {
+            const tokenData = doc.data();
+            const expiresAt = tokenData.expiresAt && typeof tokenData.expiresAt.toDate === 'function'
+                ? tokenData.expiresAt.toDate()
+                : new Date(tokenData.expiresAt);
+            if (!(expiresAt > new Date()) || tokenData.reminderSentAt) continue;
+            if (await isUnsubscribed(tokenData.email, 'migration_reminder')) continue;
+
+            await db.collection('mail').add({
+                to: tokenData.email,
+                message: {
+                    subject: "⏰ Complete Your Launchpad Profile Update - Don't Miss Out!",
+                    html: migrationReminderEmailTemplate(
+                        tokenData.userName || 'Graduate',
+                        tokenData.schoolName || 'your school',
+                        migrationLinkFor(tokenData.transitionType, doc.id, tokenData.userId),
+                    ),
+                },
+                from: FROM_ADDRESS,
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                status: 'pending',
+                provider: 'mailgun',
+                emailType: 'migration_reminder',
+                userId: tokenData.userId,
+                migrationToken: doc.id,
+            });
+            await doc.ref.update({ reminderSentAt: admin.firestore.FieldValue.serverTimestamp() });
+            sent++;
         }
 
-        const emailPromises = [];
-
-        migrationTokensSnapshot.forEach(doc => {
-            const tokenData = doc.data();
-            
-            // Check if token hasn't expired
-            if (tokenData.expiresAt && tokenData.expiresAt.toDate() > new Date()) {
-                const migrationLink = `https://launchpadhouston.com/migrate-to-alumni?token=${doc.id}&userId=${tokenData.userId}`;
-                
-                const emailTemplate = migrationReminderEmailTemplate(
-                    tokenData.userName || 'Graduate',
-                    tokenData.schoolName || 'Your School',
-                    migrationLink
-                );
-
-                const emailDoc = admin.firestore().collection('mail').add({
-                    to: tokenData.email,
-                    message: {
-                        subject: `⏰ Complete Your Alumni Migration - Don't Miss Out!`,
-                        html: emailTemplate,
-                    },
-                    from: 'no-reply@launchpadhouston.com',
-                    createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                    status: 'pending',
-                    provider: 'mailgun',
-                    emailType: 'migration_reminder',
-                    userId: tokenData.userId,
-                    schoolId: tokenData.schoolId,
-                    migrationToken: doc.id
-                });
-
-                emailPromises.push(emailDoc);
-            }
-        });
-
-        await Promise.all(emailPromises);
-
         return {
             success: true,
-            message: `Migration reminder emails queued for ${emailPromises.length} recipients`,
-            recipientsCount: emailPromises.length
+            message: `Migration reminder emails queued for ${sent} recipients`,
+            recipientsCount: sent,
         };
-
     } catch (error) {
-        console.error('Error sending migration reminders:', error);
-        throw new functions.https.HttpsError('internal', 'Error sending migration reminders: ' + error.message);
+        throw toHttpsError(error, 'Error sending migration reminders');
     }
 });
 
-/*
-========================================
-TESTING FUNCTION - Uncomment to create a simple test endpoint
-========================================
-
-// Simple test function that bypasses all restrictions
-exports.testGraduationEmails = functions.https.onCall(async (data, context) => {
-    const { schoolId, testEmail } = data;
-    
-    if (!context.auth) {
-        throw new functions.https.HttpsError('unauthenticated', 'Only authenticated users can test graduation emails.');
-    }
-
-    try {
-        // Create a test user data object
-        const testUser = {
-            userId: 'test-user-' + Date.now(),
-            email: testEmail || 'test@example.com',
-            userName: 'Test Student',
-            schoolAttending: 'Test High School',
-            graduationYear: new Date().getFullYear().toString()
-        };
-
-        // Generate migration token
-        const migrationToken = admin.firestore().collection('migration_tokens').doc().id;
-        const migrationLink = `https://launchpadhouston.com/migrate-to-alumni?token=${migrationToken}&userId=${testUser.userId}`;
-        
-        // Store migration token
-        await admin.firestore().collection('migration_tokens').doc(migrationToken).set({
-            userId: testUser.userId,
-            schoolId: schoolId || 'test-school',
-            email: testUser.email,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            used: false,
-            emailType: 'graduation'
-        });
-
-        // Create email document
-        const emailTemplate = graduationEmailTemplate(
-            testUser.userName,
-            testUser.schoolAttending,
-            migrationLink
-        );
-
-        const emailDoc = await admin.firestore().collection('mail').add({
-            to: testUser.email,
-            message: {
-                subject: `🎓 TEST - Congratulations on Your Graduation! - Complete Your Alumni Migration`,
-                html: emailTemplate,
-            },
-            from: 'no-reply@launchpadhouston.com',
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
-            status: 'pending',
-            provider: 'mailgun',
-            emailType: 'graduation',
-            userId: testUser.userId,
-            schoolId: schoolId || 'test-school',
-            migrationToken: migrationToken,
-            isTestEmail: true
-        });
-
-        return {
-            success: true,
-            message: `Test graduation email sent to ${testUser.email}`,
-            emailId: emailDoc.id,
-            migrationLink: migrationLink
-        };
-
-    } catch (error) {
-        console.error('Error in test graduation emails:', error);
-        throw new functions.https.HttpsError('internal', 'Error sending test graduation email: ' + error.message);
-    }
-});
-
-// To use this test function:
-// 1. Uncomment the function above
-// 2. Deploy your Firebase functions
-// 3. Call it from your frontend or Firebase console with:
-//    { schoolId: 'your-school-id', testEmail: 'your-email@example.com' }
-*/
+exports.runGraduationEmails = runGraduationEmails;

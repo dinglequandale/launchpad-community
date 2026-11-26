@@ -1,128 +1,86 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const crypto = require('crypto');
+const { requireAuth, sanitizeHeader, enforceRateLimit, toHttpsError } = require('../utils/security');
+const {
+    generateUnsubscribeLink,
+    isUnsubscribed,
+    hasEmailNotificationsEnabled,
+} = require('../utils/unsubscribe');
+const { newMessageEmailTemplate } = require('../utils/emailTemplates');
 
-// Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
     admin.initializeApp();
 }
 
 const db = admin.firestore();
 
-/**
- * Generate unsubscribe token and link
- */
-async function generateUnsubscribeLink(email, emailType) {
-    const token = crypto.randomUUID();
-    const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-
-    await db.collection('unsubscribe_tokens').doc(token).set({
-        email: email.toLowerCase(),
-        emailType,
-        expiresAt,
-        used: false,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    return `https://launchpadhouston.com/unsubscribe?token=${token}`;
+async function haveConnection(userA, userB) {
+    const ref = db.collection('connections');
+    const [a, b] = await Promise.all([
+        ref.where('initiateUserId', '==', userA).where('targetUserId', '==', userB).limit(1).get(),
+        ref.where('initiateUserId', '==', userB).where('targetUserId', '==', userA).limit(1).get(),
+    ]);
+    return !a.empty || !b.empty;
 }
 
 /**
- * Check if user has unsubscribed from a specific email type
- */
-async function isUnsubscribed(email, emailType) {
-    const unsubscribeDoc = await db.collection('unsubscribed_emails').doc(email.toLowerCase()).get();
-
-    if (unsubscribeDoc.exists) {
-        const unsubscribeData = unsubscribeDoc.data();
-        if (!unsubscribeData.emailType || unsubscribeData.emailType === emailType) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
- * Check if user has email notifications enabled
- */
-async function hasEmailNotificationsEnabled(userId) {
-    const userDoc = await db.collection('users').doc(userId).get();
-
-    if (!userDoc.exists) {
-        return false;
-    }
-
-    const userData = userDoc.data();
-    return userData.emailNotificationsEnabled !== false;
-}
-
-/**
- * Callable function to send email notification when a message is received
- * Called from client-side when a user sends a message
+ * Email a user that they received a message.
+ *
+ * SECURITY: previously any signed-in user could make the platform email ANY user
+ * with an arbitrary sender name and message body. Now the caller must have a
+ * connection (pending or approved) with the receiver, the sender name comes from
+ * the caller's own profile, and calls are rate limited.
  */
 exports.sendEmailNotifications = functions.https.onCall(async (data, context) => {
-    try {
-        const { receiverId, senderName, messagePreview } = data;
-        console.log('Message notification request:', { receiverId, senderName });
+    const senderId = requireAuth(context, 'Only authenticated users can send messages.');
+    const { receiverId, messagePreview } = data || {};
 
-        // Ensure the user is authenticated (message sender)
-        if (!context.auth) {
-            throw new functions.https.HttpsError('unauthenticated', 'Only authenticated users can send messages.');
+    if (typeof receiverId !== 'string' || !receiverId || receiverId.includes('/')) {
+        throw new functions.https.HttpsError('invalid-argument', 'receiverId is required');
+    }
+    if (receiverId === senderId) {
+        return { success: true, message: 'No notification for self-messages' };
+    }
+
+    try {
+        if (!(await haveConnection(senderId, receiverId))) {
+            throw new functions.https.HttpsError('permission-denied', 'You can only notify users you are connected with.');
         }
 
-        // Get receiver's user data
-        const receiverDoc = await db.collection('users').doc(receiverId).get();
+        await enforceRateLimit(`messageNotification:${senderId}`, { limit: 30, windowSeconds: 60 * 60 });
+
+        const [receiverDoc, senderDoc] = await Promise.all([
+            db.collection('users').doc(receiverId).get(),
+            db.collection('users').doc(senderId).get(),
+        ]);
 
         if (!receiverDoc.exists) {
-            console.error('Receiver user document not found:', { receiverId });
             throw new functions.https.HttpsError('not-found', 'Receiver user not found');
         }
 
         const receiverData = receiverDoc.data();
         const receiverEmail = receiverData.email;
-
         if (!receiverEmail) {
-            console.error('Receiver email not found in document:', { receiverId });
-            throw new functions.https.HttpsError('not-found', 'Receiver email not found');
+            return { success: true, message: 'Receiver has no email on file' };
         }
 
-        // Check if receiver has email notifications enabled
-        const notificationsEnabled = await hasEmailNotificationsEnabled(receiverId);
-        if (!notificationsEnabled) {
-            console.log(`User ${receiverId} has email notifications disabled`);
+        if (!(await hasEmailNotificationsEnabled(receiverId))) {
             return { success: true, message: 'User has notifications disabled' };
         }
-
-        // Check if receiver has unsubscribed from message notifications
-        const unsubscribed = await isUnsubscribed(receiverEmail, 'new_message');
-        if (unsubscribed) {
-            console.log(`User ${receiverEmail} has unsubscribed from message notifications`);
+        if (await isUnsubscribed(receiverEmail, 'new_message')) {
             return { success: true, message: 'User has unsubscribed' };
         }
 
-        // Generate unsubscribe link
         const unsubscribeLink = await generateUnsubscribeLink(receiverEmail, 'new_message');
-
-        // Prepare email template data
         const recipientName = receiverData.userName?.split(' ')[0] || 'there';
+        const senderName = (senderDoc.exists && senderDoc.data().userName) || 'A Launchpad user';
+        const preview = typeof messagePreview === 'string' ? messagePreview.slice(0, 300) : '';
 
-        // Import email template
-        const { newMessageEmailTemplate } = require('../utils/emailTemplates');
-
-        const emailHtml = newMessageEmailTemplate(
-            recipientName,
-            senderName,
-            messagePreview,
-            unsubscribeLink
-        );
-
-        // Create email document for MailGun
         await db.collection('mail').add({
             to: receiverEmail,
             message: {
-                subject: `${senderName} sent you a message on Launchpad`,
-                html: emailHtml,
+                subject: sanitizeHeader(`${senderName} sent you a message on Launchpad`),
+                html: newMessageEmailTemplate(recipientName, senderName, preview, unsubscribeLink),
             },
             from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -131,17 +89,14 @@ exports.sendEmailNotifications = functions.https.onCall(async (data, context) =>
             emailType: 'new_message',
             unsubscribeLink,
             metadata: {
-                senderId: context.auth.uid,
+                senderId,
                 receiverId,
-                messagePreview: messagePreview.substring(0, 100)
-            }
+                messagePreview: preview.substring(0, 100),
+            },
         });
 
-        console.log(`Message notification email queued for ${receiverEmail}`);
         return { success: true, message: 'Email notification queued' };
-
     } catch (error) {
-        console.error('Error in sendEmailNotifications:', error);
-        throw new functions.https.HttpsError('internal', error.message);
+        throw toHttpsError(error, 'Error sending message notification');
     }
 });

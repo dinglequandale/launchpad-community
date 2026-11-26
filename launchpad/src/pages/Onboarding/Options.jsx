@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { collection, query, orderBy, startAt, endAt, limit, getDocs } from 'firebase/firestore';
 import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
 import CustomSelect from '../../components/CustomSelect';
-import { algoliaClient } from '../../typesense/typesenseClient';
+import { algoliaClient } from '../../services/searchClient';
 // import {algoliasearch} from 'algoliasearch/lite';
 import Loading from '../../components/LoadingAnimation/Loading';
 import { loadHighSchools, addHighSchool } from '../../services/highSchoolService';

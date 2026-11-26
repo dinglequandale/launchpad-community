@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import './OpportunityApplyModal.css';
 import { IoCloseOutline } from 'react-icons/io5';
 import { LuMapPin, LuCalendar, LuBriefcase, LuClock, LuUsers, LuTarget } from 'react-icons/lu';
+import { toSafeHttpUrl, toSafeMailto } from '../../utils/safeUrl';
 
 // requirements: array of strings or ids, applyType: 'Messages' | 'Email' | 'Website', applyValue: string (email or url)
 // opportunityDetails: { format, eligibility, compensation, duration, startDate, timeCommitment, deadline, ... }
@@ -113,7 +114,8 @@ export default function OpportunityApplyModal({
   const subject = `Application for ${orgName || 'Opportunity'}`;
 
   // Compose website link (if any)
-  const websiteUrl = applyType === 'Website' ? applyValue : '';
+  // SECURITY: applyValue is written by the opportunity's creator; only allow http(s).
+  const websiteUrl = applyType === 'Website' ? toSafeHttpUrl(applyValue) : '';
 
   // Sidebar details (recap)
   const details = [
@@ -217,11 +219,11 @@ export default function OpportunityApplyModal({
                   <>
                     <p>Want to learn more about this {opportunityDetails.organizationType ? opportunityDetails.organizationType.toLowerCase() : 'opportunity'}?</p>
                     {opportunityDetails.learnMoreType === 'Website' && opportunityDetails.learnMoreValue ? (
-                      <a href={opportunityDetails.learnMoreValue} target="_blank" rel="noopener noreferrer" className="v0-opportunity-apply-learn-more-link">
+                      <a href={toSafeHttpUrl(opportunityDetails.learnMoreValue) || undefined} target="_blank" rel="noopener noreferrer" className="v0-opportunity-apply-learn-more-link">
                         Visit their website
                       </a>
                     ) : opportunityDetails.learnMoreType === 'Email' && opportunityDetails.learnMoreValue ? (
-                      <span>Email <a href={`mailto:${opportunityDetails.learnMoreValue}`} className="v0-opportunity-apply-learn-more-link">{opportunityDetails.learnMoreValue}</a> for more info.</span>
+                      <span>Email <a href={toSafeMailto(opportunityDetails.learnMoreValue) || undefined} className="v0-opportunity-apply-learn-more-link">{opportunityDetails.learnMoreValue}</a> for more info.</span>
                     ) : opportunityDetails.learnMoreType === 'Messages' ? (
                       <span>Contact the host via Launchpad messages for more info.</span>
                     ) : null}

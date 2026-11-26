@@ -443,7 +443,7 @@ function FinalInfo(){
   const { organizationData, setOrganizationData, organizationQuestionsConfig, setOrganizationLogo, currentUser } = useContext(InitiativeContext);
   const logoRef = useRef();
 
-  const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare size={20}/>],["Email", <MdEmail size={20}/>],["Website", <CgWebsite size={20}/>]];
+  const learnMoreAndApplyOptions = [["Messages", <LuMessagesSquare key="messages" size={20}/>],["Email", <MdEmail key="email" size={20}/>],["Website", <CgWebsite key="website" size={20}/>]];
 
   const [learnMoreType, setLearnMoreType] = useState("");
   const [applyType, setApplyType] = useState("");

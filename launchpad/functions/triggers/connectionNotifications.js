@@ -1,6 +1,11 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const crypto = require('crypto');
+const {
+    generateUnsubscribeLink,
+    isUnsubscribed,
+    hasEmailNotificationsEnabled,
+} = require('../utils/unsubscribe');
+const { sanitizeHeader } = require('../utils/security');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -36,57 +41,6 @@ function getUserDescription(userData) {
 }
 
 /**
- * Generate unsubscribe token and link
- */
-async function generateUnsubscribeLink(email, emailType) {
-    const token = crypto.randomUUID();
-    const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-
-    // Store the unsubscribe token
-    await db.collection('unsubscribe_tokens').doc(token).set({
-        email: email.toLowerCase(),
-        emailType,
-        expiresAt,
-        used: false,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    return `https://launchpadhouston.com/unsubscribe?token=${token}`;
-}
-
-/**
- * Check if user has unsubscribed from a specific email type
- */
-async function isUnsubscribed(email, emailType) {
-    const unsubscribeDoc = await db.collection('unsubscribed_emails').doc(email.toLowerCase()).get();
-
-    if (unsubscribeDoc.exists) {
-        const unsubscribeData = unsubscribeDoc.data();
-        // Check if email is unsubscribed for this specific type or all emails
-        if (!unsubscribeData.emailType || unsubscribeData.emailType === emailType) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
- * Check if user has email notifications enabled
- */
-async function hasEmailNotificationsEnabled(userId) {
-    const userDoc = await db.collection('users').doc(userId).get();
-
-    if (!userDoc.exists) {
-        return false;
-    }
-
-    const userData = userDoc.data();
-    // Default to true if not explicitly set to false
-    return userData.emailNotificationsEnabled !== false;
-}
-
-/**
  * Firestore onCreate trigger for connection requests
  * Sends email notification to the target user when someone sends them a connection request
  */
@@ -116,6 +70,11 @@ exports.onConnectionCreated = functions.firestore
 
             const initiatorData = initiatorDoc.data();
             const targetData = targetDoc.data();
+
+            if (!targetData.email) {
+                console.log(`User ${targetUserId} has no email on file; skipping notification`);
+                return null;
+            }
 
             // Check if target user has email notifications enabled
             const notificationsEnabled = await hasEmailNotificationsEnabled(targetUserId);
@@ -158,7 +117,7 @@ exports.onConnectionCreated = functions.firestore
             await db.collection('mail').add({
                 to: targetData.email,
                 message: {
-                    subject: `${senderName} wants to connect with you on Launchpad`,
+                    subject: sanitizeHeader(`${senderName} wants to connect with you on Launchpad`),
                     html: emailHtml,
                 },
                 from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
@@ -212,6 +171,11 @@ exports.onConnectionStatusUpdated = functions.firestore
                 const initiatorData = initiatorDoc.data();
                 const targetData = targetDoc.data();
 
+                if (!initiatorData.email) {
+                    console.log(`User ${initiateUserId} has no email on file; skipping notification`);
+                    return null;
+                }
+
                 // Check if initiator has email notifications enabled
                 const notificationsEnabled = await hasEmailNotificationsEnabled(initiateUserId);
                 if (!notificationsEnabled) {
@@ -252,7 +216,7 @@ exports.onConnectionStatusUpdated = functions.firestore
                 await db.collection('mail').add({
                     to: initiatorData.email,
                     message: {
-                        subject: `${accepterName} accepted your connection request on Launchpad!`,
+                        subject: sanitizeHeader(`${accepterName} accepted your connection request on Launchpad!`),
                         html: emailHtml,
                     },
                     from: 'Launchpad Networks <no-reply@launchpadhouston.com>',

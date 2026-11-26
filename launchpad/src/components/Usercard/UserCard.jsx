@@ -25,7 +25,7 @@ export default function UserCard({ userData, onProfileClick, onConnectClick, ref
   const [bannerVisibility, setBannerVisibility] = useState(false);
   const { approved = [], parent_approved = [], loading: connectionsLoading } = useConnections();
   const { currentUser } = useAuth();
-  const { openParentalConnectionModal, openConnectModal } = useModal();
+  const { openConnectModal } = useModal();
   const { chatClient } = useOutletContext();
   const { currentSociety } = useSociety();
   const isHSFS = currentSociety === 'hsfs';

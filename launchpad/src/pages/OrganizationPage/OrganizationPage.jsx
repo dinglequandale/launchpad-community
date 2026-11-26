@@ -15,6 +15,7 @@ import { IoFlag, IoCalendar, IoTime, IoPerson } from 'react-icons/io5';
 import { LuMapPin, LuCalendar, LuAward, LuTarget, LuArrowLeft, LuShare2, LuUsers, LuMail } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 import './OrganizationPage.css';
+import { openExternalUrl, toSafeMailto } from '../../utils/safeUrl';
 
 export default function OrganizationPage() {
   const { organizationId } = useParams();
@@ -236,7 +237,7 @@ export default function OrganizationPage() {
     const orgProfile = getOrganizationProfile();
 
     if (orgProfile.learnMore.method === 'Website' && orgProfile.learnMore.value) {
-      window.open(orgProfile.learnMore.value, '_blank', 'noopener,noreferrer');
+      openExternalUrl(orgProfile.learnMore.value);
     } else if ((orgProfile.learnMore.method === 'Email' || orgProfile.learnMore.method === 'Messages') && userData) {
       // Both "Email me" and "Message me" now open the ConnectModal for consistency
       openConnectModal({
@@ -441,7 +442,7 @@ export default function OrganizationPage() {
                       </span>
                       {userData.email && (
                         <a
-                          href={`mailto:${userData.email}`}
+                          href={toSafeMailto(userData.email) || undefined}
                           className="organization-page-contact-email"
                         >
                           <LuMail size={14} />
@@ -468,7 +469,7 @@ export default function OrganizationPage() {
                           <div key={index} className="organization-page-contact-info">
                             <span className="organization-page-contact-name">{collaborator.name}</span>
                             <a
-                              href={`mailto:${collaborator.email}`}
+                              href={toSafeMailto(collaborator.email) || undefined}
                               className="organization-page-contact-email"
                             >
                               <LuMail size={14} />

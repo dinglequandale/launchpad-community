@@ -1,5 +1,15 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const {
+    escapeHtml,
+    sanitizeHeader,
+    isValidEmail,
+    enforceRateLimit,
+    toHttpsError,
+} = require('../utils/security');
+
+const MAX_INVITES_PER_CALL = 20;
+const MAX_INVITES_PER_DAY = 50;
 
 exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
     const { recipientData, senderName, schoolName } = data;
@@ -9,9 +19,31 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('unauthenticated', 'Only authenticated users can send invitations.');
     }
 
+    // SECURITY: validate recipients and cap volume -- this callable sends mail from
+    // the platform domain to arbitrary addresses.
+    if (!Array.isArray(recipientData) || recipientData.length === 0) {
+        throw new functions.https.HttpsError('invalid-argument', 'recipientData must be a non-empty array.');
+    }
+    if (recipientData.length > MAX_INVITES_PER_CALL) {
+        throw new functions.https.HttpsError('invalid-argument', `At most ${MAX_INVITES_PER_CALL} invitations per request.`);
+    }
+    if (!recipientData.every((r) => r && isValidEmail(r.email))) {
+        throw new functions.https.HttpsError('invalid-argument', 'One or more recipient addresses are invalid.');
+    }
+
     try {
+        await enforceRateLimit(`invite:${context.auth.uid}`, {
+            limit: MAX_INVITES_PER_DAY,
+            windowSeconds: 24 * 60 * 60,
+            cost: recipientData.length,
+        });
+
         // Create email template
-        const createInviteEmailTemplate = (recipientName, senderName, schoolName) => {
+        const createInviteEmailTemplate = (rawRecipientName, rawSenderName, rawSchoolName) => {
+            // SECURITY: these values are user-supplied; escape before interpolating into HTML.
+            const recipientName = escapeHtml(rawRecipientName);
+            const senderName = escapeHtml(rawSenderName);
+            const schoolName = escapeHtml(rawSchoolName);
             // Build school-aware text with fallbacks
             const communityText = schoolName
                 ? `${schoolName}'s networking community`
@@ -174,21 +206,21 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
         };
 
         // Build subject line with school name fallback
-        const emailSubject = schoolName
+        const emailSubject = sanitizeHeader(schoolName
             ? `${senderName} invited you to join ${schoolName}'s network on Launchpad!`
-            : `${senderName} invited you to join Launchpad!`;
+            : `${senderName} invited you to join Launchpad!`);
 
         // Process each recipient
         const emailPromises = recipientData.map(async (recipient, index) => {
             const emailTemplate = createInviteEmailTemplate(
-                recipient.userName.split(" ")[0],
+                String(recipient.userName || '').split(" ")[0],
                 senderName,
                 schoolName || ''
             );
 
             // Create email document for MailGun
             return admin.firestore().collection('mail').add({
-                to: recipient.email,
+                to: recipient.email.trim(),
                 message: {
                     subject: emailSubject,
                     html: emailTemplate,
@@ -226,7 +258,6 @@ exports.sendInviteEmail = functions.https.onCall(async (data, context) => {
             recipientsCount: recipientData.length
         };
     } catch (error) {
-        console.error('Error sending invitations:', error);
-        throw new functions.https.HttpsError('internal', 'Error sending invitations: ' + error.message, error);
+        throw toHttpsError(error, 'Error sending invitations');
     }
 });

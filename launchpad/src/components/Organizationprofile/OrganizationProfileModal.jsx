@@ -10,6 +10,7 @@ import { doc, getDoc } from 'firebase/firestore'
 import { db } from '../../firebase/firebaseConfig'
 import { displayFieldsOfInterest } from '../../services/userProfileServices'
 import { stableLinkCheck } from '../../services/opportunityServices'
+import { openExternalUrl, toSafeMailto } from '../../utils/safeUrl';
 
 export default function OrganizationProfileModal({ 
   organization, 
@@ -179,10 +180,10 @@ export default function OrganizationProfileModal({
       // Handle learn more based on type
       if (orgProfile.learnMore.method === 'Website' && orgProfile.learnMore.value) {
         // Open website in new tab
-        window.open(orgProfile.learnMore.value, '_blank', 'noopener,noreferrer')
+        openExternalUrl(orgProfile.learnMore.value)
       } else if (orgProfile.learnMore.method === 'Email' && orgProfile.learnMore.value) {
         // Open email client
-        window.location.href = `mailto:${orgProfile.learnMore.value}`
+        window.location.href = toSafeMailto(orgProfile.learnMore.value) || '#'
       } else if (orgProfile.learnMore.method === 'Messages' && userData) {
         // Open connect modal for messaging
         openConnectModal({

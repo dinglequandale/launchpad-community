@@ -5,38 +5,21 @@ import { getBasicUserDescription } from './userProfileServices';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { parentInvitationTemplate } from '../utils/parentVerificationTemplates';
 import { doCreateUserWithEmailAndPassword } from '../firebase/auth';
-// import { updateTypesense } from '../typesense/typesenseClient';
 
 // Track onboarding submissions for analytics
 const trackOnboardingSubmission = async (userName) => {
     try {
-        // Extract first name from full name
         const firstName = userName?.split(' ')[0]?.trim() || 'Unknown';
-
-        // Get today's date in YYYY-MM-DD format
         const today = new Date().toISOString().split('T')[0];
-
         const analyticsDocRef = doc(db, 'onboarding_analytics', today);
 
-        // Check if document exists
-        const docSnap = await getDoc(analyticsDocRef);
-
-        if (docSnap.exists()) {
-            // Document exists, update it
-            await updateDoc(analyticsDocRef, {
-                count: increment(1),
-                firstNames: arrayUnion(firstName)
-            });
-        } else {
-            // Document doesn't exist, create it
-            await setDoc(analyticsDocRef, {
-                date: today,
-                count: 1,
-                firstNames: [firstName]
-            });
-        }
-
-        console.log('Onboarding analytics tracked:', { date: today, firstName });
+        // Single merge-write: no read needed (clients cannot read analytics), and
+        // increment/arrayUnion make it safe under concurrent sign-ups.
+        await setDoc(analyticsDocRef, {
+            date: today,
+            count: increment(1),
+            firstNames: arrayUnion(firstName)
+        }, { merge: true });
     } catch (error) {
         console.error('Error tracking onboarding analytics:', error);
         // Don't throw - we don't want analytics to break onboarding
@@ -48,7 +31,7 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         const { userPfp, userResume, ...otherData } = highSchoolerData;
 
         const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
-        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
+        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}.pdf`, 'resumes');
 
         const dataToSave = {
         ...otherData,
@@ -112,6 +95,7 @@ export const saveHighSchooler = async (currentUser, highSchoolerData, onSuccess)
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
+        throw e;
     }
 };
 
@@ -121,7 +105,7 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         const { userPfp, userResume, ...otherData } = collegeStudentData;
 
         const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
-        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
+        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}.pdf`, 'resumes');
 
         const dataToSave = {
         ...otherData,
@@ -177,6 +161,7 @@ export const saveCollegeStudent = async (currentUser, collegeStudentData, onSucc
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
+        throw e;
     }
 };
 
@@ -187,7 +172,7 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         const { userPfp, ...otherData } = professionalData;
 
         const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
-        // const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
+        // const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}.pdf`, 'resumes');
 
         const dataToSave = {
         ...otherData,
@@ -243,6 +228,7 @@ export const saveProfessional = async (currentUser, professionalData, onSuccess)
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
+        throw e;
     }
 };
 
@@ -268,6 +254,7 @@ export const saveStaff = async (currentUser, staffData, onSuccess) => {
         onSuccess();
     } catch (e) {
         console.error("Error adding document: ", e);
+        throw e;
     }
 }
 
@@ -349,7 +336,7 @@ const uploadFileToStorage = async (file, fileName, folderName) => {
       return downloadURL;
     } catch (error) {
       console.error(`Error uploading ${folderName}:`, error);
-      return null;
+      throw error;
     }
   };
 

@@ -2,7 +2,9 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const { StreamChat } = require('stream-chat');
 
-admin.initializeApp();
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
 
 const serverClient = new StreamChat(
   process.env.STREAM_API_KEY,
@@ -15,9 +17,6 @@ exports.createStreamToken = functions.https.onCall(async (data, context) => {
     throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated');
   }
   const uid = context.auth.uid;
-  // console.log('API Key:', process.env.STREAM_API_KEY);
-  // console.log('Secret:', process.env.STREAM_SECRET);
-  // console.log('User Authentication:', uid);
   try {
     
     console.log('Attempting to create Stream token');

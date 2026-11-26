@@ -347,7 +347,7 @@ const ConnectionLevel = ({ selectedOptions, setSelectedOptions }) => {
         </div>
         <div style={{display: "flex", flexDirection: "column", gap: "25px"}}>
           {availabilityOptionsConfig.map((option)=>(
-          <div style={{fontSize: "larger", lineHeight: ".6", display: "flex"}}>
+          <div key={option.id} style={{fontSize: "larger", lineHeight: ".6", display: "flex"}}>
               <label htmlFor={option.id}>
               <input 
                   type="checkbox"

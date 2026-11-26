@@ -1,6 +1,28 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const crypto = require('crypto');
+const {
+    generateUnsubscribeLink,
+    isUnsubscribed,
+    hasEmailNotificationsEnabled,
+} = require('../utils/unsubscribe');
+const { sanitizeHeader } = require('../utils/security');
+
+/** Lower-cased, non-empty skill descriptions (bad data used to crash the matcher). */
+function normalizedSkills(user) {
+    return (Array.isArray(user.userSkills) ? user.userSkills : [])
+        .map((s) => (s && typeof s.skillDescription === 'string' ? s.skillDescription.trim().toLowerCase() : ''))
+        .filter(Boolean);
+}
+
+function normalizedTags(opportunity) {
+    return (Array.isArray(opportunity.organizationTags) ? opportunity.organizationTags : [])
+        .filter((t) => typeof t === 'string' && t.trim())
+        .map((t) => t.trim().toLowerCase());
+}
+
+function skillMatchesTag(skill, tag) {
+    return skill === tag || tag.includes(skill) || skill.includes(tag);
+}
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -41,15 +63,13 @@ function calculateOpportunityMatch(user, opportunity) {
     score += 30;
 
     // Match on skills/tags (most important factor - 70 points)
-    if (opportunity.organizationTags && opportunity.organizationTags.length > 0) {
-        const userSkillDescriptions = (user.userSkills || []).map(s => s.skillDescription?.toLowerCase());
-        const opportunityTags = opportunity.organizationTags.map(tag => tag.toLowerCase());
+    const opportunityTags = normalizedTags(opportunity);
+    if (opportunityTags.length > 0) {
+        const userSkillDescriptions = normalizedSkills(user);
 
         // Calculate overlap
         const matchingTags = opportunityTags.filter(tag =>
-            userSkillDescriptions.some(skill =>
-                skill === tag || tag.includes(skill) || skill.includes(tag)
-            )
+            userSkillDescriptions.some(skill => skillMatchesTag(skill, tag))
         );
 
         if (matchingTags.length > 0) {
@@ -79,14 +99,11 @@ function getMatchReasons(user, opportunity, score) {
     }
 
     // Add skill matches
-    if (opportunity.organizationTags && user.userSkills) {
-        const userSkillDescriptions = user.userSkills.map(s => s.skillDescription);
-        const matchingSkills = opportunity.organizationTags.filter(tag =>
-            userSkillDescriptions.some(skill =>
-                skill.toLowerCase() === tag.toLowerCase() ||
-                tag.toLowerCase().includes(skill.toLowerCase()) ||
-                skill.toLowerCase().includes(tag.toLowerCase())
-            )
+    const userSkillDescriptions = normalizedSkills(user);
+    if (userSkillDescriptions.length > 0) {
+        const matchingSkills = (opportunity.organizationTags || []).filter(tag =>
+            typeof tag === 'string' && tag.trim() &&
+            userSkillDescriptions.some(skill => skillMatchesTag(skill, tag.trim().toLowerCase()))
         );
 
         if (matchingSkills.length > 0) {
@@ -95,54 +112,6 @@ function getMatchReasons(user, opportunity, score) {
     }
 
     return reasons;
-}
-
-/**
- * Generate unsubscribe token and link
- */
-async function generateUnsubscribeLink(email, emailType) {
-    const token = crypto.randomUUID();
-    const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-
-    await db.collection('unsubscribe_tokens').doc(token).set({
-        email: email.toLowerCase(),
-        emailType,
-        expiresAt,
-        used: false,
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-
-    return `https://launchpadhouston.com/unsubscribe?token=${token}`;
-}
-
-/**
- * Check if user has unsubscribed from a specific email type
- */
-async function isUnsubscribed(email, emailType) {
-    const unsubscribeDoc = await db.collection('unsubscribed_emails').doc(email.toLowerCase()).get();
-
-    if (unsubscribeDoc.exists) {
-        const unsubscribeData = unsubscribeDoc.data();
-        if (!unsubscribeData.emailType || unsubscribeData.emailType === emailType) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
- * Check if user has email notifications enabled
- */
-async function hasEmailNotificationsEnabled(userId) {
-    const userDoc = await db.collection('users').doc(userId).get();
-
-    if (!userDoc.exists) {
-        return false;
-    }
-
-    const userData = userDoc.data();
-    return userData.emailNotificationsEnabled !== false;
 }
 
 /**
@@ -173,7 +142,7 @@ exports.onOpportunityCreated = functions.firestore
                 const userId = userDoc.id;
                 const matchScore = calculateOpportunityMatch(userData, opportunityData);
 
-                if (matchScore >= MATCH_THRESHOLD) {
+                if (matchScore >= MATCH_THRESHOLD && userData.email && userId !== opportunityData.createdBy) {
                     userMatches.push({
                         userId,
                         userData,
@@ -244,7 +213,7 @@ exports.onOpportunityCreated = functions.firestore
                 return db.collection('mail').add({
                     to: userData.email,
                     message: {
-                        subject: `New ${opportunityData.organizationType || 'opportunity'}: ${opportunityData.title || opportunityData.applicantPosition || 'Check it out'}!`,
+                        subject: sanitizeHeader(`New ${opportunityData.organizationType || 'opportunity'}: ${opportunityData.title || opportunityData.applicantPosition || 'Check it out'}!`),
                         html: emailHtml,
                     },
                     from: 'Launchpad Networks <no-reply@launchpadhouston.com>',

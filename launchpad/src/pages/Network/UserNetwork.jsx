@@ -20,7 +20,6 @@ import { auth, db } from "../../firebase/firebaseConfig";
 import { collection, getDocs } from 'firebase/firestore';
 import LegalityFooter from "../../components/Legality Footer/LegalityFooter";
 import { capitalizeFirstLetter } from "../Homepage/Home";
-import ParentalConnectionModal from "../../components/ParentalConnectionModal";
 import { useModal } from '../../contexts/ModalContext';
 import { useConnections } from "../../contexts/ConnectionContext";
 import { checkConnection, isConnectionApproved } from "../../services/connectionService";
@@ -31,6 +30,7 @@ import InviteContactsModal from "../../components/InviteContactsmodal/InviteCont
 import { useSociety } from "../../contexts/SocietyContext";
 import { getSocietyConfig } from "../../utils/subdomainUtils";
 import { HSFS_INDUSTRIES, HSFS_SCHOOLS } from "../../utils/hsfsConstants";
+import { openExternalUrl } from '../../utils/safeUrl';
 // import { checkConnection } from "../../services/connectionService";
 
 
@@ -52,7 +52,7 @@ export default function UserNetwork() {
   // COMMUNITY VERSION: Removed tenantId - no longer needed without multi-tenant architecture
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  const { openConnectModal, openParentalConnectionModal } = useModal();
+  const { openConnectModal } = useModal();
 
   const [highSchoolers, setHighSchoolers] = useState([]);
   const [collegeStudents, setCollegeStudents] = useState([]);
@@ -414,7 +414,7 @@ export default function UserNetwork() {
             handleEmailClick(value);
             return;
         case "Website":
-            window.open(value, '_blank', 'noopener,noreferrer');
+            openExternalUrl(value);
             return;
       }
   }

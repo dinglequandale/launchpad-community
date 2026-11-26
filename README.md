@@ -1,37 +1,50 @@
 # launchpad-platform
-A platform that revolutionizes high schoolers' access to valuable connections and on-site job experience
 
-# Run locally
-First, `cd` into `launchpad/`. This will be the working directory from now on. Install npm packages:
+A platform that revolutionizes high schoolers' access to valuable connections and on-site job experience.
 
-`npm install`
+The app lives in [`launchpad/`](launchpad/): a React + Vite frontend, Firebase (Auth, Firestore,
+Storage, Hosting, Cloud Functions) and Stream Chat. Search uses Algolia.
 
-Then, obtain a Firebase Admin SDK private key (should be a JSON file). This is used to populate the typesense server with the information from Firestore. **Only do this once:**
+## Run locally
 
-
-`npm run populate`
-
-This populates the typesense server on Azure.
-
-Finally:
-
-`npm run dev`
-
-# Run typesense server on Azure
-
-`ssh launchpad@20.3.232.3`
-
-password: Spacestation979!
-
-```
-sudo docker run -p 443:443 -v /etc/letsencrypt:/etc/letsencrypt -v /tmp:/data typesense/typesense:27.1 --data-dir /data --api-key=xyz --enable-cors --cors-domains http://localhost:3001,https://awty.launchpadhouston.com --ssl-certificate /etc/letsencrypt/live/launchpad-typesense.westus2.cloudapp.azure.com/fullchain.pem --ssl-certificate-key /etc/letsencrypt/live/launchpad-typesense.westus2.cloudapp.azure.com/privkey.pem --api-port 443
+```bash
+cd launchpad
+cp .env.example .env        # fill in the public client config (see comments in the file)
+npm install
+npm run dev                  # http://localhost:3000
 ```
 
-Run unsecurely via http (needed for populating)
+Cloud Functions:
 
-`sudo docker run -p 8108:8108 -v/tmp:/data typesense/typesense:27.1 --data-dir /data --api-key=xyz`
+```bash
+cd launchpad/functions
+cp .env.example .env         # Stream server credentials (never commit this file)
+npm install
+npm run serve                # local emulator
+```
 
-Deleting a collection to start again
+## Deploy
 
-`curl -H "X-TYPESENSE-API-KEY: xyz" -X DELETE "http://20.3.232.3:8108/collections/users"``
+Hosting deploys automatically from `main` via GitHub Actions
+(`.github/workflows/firebase-hosting-merge.yml`). Rules and functions are deployed manually:
 
+```bash
+cd launchpad
+firebase deploy --only firestore:rules,storage
+firebase deploy --only functions
+```
+
+Deploy **rules and functions together**: the frontend now relies on new callables
+(`deleteMyAccount`, `verifySocietyAccessCode`, `redeemSocietyAccessCode`) and the rules
+deny client writes that the old functions-less flows used to make.
+
+## Administrators
+
+Admin-only callables (graduation emails, Sheets re-sync) and admin reads in Firestore rules
+check for a document at `admins/{uid}`. Create one from the Firebase console for each admin;
+clients cannot write to that collection.
+
+## Search
+
+Search is served by Algolia with a **search-only** key. The old self-hosted Typesense server
+(and its `populate` script) has been removed from this repository.

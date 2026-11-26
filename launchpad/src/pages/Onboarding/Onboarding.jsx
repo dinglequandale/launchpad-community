@@ -175,6 +175,7 @@ export default function Onboarding() {
             }
         } catch (error) {
             console.error('Error saving user data:', error);
+            toast.error(error?.message || 'We could not save your profile. Please try again.');
             setIsSubmitting(false);
         }
     };

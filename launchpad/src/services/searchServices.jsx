@@ -1,4 +1,4 @@
-import { algoliaClient } from '../typesense/typesenseClient'
+import { algoliaClient } from './searchClient'
 import { db } from '../firebase/firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
 

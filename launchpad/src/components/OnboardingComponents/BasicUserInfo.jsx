@@ -112,7 +112,6 @@ export default function BasicUserInfo({ handleChange, selectedOptions, setSelect
             onChange={(label) => handleChange(questionsForPage[4].id, label)}
             type={questionsForPage[4].type}
             placeholder={questionsForPage[4].placeholder}
-            onSearchQueryChange={questionsForPage[4].id === 'whatCollege' ? onSearchQueryChange : null}
           />
         </div>
       )}

@@ -1,131 +1,80 @@
-const crypto = require('crypto');
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
+const { requireAuth, toHttpsError } = require('../utils/security');
+const {
+    generateUnsubscribeLink,
+    isUnsubscribed,
+    recordUnsubscribe,
+} = require('../utils/unsubscribe');
 
+/**
+ * Generate an unsubscribe link for the CALLER's own email address.
+ * (Previously unauthenticated and accepted any email, which let anyone mint a
+ * token for -- and then unsubscribe -- any address.)
+ */
 exports.generateUnsubscribeLink = functions.https.onCall(async (data, context) => {
-    const { email, emailType = 'general' } = data;
-
+    requireAuth(context);
+    const email = context.auth.token.email;
     if (!email) {
-        throw new functions.https.HttpsError('invalid-argument', 'Email is required');
+        throw new functions.https.HttpsError('failed-precondition', 'Your account has no email address.');
     }
-
     try {
-        // Generate a secure token
-        const token = crypto.randomUUID();
-        const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-
-        // Store the unsubscribe token in Firestore
-        await admin.firestore().collection('unsubscribe_tokens').doc(token).set({
-            email: email.toLowerCase(),
-            emailType,
-            expiresAt,
-            used: false,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-
-        // Generate the unsubscribe link
-        const unsubscribeLink = `https://launchpadhouston.com/unsubscribe?token=${token}`;
-
-        return unsubscribeLink;
+        return await generateUnsubscribeLink(email, (data && data.emailType) || 'general');
     } catch (error) {
-        console.error('Error generating unsubscribe link:', error);
-        throw new functions.https.HttpsError('internal', 'Could not generate unsubscribe link');
+        throw toHttpsError(error, 'Could not generate unsubscribe link');
     }
 });
 
 /**
- * Process unsubscribe request
- * @param {Object} data
- * @param {string} data.token - The unsubscribe token
- * @returns {Object} Result of unsubscribe operation
+ * Process an unsubscribe request. The token itself is the credential (it is only
+ * ever delivered to the mailbox it belongs to), so no sign-in is required.
  */
-exports.processUnsubscribe = functions.https.onCall(async (data, context) => {
-    const { token } = data;
-
-    if (!token) {
+exports.processUnsubscribe = functions.https.onCall(async (data) => {
+    const token = data && data.token;
+    if (!token || typeof token !== 'string') {
         throw new functions.https.HttpsError('invalid-argument', 'Token is required');
     }
 
     try {
-        // Get the unsubscribe token document
-        const tokenDoc = await admin.firestore().collection('unsubscribe_tokens').doc(token).get();
-
-        if (!tokenDoc.exists) {
-            throw new functions.https.HttpsError('not-found', 'Invalid unsubscribe token');
-        }
-
-        const tokenData = tokenDoc.data();
-
-        // Check if token is expired
-        if (tokenData.expiresAt < Date.now()) {
-            throw new functions.https.HttpsError('failed-precondition', 'Unsubscribe token has expired');
-        }
-
-        // Check if token has already been used
-        if (tokenData.used) {
-            throw new functions.https.HttpsError('failed-precondition', 'Unsubscribe token has already been used');
-        }
-
-        // Mark token as used
-        await admin.firestore().collection('unsubscribe_tokens').doc(token).update({
-            used: true,
-            usedAt: admin.firestore.FieldValue.serverTimestamp()
+        const tokenRef = admin.firestore().collection('unsubscribe_tokens').doc(token);
+        const tokenData = await admin.firestore().runTransaction(async (tx) => {
+            const snap = await tx.get(tokenRef);
+            if (!snap.exists) {
+                throw new functions.https.HttpsError('not-found', 'Invalid unsubscribe token');
+            }
+            const t = snap.data();
+            if (t.expiresAt < Date.now()) {
+                throw new functions.https.HttpsError('failed-precondition', 'Unsubscribe token has expired');
+            }
+            if (t.used) {
+                throw new functions.https.HttpsError('failed-precondition', 'Unsubscribe token has already been used');
+            }
+            tx.update(tokenRef, { used: true, usedAt: admin.firestore.FieldValue.serverTimestamp() });
+            return t;
         });
 
-        // Add email to unsubscribe list
-        await admin.firestore().collection('unsubscribed_emails').doc(tokenData.email).set({
-            email: tokenData.email,
-            emailType: tokenData.emailType,
-            unsubscribedAt: admin.firestore.FieldValue.serverTimestamp(),
-            tokenUsed: token
-        });
+        await recordUnsubscribe(tokenData.email, tokenData.emailType, token);
 
         return {
             success: true,
             message: 'Successfully unsubscribed from emails',
-            email: tokenData.email
+            email: tokenData.email,
         };
     } catch (error) {
-        console.error('Error processing unsubscribe:', error);
-        throw new functions.https.HttpsError('internal', 'Could not process unsubscribe request');
+        throw toHttpsError(error, 'Could not process unsubscribe request');
     }
 });
 
-/**
- * Check if an email is unsubscribed
- * @param {Object} data
- * @param {string} data.email - The email to check
- * @param {string} [data.emailType] - Type of email to check
- * @returns {Object} Unsubscribe status
- */
+/** Check whether the CALLER's own email is unsubscribed (no longer an email-enumeration oracle). */
 exports.checkUnsubscribeStatus = functions.https.onCall(async (data, context) => {
-    const { email, emailType } = data;
-
+    requireAuth(context);
+    const email = context.auth.token.email;
     if (!email) {
-        throw new functions.https.HttpsError('invalid-argument', 'Email is required');
+        return { unsubscribed: false };
     }
-
     try {
-        const emailDoc = await admin.firestore().collection('unsubscribed_emails').doc(email.toLowerCase()).get();
-
-        if (!emailDoc.exists) {
-            return { unsubscribed: false };
-        }
-
-        const unsubscribeData = emailDoc.data();
-
-        // If emailType is specified, check if it matches
-        if (emailType && unsubscribeData.emailType && unsubscribeData.emailType !== emailType) {
-            return { unsubscribed: false };
-        }
-
-        return {
-            unsubscribed: true,
-            unsubscribedAt: unsubscribeData.unsubscribedAt,
-            emailType: unsubscribeData.emailType
-        };
+        return { unsubscribed: await isUnsubscribed(email, (data && data.emailType) || 'general') };
     } catch (error) {
-        console.error('Error checking unsubscribe status:', error);
-        throw new functions.https.HttpsError('internal', 'Could not check unsubscribe status');
+        throw toHttpsError(error, 'Could not check unsubscribe status');
     }
-}); 
+});

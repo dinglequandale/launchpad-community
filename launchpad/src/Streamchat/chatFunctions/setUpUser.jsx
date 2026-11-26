@@ -1,7 +1,6 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { StreamChat } from 'stream-chat';
-import { useAuth } from '../../contexts/auth/AuthContext';
 
 // IMPORTANT TODO: call this on this to onboarding
 
@@ -10,8 +9,7 @@ export const getStreamToken = async () => {
     try {
       const result = await getToken();
       if (result.data && result.data.token) {
-        console.log("success!")
-        return result.data.token;
+          return result.data.token;
       } else {
         console.error('Failed to get token:', result.data);
         return null;
@@ -24,6 +22,7 @@ export const getStreamToken = async () => {
   }
 
   const chatClient = StreamChat.getInstance(import.meta.env.VITE_STREAM_API_KEY);
+  let connectPromise = null;
 
   export function useStreamConnection() {
     const [isConnected, setIsConnected] = useState(false);
@@ -32,17 +31,7 @@ export const getStreamToken = async () => {
     // const [userPfp, setUserPfp] = useState("");
     // const { userName, userPfpPreview } = JSON.parse(localStorage.getItem("basicUserInfo"));
 
-    console.log('useStreamConnection hook state:', {
-      isConnected,
-      chatClientUserID: chatClient?.userID,
-      chatClientExists: !!chatClient
-    });
-
     const connectToStream = useCallback(async (user) => {
-      console.log('Attempting to connect to Stream');
-      console.log('Current chatClient.userID:', chatClient.userID);
-      console.log('Current user:', user.uid);
-
       // Check if basicUserInfo exists in localStorage
       const basicUserInfoString = localStorage.getItem("basicUserInfo");
       if (!basicUserInfoString) {
@@ -52,15 +41,27 @@ export const getStreamToken = async () => {
 
       const {userName, userPfpPreview} = JSON.parse(basicUserInfoString);
 
-      if(chatClient.userID){
-        setIsConnected(true);
-        isConnectedRef.current = true;
+      // The Stream client is a module-level singleton. If a different account was
+      // connected in this tab (logout -> login without a reload), disconnect it first;
+      // otherwise the new user would be handed the previous user's chat session.
+      if (chatClient.userID && chatClient.userID !== user.uid) {
+        await chatClient.disconnectUser();
+        connectPromise = null;
       }
 
-      if (!isConnectedRef.current && !chatClient.userID) {
+      if (chatClient.userID === user.uid && !connectPromise) {
+        setIsConnected(true);
+        isConnectedRef.current = true;
+        return;
+      }
 
-        try {
+      // De-duplicate concurrent calls (GlobalAuthWrapper may call this twice on load).
+      if (!connectPromise) {
+        connectPromise = (async () => {
           const token = await getStreamToken();
+          if (!token) {
+            throw new Error('Could not obtain a chat token');
+          }
           await chatClient.connectUser(
             {
               id: user.uid,
@@ -69,12 +70,16 @@ export const getStreamToken = async () => {
             },
             token
           );
-          console.log("Connected! chatClient.userID:", chatClient.userID);
-          setIsConnected(true);
-          isConnectedRef.current = true;
-        } catch (error) {
-          console.error('Error connecting to Stream:', error);
-        }
+        })();
+      }
+
+      try {
+        await connectPromise;
+        setIsConnected(true);
+        isConnectedRef.current = true;
+      } catch (error) {
+        connectPromise = null;
+        console.error('Error connecting to Stream:', error);
       }
     }, []); // Remove isConnected from dependencies to prevent infinite loops
 
@@ -102,7 +107,9 @@ export const getStreamToken = async () => {
   }
 
   export function disconnectFromStream() {
+    connectPromise = null;
     if (chatClient.userID) {
-      chatClient.disconnectUser();
+      return chatClient.disconnectUser();
     }
+    return Promise.resolve();
   }

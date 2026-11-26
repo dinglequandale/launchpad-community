@@ -11,9 +11,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # The app lives in launchpad/, and dependencies were never installed, so the
+      # previous `npm run build` at the repo root could not succeed.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: launchpad/package-lock.json
+      - run: npm ci
+        working-directory: launchpad
       - run: npm run build
+        working-directory: launchpad
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
+          entryPoint: launchpad
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_LAUNCHPAD_E7E5A }}
           channelId: live

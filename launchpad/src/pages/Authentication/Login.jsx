@@ -106,7 +106,9 @@ export default function Login(){
                         loading: 'Logging you in ...',
                         success: "Welcome back!",
                         error: (err) => {
-                            if (err.code === 'auth/user-not-found') {
+                            if (err.code === 'auth/invalid-credential') {
+                                return 'Incorrect email or password. Please try again.';
+                            } else if (err.code === 'auth/user-not-found') {
                                 return 'Account not found. Please check your email or sign up.';
                             } else if (err.code === 'auth/wrong-password') {
                                 return 'Incorrect password. Please try again.';

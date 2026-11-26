@@ -21,6 +21,7 @@ import OrganizationProfileModal from "../../components/Organizationprofile/Organ
 import NetworkingCommitmentModal from "../../components/NetworkingCommitmentModal/NetworkingCommitmentModal";
 import SixDegreesWelcomeModal from "../../components/SixDegreesWelcomeModal/SixDegreesWelcomeModal";
 import HSWelcomeModal from "../../components/HSWelcomeModal/HSWelcomeModal";
+import { openExternalUrl, toSafeMailto } from '../../utils/safeUrl';
 
 
 class ErrorBoundary extends React.Component {
@@ -298,10 +299,10 @@ export default function Home(){
             
             if (learnMoreMethod === 'Website' && learnMoreValue) {
                 // Open website in new tab
-                window.open(learnMoreValue, '_blank', 'noopener,noreferrer')
+                openExternalUrl(learnMoreValue)
             } else if (learnMoreMethod === 'Email' && learnMoreValue) {
                 // Open email client
-                window.location.href = `mailto:${learnMoreValue}`
+                window.location.href = toSafeMailto(learnMoreValue) || '#'
             } else if (learnMoreMethod === 'Messages' && userData) {
                 // Open connect modal for messaging
                 openConnectModal({

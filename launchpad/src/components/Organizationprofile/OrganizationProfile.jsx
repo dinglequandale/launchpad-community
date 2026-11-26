@@ -11,6 +11,7 @@ import { db } from '../../firebase/firebaseConfig'
 import { displayFieldsOfInterest } from '../../services/userProfileServices'
 import { stableLinkCheck } from '../../services/opportunityServices'
 import toast from 'react-hot-toast'
+import { toSafeMailto } from '../../utils/safeUrl';
 
 export default function OrganizationProfile({ organizationData, location, handleShowProfile, handleReferalClick, isPublished = true, isPreview = false, hideHeartButton = false }) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
@@ -400,7 +401,7 @@ export default function OrganizationProfile({ organizationData, location, handle
                         <div key={index} className="v0-collaborator-item">
                           <span className="v0-collaborator-name">{collaborator.name}</span>
                           <a
-                            href={`mailto:${collaborator.email}`}
+                            href={toSafeMailto(collaborator.email) || undefined}
                             className="v0-collaborator-email"
                             onClick={(e) => e.stopPropagation()} // Prevent card click navigation
                           >

@@ -63,13 +63,6 @@ function GlobalAuthWrapper() {
   } = useConnections();
   // Connection modal handlers
   const handleOnConnectClick = async (connectingUserData) => {
-    console.log('GlobalAuthWrapper handleOnConnectClick called with:', {
-      connectingUserData,
-      chatClient: !!chatClient,
-      isConnected,
-      chatClientUserID: chatClient?.userID
-    });
-    
     setConnectedUserData(connectingUserData);
     setShowVerifiedConnectionModal(true);
   };
@@ -127,78 +120,75 @@ function GlobalAuthWrapper() {
   }, []);
 
   useEffect(() => {
-    let unsubscribe;
-    const initializeUser = async () => {
-      if (!currentUser) {
-        // Store the current location before redirecting to signup
-        if (location.pathname !== '/' && location.pathname !== '/Login' && location.pathname !== '/Signup') {
-          sessionStorage.setItem('intendedDestination', location.pathname);
-        }
-        navigate("/Signup");
+    if (loading) return undefined;
+
+    if (!currentUser) {
+      // Store the current location before redirecting to signup
+      if (location.pathname !== '/' && location.pathname !== '/Login' && location.pathname !== '/Signup') {
+        sessionStorage.setItem('intendedDestination', location.pathname);
+      }
+      navigate("/Signup");
+      return undefined;
+    }
+
+    let cancelled = false;
+    const userRef = doc(db, 'users', currentUser.uid);
+
+    // NOTE: the previous implementation returned this cleanup from inside an async
+    // function, so React never received it: every auth change stacked another
+    // Firestore listener that was never removed (and kept firing after logout).
+    const unsubscribe = onSnapshot(userRef, async (docSnap) => {
+      if (cancelled) return;
+      if (!docSnap.exists()) {
+        navigate("/Onboarding");
         return;
       }
 
-      try {
-        // COMMUNITY VERSION: Removed tenant-based architecture and custom claims
-        console.log("Initializing user UID: ", currentUser.uid);
-        const userRef = doc(db, 'users', currentUser.uid);
-        async function initializeApp() {
-          if (currentUser && !isConnected) {
-            unsubscribe = onSnapshot(userRef, async (docSnap) => {
-              if (!docSnap.exists()) {
-                navigate("/Onboarding");
-                return;
-              }
+      let data = docSnap.data();
 
-              let data = docSnap.data();
-
-              // Set active society from user's societies field
-              if (data.societies && data.societies.length > 0) {
-                const primarySociety = data.societyPrimary || data.societies[0];
-                localStorage.setItem('activeSociety', primarySociety);
-              }
-
-              // For society users, fetch full data from society subcollection
-              if (data.societyPrimary) {
-                try {
-                  const societyDoc = await getDoc(doc(db, 'societies', data.societyPrimary, 'users', currentUser.uid));
-                  if (societyDoc.exists()) {
-                    data = societyDoc.data();
-                  }
-                } catch (err) {
-                  console.error('Error fetching society user data:', err);
-                }
-              }
-
-              packageBasicUserInfoToLS(data);
-              pushInitialProfileCompletion(data);
-
-              // connections population logic
-              fetchAndStoreConnections();
-            });
-
-            await connectToStream(currentUser);
-          }
-          setIsInitializing(false);
-        }
-
-        if (!loading) {
-          initializeApp();
-        }
-
-        return () => {
-          if (unsubscribe) {
-              unsubscribe();
-          }
-      };
-      } catch (error) {
-        console.error("Error initializing user:", error);
-        navigate("/Onboarding");
+      // Set active society from user's societies field
+      if (data.societies && data.societies.length > 0) {
+        const primarySociety = data.societyPrimary || data.societies[0];
+        localStorage.setItem('activeSociety', primarySociety);
       }
-    };
 
-    initializeUser();
-  }, [currentUser, isConnected, connectToStream, loading, fetchAndStoreConnections, navigate]);
+      // For society users, fetch full data from society subcollection
+      if (data.societyPrimary) {
+        try {
+          const societyDoc = await getDoc(doc(db, 'societies', data.societyPrimary, 'users', currentUser.uid));
+          if (societyDoc.exists()) {
+            data = societyDoc.data();
+          }
+        } catch (err) {
+          console.error('Error fetching society user data:', err);
+        }
+      }
+      if (cancelled) return;
+
+      packageBasicUserInfoToLS(data);
+      pushInitialProfileCompletion(data);
+      fetchAndStoreConnections();
+
+      // Stream needs the profile (name/picture) from localStorage. On a fresh
+      // device that only exists after this first snapshot, so connect here as well;
+      // connectToStream is a no-op once connected.
+      await connectToStream(currentUser);
+      if (!cancelled) setIsInitializing(false);
+    }, (error) => {
+      console.error("Error listening to user profile:", error);
+      if (!cancelled) setIsInitializing(false);
+    });
+
+    // Returning users already have their profile cached; connect right away.
+    connectToStream(currentUser).finally(() => {
+      if (!cancelled && localStorage.getItem("basicUserInfo")) setIsInitializing(false);
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [currentUser, loading, connectToStream, fetchAndStoreConnections, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Show loading screen if: still loading OR minimum display time hasn't elapsed
   if (loading || isInitializing || !minLoadingTimeElapsed) {
@@ -217,12 +207,6 @@ function GlobalAuthWrapper() {
     <ModalProvider chatClient={chatClient}>
       {showVerifiedConnectionModal && (
         <>
-          {console.log('GlobalAuthWrapper rendering ConnectModal with:', {
-            chatClient: !!chatClient,
-            chatClientUserID: chatClient?.userID,
-            isConnected,
-            connectedUserData: connectedUserData?.userId
-          })}
           <ConnectModal 
             onClose={() => setShowVerifiedConnectionModal(false)} 
             userData={connectedUserData} 
@@ -243,12 +227,6 @@ function GlobalAuthWrapper() {
           refetchConnections={refetchConnections}
         />
       )}
-      {console.log('GlobalAuthWrapper providing chatClient to Outlet:', {
-        chatClient: !!chatClient,
-        chatClientUserID: chatClient?.userID,
-        isConnected,
-        chatClientType: typeof chatClient
-      })}
       <Outlet context={{ chatClient, isConnected }} />
     </ModalProvider>
   );

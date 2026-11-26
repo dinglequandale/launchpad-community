@@ -713,7 +713,7 @@ function FinalInfo(){
   const { organizationData, setOrganizationData, organizationQuestionsConfig, setOrganizationLogo, currentUser } = useContext(OpportunityContext);
   const logoRef = useRef();
   
-  const learnMoreAndApplyOptions = [["Website", <CgWebsite size={20}/>], ["Email", <MdEmail size={20}/>], ["Messages", <LuMessagesSquare size={20}/>]];
+  const learnMoreAndApplyOptions = [["Website", <CgWebsite key="website" size={20}/>], ["Email", <MdEmail key="email" size={20}/>], ["Messages", <LuMessagesSquare key="messages" size={20}/>]];
   
   const [learnMoreType, setLearnMoreType] = useState("");
   const [applyType, setApplyType] = useState("");

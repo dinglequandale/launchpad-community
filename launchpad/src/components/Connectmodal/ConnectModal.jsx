@@ -10,6 +10,7 @@ import { displayShortenedLinkedin, formatLinkedInUrl } from '../../services/user
 import { addOrUpdateConnection } from '../../services/connectionService';
 import Loading from '../LoadingAnimation/Loading';
 import './ConnectModal.css';
+import { findUserResume } from '../../services/userProfileServices';
 
 // TODO: actually implement clickedUser logic
 export default function ConnectModal({visibility, chat, onClose, userId, userData, isOpportunity=false, opportunityType=null, onConnectionSuccess, isConnected: initialConnectionStatus}){
@@ -76,9 +77,7 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
       if (!visibility || !currentUser) return;
 
       try {
-        const resumeRef = ref(storage, `resumes/${currentUser.uid}`);
-        await getMetadata(resumeRef);
-        setHasResume(true);
+        setHasResume(Boolean(await findUserResume(currentUser.uid)));
       } catch (error) {
         // Resume doesn't exist
         setHasResume(false);
@@ -185,9 +184,10 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
         let channelId;
         if (sendWithResume) {
           // Fetch resume data for sending with resume
-          const resumeRef = ref(storage, `resumes/${currentUser.uid}`);
-          const resumeURL = await getDownloadURL(resumeRef);
-          const metaData = await getMetadata(resumeRef);
+          const resume = await findUserResume(currentUser.uid);
+          if (!resume) throw new Error('Resume not found');
+          const resumeURL = await getDownloadURL(resume.ref);
+          const metaData = resume.metadata;
 
           channelId = await sendConnectMessageWithResume(
             introMessage,
@@ -225,8 +225,8 @@ export default function ConnectModal({visibility, chat, onClose, userId, userDat
   const verifySend = async () => {
     try {
       // Check if user has a resume
-      const resumeRef = ref(storage, `resumes/${currentUser.uid}`);
-      const metadata = await getMetadata(resumeRef);
+      const resume = await findUserResume(currentUser.uid);
+      const metadata = resume?.metadata;
       
       if (metadata) {
         // User has a resume, proceed with sending

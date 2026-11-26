@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import { auth } from "../../firebase/firebaseConfig";
 // import { GoogleAuthProvider } from "firebase/auth";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { disconnectFromStream } from "../../Streamchat/chatFunctions/setUpUser";
 
 const AuthContext = React.createContext();
 
@@ -24,7 +25,9 @@ export function AuthProvider({ children }) {
   async function initializeUser(user) {
     if (user) {
 
-      setCurrentUser({ ...user });
+      // Keep the real Firebase User instance. Spreading it ({ ...user }) dropped every
+      // prototype method (delete, getIdToken, reload, ...), which broke account deletion.
+      setCurrentUser(user);
 
       // check if provider is email and password login
       const isEmail = user.providerData.some(
@@ -49,9 +52,12 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
+      // Disconnect chat first so the next account in this tab never inherits it.
+      await disconnectFromStream().catch(() => {});
       await signOut(auth);
       // Clear any local storage or state
       localStorage.clear();
+      sessionStorage.clear();
     } catch (error) {
       console.error('Logout error:', error);
       throw error;

@@ -1,86 +1,183 @@
 rules_version = '2';
 
+// Security model
+// --------------
+// * Clients read the community directory and write ONLY their own data.
+// * Everything that sends email, links two users, or consumes a shared resource
+//   (connections, mail, reports, invitations, feedback, unsubscribe records,
+//   society access codes, rate limits) is written exclusively by Cloud Functions
+//   via the Admin SDK, which bypasses these rules. Clients get no access.
+// * Admins are listed in `admins/{uid}` (create those docs from the console).
+//
+// Anything not matched below is denied by default.
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users collection
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function hasGrant(societyId) {
+      return exists(/databases/$(database)/documents/societies/$(societyId)/grants/$(request.auth.uid));
+    }
+
+    // A user may only add a society to their own profile after redeeming that
+    // society's access code (redeemSocietyAccessCode writes the grant).
+    function societiesChangeAllowed() {
+      let before = resource == null ? [] : resource.data.get('societies', []);
+      let after = request.resource.data.get('societies', []);
+      let added = after.toSet().difference(before.toSet());
+      let primary = request.resource.data.get('societyPrimary', null);
+      return after is list
+        && (primary == null || primary == '' || primary in after)
+        && (added.size() == 0 || (added == ['hsfs'].toSet() && hasGrant('hsfs')));
+    }
+
+    function isMemberOf(societyId) {
+      return hasGrant(societyId)
+        || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('societies', []).hasAny([societyId]);
+    }
+
+    // ---------------------------------------------------------------- users
     match /users/{userId} {
-      // Anyone authenticated can read all user profiles (community-wide)
-      allow read: if request.auth != null;
-      // Users can only modify their own profile
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow read: if signedIn();
+      allow create, update: if isSelf(userId) && societiesChangeAllowed();
+      allow delete: if isSelf(userId);
     }
 
-    // Connections collection
+    // Admin allow-list. Users may check whether they themselves are an admin.
+    match /admins/{adminId} {
+      allow read: if isSelf(adminId);
+    }
+
+    // ---------------------------------------------------------- connections
+    // Written only by the manageConnections function. Participants may read.
     match /connections/{connectionId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
+      allow read: if signedIn()
+        && (resource.data.initiateUserId == request.auth.uid
+            || resource.data.targetUserId == request.auth.uid);
     }
 
-    // Opportunities collection - TEMPORARILY OPEN FOR POPULATION
+    // -------------------------------------------------------- opportunities
     match /opportunities/{opportunityId} {
-      allow read: if request.auth != null;
-      // TEMPORARY: Allow any authenticated user to create opportunities
-      // TODO: After population, change this to:
-      // allow create: if request.auth != null && request.resource.data.createdBy == request.auth.uid;
-      // allow update, delete: if request.auth != null && resource.data.createdBy == request.auth.uid;
-      allow write: if request.auth != null;
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.createdBy == request.auth.uid;
+      allow update: if (signedIn()
+                        && resource.data.createdBy == request.auth.uid
+                        && request.resource.data.createdBy == request.auth.uid)
+                    || isAdmin();
+      allow delete: if (signedIn() && resource.data.createdBy == request.auth.uid) || isAdmin();
     }
 
-    // Reports collection
-    match /reports/{reportId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-    }
+    // ------------------------------------------- server-only collections
+    // Reports, invitations, mail queue, feedback and email bookkeeping are
+    // created by Cloud Functions. Admins may read them from the client.
+    match /reports/{id}               { allow read: if isAdmin(); }
+    match /invitation_batches/{id}    { allow read: if isAdmin(); }
+    match /mail/{id}                  { allow read: if isAdmin(); }
+    match /feedback/{id}              { allow read: if isAdmin(); }
+    match /email_batches/{id}         { allow read: if isAdmin(); }
+    match /unsubscribe_tokens/{id}    { allow read, write: if false; }
+    match /unsubscribed_emails/{id}   { allow read, write: if false; }
+    match /rate_limits/{id}           { allow read, write: if false; }
 
-    // Invitation batches
-    match /invitation_batches/{batchId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // Mail queue
-    match /mail/{emailId} {
-      allow read, write: if request.auth != null;
-    }
-
-    // High schools collection - dynamic, user-contributed
+    // --------------------------------------------------------- high schools
+    // User-contributed list: anyone signed in can add a school, nobody can edit.
     match /high_schools/{schoolId} {
-      // Anyone authenticated can read all high schools
-      allow read: if request.auth != null;
-      // Anyone authenticated can create new high schools (for adding unlisted schools)
-      // But cannot update or delete existing ones (prevent vandalism)
-      allow create: if request.auth != null
+      allow read: if signedIn();
+      allow create: if signedIn()
                     && request.resource.data.label is string
                     && request.resource.data.label.size() > 0
-                    && request.resource.data.value is string;
+                    && request.resource.data.label.size() <= 200
+                    && request.resource.data.value is string
+                    && request.resource.data.value.size() <= 200;
     }
 
-    // Societies collection — used for HSFS and future societies
+    // ------------------------------------------------------------ societies
+    // The society root doc holds access codes and usage limits: server-only.
     match /societies/{societyId} {
-      // Anyone authenticated can read society docs (needed for access code verification)
-      allow read: if request.auth != null;
-      // Only admins write to the society root doc (access codes, usage counts)
-      // For now allow any authenticated user to update usage tracking fields
-      allow update: if request.auth != null;
+      allow read, write: if isAdmin();
 
       match /users/{userId} {
-        // Anyone authenticated can read society member profiles
-        allow read: if request.auth != null;
-        // Users can only write their own society profile
-        allow write: if request.auth != null && request.auth.uid == userId;
+        allow read: if signedIn();
+        allow write: if isSelf(userId) && isMemberOf(societyId);
+      }
+
+      match /grants/{userId} {
+        allow read: if isSelf(userId);
+      }
+
+      // Society-scoped opportunities (e.g. HSFS). Members read; creators edit.
+      match /opportunities/{opportunityId} {
+        allow read: if signedIn() && isMemberOf(societyId);
+        allow create: if signedIn() && isMemberOf(societyId)
+                      && request.resource.data.createdBy == request.auth.uid;
+        allow update: if (signedIn()
+                          && resource.data.createdBy == request.auth.uid
+                          && request.resource.data.createdBy == request.auth.uid)
+                      || isAdmin();
+        allow delete: if (signedIn() && resource.data.createdBy == request.auth.uid) || isAdmin();
       }
     }
 
-    // Onboarding analytics collection
+    // -------------------------------------------------- onboarding analytics
+    // Contains first names of (often minor) users: write-only for clients.
     match /onboarding_analytics/{dateId} {
-      // Allow authenticated users to read analytics
-      allow read: if request.auth != null;
-      // Allow authenticated users to create and update daily analytics
-      // This is needed for the trackOnboardingSubmission function
-      allow create, update: if request.auth != null
-                            && request.resource.data.date is string
-                            && request.resource.data.count is number
-                            && request.resource.data.firstNames is list;
+      allow read: if isAdmin();
+      allow create: if signedIn()
+                    && request.resource.data.keys().hasOnly(['date', 'count', 'firstNames'])
+                    && request.resource.data.date == dateId
+                    && request.resource.data.count == 1
+                    && request.resource.data.firstNames is list
+                    && request.resource.data.firstNames.size() == 1;
+      allow update: if signedIn()
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count', 'firstNames'])
+                    && request.resource.data.count == resource.data.count + 1
+                    && request.resource.data.firstNames is list
+                    && request.resource.data.firstNames.size() <= resource.data.firstNames.size() + 1;
+    }
+
+    // ------------------------------------------------------------- waitlist
+    // Public sign-up form (no account required). Synced to Sheets by a trigger.
+    match /waitlist/{entryId} {
+      allow create: if request.resource.data.keys().hasOnly(
+                        ['fullName', 'gradeLevel', 'interests', 'email', 'createdAt', 'syncedToSheets'])
+                    && request.resource.data.fullName is string
+                    && request.resource.data.fullName.size() > 0
+                    && request.resource.data.fullName.size() <= 200
+                    && request.resource.data.email is string
+                    && request.resource.data.email.size() <= 254
+                    && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')
+                    && request.resource.data.interests is list
+                    && request.resource.data.interests.size() <= 50
+                    && request.resource.data.createdAt == request.time
+                    && request.resource.data.syncedToSheets == false;
+      allow read: if isAdmin();
+    }
+
+    // ------------------------------------------ 6 degree program applications
+    match /6_degree_applications/{applicationId} {
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin();
+    }
+
+    // ----------------------------------------------------- migration tokens
+    // Created by sendGraduationEmails. The owner can read theirs and mark it used.
+    match /migration_tokens/{tokenId} {
+      allow get: if signedIn() && resource.data.userId == request.auth.uid;
+      allow update: if signedIn()
+                    && resource.data.userId == request.auth.uid
+                    && resource.data.used == false
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'usedAt'])
+                    && request.resource.data.used == true;
     }
   }
 }

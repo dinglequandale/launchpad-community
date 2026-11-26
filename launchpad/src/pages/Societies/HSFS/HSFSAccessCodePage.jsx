@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
 import SecurityCodeInput from "../../../components/Security Key/SecurityInput";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { db } from "../../../firebase/firebaseConfig";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { HSFS_ACCESS_CODE_KEY } from "../../../services/hsfsOnboardingServices";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/auth/AuthContext";
 import { useSociety } from "../../../contexts/SocietyContext";
@@ -11,7 +11,6 @@ export default function HSFSAccessCodePage() {
     const navigate = useNavigate();
     const { userLoggedIn } = useAuth();
     const { setSociety } = useSociety();
-    const today = (new Date()).toLocaleDateString('en-US');
 
     // Only redirect to Home if the user is already an HSFS member.
     // Existing Launchpad users who are not yet HSFS members must still go through this page.
@@ -27,57 +26,27 @@ export default function HSFSAccessCodePage() {
         const loadingToast = toast.loading('Verifying your code...');
 
         try {
-            const societyRef = doc(db, "societies", "hsfs");
-            const societyDoc = await getDoc(societyRef);
+            // Codes are checked server-side; the society document (codes, limits) is
+            // no longer readable from the browser. The code is consumed later, when
+            // the user actually joins (redeemSocietyAccessCode).
+            const verify = httpsCallable(getFunctions(), 'verifySocietyAccessCode');
+            const { data } = await verify({ societyId: 'hsfs', code: key });
 
-            if (!societyDoc.exists()) {
-                toast.error('Society not found. Please contact support.', { id: loadingToast });
-                return;
-            }
-
-            const data = societyDoc.data();
-            const accessCodes = data.accessCodes || {};
-
-            let matchedKeyType = null;
-            for (const [type, value] of Object.entries(accessCodes)) {
-                if (value === key) {
-                    matchedKeyType = type;
-                    break;
-                }
-            }
-
-            if (!matchedKeyType) {
-                toast.error('Invalid code!', { id: loadingToast });
-                return;
-            }
-
-            // Check expiration
-            if (data.expiration_date?.toDate && new Date() > data.expiration_date.toDate()) {
-                toast.error("This code has expired. Please request a new one!", { id: loadingToast });
-                return;
-            }
-
-            // Check usage limits
-            if ((data.usages_threshold <= data.usages_count) ||
-                (data.daily_usages_threshold <= (data.daily_usage_tracker?.[today] || 0))) {
-                toast.error("Code usage limit reached. Please contact houstonstudentfinancesociety@gmail.com for help.", { id: loadingToast });
+            if (!data.valid) {
+                const messages = {
+                    invalid: 'Invalid code!',
+                    expired: 'This code has expired. Please request a new one!',
+                    limit: 'Code usage limit reached. Please contact houstonstudentfinancesociety@gmail.com for help.',
+                };
+                toast.error(messages[data.reason] || 'Invalid code!', { id: loadingToast });
                 return;
             }
 
             toast.success('Access code verified!', { id: loadingToast });
+            sessionStorage.setItem(HSFS_ACCESS_CODE_KEY, key);
 
             // Set society context
             setSociety('hsfs');
-
-            // Update usage tracking
-            await updateDoc(societyRef, {
-                last_used: new Date(),
-                usages_count: (data.usages_count || 0) + 1,
-                daily_usage_tracker: {
-                    ...data.daily_usage_tracker,
-                    [today]: (data.daily_usage_tracker?.[today] || 0) + 1
-                }
-            });
 
             // If already logged in, go to the lightweight HSFS join page (just interests).
             // Otherwise, proceed to full signup + onboarding.
@@ -88,7 +57,10 @@ export default function HSFSAccessCodePage() {
             }
         } catch (error) {
             console.error('Error verifying code:', error);
-            toast.error('An error occurred while verifying your code', { id: loadingToast });
+            const message = error?.code === 'functions/resource-exhausted'
+                ? 'Too many attempts. Please wait a while and try again.'
+                : 'An error occurred while verifying your code';
+            toast.error(message, { id: loadingToast });
         } finally {
             setIsSubmitting(false);
         }

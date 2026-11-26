@@ -2,7 +2,7 @@ import { db, storage } from '../firebase/firebaseConfig';
 import { collection, addDoc, updateDoc, doc, query, where, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
-// import { deleteFromTypesense, updateTypesense } from '../typesense/typesenseClient';
+import { toSafeHttpUrl } from '../utils/safeUrl';
 
 export const saveOpportunity = async (opportunityData, organizationLogo, currentUser, isEditing, opportunityId, collectionPath = "opportunities") => {
   // COMMUNITY VERSION: Removed tenant-based architecture
@@ -43,14 +43,8 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
   }
 };
 
-export const stableLinkCheck = (link) => {
-  if(!link.includes("http")){
-    return "https://" + link;
-  }
-  else{
-    return link;
-  }
-}
+// Returns a safe http(s) URL, or "" for anything else (e.g. javascript: links).
+export const stableLinkCheck = (link) => toSafeHttpUrl(link);
 
 const uploadImage = async (file, opportunityId) => {
   const storageRef = ref(storage, `opportunity-logos/${opportunityId}`);

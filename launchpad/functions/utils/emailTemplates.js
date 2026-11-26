@@ -833,7 +833,14 @@ exports.connectionAcceptedEmailTemplate = (recipientName, accepterName, accepter
  * Sent when a new opportunity matches user's interests/skills
  */
 exports.opportunityMatchEmailTemplate = (recipientName, opportunityTitle, opportunityType, companyName, matchScore, matchReasons, deadline, postedBy, unsubscribeLink, opportunityId) => {
-  const deadlineText = deadline ? new Date(deadline.seconds * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null;
+  // deadline may be a Firestore Timestamp, a Date, or an ISO/date string.
+  const deadlineDate = !deadline ? null
+    : typeof deadline.toDate === 'function' ? deadline.toDate()
+    : typeof deadline.seconds === 'number' ? new Date(deadline.seconds * 1000)
+    : new Date(deadline);
+  const deadlineText = deadlineDate && !isNaN(deadlineDate.getTime())
+    ? deadlineDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : null;
 
   return `
     <!DOCTYPE html>
@@ -1219,3 +1226,36 @@ exports.newMessageEmailTemplate = (recipientName, senderName, messagePreview, un
     </html>
   `;
 };
+
+/*
+ * SECURITY: every template above interpolates user-controlled values (names,
+ * descriptions, opportunity titles, message previews, ...) directly into HTML.
+ * Wrap each exported template so that string arguments are HTML-escaped and
+ * URL-like arguments are restricted to http(s). Non-string arguments (numbers,
+ * Firestore Timestamps) are passed through untouched.
+ */
+const { escapeHtml, safeHttpUrl } = require('./security');
+
+const URL_ARG_NAMES = /(link|pfp|url)$/i;
+
+function escapeTemplateArgs(fn) {
+  const argNames = ((fn.toString().match(/^[^(]*\(([^)]*)\)/) || [])[1] || '')
+    .split(',')
+    .map((s) => s.trim());
+  return (...args) => fn(...args.map((arg, i) => {
+    const name = argNames[i] || '';
+    if (typeof arg === 'string') {
+      return URL_ARG_NAMES.test(name) ? escapeHtml(safeHttpUrl(arg)) : escapeHtml(arg);
+    }
+    if (Array.isArray(arg)) {
+      return arg.map((item) => (typeof item === 'string' ? escapeHtml(item) : item));
+    }
+    return arg;
+  }));
+}
+
+for (const key of Object.keys(exports)) {
+  if (typeof exports[key] === 'function' && key.endsWith('Template')) {
+    exports[key] = escapeTemplateArgs(exports[key]);
+  }
+}

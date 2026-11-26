@@ -24,8 +24,6 @@ npm run preview
 # Lint code
 npm run lint
 
-# Populate Typesense search index
-npm run populate
 ```
 
 ### Firebase Functions
@@ -71,7 +69,9 @@ The database uses **flat root-level collections** (not nested under tenants):
 - `opportunities/{opportunityId}` - Job/internship opportunities
 - `reports/{reportId}` - User reports for moderation
 - `invitation_batches/{batchId}` - Invitation tracking
-- `mail/{emailId}` - Email queue for Firebase Auto Send + MailGun
+- `mail/{emailId}` - Email queue for Firebase Auto Send + MailGun (server-only)
+- `admins/{uid}` - Admin allow-list (created from the console)
+- `societies/{societyId}` - Society config incl. access codes (server-only); `users/` and `grants/` subcollections
 
 ### User Types
 
@@ -89,9 +89,10 @@ Connections are **bidirectional** with two states:
 - `pending` - Connection request sent, awaiting approval
 - `approved` - Connection accepted by both parties
 
-Each connection creates **two documents** with reciprocal roles:
-- One with `role: 'initiator'` (user who sent request)
-- One with `role: 'target'` (user who received request)
+Each connection is a **single document** `{ initiateUserId, targetUserId, status }`.
+`manageConnections` annotates query results with `role: 'initiator' | 'target'` from the
+caller's point of view. Connections are written **only** by the `manageConnections`
+function: new requests are always `pending`, and only the target can approve.
 
 **Removed Features** (from school version):
 - Parent verification system for high schoolers
@@ -113,22 +114,22 @@ Active callable functions:
 
 | Function | Purpose |
 |----------|---------|
-| `manageConnections` | CRUD operations for user connections |
+| `manageConnections` | Connections: create (pending only), approve (target only), remove, query |
 | `createStreamToken` | Generate JWT tokens for Stream Chat |
-| `sendEmailNotifications` | Send email notifications via MailGun |
-| `sendInviteEmail` | Send invitation emails to new users |
-| `sendReport` | Handle user reports and moderation |
-| `getEmail` | Retrieve user email addresses |
-| `generateUnsubscribeLink` | Create email unsubscribe links |
-| `processUnsubscribe` | Handle unsubscribe requests |
-| `deleteAuthUsers` | Delete Firebase Auth users |
+| `sendEmailNotifications` | New-message email (caller must be connected to the receiver) |
+| `sendInviteEmail` | Invitation emails (validated, rate limited) |
+| `sendSESEmail` | Client-templated emails (signed-in, allow-listed types, rate limited) |
+| `sendReport` / `sendFeedback` | Moderation reports and feedback |
+| `getEmail` | Return the caller's own email |
+| `generateUnsubscribeLink` / `processUnsubscribe` / `checkUnsubscribeStatus` | Unsubscribe handling |
+| `deleteMyAccount` | Delete the caller's account and all their data |
+| `verifySocietyAccessCode` / `redeemSocietyAccessCode` | Society (HSFS) access codes |
+| `sendGraduationEmails` / `sendMigrationReminders` | Graduation emails (**admin only**) |
 
-**Commented Out** (removed in community migration):
-- `createSchoolClaim` - Custom claims for school assignment
-- `generateVerificationLink` - Parent email verification
-- `verifyParentToken` - Parent verification token validation
-- `sendGraduationEmails` - Graduation email campaigns
-- `migrateAlumniToTenants` - Tenant migration utilities
+Shared helpers live in `functions/utils/security.js` (escaping, auth/admin guards, rate
+limiting) and `functions/utils/unsubscribe.js`. **Every user-supplied string placed in
+email HTML must be escaped.** The school-version functions (school claims, parent
+verification) and the unauthenticated `deleteAuthUsers` endpoint have been deleted.
 
 ## Key Files and Services
 
@@ -187,7 +188,7 @@ Active callable functions:
 
 ### Stream Chat
 
-**`src/Streamchat/chatFunctions/setUpUser.js`**
+**`src/Streamchat/chatFunctions/setUpUser.jsx`**
 - `useStreamConnection` hook for initializing Stream Chat
 - Connects user to Stream with custom token from Cloud Function
 
@@ -295,9 +296,14 @@ Currently no automated test suite. Manual testing recommended for:
 
 Rules enforce:
 - Authenticated users can read all profiles (community-wide)
-- Users can only modify their own profile
-- Connection participants can read/modify their connections
-- Opportunity creators can edit their own opportunities
+- Users can only modify their own profile; adding a society requires a redeemed access-code grant
+- Connections: participants can read; only Cloud Functions write
+- Opportunities: only the creator (or an admin) can edit/delete
+- Mail, reports, invitations, feedback, unsubscribe data, society config: server-only
+- Waitlist: public create with field validation; 6-degree applications: owner create only
+- Storage: users can only write their own files, with size/content-type limits
+
+Never loosen a rule "temporarily" for a data migration -- run migrations with the Admin SDK.
 
 **No longer enforced**:
 - School-based tenant isolation
@@ -306,7 +312,7 @@ Rules enforce:
 
 ## Common Gotchas
 
-1. **Connection Documents Are Dual**: Every connection creates two documents with reciprocal roles. Always query both directions.
+1. **One Document Per Connection**: A connection is a single document; the user may be either `initiateUserId` or `targetUserId`, so always query both directions (or use `manageConnections`).
 
 2. **User ID Fields**: User documents may have `userId` or `id` fields. Always check both:
    ```javascript
@@ -317,9 +323,13 @@ Rules enforce:
 
 4. **localStorage Usage**: Connection states are cached in localStorage for performance. Clear on logout or data changes.
 
-5. **College Student vs Alumni**: Frontend may still reference "Alumni" in old code. Prefer "College Student" in new code.
+5. **User-supplied links**: always pass them through `src/utils/safeUrl.js`
+   (`toSafeHttpUrl`, `openExternalUrl`, `toSafeMailto`) before using them in `href` or
+   `window.open` -- React 18 still executes `javascript:` URLs.
 
-6. **Email System**: All emails use Firebase Auto Send + MailGun. Never use Gmail OAuth2 (legacy system).
+6. **College Student vs Alumni**: Frontend may still reference "Alumni" in old code. Prefer "College Student" in new code.
+
+7. **Email System**: All emails use Firebase Auto Send + MailGun. Never use Gmail OAuth2 (legacy system).
 
 ## File Organization
 
@@ -337,14 +347,14 @@ src/
 │   └── Settings/       # User settings
 ├── services/           # Business logic and Firebase operations
 ├── Streamchat/         # Stream Chat integration
-├── typesense/          # Typesense search client (alternative to Algolia)
 ├── utils/              # Utility functions and templates
 ├── App.jsx             # Root app component
 └── main.jsx            # React Router setup and app entry
 
 functions/
 ├── callableFunctions/  # Firebase callable functions
-├── config/             # Function configuration
+├── triggers/           # Firestore triggers (notifications, Sheets sync)
+├── utils/              # security.js, unsubscribe.js, emailTemplates.js
 └── index.js            # Function exports
 ```
 
@@ -353,16 +363,3 @@ functions/
 - `MIGRATION_TO_COMMUNITY_VERSION.md` - Complete migration documentation
 - `EMAIL_MIGRATION_SUMMARY.md` - Email system migration details
 - `GRADUATION_EMAIL_IMPLEMENTATION.md` - Graduation email workflow (deprecated)
-
-## For Playwright: I'm now successfully logged into the Launchpad app. Here's what was accomplished:
-
-  Test Account Created:
-
-  - Email: test.playwright.user@example.com
-  - Password: TestPass123!
-  - Name: Alex Martinez
-  - User Type: College Student
-  - College: The University of Texas at Austin
-  - High School: Bellaire High School (graduated 2022)
-  - Field of Study: Computer Science
-  - Skill: Python Programming

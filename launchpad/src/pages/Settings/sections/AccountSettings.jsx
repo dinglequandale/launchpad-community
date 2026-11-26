@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { BiDownload } from 'react-icons/bi';
 import { CiWarning } from 'react-icons/ci';
 import { FiDelete } from 'react-icons/fi';
-import { doc, getDoc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../../../firebase/firebaseConfig';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { signOut } from 'firebase/auth';
+import { auth, db } from '../../../firebase/firebaseConfig';
+import { disconnectFromStream } from '../../../Streamchat/chatFunctions/setUpUser';
 import { useAuth } from '../../../contexts/auth/AuthContext';
 import toast from 'react-hot-toast';
 import { CgClose } from 'react-icons/cg';
@@ -101,18 +104,22 @@ const AccountSettings = () => {
 
   const handleDeleteAccount = async () => {
     if (confirmDelete === 'DELETE') {
+      const loadingToast = toast.loading('Deleting your account...');
       try {
-        const loadingToast = toast.loading('Deleting your account...');
-        // COMMUNITY VERSION: Removed tenant-based architecture
-        const userDoc = doc(db, "users", currentUser.uid);
-        await deleteDoc(userDoc);
-        await currentUser.delete();
+        // Deletion runs server-side so that the profile, connections, uploaded files,
+        // chat user and Auth account are all removed together (the old client-side
+        // flow deleted the profile and then failed, leaving the account half-deleted).
+        const deleteMyAccount = httpsCallable(getFunctions(), 'deleteMyAccount');
+        await deleteMyAccount();
+        disconnectFromStream();
+        await signOut(auth).catch(() => {});
         localStorage.clear();
+        sessionStorage.clear();
         toast.success('Account deleted successfully', { id: loadingToast });
         window.location.href = '/Landing';
       } catch (error) {
         console.error('Error deleting account:', error);
-        toast.error('Failed to delete account. Please try again.');
+        toast.error('Failed to delete account. Please try again.', { id: loadingToast });
       }
     }
   };
