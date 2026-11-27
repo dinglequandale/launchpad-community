@@ -1,4 +1,4 @@
-import { db } from '../firebase/firebaseConfig';
+import { auth, db } from '../firebase/firebaseConfig';
 import { collection, getDocs, addDoc, query, orderBy, where } from 'firebase/firestore';
 
 const SESSION_STORAGE_KEY = 'high_schools_cache';
@@ -29,8 +29,13 @@ export const loadHighSchools = async () => {
       return cachedSchools;
     }
 
+    // The list is only readable when signed in; signed-out callers (e.g. the
+    // protected-route wrapper before it redirects) just get an empty list.
+    if (!auth.currentUser) {
+      return [];
+    }
+
     // No valid cache, fetch from Firebase
-    console.log('🔄 Fetching high schools from Firebase...');
     const schools = await fetchHighSchoolsFromFirebase();
 
     // Cache the results
