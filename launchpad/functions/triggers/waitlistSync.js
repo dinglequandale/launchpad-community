@@ -1,6 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { google } = require('googleapis');
+const { requireAdmin, toHttpsError } = require('../utils/security');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -89,7 +91,7 @@ exports.onWaitlistEntryCreated = functions.firestore
             // Update Firestore document to mark as synced
             await snap.ref.update({
                 syncedToSheets: true,
-                syncedAt: admin.firestore.FieldValue.serverTimestamp()
+                syncedAt: FieldValue.serverTimestamp()
             });
 
             console.log(`Successfully synced waitlist entry ${waitlistId} to Google Sheets`);
@@ -101,7 +103,7 @@ exports.onWaitlistEntryCreated = functions.firestore
             await snap.ref.update({
                 syncedToSheets: false,
                 syncError: error.message,
-                lastSyncAttempt: admin.firestore.FieldValue.serverTimestamp()
+                lastSyncAttempt: FieldValue.serverTimestamp()
             });
         }
     });
@@ -111,13 +113,8 @@ exports.onWaitlistEntryCreated = functions.firestore
  * Can be called from the frontend to retry failed syncs
  */
 exports.resyncWaitlistToSheets = functions.https.onCall(async (data, context) => {
-    // Require authentication (admin only)
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
-            'unauthenticated',
-            'Must be authenticated to resync waitlist entries'
-        );
-    }
+    // Admin only: this re-processes every unsynced entry.
+    await requireAdmin(context);
 
     try {
         // Get all waitlist entries that haven't been synced
@@ -130,7 +127,7 @@ exports.resyncWaitlistToSheets = functions.https.onCall(async (data, context) =>
         failedEntries.forEach(doc => {
             // Trigger the sync manually
             syncPromises.push(
-                exports.onWaitlistEntryCreated(doc, { params: { waitlistId: doc.id } })
+                exports.onWaitlistEntryCreated.run(doc, { params: { waitlistId: doc.id } })
             );
         });
 
@@ -143,7 +140,6 @@ exports.resyncWaitlistToSheets = functions.https.onCall(async (data, context) =>
         };
 
     } catch (error) {
-        console.error('Error re-syncing waitlist entries:', error);
-        throw new functions.https.HttpsError('internal', error.message);
+        throw toHttpsError(error, 'Error re-syncing entries');
     }
 });

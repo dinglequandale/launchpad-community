@@ -1,5 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
+const { escapeHtml, sanitizeHeader, enforceRateLimit, toHttpsError } = require('../utils/security');
 
 exports.sendReport = functions.https.onCall(async (data, context) => {
     const { reportedUser, reportTarget, reportReason } = data;
@@ -9,7 +11,18 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('unauthenticated', 'Only authenticated users can submit reports.');
     }
 
+    if (!reportReason || typeof reportReason !== 'string') {
+        throw new functions.https.HttpsError('invalid-argument', 'A report reason is required.');
+    }
+
     try {
+        await enforceRateLimit(`report:${context.auth.uid}`, { limit: 20, windowSeconds: 24 * 60 * 60 });
+
+        // SECURITY: escape user-supplied values before interpolating them into HTML.
+        const safeTarget = escapeHtml(reportTarget);
+        const safeUser = escapeHtml(reportedUser);
+        const safeReason = escapeHtml(String(reportReason).slice(0, 5000));
+
         // Create email template
         const emailTemplate = `
         <!DOCTYPE html>
@@ -77,10 +90,10 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
                 </div>
                 
                 <div class="report-details">
-                    <p><span class="label">Report Type:</span> <span class="value">${reportTarget}</span></p>
-                    <p><span class="label">Reported User/Organization:</span> <span class="value">${reportedUser}</span></p>
+                    <p><span class="label">Report Type:</span> <span class="value">${safeTarget}</span></p>
+                    <p><span class="label">Reported User/Organization:</span> <span class="value">${safeUser}</span></p>
                     <p><span class="label">Report Reason:</span></p>
-                    <p class="value" style="margin-top: 10px; padding: 10px; background: white; border-radius: 4px; border: 1px solid #e2e8f0;">${reportReason}</p>
+                    <p class="value" style="margin-top: 10px; padding: 10px; background: white; border-radius: 4px; border: 1px solid #e2e8f0;">${safeReason}</p>
                 </div>
                 
                 <p><strong>Action Required:</strong> This report was submitted by a user on Launchpad. Please review and take appropriate action.</p>
@@ -98,11 +111,11 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
         const emailDoc = await admin.firestore().collection('mail').add({
             to: 'launchpadhelpline@gmail.com',
             message: {
-                subject: `🚨 New Report: ${reportTarget} - ${reportedUser}`,
+                subject: sanitizeHeader(`🚨 New Report: ${reportTarget} - ${reportedUser}`),
                 html: emailTemplate,
             },
             from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             provider: 'mailgun',
             emailType: 'report',
@@ -118,7 +131,7 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
             reportTarget: reportTarget,
             reportReason: reportReason,
             reporterId: context.auth.uid,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             emailId: emailDoc.id
         });
@@ -129,7 +142,6 @@ exports.sendReport = functions.https.onCall(async (data, context) => {
             emailId: emailDoc.id
         };
     } catch (error) {
-        console.error('Error sending report:', error);
-        throw new functions.https.HttpsError('internal', 'Error submitting report: ' + error.message, error);
+        throw toHttpsError(error, 'Error submitting report');
     }
 });

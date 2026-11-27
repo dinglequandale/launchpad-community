@@ -1,38 +1,78 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
+// Every write is restricted to the uploader's own files, with size and content-type
+// limits. Previously any signed-in user could overwrite anyone else's profile
+// picture, resume or opportunity logo, with no size limit.
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Default: No public access
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isImage(maxMb) {
+      return request.resource.size < maxMb * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    function isDocument(maxMb) {
+      return request.resource.size < maxMb * 1024 * 1024
+        && (request.resource.contentType == 'application/pdf'
+            || request.resource.contentType == 'application/msword'
+            || request.resource.contentType == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    }
+
+    // Default: no access.
     match /{allPaths=**} {
       allow read, write: if false;
     }
 
-    // User profile pictures (actual path: profile_pictures/pfp_{userId})
+    // Profile pictures: profile_pictures/pfp_{uid}
     match /profile_pictures/{fileName} {
-      allow read: if true; // Public read access for profile pictures
-      allow write: if request.auth != null; // Any authenticated user can write their own pfp
+      allow read: if true;
+      allow write: if signedIn()
+                   && fileName == 'pfp_' + request.auth.uid
+                   && (request.resource == null || isImage(5));
     }
 
-    // User resumes (actual paths: resumes/resume_{userId}.pdf OR resumes/{userId})
+    // Resumes: resumes/resume_{uid}.pdf, resumes/resume_{uid}, resumes/{uid}
     match /resumes/{fileName} {
-      allow read: if request.auth != null; // Authenticated users can read
-      allow write: if request.auth != null; // Any authenticated user can write their own resume
+      allow read: if signedIn();
+      allow write: if signedIn()
+                   && (fileName == 'resume_' + request.auth.uid + '.pdf'
+                       || fileName == 'resume_' + request.auth.uid
+                       || fileName == request.auth.uid)
+                   && (request.resource == null || isDocument(10));
     }
 
-    // Feedback attachments (screenshots)
-    match /feedback/{allPaths=**} {
-      allow read: if request.auth != null; // Authenticated users can read
-      allow write: if request.auth != null; // Any authenticated user can upload feedback attachments
+    // Feedback screenshots: feedback/{uid}/{file}
+    match /feedback/{userId}/{fileName} {
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow create: if signedIn() && request.auth.uid == userId && isImage(10);
     }
 
-    // Opportunity/Organization logos (actual path: opportunity-logos/{opportunityId})
+    // Opportunity logos: opportunity-logos/{opportunityId}. Only the opportunity's creator
+    // (community opportunities, or society-scoped HSFS opportunities).
+    function createdOpportunity(opportunityId) {
+      let community = /databases/(default)/documents/opportunities/$(opportunityId);
+      let hsfs = /databases/(default)/documents/societies/hsfs/opportunities/$(opportunityId);
+      return (firestore.exists(community) && firestore.get(community).data.createdBy == request.auth.uid)
+          || (firestore.exists(hsfs) && firestore.get(hsfs).data.createdBy == request.auth.uid);
+    }
+
     match /opportunity-logos/{opportunityId} {
-      allow read: if true; // Public read access for opportunity logos
-      allow write: if request.auth != null; // Authenticated users can write
+      allow read: if true;
+      allow write: if signedIn()
+                   && createdOpportunity(opportunityId)
+                   && (request.resource == null || isImage(5));
+    }
+
+    // 6 degree program application materials: 6_degree_applications/{uid}_{...}
+    match /6_degree_applications/{fileName} {
+      allow read: if signedIn() && fileName.matches(request.auth.uid + '_.*');
+      allow create: if signedIn()
+                    && fileName.matches(request.auth.uid + '_.*')
+                    && isDocument(10);
     }
   }
 }

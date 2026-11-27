@@ -30,11 +30,11 @@ export default function SideNav({show}){
     const { openLogoutModal } = useModal();
     const [unreadCount, setUnreadCount] = useState(0);
     const navList = [
-        [<IoHomeOutline size={24}/>, "Home", "/Home"],
-        [<TbUserHexagon size={24}/>, "Network", "/network"],
-        [<GoOrganization size={24}/>, "Organizations", "/Organizations"],
-        [<LuGraduationCap size={24}/>, "Academics", "/academics"],
-        [<LuMessagesSquare size={24}/>, "Messages", "/chat"]
+        [<IoHomeOutline key="home" size={24}/>, "Home", "/Home"],
+        [<TbUserHexagon key="network" size={24}/>, "Network", "/network"],
+        [<GoOrganization key="orgs" size={24}/>, "Organizations", "/Organizations"],
+        [<LuGraduationCap key="academics" size={24}/>, "Academics", "/academics"],
+        [<LuMessagesSquare key="messages" size={24}/>, "Messages", "/chat"]
     ];
 
     const [selectedNav, setSelectedNav] = useState(null);

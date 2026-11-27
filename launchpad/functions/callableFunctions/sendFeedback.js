@@ -1,5 +1,10 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
+const { escapeHtml, sanitizeHeader, enforceRateLimit, toHttpsError } = require('../utils/security');
+
+const ALLOWED_FEEDBACK_TYPES = new Set(['Bug', 'Inconvenience', 'Suggestion', 'Other']);
+const ATTACHMENT_URL_PREFIX = 'https://firebasestorage.googleapis.com/';
 
 exports.sendFeedback = functions.https.onCall(async (data, context) => {
     const { feedbackType, feedbackDetails, attachments } = data;
@@ -9,23 +14,39 @@ exports.sendFeedback = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('unauthenticated', 'Only authenticated users can submit feedback.');
     }
 
+    if (!feedbackDetails || typeof feedbackDetails !== 'string') {
+        throw new functions.https.HttpsError('invalid-argument', 'Feedback details are required.');
+    }
+
     try {
+        await enforceRateLimit(`feedback:${context.auth.uid}`, { limit: 20, windowSeconds: 24 * 60 * 60 });
+
         // Get user information
         const userDoc = await admin.firestore().collection('users').doc(context.auth.uid).get();
         const userData = userDoc.data();
         const userName = userData?.name || 'Anonymous User';
         const userEmail = userData?.email || context.auth.token.email || 'No email';
 
+        // SECURITY: only accept attachment links that point at our own Storage bucket,
+        // and escape every user-supplied value before it is placed in the HTML.
+        const safeAttachments = (Array.isArray(attachments) ? attachments : [])
+            .filter((url) => typeof url === 'string' && url.startsWith(ATTACHMENT_URL_PREFIX))
+            .slice(0, 10);
+        const safeType = ALLOWED_FEEDBACK_TYPES.has(feedbackType) ? feedbackType : 'Other';
+        const safeUserName = escapeHtml(userName);
+        const safeUserEmail = escapeHtml(userEmail);
+        const safeDetails = escapeHtml(feedbackDetails.slice(0, 10000));
+
         // Build attachments HTML if there are any
         let attachmentsHTML = '';
-        if (attachments && attachments.length > 0) {
+        if (safeAttachments.length > 0) {
             attachmentsHTML = `
                 <div style="margin-top: 20px;">
                     <p class="label">Attachments:</p>
                     <div style="margin-top: 10px;">
-                        ${attachments.map((url, index) => `
+                        ${safeAttachments.map((url, index) => `
                             <div style="margin-bottom: 10px;">
-                                <a href="${url}" target="_blank" style="color: #2c5282; text-decoration: none;">
+                                <a href="${escapeHtml(url)}" target="_blank" style="color: #2c5282; text-decoration: none;">
                                     📎 Screenshot ${index + 1}
                                 </a>
                             </div>
@@ -41,7 +62,7 @@ exports.sendFeedback = functions.https.onCall(async (data, context) => {
             'Inconvenience': '⚠️',
             'Suggestion': '💡',
             'Other': '📝'
-        }[feedbackType] || '📝';
+        }[safeType] || '📝';
 
         // Create email template
         const emailTemplate = `
@@ -119,11 +140,11 @@ exports.sendFeedback = functions.https.onCall(async (data, context) => {
                 </div>
 
                 <div class="feedback-details">
-                    <p><span class="label">Feedback Type:</span> <span class="badge">${feedbackType}</span></p>
-                    <p><span class="label">Submitted By:</span> <span class="value">${userName}</span></p>
-                    <p><span class="label">User Email:</span> <span class="value">${userEmail}</span></p>
+                    <p><span class="label">Feedback Type:</span> <span class="badge">${safeType}</span></p>
+                    <p><span class="label">Submitted By:</span> <span class="value">${safeUserName}</span></p>
+                    <p><span class="label">User Email:</span> <span class="value">${safeUserEmail}</span></p>
                     <p><span class="label">Feedback Details:</span></p>
-                    <p class="value" style="margin-top: 10px; padding: 15px; background: white; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap;">${feedbackDetails}</p>
+                    <p class="value" style="margin-top: 10px; padding: 15px; background: white; border-radius: 4px; border: 1px solid #e2e8f0; white-space: pre-wrap;">${safeDetails}</p>
                     ${attachmentsHTML}
                 </div>
 
@@ -142,17 +163,17 @@ exports.sendFeedback = functions.https.onCall(async (data, context) => {
         const emailDoc = await admin.firestore().collection('mail').add({
             to: 'launchpadhelpline@gmail.com',
             message: {
-                subject: `${feedbackIcon} New ${feedbackType} Feedback from ${userName}`,
+                subject: sanitizeHeader(`${feedbackIcon} New ${safeType} Feedback from ${userName}`),
                 html: emailTemplate,
             },
             from: 'Launchpad Networks <no-reply@launchpadhouston.com>',
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             provider: 'mailgun',
             emailType: 'feedback',
-            feedbackType: feedbackType,
+            feedbackType: safeType,
             feedbackDetails: feedbackDetails,
-            attachments: attachments || [],
+            attachments: safeAttachments,
             userId: context.auth.uid,
             userName: userName,
             userEmail: userEmail
@@ -160,13 +181,13 @@ exports.sendFeedback = functions.https.onCall(async (data, context) => {
 
         // Log the feedback for tracking
         await admin.firestore().collection('feedback').add({
-            feedbackType: feedbackType,
+            feedbackType: safeType,
             feedbackDetails: feedbackDetails,
-            attachments: attachments || [],
+            attachments: safeAttachments,
             userId: context.auth.uid,
             userName: userName,
             userEmail: userEmail,
-            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
             status: 'pending',
             emailId: emailDoc.id
         });
@@ -177,7 +198,6 @@ exports.sendFeedback = functions.https.onCall(async (data, context) => {
             emailId: emailDoc.id
         };
     } catch (error) {
-        console.error('Error sending feedback:', error);
-        throw new functions.https.HttpsError('internal', 'Error submitting feedback: ' + error.message, error);
+        throw toHttpsError(error, 'Error submitting feedback');
     }
 });

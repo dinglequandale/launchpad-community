@@ -1,6 +1,8 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { google } = require('googleapis');
+const { requireAdmin, toHttpsError } = require('../utils/security');
 
 // Initialize Firebase Admin if not already initialized
 if (!admin.apps.length) {
@@ -47,7 +49,7 @@ exports.onSixDegreeApplicationCreated = functions.firestore
                 await snap.ref.update({
                     syncedToSheets: false,
                     syncError: 'Google Sheets configuration missing',
-                    lastSyncAttempt: admin.firestore.FieldValue.serverTimestamp()
+                    lastSyncAttempt: FieldValue.serverTimestamp()
                 });
                 return;
             }
@@ -150,7 +152,7 @@ exports.onSixDegreeApplicationCreated = functions.firestore
             // Update Firestore document to mark as synced
             await snap.ref.update({
                 syncedToSheets: true,
-                syncedAt: admin.firestore.FieldValue.serverTimestamp()
+                syncedAt: FieldValue.serverTimestamp()
             });
 
             console.log(`Successfully synced 6 degree application ${applicationId} to Google Sheets`);
@@ -162,7 +164,7 @@ exports.onSixDegreeApplicationCreated = functions.firestore
             await snap.ref.update({
                 syncedToSheets: false,
                 syncError: error.message,
-                lastSyncAttempt: admin.firestore.FieldValue.serverTimestamp()
+                lastSyncAttempt: FieldValue.serverTimestamp()
             });
         }
     });
@@ -172,13 +174,8 @@ exports.onSixDegreeApplicationCreated = functions.firestore
  * Can be called from the frontend to retry failed syncs
  */
 exports.resyncSixDegreeApplicationsToSheets = functions.https.onCall(async (data, context) => {
-    // Require authentication (admin only recommended)
-    if (!context.auth) {
-        throw new functions.https.HttpsError(
-            'unauthenticated',
-            'Must be authenticated to resync application entries'
-        );
-    }
+    // Admin only: this re-processes every unsynced entry.
+    await requireAdmin(context);
 
     try {
         // Get all application entries that haven't been synced
@@ -191,7 +188,7 @@ exports.resyncSixDegreeApplicationsToSheets = functions.https.onCall(async (data
         failedEntries.forEach(doc => {
             // Trigger the sync manually
             syncPromises.push(
-                exports.onSixDegreeApplicationCreated(doc, { params: { applicationId: doc.id } })
+                exports.onSixDegreeApplicationCreated.run(doc, { params: { applicationId: doc.id } })
             );
         });
 
@@ -204,7 +201,6 @@ exports.resyncSixDegreeApplicationsToSheets = functions.https.onCall(async (data
         };
 
     } catch (error) {
-        console.error('Error re-syncing application entries:', error);
-        throw new functions.https.HttpsError('internal', error.message);
+        throw toHttpsError(error, 'Error re-syncing entries');
     }
 });

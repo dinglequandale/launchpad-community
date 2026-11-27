@@ -1,6 +1,32 @@
-import { algoliaClient } from '../typesense/typesenseClient'
 import { db } from '../firebase/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, limit, query, where } from 'firebase/firestore';
+import { queryTokens } from '../utils/searchTokens';
+
+const CANDIDATE_LIMIT = 60;
+const RESULT_LIMIT = 20;
+
+/**
+ * In-house search over Firestore (replaces Algolia). Each document carries a
+ * `searchTokens` array of word prefixes maintained by a Cloud Function
+ * (functions/triggers/searchIndex.js). We query on the most selective word and
+ * require every other word to be present too. Reads go through security rules.
+ */
+const fetchMatches = async (collectionPath, searchText) => {
+  const tokens = queryTokens(searchText);
+  if (tokens.length === 0) return [];
+  const [primary, ...rest] = tokens; // longest word first = most selective
+
+  const snapshot = await getDocs(query(
+    collection(db, collectionPath),
+    where('searchTokens', 'array-contains', primary),
+    limit(CANDIDATE_LIMIT)
+  ));
+
+  return snapshot.docs
+    .map((d) => ({ id: d.id, objectID: d.id, ...d.data() }))
+    .filter((item) => rest.every((t) => item.searchTokens?.includes(t)))
+    .map(({ searchTokens, ...item }) => item); // eslint-disable-line no-unused-vars
+};
 
 // Normalize openToCrossSchoolConnections values to handle legacy label strings from Firebase
 const normalizeCrossSchoolPref = (val) => {
@@ -12,16 +38,15 @@ const normalizeCrossSchoolPref = (val) => {
     return val;
 };
 
-// COMMUNITY VERSION: Removed tenantId parameter - no longer needed without multi-tenant architecture
+// collectionName: 'users', 'opportunities' or a society path such as 'societies/hsfs/opportunities'
 const searchDocuments = async (collectionName, searchText, currentUserId = null) => {
+  const isUsers = collectionName === 'users' || collectionName.endsWith('/users');
+  const isOpportunities = collectionName === 'opportunities' || collectionName.endsWith('/opportunities');
   try {
-    const {results} = await algoliaClient.search({
-              requests: [{ indexName: collectionName, query: searchText, hitsPerPage: 10 }],
-            });
-    let matches = results[0].hits;
+    let matches = await fetchMatches(collectionName, searchText);
 
     // Apply cross-school connection filtering if currentUserId is provided
-    if (currentUserId && collectionName === 'users') {
+    if (currentUserId && isUsers) {
       // Get current user's data
       const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
       const currentUserData = currentUserDoc.exists() ? currentUserDoc.data() : null;
@@ -74,7 +99,7 @@ const searchDocuments = async (collectionName, searchText, currentUserId = null)
     }
 
     // Apply cross-school connection filtering for opportunities
-    if (currentUserId && collectionName === 'opportunities') {
+    if (currentUserId && isOpportunities) {
       // Get current user's data
       const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
       const currentUserData = currentUserDoc.exists() ? currentUserDoc.data() : null;
@@ -146,9 +171,9 @@ const searchDocuments = async (collectionName, searchText, currentUserId = null)
       }
     }
 
-    return matches;
+    return matches.slice(0, RESULT_LIMIT);
   } catch (error) {
-    console.error('Error searching algolia: ', error);
+    console.error('Error searching: ', error);
     return [];
   }
 };

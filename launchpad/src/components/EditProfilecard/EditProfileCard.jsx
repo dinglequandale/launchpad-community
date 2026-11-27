@@ -30,6 +30,7 @@ import AllConnectionsModal from '../AllConnectionsModal';
 import { useModal } from '../../contexts/ModalContext';
 import { FaUserFriends } from "react-icons/fa";
 import ProfilePictureCropModal from '../ProfilePictureCropModal/ProfilePictureCropModal';
+import { openExternalUrl } from '../../utils/safeUrl';
 
 const ProfileContext = createContext({
     currentUser: null,
@@ -571,7 +572,7 @@ function ContactInformation({ contactModalVisibility, setContactModalVisibility 
                     ) : (
                         <Link 
                             className="v0-contact-link"
-                            onClick={() => window.open(userData.linkedinLink, '_blank', 'noopener,noreferrer')}
+                            onClick={() => openExternalUrl(userData.linkedinLink)}
                         >
                             {displayShortenedLinkedin(userData.linkedinLink)}
                         </Link>

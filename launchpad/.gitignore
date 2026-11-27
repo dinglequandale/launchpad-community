@@ -22,8 +22,21 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-# *.env
-*.json
-!studentEmailData.json
-!tempInitialOrgData.json
-typesense-server-data/
+# Local-only env overrides (the tracked .env holds public client config only)
+.env.local
+.env.*.local
+functions/.env
+functions/.env.*
+functions/.secret.local
+
+# Service-account / admin credentials must never be committed.
+# (This used to be a blanket `*.json`, which silently ignored legitimate new files
+# such as firestore.indexes.json.)
+*firebase-adminsdk*.json
+service-account*.json
+serviceAccount*.json
+*-credentials.json
+.firebase/
+firebase-debug*.log
+firestore-debug.log
+ui-debug.log

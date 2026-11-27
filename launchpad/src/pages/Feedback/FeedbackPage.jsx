@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { IoCloudUploadOutline, IoCloseOutline, IoCheckmarkCircle } from 'react-icons/io5';
 import LegalityGoBack from '../../components/Legality Footer/LegalityGoBack.jsx';
 import CustomSelect from '../../components/CustomSelect/CustomSelect.jsx';
+import { getAuth } from 'firebase/auth';
 
 const FeedbackPage = () => {
   const [feedbackType, setFeedbackType] = useState('Bug');
@@ -76,7 +77,8 @@ const FeedbackPage = () => {
     const storage = getStorage();
     const uploadPromises = attachedFiles.map(async (file) => {
       const timestamp = Date.now();
-      const fileName = `feedback/${timestamp}_${file.name}`;
+      const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const fileName = `feedback/${getAuth().currentUser.uid}/${timestamp}_${safeName}`;
       const storageRef = ref(storage, fileName);
 
       await uploadBytes(storageRef, file);

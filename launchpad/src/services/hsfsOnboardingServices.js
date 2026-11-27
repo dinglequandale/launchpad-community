@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, increment, arrayUnion } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { packageBasicUserInfoToLS, pushInitialProfileCompletion } from './onboardingServices';
@@ -6,29 +6,39 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { storage } from '../firebase/firebaseConfig';
 import { parentInvitationTemplate } from '../utils/parentVerificationTemplates';
 
+export const HSFS_ACCESS_CODE_KEY = 'societyAccessCode:hsfs';
+
+/**
+ * Consume the HSFS access code (entered on /hsfs-access) on the server. Firestore
+ * rules only let a user add 'hsfs' to their profile after this succeeds.
+ */
+export const redeemHSFSAccessCode = async () => {
+    const code = sessionStorage.getItem(HSFS_ACCESS_CODE_KEY);
+    if (!code) {
+        throw new Error('Your HSFS access code has expired. Please enter it again.');
+    }
+    const redeem = httpsCallable(getFunctions(), 'redeemSocietyAccessCode');
+    await redeem({ societyId: 'hsfs', code });
+    sessionStorage.removeItem(HSFS_ACCESS_CODE_KEY);
+};
+
 // Track onboarding submissions for analytics
 const trackOnboardingSubmission = async (userName) => {
     try {
-        const { doc: docFn, getDoc, updateDoc, increment, arrayUnion, setDoc: setDocFn } = await import('firebase/firestore');
         const firstName = userName?.split(' ')[0]?.trim() || 'Unknown';
         const today = new Date().toISOString().split('T')[0];
         const analyticsDocRef = doc(db, 'onboarding_analytics', today);
-        const docSnap = await getDoc(analyticsDocRef);
 
-        if (docSnap.exists()) {
-            await updateDoc(analyticsDocRef, {
-                count: increment(1),
-                firstNames: arrayUnion(firstName)
-            });
-        } else {
-            await setDocFn(analyticsDocRef, {
-                date: today,
-                count: 1,
-                firstNames: [firstName]
-            });
-        }
+        // Single merge-write: no read needed (clients cannot read analytics), and
+        // increment/arrayUnion make it safe under concurrent sign-ups.
+        await setDoc(analyticsDocRef, {
+            date: today,
+            count: increment(1),
+            firstNames: arrayUnion(firstName)
+        }, { merge: true });
     } catch (error) {
         console.error('Error tracking onboarding analytics:', error);
+        // Don't throw - we don't want analytics to break onboarding
     }
 };
 
@@ -41,7 +51,7 @@ const uploadFileToStorage = async (file, fileName, folderName) => {
         return downloadURL;
     } catch (error) {
         console.error(`Error uploading ${folderName}:`, error);
-        return null;
+        throw error;
     }
 };
 
@@ -49,8 +59,10 @@ export const saveHSFSHighSchooler = async (currentUser, highSchoolerData, onSucc
     try {
         const { userPfp, userResume, ...otherData } = highSchoolerData;
 
+        await redeemHSFSAccessCode();
+
         const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
-        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}`, 'resumes');
+        const resumeURL = await uploadFileToStorage(userResume, `resume_${currentUser.uid}.pdf`, 'resumes');
 
         const dataToSave = {
             ...otherData,
@@ -72,6 +84,9 @@ export const saveHSFSHighSchooler = async (currentUser, highSchoolerData, onSucc
             userName: highSchoolerData.userName,
             userType: "High Schooler",
             userPfpPreview: pfpURL,
+            // Notification functions read the email from the root user doc.
+            email: otherData.email || currentUser.email || null,
+            emailNotificationsEnabled: true,
             societies: ["hsfs"],
             societyPrimary: "hsfs",
         });
@@ -84,12 +99,15 @@ export const saveHSFSHighSchooler = async (currentUser, highSchoolerData, onSucc
         onSuccess();
     } catch (e) {
         console.error("Error saving HSFS High Schooler:", e);
+        throw e;
     }
 };
 
 export const saveHSFSProfessional = async (currentUser, professionalData, onSuccess) => {
     try {
         const { userPfp, ...otherData } = professionalData;
+
+        await redeemHSFSAccessCode();
 
         const pfpURL = await uploadFileToStorage(userPfp, `pfp_${currentUser.uid}`, 'profile_pictures');
 
@@ -114,6 +132,9 @@ export const saveHSFSProfessional = async (currentUser, professionalData, onSucc
             userName: professionalData.userName,
             userType: "Professional",
             userPfpPreview: pfpURL,
+            // Notification functions read the email from the root user doc.
+            email: otherData.email || currentUser.email || null,
+            emailNotificationsEnabled: true,
             societies: ["hsfs"],
             societyPrimary: "hsfs",
         });
@@ -153,6 +174,7 @@ export const saveHSFSProfessional = async (currentUser, professionalData, onSucc
         onSuccess();
     } catch (e) {
         console.error("Error saving HSFS Professional:", e);
+        throw e;
     }
 };
 
@@ -163,6 +185,8 @@ export const saveHSFSProfessional = async (currentUser, professionalData, onSucc
  * the society subcollection — no need to re-collect name, pfp, or other existing fields.
  */
 export const enrollExistingUserInHSFS = async (currentUser, areasOfInterest) => {
+    await redeemHSFSAccessCode();
+
     // Fetch their existing Launchpad profile
     const userSnap = await getDoc(doc(db, 'users', currentUser.uid));
     const existingData = userSnap.exists() ? userSnap.data() : {};

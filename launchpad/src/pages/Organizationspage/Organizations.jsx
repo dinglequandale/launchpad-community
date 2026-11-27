@@ -15,10 +15,8 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { auth } from "../../firebase/firebaseConfig";
 import { useModal } from '../../contexts/ModalContext';
-import { populateOpportunitiesCollection } from '../../utils/populateOpportunities';
-import { updateOpportunitiesLocation } from '../../utils/updateOpportunitiesLocation';
-import { seedHighSchools } from '../../utils/seedHighSchools';
 import { useSociety } from "../../contexts/SocietyContext";
+import { openExternalUrl } from '../../utils/safeUrl';
 
 const filterContent = {
     organizationType: ["Any Category", "Clubs", "Workplace Opportunities", "Nonprofits", "Businesses", "Community Service", "Leadership"],
@@ -55,19 +53,6 @@ export default function Organizations(){
         areasOfInterestOrExpertise: 'Any Subject Matter',
         location: 'Any Location'
     });
-
-    // Admin function to populate opportunities - call this once
-    const handlePopulateOpportunities = async () => {
-        if (window.confirm('Are you sure you want to populate the opportunities collection? This should only be done once.')) {
-            try {
-                const result = await populateOpportunitiesCollection();
-                toast.success(`Successfully uploaded ${result.successCount} opportunities!`);
-            } catch (error) {
-                console.error('Population failed:', error);
-                toast.error('Failed to populate opportunities');
-            }
-        }
-    };
 
     // Listen for sidebar state changes
     useEffect(() => {
@@ -211,7 +196,7 @@ export default function Organizations(){
                 handleConnectClick(userData);
                 return;
             case "Website":
-                window.open(value, '_blank', 'noopener,noreferrer');
+                openExternalUrl(value);
                 return;
         }
     }
@@ -244,9 +229,9 @@ export default function Organizations(){
         setIsSearching(false);
         if (queryText) {
             // COMMUNITY VERSION: No tenantId needed for search
-            const searchResults = await searchDocuments(pageName.toLowerCase(), queryText, currentUser.uid);
+            // Search the same collection the page lists (society-scoped for HSFS).
+            const searchResults = await searchDocuments(opportunitiesCollection, queryText, currentUser.uid);
             setOrganizationsData(searchResults);
-            console.log(searchResults);
         }
     };
 

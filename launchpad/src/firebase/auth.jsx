@@ -1,6 +1,5 @@
-import { createUserWithEmailAndPassword, GoogleAuthProvider, sendEmailVerification, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, updatePassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, updatePassword } from "firebase/auth";
 import { auth } from "./firebaseConfig";
-import { Navigate } from "react-router-dom";
 
 export const doCreateUserWithEmailAndPassword = async (email, password) => {
     return createUserWithEmailAndPassword(auth, email, password);
@@ -27,6 +26,11 @@ export const doPasswordReset = (email) => {
 
 export const doPasswordChange = (password) => {
     return updatePassword(auth.currentUser, password);
+}
+
+export const doReauthenticate = (email, password) => {
+    const credential = EmailAuthProvider.credential(email, password);
+    return reauthenticateWithCredential(auth.currentUser, credential);
 }
 
 // export const doSendEmailVerification = () => {

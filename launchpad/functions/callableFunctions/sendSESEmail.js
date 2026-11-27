@@ -1,97 +1,93 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const crypto = require('crypto');
+const { FieldValue } = require('firebase-admin/firestore');
+const {
+    requireAuth,
+    isValidEmail,
+    sanitizeHeader,
+    enforceRateLimit,
+    toHttpsError,
+} = require('../utils/security');
+const { generateUnsubscribeLink, isUnsubscribed } = require('../utils/unsubscribe');
+
+// SECURITY: this function used to be callable WITHOUT authentication and accepted an
+// arbitrary sender, recipient list and HTML body -- i.e. an open mail relay on the
+// launchpadhouston.com domain. It now:
+//   * requires a signed-in user,
+//   * always sends from the fixed no-reply address,
+//   * only accepts known email types,
+//   * caps recipients per call and per user per day,
+//   * records the sending uid on every queued mail document.
+// The HTML body is still client-supplied (the invitation templates live in the
+// frontend); moving those templates server-side is the remaining hardening step.
+const FROM_ADDRESS = 'Launchpad Networks <no-reply@launchpadhouston.com>';
+const ALLOWED_EMAIL_TYPES = new Set(['invitation', 'parent_invitation', 'migration_success']);
+const MAX_RECIPIENTS_PER_CALL = 10;
+const MAX_RECIPIENTS_PER_DAY = 25;
+const MAX_HTML_BYTES = 100 * 1024;
 
 exports.sendSESEmail = functions.https.onCall(async (data, context) => {
-    const {recipient, subject, htmlTemplate, sender="Launchpad Networks <no-reply@launchpadhouston.com>", emailType="general"} = data;
+    const uid = requireAuth(context, 'You must be signed in to send email.');
+    const { recipient, subject, htmlTemplate, emailType = 'invitation' } = data || {};
 
-    if (!recipient || !subject || !htmlTemplate) {
-        throw new functions.https.HttpsError('invalid-argument', 'Missing required parameters: recipient, subject, and htmlTemplate are required');
+    const recipients = Array.isArray(recipient) ? recipient : [recipient];
+    if (!subject || !htmlTemplate || recipients.length === 0) {
+        throw new functions.https.HttpsError('invalid-argument', 'recipient, subject and htmlTemplate are required.');
+    }
+    if (!ALLOWED_EMAIL_TYPES.has(emailType)) {
+        throw new functions.https.HttpsError('invalid-argument', `Unsupported emailType: ${emailType}`);
+    }
+    if (recipients.length > MAX_RECIPIENTS_PER_CALL) {
+        throw new functions.https.HttpsError('invalid-argument', `At most ${MAX_RECIPIENTS_PER_CALL} recipients per request.`);
+    }
+    if (!recipients.every(isValidEmail)) {
+        throw new functions.https.HttpsError('invalid-argument', 'One or more recipient addresses are invalid.');
+    }
+    if (typeof htmlTemplate !== 'string' || Buffer.byteLength(htmlTemplate, 'utf8') > MAX_HTML_BYTES) {
+        throw new functions.https.HttpsError('invalid-argument', 'Email body is missing or too large.');
     }
 
     try {
-        // Generate unsubscribe link for each recipient
-        const unsubscribeLinks = [];
-        for (const email of recipient) {
-            // Check if email is already unsubscribed
-            const unsubscribeDoc = await admin.firestore().collection('unsubscribed_emails').doc(email.toLowerCase()).get();
-            
-            if (unsubscribeDoc.exists) {
-                const unsubscribeData = unsubscribeDoc.data();
-                // Skip sending if email is unsubscribed for this email type
-                if (!unsubscribeData.emailType || unsubscribeData.emailType === emailType) {
-                    console.log(`Skipping email to ${email} - already unsubscribed`);
-                    continue;
-                }
-            }
-
-            // Generate unsubscribe token
-            const token = crypto.randomUUID();
-            const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-
-            // Store the unsubscribe token
-            await admin.firestore().collection('unsubscribe_tokens').doc(token).set({
-                email: email.toLowerCase(),
-                emailType,
-                expiresAt,
-                used: false,
-                createdAt: admin.firestore.FieldValue.serverTimestamp()
-            });
-
-            const unsubscribeLink = `https://launchpadhouston.com/unsubscribe?token=${token}`;
-            unsubscribeLinks.push({ email, unsubscribeLink });
-        }
-
-        // If no valid recipients, return early
-        if (unsubscribeLinks.length === 0) {
-            return { 
-                success: true, 
-                message: 'No valid recipients (all unsubscribed)',
-                emailId: null
-            };
-        }
-
-        // Create email documents for each recipient with their unsubscribe link
-        const emailPromises = unsubscribeLinks.map(async ({ email, unsubscribeLink }) => {
-            // Replace unsubscribe placeholder in template if it exists
-            let personalizedTemplate = htmlTemplate;
-            if (htmlTemplate.includes('${unsubscribeLink}')) {
-                personalizedTemplate = htmlTemplate.replace(/\${unsubscribeLink}/g, unsubscribeLink);
-            }
-
-            return admin.firestore().collection('mail').add({
-                to: email,
-                message: {
-                    subject: subject,
-                    html: personalizedTemplate,
-                },
-                // Mailgun specific fields
-                from: `Launchpad Networks <${sender}>`,
-                // Additional metadata for tracking
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                status: 'pending',
-                // Specify Mailgun as the provider
-                provider: 'mailgun',
-                // Store unsubscribe link for reference
-                unsubscribeLink,
-                emailType
-            });
+        await enforceRateLimit(`sesEmail:${uid}`, {
+            limit: MAX_RECIPIENTS_PER_DAY,
+            windowSeconds: 24 * 60 * 60,
+            cost: recipients.length,
         });
 
-        const emailDocs = await Promise.all(emailPromises);
-        const emailIds = emailDocs.map(doc => doc.id);
+        const safeSubject = sanitizeHeader(subject);
+        const queued = [];
 
-        console.log(`Emails queued for sending with IDs: ${emailIds.join(', ')}`);
-        
-        return { 
-            success: true, 
-            message: 'Emails queued for sending successfully',
-            emailIds: emailIds,
-            recipientsCount: unsubscribeLinks.length
+        for (const rawEmail of recipients) {
+            const email = rawEmail.trim().toLowerCase();
+            if (await isUnsubscribed(email, emailType)) {
+                console.log(`Skipping email to ${email} - unsubscribed from ${emailType}`);
+                continue;
+            }
+
+            const unsubscribeLink = await generateUnsubscribeLink(email, emailType);
+            const html = htmlTemplate.replace(/\$\{unsubscribeLink\}/g, unsubscribeLink);
+
+            const ref = await admin.firestore().collection('mail').add({
+                to: email,
+                message: { subject: safeSubject, html },
+                from: FROM_ADDRESS,
+                createdAt: FieldValue.serverTimestamp(),
+                status: 'pending',
+                provider: 'mailgun',
+                unsubscribeLink,
+                emailType,
+                senderId: uid,
+            });
+            queued.push(ref.id);
+        }
+
+        return {
+            success: true,
+            message: queued.length ? 'Emails queued for sending successfully' : 'No valid recipients (all unsubscribed)',
+            emailIds: queued,
+            recipientsCount: queued.length,
         };
+    } catch (error) {
+        throw toHttpsError(error, 'Error sending email');
     }
-    catch(error) {
-        console.log(error);
-        throw new functions.https.HttpsError('internal', 'Error sending email: ' + error.message, error);
-    }     
 });

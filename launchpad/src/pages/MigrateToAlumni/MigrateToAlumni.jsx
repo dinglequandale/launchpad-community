@@ -6,13 +6,16 @@ import { db } from '../../firebase/firebaseConfig';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { highSchools, careerInterests, graduationYears } from '../Onboarding/Options';
 import OnboardingDropdown from '../../components/OnboardingDropdown/OnboardingDropdown';
-import CustomSelect from '../../components/CustomSelect';
 import { BiPlus, BiTrash } from 'react-icons/bi';
 import toast from 'react-hot-toast';
 import './MigrateToAlumni.css';
 import Loading from '../../components/LoadingAnimation/Loading';
 
 const sendSESEmail = httpsCallable(getFunctions(), 'sendSESEmail');
+
+const escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
 const MigrateToAlumni = () => {
     const [searchParams] = useSearchParams();
@@ -24,6 +27,8 @@ const MigrateToAlumni = () => {
     const [userData, setUserData] = useState(null);
     const [migrationToken, setMigrationToken] = useState(null);
     const [isValidToken, setIsValidToken] = useState(false);
+    const [transitionType, setTransitionType] = useState('hs_to_college');
+    const isToProfessional = transitionType === 'college_to_professional';
     
     // Alumni-specific form data
     const [alumniData, setAlumniData] = useState({
@@ -42,9 +47,23 @@ const MigrateToAlumni = () => {
             return;
         }
 
+        // This page is public (linked from email), but the migration edits the
+        // signed-in user's profile: require sign-in and the matching account.
+        if (!currentUser) {
+            sessionStorage.setItem('intendedDestination', `${window.location.pathname}${window.location.search}`);
+            toast('Please log in to update your account.');
+            navigate('/Login');
+            return;
+        }
+        if (currentUser.uid !== userId) {
+            toast.error('This link belongs to a different account. Please log in with the account it was sent to.');
+            navigate('/Home');
+            return;
+        }
+
         setMigrationToken(token);
         loadUserDataAndValidateToken(userId, token);
-    }, [searchParams, navigate]);
+    }, [searchParams, navigate, currentUser]);
 
     const loadUserDataAndValidateToken = async (userId, token) => {
         try {
@@ -59,7 +78,10 @@ const MigrateToAlumni = () => {
             }
 
             const tokenData = tokenDoc.data();
-            if (tokenData.used || tokenData.expiresAt.toDate() < new Date()) {
+            const expiresAt = typeof tokenData.expiresAt?.toDate === 'function'
+                ? tokenData.expiresAt.toDate()
+                : new Date(tokenData.expiresAt);
+            if (tokenData.used || !(expiresAt > new Date())) {
                 toast.error('Migration token has expired or already been used');
                 navigate('/Home');
                 return;
@@ -72,6 +94,7 @@ const MigrateToAlumni = () => {
             }
 
             setIsValidToken(true);
+            setTransitionType(tokenData.transitionType || 'hs_to_college');
 
             // COMMUNITY VERSION: Load user data from flat collection
             const userDoc = await getDoc(doc(db, 'users', userId));
@@ -140,13 +163,15 @@ const MigrateToAlumni = () => {
 
             // COMMUNITY VERSION: Update user data in flat collection
             const userRef = doc(db, 'users', currentUser.uid);
+            // Graduating college students become Professionals; high schoolers become
+            // College Students. (Previously everyone was set to 'College Student'.)
             await updateDoc(userRef, {
-                userType: 'College Student',
-                collegeAttending: alumniData.collegeAttending,
+                userType: isToProfessional ? 'Professional' : 'College Student',
+                ...(isToProfessional ? {} : { collegeAttending: alumniData.collegeAttending }),
                 userSkills: alumniData.userSkills,
                 networkingLevel: alumniData.networkingLevel,
                 migratedAt: new Date(),
-                migratedFrom: 'High Schooler'
+                migratedFrom: isToProfessional ? 'College Student' : 'High Schooler'
             });
 
             // Mark migration token as used
@@ -163,9 +188,9 @@ const MigrateToAlumni = () => {
                     <title>Welcome to the Alumni Network!</title>
                 </head>
                 <body>
-                    <h1>🎉 Welcome to the Alumni Network!</h1>
-                    <p>Dear ${userData.userName},</p>
-                    <p>Congratulations! Your account has been successfully migrated to the ${userData.schoolAttending} Alumni network.</p>
+                    <h1>🎉 Your Launchpad account has been updated!</h1>
+                    <p>Dear ${escapeHtml(userData.userName)},</p>
+                    <p>Congratulations! Your account is now set up as a ${isToProfessional ? 'Professional' : 'College Student'} on Launchpad.</p>
                     <p>You now have access to all alumni features and can start connecting with fellow graduates and mentoring current students.</p>
                     <p>Best regards,<br>The Launchpad Team</p>
                 </body>
@@ -173,13 +198,13 @@ const MigrateToAlumni = () => {
             `;
 
             await sendSESEmail({
-                recipient: [userData.email],
-                subject: 'Welcome to the Alumni Network!',
+                recipient: [userData.email || currentUser.email],
+                subject: 'Your Launchpad account has been updated!',
                 htmlTemplate: successEmailTemplate,
                 emailType: 'migration_success'
             });
 
-            toast.success('Successfully migrated to alumni account!');
+            toast.success('Your account has been updated!');
             navigate('/Home');
 
         } catch (error) {
@@ -218,8 +243,10 @@ const MigrateToAlumni = () => {
     return (
         <div className="migration-container">
             <div className="migration-header">
-                <h1>🎓 Welcome to the Alumni Network!</h1>
-                <p>Complete your migration from High Schooler to Alumni to unlock new networking opportunities.</p>
+                <h1>🎓 Congratulations, graduate!</h1>
+                <p>{isToProfessional
+                    ? 'Update your account from College Student to Professional to keep networking on Launchpad.'
+                    : 'Update your account from High Schooler to College Student to unlock new networking opportunities.'}</p>
             </div>
 
             <div className="migration-form">
@@ -232,18 +259,24 @@ const MigrateToAlumni = () => {
                     </div>
                 </div>
 
+                {!isToProfessional && (
                 <div className="form-section">
                     <h2>College Information</h2>
                     <div className="form-group">
-                        <label className="form-label">What college do you go to?</label>
-                        <CustomSelect
-                            options={[]} // This would be populated with college options
+                        <label className="form-label" htmlFor="migrate-college">What college do you go to?</label>
+                        {/* Previously a CustomSelect with an empty options list, so no college could be chosen. */}
+                        <input
+                            id="migrate-college"
+                            type="text"
+                            className="form-input"
+                            maxLength={200}
                             value={alumniData.collegeAttending}
-                            onChange={(value) => setAlumniData(prev => ({ ...prev, collegeAttending: value }))}
-                            placeholder="Select your college"
+                            onChange={(e) => setAlumniData(prev => ({ ...prev, collegeAttending: e.target.value }))}
+                            placeholder="e.g. The University of Texas at Austin"
                         />
                     </div>
                 </div>
+                )}
 
                 <div className="form-section">
                     <h2>Your Skills</h2>
@@ -324,7 +357,7 @@ const MigrateToAlumni = () => {
                         onClick={handleMigration}
                         disabled={migrating}
                     >
-                        {migrating ? 'Migrating...' : 'Complete Migration to Alumni'}
+                        {migrating ? 'Updating...' : 'Complete Account Update'}
                     </button>
                     <button 
                         className="btn-secondary"

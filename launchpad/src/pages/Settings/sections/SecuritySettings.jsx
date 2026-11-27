@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BiLock } from 'react-icons/bi';
 import { useAuth } from '../../../contexts/auth/AuthContext';
-import { doPasswordChange, doSignInWithEmailAndPassword } from '../../../firebase/auth';
+import { doPasswordChange, doReauthenticate } from '../../../firebase/auth';
 import toast, { Toaster } from 'react-hot-toast';
 
 const SecuritySettings = () => {
@@ -11,7 +11,7 @@ const SecuritySettings = () => {
         confirmPassword: '',
     });
 
-    const currentUser = useAuth();
+    const { currentUser } = useAuth();
     const isEmailProvider = currentUser?.providerData?.some(
         provider => provider.providerId === 'password'
     );
@@ -52,8 +52,8 @@ const SecuritySettings = () => {
         }
 
         try {
-            // First verify the current password
-            await doSignInWithEmailAndPassword(currentUser.email, passwordData.currentPassword);
+            // First verify the current password (also satisfies Firebase's recent-login requirement)
+            await doReauthenticate(currentUser.email, passwordData.currentPassword);
             
             // If verification successful, update the password
             await doPasswordChange(passwordData.newPassword);
@@ -68,7 +68,7 @@ const SecuritySettings = () => {
             toast.success("Password successfully changed!");
         } catch (error) {
             console.error('Password change error:', error);
-            if (error.code === 'auth/wrong-password') {
+            if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                 toast.error("Current password is incorrect!");
             } else {
                 toast.error("Failed to change password. Please try again.");

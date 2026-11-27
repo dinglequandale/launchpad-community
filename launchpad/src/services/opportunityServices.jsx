@@ -2,7 +2,7 @@ import { db, storage } from '../firebase/firebaseConfig';
 import { collection, addDoc, updateDoc, doc, query, where, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import toast from 'react-hot-toast';
-// import { deleteFromTypesense, updateTypesense } from '../typesense/typesenseClient';
+import { toSafeHttpUrl } from '../utils/safeUrl';
 
 export const saveOpportunity = async (opportunityData, organizationLogo, currentUser, isEditing, opportunityId, collectionPath = "opportunities") => {
   // COMMUNITY VERSION: Removed tenant-based architecture
@@ -17,23 +17,14 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
         createdAt: new Date()
       });
 
-      // Update Typesense
-      // await updateTypesense('opportunities', opportunityRef.id,
-      //   {
-      //     ...opportunityData,
-      //     createdBy: currentUser.uid,
-      //     createdAt: new Date(),
-      //   });
     } else {
       opportunityRef = doc(db, collectionPath, opportunityId);
       await updateDoc(opportunityRef, opportunityData);
-      // await updateTypesense('opportunities', opportunityId, opportunityData);
     }
 
     if (organizationLogo) {
       const logoUrl = await uploadImage(organizationLogo, opportunityRef.id);
       await updateDoc(opportunityRef, { organizationLogoPreview: logoUrl });
-      // We don't add logo to typesense, as it is an image and there's no point in searching
     }
 
     return opportunityRef.id;
@@ -43,14 +34,8 @@ export const saveOpportunity = async (opportunityData, organizationLogo, current
   }
 };
 
-export const stableLinkCheck = (link) => {
-  if(!link.includes("http")){
-    return "https://" + link;
-  }
-  else{
-    return link;
-  }
-}
+// Returns a safe http(s) URL, or "" for anything else (e.g. javascript: links).
+export const stableLinkCheck = (link) => toSafeHttpUrl(link);
 
 const uploadImage = async (file, opportunityId) => {
   const storageRef = ref(storage, `opportunity-logos/${opportunityId}`);
@@ -102,7 +87,6 @@ export const handleDeleteOpportunity = async (opportunityId, collectionPath = "o
     const opportunityDoc = doc(db, collectionPath, opportunityId);
     try {
         await deleteDoc(opportunityDoc);
-        // await deleteFromTypesense('opportunities', opportunityId);
         toast.success("Opportunity deleted successfully!");
     } catch (error) {
         console.error("Error deleting user profile: ", error);

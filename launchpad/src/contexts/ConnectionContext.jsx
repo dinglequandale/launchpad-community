@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { getConnectionsByStatus } from "../services/connectionService";
+import { useAuth } from "./auth/AuthContext";
 
 const ConnectionContext = createContext();
 
@@ -15,8 +16,18 @@ export function ConnectionProvider({ children }) {
     incomingRequests: [],
   });
   const [loading, setLoading] = useState(true);
+  const { currentUser } = useAuth();
+  const uid = currentUser?.uid || null;
+  const lastFetchRef = useRef(0);
 
-  const fetchAllConnections = async () => {
+  const fetchAllConnections = useCallback(async () => {
+    // The provider wraps public pages too; never call the backend while signed out.
+    if (!uid) {
+      setConnections({ pending: [], approved: [], incomingRequests: [] });
+      setLoading(false);
+      return;
+    }
+    lastFetchRef.current = Date.now();
     setLoading(true);
     try {
       // COMMUNITY VERSION: Simplified to only pending and approved
@@ -53,25 +64,30 @@ export function ConnectionProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [uid]);
 
-  // Initial fetch on mount
+  // Fetch whenever the signed-in user changes (login, logout, account switch).
   useEffect(() => {
     fetchAllConnections();
-    // eslint-disable-next-line
-  }, []);
+  }, [fetchAllConnections]);
 
   // Refetch connections when user returns to the tab (handles cases where connections
   // were updated while user was away or in another tab)
   useEffect(() => {
+    // 'focus' and 'visibilitychange' usually fire together; throttle to one fetch.
+    const refetchIfStale = () => {
+      if (Date.now() - lastFetchRef.current > 5000) {
+        fetchAllConnections();
+      }
+    };
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        fetchAllConnections();
+        refetchIfStale();
       }
     };
 
     const handleFocus = () => {
-      fetchAllConnections();
+      refetchIfStale();
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -81,8 +97,7 @@ export function ConnectionProvider({ children }) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
-    // eslint-disable-next-line
-  }, []);
+  }, [fetchAllConnections]);
 
   // Optionally, expose a refetch function for when connections change
   const refetchConnections = fetchAllConnections;

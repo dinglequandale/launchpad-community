@@ -1,7 +1,6 @@
 import { doc, onSnapshot, updateDoc, setDoc, deleteDoc, getDocs, collection, query, where } from "firebase/firestore";
 import { db, storage } from "../firebase/firebaseConfig";
-import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
-// import { updateTypesense } from '../typesense/typesenseClient';
+import { deleteObject, getDownloadURL, ref, uploadBytes, getMetadata } from 'firebase/storage';
 import { pushInitialProfileCompletion } from "./onboardingServices";
 import { SiNamesilo } from "react-icons/si";
 
@@ -262,7 +261,6 @@ export const editUserData = async (newData, currentUser, origUserData) => {
         console.log("Updated user data!!!");
         pushInitialProfileCompletion({... origUserData, ...newData});
 
-        // await updateTypesense('users', currentUser.uid, {... origUserData, ...newData});
     }catch(error){console.log(error)};
 }
 
@@ -382,3 +380,23 @@ export const getVerificationStatus = (userData) => {
 
 // Connection functions have been moved to Firebase Cloud Functions
 // See connectionService.jsx for the new implementation
+
+/**
+ * Resolve the current user's resume in Storage. Over time the app has written it to
+ * three different paths (onboarding: resume_{uid}, Edit Profile: resume_{uid}.pdf,
+ * legacy: {uid}); ConnectModal only ever looked at the legacy path, so "send with
+ * resume" never found a resume. Returns { ref, metadata } or null.
+ */
+export const findUserResume = async (uid) => {
+    const candidates = [`resumes/resume_${uid}.pdf`, `resumes/resume_${uid}`, `resumes/${uid}`];
+    for (const path of candidates) {
+        try {
+            const resumeRef = ref(storage, path);
+            const metadata = await getMetadata(resumeRef);
+            return { ref: resumeRef, metadata };
+        } catch {
+            // not at this path; try the next one
+        }
+    }
+    return null;
+};

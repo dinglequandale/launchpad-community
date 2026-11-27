@@ -20,13 +20,11 @@ import Professional_LandingPage from './pages/landing_page/Professional_LandPage
 import Alumni_LandingPage from './pages/landing_page/Alumni_LandingPage.jsx';
 import PrivacyPolicy from './pages/Policies/PrivacyPolicy.jsx';
 import Terms from './pages/Policies/Terms.jsx';
-import PrivateKeyPage from './pages/Onboarding/Private Key Page/PrivateKeyPage.jsx';
 import GlobalAuthWrapper from './contexts/GlobalAuthWrapper.jsx';
 import AboutUs from './components/Legality Footer/AboutUs.jsx';
 import FAQs from './components/Legality Footer/FAQs.jsx';
 import SettingsPage from './pages/Settings/SettingsPage.jsx';
 import ReportModal from './components/ReportModal/ReportModal.jsx';
-import ParentVerificationPage from './pages/ParentVerificationPage.jsx';
 import UnsubscribePage from './pages/UnsubscribePage.jsx';
 import LandingPageRevamped from './pages/landing_page/LandingPageRevamped.jsx';
 import UserType from './pages/Onboarding/UserType.jsx';
@@ -108,6 +106,18 @@ const ErrorPage = () => {
   );
 };
 
+const NotFoundPage = () => (
+  <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center', backgroundColor: '#f8f9fa' }}>
+    <h1 style={{ fontSize: '2rem', color: '#2c5282', marginBottom: '1rem' }}>Page not found</h1>
+    <p style={{ fontSize: '1.1rem', color: '#444', maxWidth: '600px', lineHeight: '1.6', marginBottom: '2rem' }}>
+      The page you were looking for doesn&apos;t exist or has moved.
+    </p>
+    <a href="/" style={{ padding: '0.75rem 1.5rem', backgroundColor: '#2c5282', color: 'white', borderRadius: '8px', textDecoration: 'none' }}>
+      Go to Launchpad
+    </a>
+  </div>
+);
+
 // Create a Root component that wraps the router content with providers
 const Root = () => {
   return (
@@ -146,15 +156,16 @@ const router = createBrowserRouter([
         element: <App/>
       },
       {
-        path: '/parent-verify',
-        element: <ParentVerificationPage />
-      },
-      {
         path: '/unsubscribe',
         element: <UnsubscribePage />
       },
       {
         path: '/migrate-to-alumni',
+        element: <MigrateToAlumni />
+      },
+      {
+        // Linked from graduation emails sent to graduating college students.
+        path: '/migrate-to-professional',
         element: <MigrateToAlumni />
       },
       {
@@ -224,10 +235,6 @@ const router = createBrowserRouter([
       {
         path: '/terms',
         element: <Terms/>
-      },
-      {
-        path: '/school-signup',
-        element: <PrivateKeyPage/>
       },
       {
         path: '/hsfs',
@@ -301,6 +308,11 @@ const router = createBrowserRouter([
             element: <SixDegreeApplicationPage/>
           }
         ]
+      },
+      {
+        // Unknown URLs previously fell through to the generic "Something went wrong" error page.
+        path: '*',
+        element: <NotFoundPage/>
       }
     ]
   }
