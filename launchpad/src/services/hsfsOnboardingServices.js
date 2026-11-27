@@ -87,12 +87,17 @@ export const saveHSFSHighSchooler = async (currentUser, highSchoolerData, onSucc
             // Notification functions read the email from the root user doc.
             email: otherData.email || currentUser.email || null,
             emailNotificationsEnabled: true,
+            // Home treats a High Schooler without this preference as a pre-existing
+            // ("Welcome back!") account; new members start open to all schools.
+            openToCrossSchoolConnections: 'yes',
             societies: ["hsfs"],
             societyPrimary: "hsfs",
         });
 
         pushInitialProfileCompletion(dataToSave);
         packageBasicUserInfoToLS(dataToSave);
+        // Same first-run welcome as regular onboarding ("Welcome to Launchpad!").
+        localStorage.setItem('showHSWelcomeModal', 'true');
 
         await trackOnboardingSubmission(highSchoolerData.userName);
 

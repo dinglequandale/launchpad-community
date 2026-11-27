@@ -16,7 +16,6 @@ const SecuritySettings = () => {
         provider => provider.providerId === 'password'
     );
 
-    const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
     const handlePasswordChange = (e) => {
         const { name, value } = e.target;
@@ -74,12 +73,6 @@ const SecuritySettings = () => {
                 toast.error("Failed to change password. Please try again.");
             }
         }
-    };
-
-    const handleTwoFactorToggle = () => {
-        setTwoFactorEnabled(!twoFactorEnabled);
-        // TODO: Implement 2FA toggle logic
-        console.log('2FA toggled:', !twoFactorEnabled);
     };
 
     return (
@@ -163,36 +156,11 @@ const SecuritySettings = () => {
                 Two-factor authentication adds an extra layer of security to your account by requiring more than just a password to sign in.
             </div>
 
-            <div className="settings-toggle-group">
-                <div className="settings-toggle-content">
-                <h4 className="settings-toggle-title">Enable Two-Factor Authentication</h4>
-                <p className="settings-toggle-description">
-                    Require a verification code in addition to your password when signing in
-                </p>
-                </div>
-                <label className="settings-switch">
-                <input
-                    type="checkbox"
-                    checked={twoFactorEnabled}
-                    onChange={handleTwoFactorToggle}
-                />
-                <span className="settings-switch-slider"></span>
-                </label>
+            {/* The previous switch here did nothing (its handler was a TODO), so it implied
+                protection that did not exist. Shown as upcoming until 2FA is implemented. */}
+            <div className="settings-alert settings-alert-info">
+                <strong>Coming soon.</strong> Two-factor authentication is not available yet.
             </div>
-
-            {twoFactorEnabled && (
-                <div className="settings-action-group">
-                <button
-                    className="settings-button settings-button-secondary"
-                    onClick={() => {
-                    // TODO: Implement 2FA setup flow
-                    console.log('Setup 2FA clicked');
-                    }}
-                >
-                    Setup Two-Factor Authentication
-                </button>
-                </div>
-            )}
             </div>
         </div>
     </div>

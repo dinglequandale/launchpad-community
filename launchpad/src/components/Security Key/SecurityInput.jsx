@@ -77,7 +77,6 @@ export default function SecurityCodeInput({onSubmit, isSubmitting, onCodeChange}
         event.preventDefault();
         const fullCode = code.join('');
         if (fullCode.length === codeLength) {
-        console.log('Security Code Submitted:', fullCode);
         await onSubmit(fullCode);
         } else {
         alert('Please complete the entire security code');
